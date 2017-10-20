@@ -11,7 +11,7 @@
   {
     $routeProvider
       .when("/main", {
-        templateUrl: "main.html",
+        templateUrl: "../main.html",
         controller: "MainCtrl"
       })
       .otherwise({
