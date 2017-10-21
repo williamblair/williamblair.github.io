@@ -3,4 +3,5 @@ html {
 
 .homePage {
 	background-image: url('../images/VzseN12.jpg');
+	min-height: 100%;
 }
