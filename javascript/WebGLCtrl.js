@@ -9,7 +9,7 @@
   /* Define our controller */
   var MainCtrl = function($scope) {
 
-    $scope.pageTitle = "Hello World";
+    $scope.pageTitle = "WebGL Page";
     $scope.pageSubTitle = "Home Page";
 
   };
