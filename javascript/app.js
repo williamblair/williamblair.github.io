@@ -15,7 +15,8 @@
         controller: "MainCtrl"
       })
 	  .when("/WebGL", {
-	    templateUrl: "../WebGL/webgltest.html"
+	    templateUrl: "../WebGL/webgltest.html",
+		controller: "WebGLCtrl"
 	  })
       .otherwise({
         redirectTo: "/main"
