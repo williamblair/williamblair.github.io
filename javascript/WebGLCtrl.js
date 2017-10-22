@@ -11,6 +11,11 @@
 
     $scope.pageTitle = "WebGL Page";
     $scope.pageSubTitle = "Home Page";
+	
+	/* Run our opengl code on load */
+	$scope.$on('$ionicView.enter', function(){
+		alert('page loaded! or something');
+	});
 
   };
 
