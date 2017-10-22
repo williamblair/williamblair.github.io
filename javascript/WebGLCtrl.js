@@ -7,7 +7,7 @@
   var app = angular.module('githubSite'); // defined in app.js
 
   /* Define our controller */
-  var MainCtrl = function($scope) {
+  var WebGLCtrl = function($scope) {
 
     $scope.pageTitle = "WebGL Page";
     $scope.pageSubTitle = "Home Page";
