@@ -1,5 +1,8 @@
 
-    
+<div onload="function(){
+  console.log('in canvas onload');
+  webGLStart();
+}">
 	   <!-- matrix library -->
     <script src="glMatrix-0.9.5.min.js"></script>
     
@@ -49,7 +52,6 @@ var squareVertexPositionBuffer;
 
 In the correct page!
 
-<canvas onload="function(){
-  console.log('in canvas onload');
-  webGLStart();
-}" id="mycanvas" width="500" height="500"></canvas>
+<canvas id="mycanvas" width="500" height="500"></canvas>
+
+</div>    
