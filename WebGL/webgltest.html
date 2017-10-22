@@ -46,5 +46,10 @@ var squareVertexPositionBuffer;
 <script src="initBuffers.js"></script>
 <script src="drawScene.js"></script>
 <script src="main.js"></script>
-	
-<canvas onload="webGLStart()" id="mycanvas" width="500" height="500"></canvas>
+
+In the correct page!
+
+<canvas onload="function(){
+  console.log('in canvas onload');
+  webGLStart();
+}" id="mycanvas" width="500" height="500"></canvas>
