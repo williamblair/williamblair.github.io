@@ -1,6 +1,9 @@
+<!DOCTYPE html>
+<html>
 
-    
-	   <!-- matrix library -->
+  <head>
+    <!-- <link rel="stylesheet" href="style.css"> -->
+    <!-- matrix library -->
     <script src="glMatrix-0.9.5.min.js"></script>
     
     <style>
@@ -46,5 +49,14 @@ var squareVertexPositionBuffer;
 <script src="initBuffers.js"></script>
 <script src="drawScene.js"></script>
 <script src="main.js"></script>
-	
-<canvas onload="webGLStart()" id="mycanvas" width="500" height="500"></canvas>
+    
+  </head>
+
+  <body onload="webGLStart()">
+    <h1>Hello Plunker!</h1>
+    
+    <canvas id="mycanvas" width="500" height="500"></canvas>
+    
+  </body>
+
+</html>
