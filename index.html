@@ -1,37 +1,86 @@
 <!-- Angular test site -->
 <!DOCTYPE html>
-<html lang="en-US" ng-app="githubSite">
+<html lang="en-US">
 
   <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AngularJS Site</title>
-
-	<!-- angular -->
-    <script src="https://code.angularjs.org/latest/angular.js"></script>
-    <script src="https://code.angularjs.org/latest/angular-route.js"></script>
+    <title>Bootstrap Site</title>
 	
 	<!-- bootstrap -->
-	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	
-	<link rel="stylesheet" href="./css/site.css"/>
+	<style>
+	html {
+	  position: relative;
+	  min-height: 100%;
+	}
+	body {
+	margin-bottom: 60px;
+	}
+	.footer {
+	  /* Positioning */
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      /* Set the fixed height of the footer here */
+      height: 60px;
+      line-height: 60px; /* Vertically center the text there */
+      
+	  /* Look */
+	  background-color: #000000;
+    }
 	
-    <!-- url mapping -->
-    <script src="javascript/app.js"></script>
-    <!-- main/home page controller -->
-    <script src="javascript/MainCtrl.js"></script>
-	<!-- webgl page controller -->
-	<script src="javascript/WebGLCtrl.js"></script>
+	#lastModified {
+	  color: #AAAAAA;
+	}
+	
+	.jumbotron {
+	  padding:0px;
+	  background-color:#000000;
+	}
+	
+	#imageContainer {
+	  margin-left: auto; 
+	  margin-right: auto; 
+	  width:75%; 
+	  min-width:800px;
+	}
+	</style>
+	
   </head>
 
-<body>
-  <h1>Hello, World!</h1>
+<body style="background-color: #000000;">
+  
+<!-- navbar content is filled in with navbar.js, using its id -->
+<nav class="navbar navbar-inverse" id="pageNav">
+<script src="javascript/navbar.js"></script>
+</nav>
 
-  <!-- where the main content goes -->
-  <div ng-view></div>
+<!-- Cool Image -->
+<div class="jumbotron">
+	<div id="imageContainer">
+  <img src="https://img00.deviantart.net/16bf/i/2011/229/2/b/ghost_in_the_shell_skyline_by_mobiuszeroone-d46y272.png"
+  width="100%"/>
+  </div>
+</div>
+
+
+<!-- footer content is filled in with footer.js, using its id -->
+<footer class="footer" id="pageFooter">
+<script src="javascript/footer.js"></script>
+</footer>
+
+<!-- last modified will exist after footer.js enters the elements
+     into pageFooter -->
+<script>
+  var p = document.getElementById('lastModified');
+  var modString = "Last Modified: ";
+  modString += document.lastModified;
+  p.innerHTML = modString;
+</script>
 
 </body>
 </html>
