@@ -116,11 +116,11 @@
         </div>-->
 
         <!-- load the text from canvasPhysics.js and put it in the editor area -->
-        <script>
+        <!--<script>
           $(function(){
             $('#editorArea1').load('canvasPhysics.js');
           });
-        </script>
+        </script>-->
 
         <!-- codemirror editor area -->
         <textarea id="editorArea1">
@@ -129,6 +129,10 @@
         <button class="btn btn-primary" id="runButton">Run</button>
         <!--  -->
         <script>
+
+          $(function(){
+            $('#editorArea1').load('canvasPhysics.js');
+          });
 
           /* create code mirror from the text area */
           var editor = CodeMirror.fromTextArea(document.getElementById('editorArea1'), {
