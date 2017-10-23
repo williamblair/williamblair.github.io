@@ -10,26 +10,6 @@
     <!-- matrix library -->
     <script src="glMatrix-0.9.5.min.js"></script>
 
-
-     <!-- codemirror (in browser editing) -->
-     <script src="../CodeMirror/lib/codemirror.js"></script>
-     <!-- theme -->
-     <link rel="stylesheet" href="../CodeMirror/lib/codemirror.css">
-     <link rel="stylesheet" href="../CodeMirror/theme/monokai.css">
-     <!-- syntax hilighting -->
-     <script src="../CodeMirror/mode/javascript/javascript.js"></script>
-     <!-- line hilighting -->
-     <script src="../CodeMirror/addon/selection/active-line.js"></script>
-     <!-- match brackets -->
-     <script src="../CodeMirror/addon/edit/matchbrackets.js"></script>
-     <style>
-     /* style the editing area */
-     .CodeMirror{
-       border: 1px solid rgb(255,255,255);
-       margin: 10px;
-     }
-     </style>
-
     <style>
       html {
       position: relative;
@@ -114,102 +94,43 @@
   <!-- jquery load text -->
   <script>
 
-    /* empty array of CodeMirror editors */
-    var editors = [];
-
     $(function(){
       $("#mainJSEmbed").load("main.js", function(){
-        var editor = CodeMirror.fromTextArea(document.getElementById('mainJSEmbed'), {
-          theme: "monokai",
-          mode: "javascript",
-          indentUnit: 4,
-          lineNumbers: true,
-          styleActiveLine: true,
-          matchBrackets: true
-        });
-        editors.push(editor);
       });
       $("#initGLjsEmbed").load("initGL.js", function(){
-        var editor = CodeMirror.fromTextArea(document.getElementById('initGLjsEmbed'), {
-          theme: "monokai",
-          mode: "javascript",
-          indentUnit: 4,
-          lineNumbers: true,
-          styleActiveLine: true,
-          matchBrackets: true
-        });
-        editors.push(editor);
       });
       $("#getShaderJSEmbed").load("getShader.js", function(){
-        var editor = CodeMirror.fromTextArea(document.getElementById('getShaderJSEmbed'), {
-          theme: "monokai",
-          mode: "javascript",
-          indentUnit: 4,
-          lineNumbers: true,
-          styleActiveLine: true,
-          matchBrackets: true
         });
-        editors.push(editor);
       });
       $("#initShadersJSEmbed").load("initShaders.js", function(){
-        var editor = CodeMirror.fromTextArea(document.getElementById('initShadersJSEmbed'), {
-          theme: "monokai",
-          mode: "javascript",
-          indentUnit: 4,
-          lineNumbers: true,
-          styleActiveLine: true,
-          matchBrackets: true
         });
-        editors.push(editor);
       });
       $("#vertexShaderJSEmbed").load("vertexShader.js", function(){
-        var editor = CodeMirror.fromTextArea(document.getElementById('vertexShaderJSEmbed'), {
-          theme: "monokai",
-          mode: "javascript",
-          indentUnit: 4,
-          lineNumbers: true,
-          styleActiveLine: true,
-          matchBrackets: true
         });
-        editors.push(editor);
+
       });
       $("#fragmentShaderJSEmbed").load("fragmentShader.js", function(){
-        var editor = CodeMirror.fromTextArea(document.getElementById('fragmentShaderJSEmbed'), {
-          theme: "monokai",
-          mode: "javascript",
-          indentUnit: 4,
-          lineNumbers: true,
-          styleActiveLine: true,
-          matchBrackets: true
         });
-        editors.push(editor);
+
       });
       $("#initBuffersJSEmbed").load("initBuffers.js", function(){
-        var editor = CodeMirror.fromTextArea(document.getElementById('initBuffersJSEmbed'), {
-          theme: "monokai",
-          mode: "javascript",
-          indentUnit: 4,
-          lineNumbers: true,
-          styleActiveLine: true,
-          matchBrackets: true
         });
-        editors.push(editor);
+
       });
       $("#drawSceneJSEmbed").load("drawScene.js", function(){
-        var editor = CodeMirror.fromTextArea(document.getElementById('drawSceneJSEmbed'), {
-          theme: "monokai",
-          mode: "javascript",
-          indentUnit: 4,
-          lineNumbers: true,
-          styleActiveLine: true,
-          matchBrackets: true
         });
-        editors.push(editor);
+
       });
     });
 
   </script>
-  
+  <script src="../ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+  <script>
+    var editors = []
+    var editor = ace.edit("mainJSEmbed");
+    editor.setTheme("ace/theme/twilight");
+    editor.session.setMode("ace/mode/javascrupt");
+  </script>
 <div class="container">
   <div class="row">
     <div class="col-xs-10 col-xs-offset-1">
@@ -244,42 +165,42 @@
           <div id="mainJS" class="tab-pane fade in active">
             <!--<pre><code id="mainJSEmbed"></code>
             </pre> -->
-            <textarea id="mainJSEmbed"></textarea>
+            <pre id="mainJSEmbed"></pre>
           </div>
           <div id="initGLjs" class="tab-pane fade">
               <!--<pre><code id="initGLjsEmbed"></code>
               </pre>-->
-              <textarea id="initGLjsEmbed"></textarea>
+              <pre id="initGLjsEmbed"></pre>
             </div>
             <div id="getShaderJS" class="tab-pane fade">
                 <!--<pre><code id="getShaderJSEmbed"></code>
                 </pre>-->
-                <textarea id="getShaderJSEmbed"></textarea>
+                <pre id="getShaderJSEmbed"></pre>
             </div>
             <div id="initShadersJS" class="tab-pane fade">
                 <!--<pre><code id="initShadersJSEmbed"></code>
                 </pre>-->
-                <textarea id="initShadersJSEmbed"></textarea>
+                <pre id="initShadersJSEmbed"></pre>
             </div>
             <div id="vertexShaderJS" class="tab-pane fade">
                 <!--<pre><code id="vertexShaderJSEmbed"></code>
                 </pre>-->
-                <textarea id="vertexShaderJSEmbed"></textarea>
+                <pre id="vertexShaderJSEmbed"></pre>
             </div>
             <div id="fragmentShaderJS" class="tab-pane fade">
                 <!--<pre><code id="fragmentShaderJSEmbed"></code>
                 </pre>-->
-                <textarea id="fragmentShaderJSEmbed"></textarea>
+                <pre id="fragmentShaderJSEmbed"></pre>
             </div>
             <div id="initBuffersJS" class="tab-pane fade">
                 <!--<pre><code id="initBuffersJSEmbed"></code>
                 </pre>-->
-                <textarea id="initBufferJSEmbed"></textarea>
+                <pre id="initBufferJSEmbed"></pre>
             </div>
             <div id="drawSceneJS" class="tab-pane fade">
                 <!--<pre><code id="drawSceneJSEmbed"></code>
                 </pre>-->
-                <textarea id="drawSceneJSEmbed"></textarea>
+                <pre id="drawSceneJSEmbed"></pre>
             </div>
         </div>
       </div>
