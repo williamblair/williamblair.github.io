@@ -113,16 +113,101 @@
   
   <!-- jquery load text -->
   <script>
+
+    /* empty array of CodeMirror editors */
+    var editors = [];
+
     $(function(){
-      $("#mainJSEmbed").load("main.js");
-      $("#initGLjsEmbed").load("initGL.js");
-      $("#getShaderJSEmbed").load("getShader.js");
-      $("#initShadersJSEmbed").load("initShaders.js");
-      $("#vertexShaderJSEmbed").load("vertexShader.js");
-      $("#fragmentShaderJSEmbed").load("fragmentShader.js");
-      $("#initBuffersJSEmbed").load("initBuffers.js");
-      $("#drawSceneJSEmbed").load("drawScene.js");
+      $("#mainJSEmbed").load("main.js", function(){
+        var editor = CodeMirror.fromTextArea(document.getElementById('mainJSEmbed'), {
+          theme: "monokai",
+          mode: "javascript",
+          indentUnit: 4,
+          lineNumbers: true,
+          styleActiveLine: true,
+          matchBrackets: true
+        });
+        editors.push(editor);
+      });
+      $("#initGLjsEmbed").load("initGL.js", function(){
+        var editor = CodeMirror.fromTextArea(document.getElementById('initGLjsEmbed'), {
+          theme: "monokai",
+          mode: "javascript",
+          indentUnit: 4,
+          lineNumbers: true,
+          styleActiveLine: true,
+          matchBrackets: true
+        });
+        editors.push(editor);
+      });
+      $("#getShaderJSEmbed").load("getShader.js", function(){
+        var editor = CodeMirror.fromTextArea(document.getElementById('getShaderJSEmbed'), {
+          theme: "monokai",
+          mode: "javascript",
+          indentUnit: 4,
+          lineNumbers: true,
+          styleActiveLine: true,
+          matchBrackets: true
+        });
+        editors.push(editor);
+      });
+      $("#initShadersJSEmbed").load("initShaders.js", function(){
+        var editor = CodeMirror.fromTextArea(document.getElementById('initShadersJSEmbed'), {
+          theme: "monokai",
+          mode: "javascript",
+          indentUnit: 4,
+          lineNumbers: true,
+          styleActiveLine: true,
+          matchBrackets: true
+        });
+        editors.push(editor);
+      });
+      $("#vertexShaderJSEmbed").load("vertexShader.js", function(){
+        var editor = CodeMirror.fromTextArea(document.getElementById('vertexShaderJSEmbed'), {
+          theme: "monokai",
+          mode: "javascript",
+          indentUnit: 4,
+          lineNumbers: true,
+          styleActiveLine: true,
+          matchBrackets: true
+        });
+        editors.push(editor);
+      });
+      $("#fragmentShaderJSEmbed").load("fragmentShader.js", function(){
+        var editor = CodeMirror.fromTextArea(document.getElementById('fragmentShaderJSEmbed'), {
+          theme: "monokai",
+          mode: "javascript",
+          indentUnit: 4,
+          lineNumbers: true,
+          styleActiveLine: true,
+          matchBrackets: true
+        });
+        editors.push(editor);
+      });
+      $("#initBuffersJSEmbed").load("initBuffers.js", function(){
+        var editor = CodeMirror.fromTextArea(document.getElementById('initBuffersJSEmbed'), {
+          theme: "monokai",
+          mode: "javascript",
+          indentUnit: 4,
+          lineNumbers: true,
+          styleActiveLine: true,
+          matchBrackets: true
+        });
+        editors.push(editor);
+      });
+      $("#drawSceneJSEmbed").load("drawScene.js", function(){
+        var editor = CodeMirror.fromTextArea(document.getElementById('drawSceneJSEmbed'), {
+          theme: "monokai",
+          mode: "javascript",
+          indentUnit: 4,
+          lineNumbers: true,
+          styleActiveLine: true,
+          matchBrackets: true
+        });
+        editors.push(editor);
+      });
     });
+
   </script>
   
 <div class="container">
