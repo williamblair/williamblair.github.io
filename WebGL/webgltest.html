@@ -15,7 +15,7 @@
       }
       body {
       margin-bottom: 60px;
-      background-color: #000000;
+      background-color: #333333;
       }
       .footer {
       /* Positioning */
@@ -88,12 +88,23 @@
     <nav class="navbar navbar-inverse" id="pageNav">
       <script src="../javascript/navbar.js"></script>
     </nav>
-    <h1>Hello Plunker!</h1>
-    <canvas id="mycanvas" width="500" height="500"></canvas>
+  
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-10 col-xs-offset-1">
+        <div style="width:500px; height:500px; margin-left: auto; margin-right: auto;">
+          <canvas id="mycanvas" width="500" height="500"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  
     <!-- footer content is filled in with footer.js, using its id -->
     <footer class="footer" id="pageFooter">
       <script src="../javascript/footer.js"></script>
     </footer>
+  
+  
     <!-- last modified will exist after footer.js enters the elements
       into pageFooter -->
     <script>
