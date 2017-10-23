@@ -167,16 +167,17 @@
     </div>
 
   <script src="/ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+  <script> 
+    var editor = ace.edit("mainJSEmbed");
+    editor.setTheme("ace/theme/twilight");
+    editor.session.setMode("ace/mode/javascript");
+    editors.push(editor);
+  </script>
   <!-- jquery load text -->
   <script>
 
-      var editors = [];
     $(function(){
       $("#mainJSEmbed").load("main.js", function(){
-        var editor = ace.edit("mainJSEmbed");
-        editor.setTheme("ace/theme/twilight");
-        editor.session.setMode("ace/mode/javascript");
-        editors.push(editor);
       });
       $("#initGLjsEmbed").load("initGL.js", function(){
       });
