@@ -16,6 +16,7 @@ nav.innerHTML =
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
         <li><a href="/index.html">Home</a></li>
+        <li><a href="/CanvasPhysics/canvasphysics.html">Canvas Physics</a></li>
 		<!-- for dropdown -->
         <!--<li class="dropdown">
           <a class="dropdown-toggle" data-toggle="dropdown" href="#">Page 1 <span class="caret"></span></a>
