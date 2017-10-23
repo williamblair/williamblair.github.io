@@ -1,9 +1,21 @@
+<!DOCTYPE html>
+<html lang="en-US">
 
-<div onload="function(){
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bootstrap Site</title>
+	
+	<!-- bootstrap -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<body onload="function(){
   console.log('in canvas onload');
   webGLStart();
 }">
-	<h1>{{pageTitle}}</h1>
+	<h1>WebGL Test</h1>
 
 	   <!-- matrix library -->
     <script src="glMatrix-0.9.5.min.js"></script>
@@ -52,10 +64,9 @@ var squareVertexPositionBuffer;
 <script src="drawScene.js"></script>
 <script src="main.js"></script>
 
-In the correct page!
-
 <canvas id="mycanvas" width="500" height="500"></canvas>
 
 <script>console.log('Running!');</script>
 
-</div>    
+</body>
+</html>
