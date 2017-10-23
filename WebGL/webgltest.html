@@ -96,10 +96,15 @@
   <!-- jquery load text -->
   <script>
     $(function(){
-      $("#embeddedCode").load("initGL.js");
+      $("#mainJSEmbed").load("main.js");
+    });
+    $(function(){
+      $("#initGLjsEmbed").load("initGL.js");
+    });
+    $(function(){
+      $("#getShaderJSEmbed").load("getShader.js");
     });
   </script>
-
   
   <script src="../javascript/prism.js"></script>
   
@@ -111,12 +116,45 @@
         </div>
       </div>
     </div>
+
     <div class="row">
-      <div class="col-xs-12">
-      <pre><code class="language-javascript" id="embeddedCode"></code></pre>
+      <!-- panel throught the different files -->
+      <ul class="nav nav-pills">
+          <li class="active"><a data-toggle="pill" href="#mainJS">main.js</a></li>
+          <li><a data-toggle="pill" href="#initGLjs">initGL.js</a></li>
+          <li><a data-toggle="pill" href="#getShaderJS">getShader.js</a></li>
+      </ul>
+    </div>
+    <div class="row">
+    <!-- data for the panel -->
+    <div class="tab-content">
+      <div id="mainJS" class="tab-pane fade in active">
+        <pre>
+        <code class="language-JavaScript" id="mainJSEmbed">
+        </code>
+        </pre>
       </div>
+      <div id="initGLjs" class="tab-pane fade">
+          <pre>
+          <code class="language-JavaScript" id="initGLjsEmbed">
+          </code>
+          </pre>
+        </div>
+        <div id="getShaderJS" class="tab-pane fade">
+            <pre>
+            <code class="language-JavaScript" id="getShaderJSEmbed">
+            </code>
+            </pre>
+        </div>
+    </div>
+
     </div>
   </div>
+
+  <!--
+          <div class="col-xs-12">
+      <pre><code class="language-javascript" id="embeddedCode"></code></pre>
+      </div> -->
   
     <!-- footer content is filled in with footer.js, using its id -->
     <footer class="footer" id="pageFooter">
