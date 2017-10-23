@@ -132,6 +132,9 @@
 
           $(function(){
             $('#editorArea1').load('canvasPhysics.js', function(){
+
+              console.log('load performed!');
+
               /* create code mirror from the text area */
               var editor = CodeMirror.fromTextArea(document.getElementById('editorArea1'), {
                 theme: "monokai",
