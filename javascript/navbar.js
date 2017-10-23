@@ -15,7 +15,7 @@ nav.innerHTML =
     </div>
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
-        <li><a href="#">Home</a></li>
+        <li><a href="/index.html">Home</a></li>
 		<!-- for dropdown -->
         <!--<li class="dropdown">
           <a class="dropdown-toggle" data-toggle="dropdown" href="#">Page 1 <span class="caret"></span></a>
@@ -25,9 +25,9 @@ nav.innerHTML =
             <li><a href="#">Page 1-3</a></li>
           </ul>
         </li>-->
-		<li><a href="WebGL/webgltest.html">WebGL</a></li>
-        <li><a href="#">Page 2</a></li>
-        <li><a href="#">Page 3</a></li>
+		<li><a href="/WebGL/webgltest.html">WebGL</a></li>
+        <!--<li><a href="#">Page 2</a></li>
+        <li><a href="#">Page 3</a></li>-->
       </ul>
     </div>
   </div>
