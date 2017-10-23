@@ -219,8 +219,11 @@ function startPhysics() {
 
 startPhysics(); // call the above function
         </textarea>
-        <!-- create code mirror from the text area -->
+        <button class="btn btn-primary" id="runButton">Run</button>
+        <!--  -->
         <script>
+
+          /* create code mirror from the text area */
           var editor = CodeMirror.fromTextArea(document.getElementById('editorArea1'), {
             theme: "monokai",
             mode: "javascript",
@@ -229,6 +232,17 @@ startPhysics(); // call the above function
             styleActiveLine: true,
             matchBrackets: true
           });
+
+          /* run the text as a function */
+          var button = document.getElementById('runButton');
+          button.onclick = function() {
+            var animate = new Function(editor.getValue());
+            animate();
+          };
+
+          /* Run the function when the web page loads */
+          var initialFunc = new Function(editor.getValue());
+          initialFunc();
         </script>
       </div>
     </div>
