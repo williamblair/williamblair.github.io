@@ -176,7 +176,10 @@
   <script>
 
     $(function(){
-      $("#mainJSEmbed").load("main.js", function(){
+      $.get("main.js", function(data, status){
+        console.log('file contents:');
+        console.log(data);
+        editor.setValue(data);
       });
       $("#initGLjsEmbed").load("initGL.js", function(){
       });
