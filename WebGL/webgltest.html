@@ -5,6 +5,10 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    
+    <!-- code hilighting/viewing -->
+    <link rel="stylesheet" href="../css/prism.css">
+    
     <!-- <link rel="stylesheet" href="style.css"> -->
     <!-- matrix library -->
     <script src="glMatrix-0.9.5.min.js"></script>
@@ -89,12 +93,25 @@
       <script src="../javascript/navbar.js"></script>
     </nav>
   
+  <script src="../javascript/prism.js"></script>
+  
   <div class="container">
     <div class="row">
       <div class="col-xs-10 col-xs-offset-1">
         <div style="width:500px; height:500px; margin-left: auto; margin-right: auto;">
           <canvas id="mycanvas" width="500" height="500"></canvas>
         </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-12">
+      <pre><code id="embeddedCode"></code></pre>
+      <!-- jquery load text -->
+      <script>
+        $(function(){
+          $("#embeddedCode").load("initGL.js");
+        });
+      </script>
       </div>
     </div>
   </div>
