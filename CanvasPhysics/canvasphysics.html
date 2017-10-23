@@ -131,29 +131,29 @@
         <script>
 
           $(function(){
-            $('#editorArea1').load('canvasPhysics.js');
+            $('#editorArea1').load('canvasPhysics.js', function(){
+              /* create code mirror from the text area */
+              var editor = CodeMirror.fromTextArea(document.getElementById('editorArea1'), {
+                theme: "monokai",
+                mode: "javascript",
+                indentUnit: 4,
+                lineNumbers: true,
+                styleActiveLine: true,
+                matchBrackets: true
+              });
+
+              /* run the text as a function */
+              var button = document.getElementById('runButton');
+              button.onclick = function() {
+                var animate = new Function(editor.getValue());
+                animate();
+              };
+
+              /* Run the function when the web page loads */
+              var initialFunc = new Function(editor.getValue());
+              initialFunc();
+            });
           });
-
-          /* create code mirror from the text area */
-          var editor = CodeMirror.fromTextArea(document.getElementById('editorArea1'), {
-            theme: "monokai",
-            mode: "javascript",
-            indentUnit: 4,
-            lineNumbers: true,
-            styleActiveLine: true,
-            matchBrackets: true
-          });
-
-          /* run the text as a function */
-          var button = document.getElementById('runButton');
-          button.onclick = function() {
-            var animate = new Function(editor.getValue());
-            animate();
-          };
-
-          /* Run the function when the web page loads */
-          var initialFunc = new Function(editor.getValue());
-          initialFunc();
         </script>
       </div>
     </div>
