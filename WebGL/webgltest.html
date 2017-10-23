@@ -176,7 +176,7 @@
         var editor = ace.edit("mainJSEmbed");
         editor.setTheme("ace/theme/twilight");
         editor.session.setMode("ace/mode/javascript");
-        editors.add(editor);
+        editors.push(editor);
       });
       $("#initGLjsEmbed").load("initGL.js", function(){
       });
