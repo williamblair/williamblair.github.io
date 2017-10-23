@@ -93,6 +93,14 @@
       <script src="../javascript/navbar.js"></script>
     </nav>
   
+  <!-- jquery load text -->
+  <script>
+    $(function(){
+      $("#embeddedCode").load("initGL.js");
+    });
+  </script>
+
+  
   <script src="../javascript/prism.js"></script>
   
   <div class="container">
@@ -106,12 +114,6 @@
     <div class="row">
       <div class="col-xs-12">
       <pre><code class="language-javascript" id="embeddedCode"></code></pre>
-      <!-- jquery load text -->
-      <script>
-        $(function(){
-          $("#embeddedCode").load("initGL.js");
-        });
-      </script>
       </div>
     </div>
   </div>
