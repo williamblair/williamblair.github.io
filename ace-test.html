@@ -47,6 +47,9 @@
         console.log(data);
         editor.setValue(data);
         editor.resize();
+
+        /* loading the text selects it all for some reason */
+        editor.getSession().selection.clearSelection();
       });
 
   </script>
