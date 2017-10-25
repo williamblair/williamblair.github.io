@@ -210,23 +210,24 @@
       }
 
       /* set each editors file contents */
-      for(var i=0; i<ids.length; i++) {
+      //for(var i=0; i<ids.length; i++) {
+      editors.forEach(function(editor, index) {
 
         //var dataHolder=""; // placeholder test
 
         /* load text into the editor */
-        jQuery.get(sources[i], function(data, status){
+        jQuery.get(sources[index], function(data, status){
           console.log('file contents:');
           console.log(data);
           //dataHolder = data;
 
-          editors[i].setValue(data);
-          editors[i].resize();
+          editor.setValue(data);
+          editor.resize();
   
           /* loading the text selects it all for some reason */
-          editors[i].getSession().selection.clearSelection();
+          editor.getSession().selection.clearSelection();
         });
-      }
+      });
   
     </script>
 
