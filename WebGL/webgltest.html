@@ -141,32 +141,32 @@
               </pre>-->
               <!--<pre id="initGLjsEmbed"></pre>-->
             </div>
-            <div id="getShaderJSEmbed" class="tab-pane fade">
+            <div id="getShaderJSEmbed" class="tab-pane fade codeEditor">
                 <!--<pre><code id="getShaderJSEmbed"></code>
                 </pre>-->
                 <!--<pre id="getShaderJSEmbed"></pre>-->
             </div>
-            <div id="initShadersJSEmbed" class="tab-pane fade">
+            <div id="initShadersJSEmbed" class="tab-pane fade codeEditor">
                 <!--<pre><code id="initShadersJSEmbed"></code>
                 </pre>-->
                 <!--<pre id="initShadersJSEmbed"></pre>-->
             </div>
-            <div id="vertexShaderJSEmbed" class="tab-pane fade">
+            <div id="vertexShaderJSEmbed" class="tab-pane fade codeEditor">
                 <!--<pre><code id="vertexShaderJSEmbed"></code>
                 </pre>-->
                 <!--<pre id="vertexShaderJSEmbed"></pre>-->
             </div>
-            <div id="fragmentShaderJSEmbed" class="tab-pane fade">
+            <div id="fragmentShaderJSEmbed" class="tab-pane fade codeEditor">
                 <!--<pre><code id="fragmentShaderJSEmbed"></code>
                 </pre>-->
                 <!--<pre id="fragmentShaderJSEmbed"></pre>-->
             </div>
-            <div id="initBuffersJSEmbed" class="tab-pane fade">
+            <div id="initBuffersJSEmbed" class="tab-pane fade codeEditor">
                 <!--<pre><code id="initBuffersJSEmbed"></code>
                 </pre>-->
                 <!--<pre id="initBuffersJSEmbed"></pre>-->
             </div>
-            <div id="drawSceneJSEmbed" class="tab-pane fade">
+            <div id="drawSceneJSEmbed" class="tab-pane fade codeEditor">
                 <!--<pre><code id="drawSceneJSEmbed"></code>
                 </pre>-->
                 <!--<pre id="drawSceneJSEmbed"></pre>-->
@@ -177,20 +177,47 @@
 
     <script src="/ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
     <script>
-      var editor = ace.edit("mainJSEmbed"); // get the id of the div containing the editor
-      editor.setTheme("ace/theme/monokai");
-      editor.getSession().setMode("ace/mode/javascript");
-  
-      /* load text into the editor */
-      $.get("main.js", function(data, status){
+      /* Array of ace instances */
+      var editors = [];
+      /* Array of div ids for each editor */
+      var ids = [
+        "mainJSEmbed",
+        "initGLJSEmbed", 
+        "getShaderJSEmbed", 
+        "initShadersJSEmbed", 
+        "vertexShaderJSEmbed",
+        "fragmentShaderJSEmbed",
+        "initBuffersJSEmbed",
+        "drawSceneJSEmbed"
+      ];
+      /* Array of source files for each id */
+      var sources = [
+        "main.js",
+        "initGL.js",
+        "getShader.js",
+        "initShaders.js",
+        "vertexShader.js",
+        "fragmentShader.js",
+        "initBuffers.js",
+        "drawScene.js"
+      ]; 
+      /* set each editors file contents */
+      for(var i=0; i<ids.length; i++) {
+        editors.push( ace.edit(ids[i]) );
+        editors[i].setTheme("ace/theme/monokai");
+        editors[i].getSession().setMode("ace/mode/javascript");
+
+        /* load text into the editor */
+        $.get(sources[i], function(data, status){
           console.log('file contents:');
           console.log(data);
-          editor.setValue(data);
-          editor.resize();
+          editors[i].setValue(data);
+          editors[i].resize();
   
           /* loading the text selects it all for some reason */
-          editor.getSession().selection.clearSelection();
+          editors[i].getSession().selection.clearSelection();
         });
+      }
   
     </script>
   <!-- jquery load text -->
