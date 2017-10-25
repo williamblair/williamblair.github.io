@@ -211,17 +211,17 @@
         editors[i].getSession().setMode("ace/mode/javascript");
 
         /* load text into the editor */
-        $.get(sources[i], function(data, status){
+        jQuery.get(sources[i], function(data, status){
           console.log('file contents:');
           console.log(data);
           dataHolder = data;
-        });
 
-        editors[i].setValue(dataHolder);
-        editors[i].resize();
+          editors[i].setValue(data);
+          editors[i].resize();
   
-        /* loading the text selects it all for some reason */
-        editors[i].getSession().selection.clearSelection();
+          /* loading the text selects it all for some reason */
+          editors[i].getSession().selection.clearSelection();
+        });
       }
   
     </script>
