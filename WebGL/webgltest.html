@@ -238,6 +238,16 @@
     <script>
       var runGL = function() {
         console.log("In RunGL!");
+
+        /* collect all of the javascript from the editors */
+        var allText = "";
+        editors.forEach(function(editor, index){
+          allText += editor.getValue() + "\n";
+        });
+
+        /* create function from selected text and run */
+        var runFunc = new Function(allText);
+        runFunc();
       };
     </script>
 
