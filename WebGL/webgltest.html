@@ -203,6 +203,9 @@
       ]; 
       /* set each editors file contents */
       for(var i=0; i<ids.length; i++) {
+
+        var dataHolder=""; // placeholder test
+
         editors.push( ace.edit(ids[i]) );
         editors[i].setTheme("ace/theme/monokai");
         editors[i].getSession().setMode("ace/mode/javascript");
@@ -211,12 +214,14 @@
         $.get(sources[i], function(data, status){
           console.log('file contents:');
           console.log(data);
-          editors[i].setValue(data);
-          editors[i].resize();
-  
-          /* loading the text selects it all for some reason */
-          editors[i].getSession().selection.clearSelection();
+          dataHolder = data;
         });
+
+        editors[i].setValue(data);
+        editors[i].resize();
+  
+        /* loading the text selects it all for some reason */
+        editors[i].getSession().selection.clearSelection();
       }
   
     </script>
