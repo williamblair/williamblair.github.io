@@ -12,20 +12,26 @@
   <!-- ace style -->
   <style type="text/css" meda="screen">
     #editor {
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
+      height: 300px;
     }
   </style>
 
 </head>
 <body>
+  <div class="container">
+    <div class="jumbotron">
+      <h1>Testing other content!</h1>
+    </div>
+  </div>
 
-  <div width="800" height"500">
-    <div id="editor">
-      this is my text here
+  <div class="container">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel title">Title</h3>
+      </div>
+      <div class="panel-body">
+        <div id="editor">var text="Hello World!";</div>
+      </div>
     </div>
   </div>
 
@@ -34,6 +40,14 @@
     var editor = ace.edit("editor"); // get the id of the div containing the editor
     editor.setTheme("ace/theme/monokai");
     editor.getSession().setMode("ace/mode/javascript");
+
+    /* load text into the editor */
+    $.get("WebGL/main.js", function(data, status){
+        console.log('file contents:');
+        console.log(data);
+        editor.setValue(data);
+      });
+
   </script>
 
 </body>
