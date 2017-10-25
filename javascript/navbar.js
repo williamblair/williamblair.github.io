@@ -27,7 +27,6 @@ nav.innerHTML =
           </ul>
         </li>-->
     <li><a href="/WebGL/webgltest.html">WebGL</a></li>
-    <li><a href="/ace-test.html">ace editor test</a></li>
         <!--<li><a href="#">Page 2</a></li>
         <li><a href="#">Page 3</a></li>-->
       </ul>
