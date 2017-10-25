@@ -201,14 +201,20 @@
         "initBuffers.js",
         "drawScene.js"
       ]; 
+
+      /* create each instance */
+      for(var i=0; i<ids.length; i++) {
+        editors[i].setValue(dataHolder);
+        editors[i].resize();
+  
+        /* loading the text selects it all for some reason */
+        editors[i].getSession().selection.clearSelection();
+      }
+
       /* set each editors file contents */
       for(var i=0; i<ids.length; i++) {
 
-        var dataHolder=""; // placeholder test
-
-        editors.push( ace.edit(ids[i]) );
-        editors[i].setTheme("ace/theme/monokai");
-        editors[i].getSession().setMode("ace/mode/javascript");
+        //var dataHolder=""; // placeholder test
 
         /* load text into the editor */
         jQuery.get(sources[i], function(data, status){
