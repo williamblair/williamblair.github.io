@@ -59,7 +59,7 @@
     }
     </style>
 
-    <!-- vertex and fragment shaders -->
+    <!-- all of our WebGL scripts -->
     <script id="shader-fs" src="fragmentShader.js"></script>
     <script id="shader-vs" src="vertexShader.js"></script>
     <script src="initGL.js"></script>
@@ -69,12 +69,16 @@
     <script src="drawScene.js"></script>
     <script src="main.js"></script>
   </head>
+
+  <!-- initially run the WebGL program so it isn't blank when we
+       load the page -->
   <body onload="webGLStart()">
     <!-- navbar content is filled in with navbar.js, using its id -->
     <nav class="navbar navbar-inverse" id="pageNav">
       <script src="../javascript/navbar.js"></script>
     </nav>
-  
+
+<!-- html5 canvas to draw on -->
 <div class="container">
   <div class="row">
     <div class="col-xs-10 col-xs-offset-1">
@@ -103,7 +107,7 @@
     </div>
 
     <div class="row">
-      <!-- data for the panel -->
+      <!-- data for the panel - where the code editors go -->
       <div class="col-sm-12">
         <div class="tab-content" style="margin-left:20px;margin-right:20px;">
           <div id="mainJSEmbed" class="tab-pane fade in active codeEditor">
@@ -125,10 +129,13 @@
         </div>
       </div>
     </div>
+    <!-- button to run the code from the editors -->
     <div class="row">
       <div class="col-xs-3">
         <button class="btn btn-primary" onclick="runGL()" style="margin:10px;">Run</button>
       </div>
+      <!-- link/acknowledgement to the website where the code
+           is from -->
       <div class="col-xs-9">
         <p style="line-height: 20px;">Interactive WebGL examples with code from 
           <a href="http://learningwebgl.com/">http://learningwebgl.com/</a>
