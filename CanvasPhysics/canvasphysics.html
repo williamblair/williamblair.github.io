@@ -6,17 +6,6 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
-    <!-- codemirror (in browser editing) -->
-    <script src="../CodeMirror/lib/codemirror.js"></script>
-    <!-- theme -->
-    <link rel="stylesheet" href="../CodeMirror/lib/codemirror.css">
-    <link rel="stylesheet" href="../CodeMirror/theme/monokai.css">
-    <!-- syntax hilighting -->
-    <script src="../CodeMirror/mode/javascript/javascript.js"></script>
-    <!-- line hilighting -->
-    <script src="../CodeMirror/addon/selection/active-line.js"></script>
-    <!-- match brackets -->
-    <script src="../CodeMirror/addon/edit/matchbrackets.js"></script>
     <style>
     /* style the editing area */
     .CodeMirror{
@@ -66,6 +55,15 @@
       overflow: hidden;
       }
     </style>
+
+    <!-- ace editor -->
+    <style>
+      .codeEditor {
+        height: 300px;
+        margin: 10px;
+      }
+    </style>
+
   </head>
   <body>
     <!-- navbar content is filled in with navbar.js, using its id -->
@@ -116,7 +114,7 @@
         </div>-->
 
         <!-- codemirror editor area -->
-        <div id="editorArea1"></div>
+        <div id="editorArea1" class="codeEditor"></div>
 
         <button class="btn btn-primary" id="runButton">Run</button>
 
