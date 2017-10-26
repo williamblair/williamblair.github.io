@@ -264,6 +264,9 @@
           allText += editor.getValue() + "\n";
         });
 
+        console.log('Alltext:\n--------');
+        console.log(allText);
+
         /* create function from selected text and run */
         var runFunc = new Function(allText);
         runFunc();
