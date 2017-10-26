@@ -73,7 +73,7 @@ function startPhysics() {
       }
 
       /* if the ball hits the left or right wall */
-      if ((ball1.x > canvas.width - ball1.radius || ball1.x < 0.0 + ball1.radius) && ball1.vx != 0) {
+      if ((ball1.x > canvas.width - ball1.radius || ball1.x < 0.0 + ball1.radius) && ball1.vx !== 0) {
           ball1.vx *= ball1.elast;
 
           /* move it away from the left or right wall if necessary */
