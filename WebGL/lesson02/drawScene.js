@@ -25,7 +25,7 @@ var drawScene = function() {
     0, 0
   );
 
-  gl.bindBuffer(gl.ARRAY_BUFFER. triangleVertexColorBuffer);
+  gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexColorBuffer);
   gl.vertexAttribPointer(
     shaderId.vertexColorAttribute,
     triangleVertexColorBuffer.itemSize,
@@ -48,7 +48,7 @@ var drawScene = function() {
     0, 0
   );
 
-  gl.bindBuffer(gl.ARRAY_BUFFER. squareVertexColorBuffer);
+  gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer);
   gl.vertexAttribPointer(
     shaderId.vertexColorAttribute,
     squareVertexColorBuffer.itemSize,
