@@ -17,18 +17,14 @@ nav.innerHTML =
       <ul class="nav navbar-nav">
         <li><a href="/index.html">Home</a></li>
         <li><a href="/CanvasPhysics/canvasphysics.html">Canvas Physics</a></li>
-		<!-- for dropdown -->
+        <!-- for dropdown -->
         <li class="dropdown">
-          <a class="dropdown-toggle" data-toggle="dropdown" href="#">Page 1 <span class="caret"></span></a>
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#">WebGL<span class="caret"></span></a>
           <ul class="dropdown-menu">
-            <li><a href="#">Page 1-1</a></li>
-            <li><a href="#">Page 1-2</a></li>
-            <li><a href="#">Page 1-3</a></li>
+            <li><a href="/WebGL/lesson01/index.html">Lesson 01</a></li>
+            <li><a href="/WebGL/lesson02/index.html">Lesson 02</a></li>
           </ul>
         </li>
-    <li><a href="/WebGL/lesson01/index.html">WebGL</a></li>
-        <!--<li><a href="#">Page 2</a></li>
-        <li><a href="#">Page 3</a></li>-->
       </ul>
     </div>
   </div>
