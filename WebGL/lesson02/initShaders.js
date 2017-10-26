@@ -21,6 +21,10 @@ var initShaders = function(){
   /* aVertexPosition specified in the vertex shader */
   shaderId.vertexPositionAttribute = gl.getAttribLocation(shaderId, 'aVertexPosition');
   gl.enableVertexAttribArray(shaderId.vertexPositionAttribute);
+
+  /* aVertexColor specified in the vertex shader */
+  shaderId.vertexColorAttribute = gl.getAttribLocation(shaderId, 'aVertexColor');
+  gl.enableVertexAttribArray(shaderId.vertexColorAttribute);
   
   shaderId.pMatrixUniform = gl.getUniformLocation(shaderId, 'uPMatrix');
   shaderId.mvMatrixUniform = gl.getUniformLocation(shaderId, 'uMVMatrix');

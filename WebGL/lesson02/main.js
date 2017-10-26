@@ -12,6 +12,10 @@ var shaderId;
 var triangleVertexPositionBuffer;
 var squareVertexPositionBuffer;
 
+/* color buffers for the square and triangle */
+var triangleVertexColorBuffer;
+var squareVertexColorBuffer;
+
 var mvMatrix = mat4.create(); // move/translate matrix
 var pMatrix = mat4.create();  // projection matrix
 

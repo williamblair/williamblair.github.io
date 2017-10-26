@@ -24,6 +24,16 @@ var drawScene = function() {
     false, 
     0, 0
   );
+
+  gl.bindBuffer(gl.ARRAY_BUFFER. triangleVertexColorBuffer);
+  gl.vertexAttribPointer(
+    shaderId.vertexColorAttribute,
+    triangleVertexColorBuffer.itemSize,
+    gl.FLOAT,
+    false,
+    0, 0
+  );
+
   setMatrixUniforms();
   gl.drawArrays(gl.TRIANGLES, 0, triangleVertexPositionBuffer.numItems);
   
@@ -37,6 +47,16 @@ var drawScene = function() {
     false, 
     0, 0
   );
+
+  gl.bindBuffer(gl.ARRAY_BUFFER. squareVertexColorBuffer);
+  gl.vertexAttribPointer(
+    shaderId.vertexColorAttribute,
+    squareVertexColorBuffer.itemSize,
+    gl.FLOAT,
+    false,
+    0, 0
+  );
+
   setMatrixUniforms();
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer.numItems);
 };
