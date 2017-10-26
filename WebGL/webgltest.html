@@ -240,23 +240,23 @@
         console.log("In RunGL!");
 
         /* the OpenGL context */
-        var gl;
+        //var gl;
       
         /* shader program id */
-        var shaderId;
+        //var shaderId;
       
         /* vertex/array buffers for the square and triangle */
-        var triangleVertexPositionBuffer;
-        var squareVertexPositionBuffer;
+        //var triangleVertexPositionBuffer;
+        //var squareVertexPositionBuffer;
 
-        var mvMatrix = mat4.create(); // move/translate matrix
-        var pMatrix = mat4.create();  // projection matrix
+        //var mvMatrix = mat4.create(); // move/translate matrix
+        //var pMatrix = mat4.create();  // projection matrix
       
         /* tell opengl we're using these as our translation and projection matrices */
-        var setMatrixUniforms = function() {
-          gl.uniformMatrix4fv(shaderId.pMatrixUniform, false, pMatrix);
-          gl.uniformMatrix4fv(shaderId.mvMatrixUniform, false, mvMatrix);
-        };
+        //var setMatrixUniforms = function() {
+        //  gl.uniformMatrix4fv(shaderId.pMatrixUniform, false, pMatrix);
+        //  gl.uniformMatrix4fv(shaderId.mvMatrixUniform, false, mvMatrix);
+        //};
 
         /* collect all of the javascript from the editors */
         var allText = "";
