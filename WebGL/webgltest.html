@@ -239,35 +239,15 @@
       var runGL = function() {
         console.log("In RunGL!");
 
-        /* the OpenGL context */
-        //var gl;
-      
-        /* shader program id */
-        //var shaderId;
-      
-        /* vertex/array buffers for the square and triangle */
-        //var triangleVertexPositionBuffer;
-        //var squareVertexPositionBuffer;
-
-        //var mvMatrix = mat4.create(); // move/translate matrix
-        //var pMatrix = mat4.create();  // projection matrix
-      
-        /* tell opengl we're using these as our translation and projection matrices */
-        //var setMatrixUniforms = function() {
-        //  gl.uniformMatrix4fv(shaderId.pMatrixUniform, false, pMatrix);
-        //  gl.uniformMatrix4fv(shaderId.mvMatrixUniform, false, mvMatrix);
-        //};
-
         /* collect all of the javascript from the editors */
         var allText = "";
         editors.forEach(function(editor, index){
           allText += editor.getValue() + "\n";
         });
 
+        /* we actually need to call main now to
+         * get everything to run */
         allText += "\nwebGLStart();\n";
-
-        console.log('Alltext:\n--------');
-        console.log(allText);
 
         /* create function from selected text and run */
         var runFunc = new Function(allText);
@@ -278,11 +258,6 @@
   </div>
 
 </div>
-
-  <!--
-          <div class="col-xs-12">
-      <pre><code class="language-javascript" id="embeddedCode"></code></pre>
-      </div> -->
   
     <!-- footer content is filled in with footer.js, using its id -->
     <footer class="footer" id="pageFooter">
