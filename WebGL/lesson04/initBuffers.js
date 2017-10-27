@@ -63,8 +63,8 @@ var initBuffers = function() {
   ];
 
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-  triangleVertexColorBuffer.itemSize = 4; // 4 coordinates per vertex
-  triangleVertexColorBuffer.numItems = 4; // 4 faces
+  triangleVertexColorBuffer.itemSize = 4; // 4 values per vertex
+  triangleVertexColorBuffer.numItems = 12; // 3 vertices per face * 4 faces
   
   /************************************************************/
   /**                   Init the Square                      **/
