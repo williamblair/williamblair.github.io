@@ -69,7 +69,7 @@ var drawScene = function() {
   mvPushMatrix();
 
   /* Rotate again */
-  mat4.rotate(mvMatrix, angle * Math.PI / 180, [1, 0.5, 0]);
+  mat4.rotate(mvMatrix, angle * Math.PI / 180, [1, 1, 1]);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
   gl.vertexAttribPointer(
