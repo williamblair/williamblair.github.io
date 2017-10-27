@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-US" ng-app="bjSite">
   <head>
     <!-- bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -8,6 +8,12 @@
     
     <!-- matrix library -->
     <script src="glMatrix-0.9.5.min.js"></script>
+
+    <!-- angular -->
+	  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+  
+    <!-- defines the page navbar -->
+    <script src="/javascript/NavbarDirective.js"></script>
 
     <style>
       html {
@@ -74,9 +80,10 @@
        load the page -->
   <body onload="webGLStart()">
     <!-- navbar content is filled in with navbar.js, using its id -->
-    <nav class="navbar navbar-inverse" id="pageNav">
+    <!--<nav class="navbar navbar-inverse" id="pageNav">
       <script src="../../javascript/navbar.js"></script>
-    </nav>
+    </nav>-->
+    <site-nav></site-nav>
 
 <!-- html5 canvas to draw on -->
 <div class="container">

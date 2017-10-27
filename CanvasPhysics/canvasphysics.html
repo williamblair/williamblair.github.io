@@ -1,10 +1,16 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-US">
   <head>
     <!-- bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <!-- angular -->
+	  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+  
+    <!-- defines the page navbar -->
+    <script src="javascript/NavbarDirective.js"></script>
 
     <style>
     /* style the editing area */
@@ -67,9 +73,10 @@
   </head>
   <body>
     <!-- navbar content is filled in with navbar.js, using its id -->
-    <nav class="navbar navbar-inverse" id="pageNav">
+    <!--<nav class="navbar navbar-inverse" id="pageNav">
       <script src="../javascript/navbar.js"></script>
-    </nav>
+    </nav>-->
+    <site-nav></site-nav>
   
 <div class="container">
   <div class="row">
