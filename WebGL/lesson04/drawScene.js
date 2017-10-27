@@ -89,8 +89,9 @@ var drawScene = function() {
     0, 0
   );
 
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, squareVertexIndexBuffer);
   setMatrixUniforms();
-  gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer.numItems);
+  gl.drawElements(gl.TRIANGLES, squareVertexPositionBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 
   mvPopMatrix(); // restore the matrix before rotate
 
