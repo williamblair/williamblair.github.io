@@ -35,7 +35,6 @@ var animate = function() {
    * but this is simpler */
   angle += 1;
   if(angle > 360) angle -=360; 
-  console.log('Angle: ' + angle);
 };
 
 /* updates timer (animation), redraws the canvas, and updates the canvas */
@@ -58,7 +57,6 @@ var webGLStart = function() {
   /* set the background color */
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.enable(gl.DEPTH_TEST);
-  
-  //drawScene();
+
   update();
 };
