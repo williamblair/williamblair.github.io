@@ -82,9 +82,9 @@ var initBuffers = function() {
 
     // back face
     -1.0, -1.0, -1.0,
-    1.0, -1.0, -1.0,
-    1.0, 1.0, -1.0,
     -1.0, 1.0, -1.0,
+    1.0, 1.0, -1.0,
+    1.0, -1.0, -1.0,
 
     // top face
     -1.0, 1.0, -1.0,
@@ -132,7 +132,7 @@ var initBuffers = function() {
   /* go through each vec4 in colors and assign it to the 
    * 4 points of a face */
   for(var c in colors) {
-    var color = colors[i];
+    var color = colors[c];
     for(var j=0; j<4; j++) {
       unpackedColors = unpackedColors.concat(color); // add a row to the master list
     }
