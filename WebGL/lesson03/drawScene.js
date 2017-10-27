@@ -6,7 +6,7 @@ var mvPushMatrix = function() {
   mvMatrixStack.push(copy);
 };
 var mvPopMatrix = function() {
-  if(mvMatrixStack.length == 0) {
+  if(mvMatrixStack.length === 0) {
     throw "Invalid Pop Matrix!";
   }
   mvMatrix =  mvMatrixStack.pop();
