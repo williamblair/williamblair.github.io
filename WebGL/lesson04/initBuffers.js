@@ -153,6 +153,6 @@ var initBuffers = function() {
     20, 21, 22,   20, 22, 23  // left face 
   ];
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeVertexIndices), gl.STATIC_DRAW);
-  cubeVertexIndexBuffer.itemSize = 1;
-  cubeVertexIndexBuffer.numItems = 36; // 6 faces * 6 indices per face
+  squareVertexIndexBuffer.itemSize = 1;
+  squareVertexIndexBuffer.numItems = 36; // 6 faces * 6 indices per face
 };
