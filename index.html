@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en-US">
+<html lang="en-US" ng-app="bjSite">
 
   <head>
     <meta charset="utf-8"/>
@@ -8,9 +8,12 @@
 	
 	<!-- bootstrap -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	
+	<!-- angular -->
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+
 	<style>
 	html {
 	  position: relative;
@@ -55,9 +58,11 @@
 <body>
   
 <!-- navbar content is filled in with navbar.js, using its id -->
-<nav class="navbar navbar-inverse" id="pageNav">
+<!--<nav class="navbar navbar-inverse" id="pageNav">
 <script src="javascript/navbar.js"></script>
-</nav>
+</nav>-->
+<!-- defined with NavbarDirective.html/.js -->
+<site-nav></site-nav>
 
 <!-- Cool Image -->
 <div class="jumbotron">
