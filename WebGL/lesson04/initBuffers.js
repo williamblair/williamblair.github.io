@@ -13,8 +13,8 @@ var initBuffers = function() {
   var vertices = [
     // front face
     0.0, 1.0, 0.0,
-    -1.0, -1.0, 0.0,
-    1.0, -1.0, 0.0,
+    -1.0, -1.0, 1.0,
+    1.0, -1.0, 1.0,
 
     // right face
     0.0, 1.0, 0.0,
