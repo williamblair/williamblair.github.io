@@ -9,7 +9,7 @@
   var NavbarDirective = function () {
     /* Return a new object with the directive properties */
     return {
-      templateUrl: '../NavbarDirective.html'
+      templateUrl: '/NavbarDirective.html'
     };
   };
 
