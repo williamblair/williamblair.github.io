@@ -138,7 +138,7 @@ var initBuffers = function() {
     }
   }
 
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(unpackedColors), gl.STATIC_DRAW);
   squareVertexColorBuffer.itemSize = 4; // 4 coordinates per vertex
   squareVertexColorBuffer.numItems = 24; // 4*6 vertices (4 vertices, 6 faces)
 
