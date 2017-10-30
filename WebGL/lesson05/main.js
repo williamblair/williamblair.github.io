@@ -61,7 +61,7 @@ var webGLStart = function() {
   initTexture();
   
   /* set the background color */
-  gl.clearColor(0.0, 0.0, 0.0, 1.0);
+  gl.clearColor(0.0, 0.3, 0.3, 1.0);
   gl.enable(gl.DEPTH_TEST);
 
   update();
