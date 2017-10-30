@@ -35,7 +35,7 @@ var drawScene = function() {
   /* Rotate again */
   mat4.rotate(mvMatrix, angle * Math.PI / 180, [1, 1, 1]);
 
-  gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
+  gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
   gl.vertexAttribPointer(
     shaderId.vertexPositionAttribute,
     squareVertexPositionBuffer.itemSize,
@@ -44,7 +44,7 @@ var drawScene = function() {
     0, 0
   );
 
-  gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexTextureCoordBuffer);
+  gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexTextureCoordBuffer);
   gl.vertexAttribPointer(
     shaderId.textureCoordAttribute, 
     squareVertexTextureCoordBuffer.itemSize,
@@ -59,9 +59,9 @@ var drawScene = function() {
   /* Tell the shader we're using texture 0 */
   gl.uniform1i(shaderId.samplerUniform, 0);
 
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, squareVertexIndexBuffer);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer);
   setMatrixUniforms();
-  gl.drawElements(gl.TRIANGLES, squareVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+  gl.drawElements(gl.TRIANGLES, cubeVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 
   mvPopMatrix(); // restore the matrix before rotate
 

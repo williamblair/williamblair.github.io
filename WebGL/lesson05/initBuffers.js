@@ -6,8 +6,8 @@ var initBuffers = function() {
   /************************************************************/
   /**                   Init the Square                      **/
   /************************************************************/
-  squareVertexPositionBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
+  cubeVertexPositionBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
   
   /* Square Vertices */
   vertices = [
@@ -50,11 +50,11 @@ var initBuffers = function() {
   ];
   
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-  squareVertexPositionBuffer.itemSize = 3; // using triangles
-  squareVertexPositionBuffer.numItems = 24; // 4 coordinates
+  cubeVertexPositionBuffer.itemSize = 3; // using triangles
+  cubeVertexPositionBuffer.numItems = 24; // 4 coordinates
 
-  squareVertexTextureCoordBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexTextureCoordBuffer);
+  cubeVertexTextureCoordBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexTextureCoordBuffer);
 
   /* Texture coordinate positions */
   var textureCoords = [
@@ -96,11 +96,11 @@ var initBuffers = function() {
   ];
 
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
-  squareVertexTextureCoordBuffer.itemSize = 2,
-  squareVertexTextureCoordBuffer.numItems = 24;
+  cubeVertexTextureCoordBuffer.itemSize = 2,
+  cubeVertexTextureCoordBuffer.numItems = 24;
 
-  squareVertexIndexBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, squareVertexIndexBuffer);
+  cubeVertexIndexBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer);
   var cubeVertexIndices = [
     0,  1,  2,    0,  2,  3,  // front face - two groups of 3 vertices since each square is made out of a triangle
     4,  5,  6,    4,  6,  7,  // back face
@@ -110,6 +110,6 @@ var initBuffers = function() {
     20, 21, 22,   20, 22, 23  // left face 
   ];
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeVertexIndices), gl.STATIC_DRAW);
-  squareVertexIndexBuffer.itemSize = 1;
-  squareVertexIndexBuffer.numItems = 36; // 6 faces * 6 indices per face
+  cubeVertexIndexBuffer.itemSize = 1;
+  cubeVertexIndexBuffer.numItems = 36; // 6 faces * 6 indices per face
 };

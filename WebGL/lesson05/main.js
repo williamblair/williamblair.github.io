@@ -9,17 +9,17 @@ var gl;
 var shaderId;
   
 /* vertex/array buffers for the square */
-var squareVertexPositionBuffer;
+var cubeVertexPositionBuffer;
 
 /* color buffers for the square and triangle */
 //var squareVertexColorBuffer;
 
 /* Index buffers for the quad/pyramids */
 //var triangleVertexIndexBuffer; - not actually used
-var squareVertexIndexBuffer;
+var cubeVertexIndexBuffer;
 
 /* Texture coordinate positions to put on the cube */
-var squareVertexTextureCoordBuffer;
+var cubeVertexTextureCoordBuffer;
 
 var mvMatrix = mat4.create(); // move/translate matrix
 var pMatrix = mat4.create();  // projection matrix
