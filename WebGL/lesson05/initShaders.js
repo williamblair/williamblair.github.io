@@ -31,4 +31,5 @@ var initShaders = function(){
   
   shaderId.pMatrixUniform = gl.getUniformLocation(shaderId, 'uPMatrix');
   shaderId.mvMatrixUniform = gl.getUniformLocation(shaderId, 'uMVMatrix');
+  shaderId.samplerUniform = gl.getUniformLocation(shaderId, "uSampler");
 };

@@ -44,6 +44,15 @@ var drawScene = function() {
     0, 0
   );
 
+  gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexTextureCoordBuffer);
+  gl.vertexAttribPointer(
+    shaderId.textureCoordAttribute, 
+    squareVertexTextureCoordBuffer.itemSize,
+    gl.FLOAT,
+    false,
+    0,0
+  );
+
   /* WebGL can handle up to 32 at a time, we're using the first one */
   gl.activeTexture(gl.TEXTURE0);
   gl.bindTexture(gl.TEXTURE_2D, myTexture);
