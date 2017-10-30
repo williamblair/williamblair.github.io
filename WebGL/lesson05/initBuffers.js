@@ -54,7 +54,7 @@ var initBuffers = function() {
   squareVertexPositionBuffer.numItems = 24; // 4 coordinates
 
   squareVertexTextureCoordBuffer = gl.createBuffer();
-  gl.bindBuffer(g.ARRAY_BUFFER, squareVertexTextureCoordBuffer);
+  gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexTextureCoordBuffer);
 
   /* Texture coordinate positions */
   var textureCoords = [
