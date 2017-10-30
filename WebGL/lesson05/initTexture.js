@@ -20,7 +20,7 @@ var initTexture = function() {
 var handleLoadedTexture = function(texture) {
 
   /* tell opengl which texture we're working on */
-  gl.bindTexture(g.TEXTURE_2D, texture);
+  gl.bindTexture(gl.TEXTURE_2D, texture);
 
   /* tell opengl the texture needs to be flipped vertically */
   gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
