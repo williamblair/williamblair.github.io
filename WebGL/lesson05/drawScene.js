@@ -38,7 +38,7 @@ var drawScene = function() {
   gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
   gl.vertexAttribPointer(
     shaderId.vertexPositionAttribute,
-    squareVertexPositionBuffer.itemSize,
+    cubeVertexPositionBuffer.itemSize,
     gl.FLOAT, 
     false, 
     0, 0
@@ -47,7 +47,7 @@ var drawScene = function() {
   gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexTextureCoordBuffer);
   gl.vertexAttribPointer(
     shaderId.textureCoordAttribute, 
-    squareVertexTextureCoordBuffer.itemSize,
+    cubeVertexTextureCoordBuffer.itemSize,
     gl.FLOAT,
     false,
     0,0
