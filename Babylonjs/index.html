@@ -95,7 +95,7 @@
   /* New editor instance from the given id */
   var editor = ace.edit("codeEditor");
   editor.setTheme("ace/theme/monokai");
-  editor.setMode("ace/mode/javascript");
+  editor.getSession().setMode("ace/mode/javascript");
 
   jQuery.get("index.js", function(data, status){
     console.log('file contents:');
