@@ -26,7 +26,7 @@ var createScene = function() {
   var light2 = new BABYLON.PointLight("light2", new BABYLON.Vector3(0, 1, -1), scene);
 
   /* Add a sphere to the scene */
-  var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", {diameter:2}, scene);
+  var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", {diameter:1}, scene);
 
   /* return the scene with all of our new additions */
   return scene;
