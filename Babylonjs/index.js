@@ -35,7 +35,7 @@ var createScene = function() {
 var scene = createScene();
 
 /* tell babylon to draw our scene when the engine is running */
-engine.runRunderLoop(function() {
+engine.runRenderLoop(function() {
   scene.render();
 });
 
