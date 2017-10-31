@@ -82,6 +82,33 @@
   <script src="index.js"></script>
 </div>
 
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12">
+      <div id="codeEditor" class="codeDiv"></div>
+    </div>
+  </div>
+</div>
+
+<script src="/ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+<script>
+  /* New editor instance from the given id */
+  var editor = ace.edit("codeEmbed");
+  editor.setTheme("ace/theme/monokai");
+  editor.setMode("ace/mode/javascript");
+
+  jQuery.get("index.js", function(data, status){
+    console.log('file contents:');
+    console.log(data);
+
+    editor.setValue(data);
+    editor.resize();
+
+    /* loading text selects it all for some reason */
+    editor.getSession().selection.clearSelection();
+  });
+
+</script>
 
 <!-- footer content is filled in with footer.js, using its id -->
 <footer class="footer" id="pageFooter">
