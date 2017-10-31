@@ -19,6 +19,7 @@ var createScene = function() {
     BABYLON.Vector3.Zero(), 
     scene
   );
+  camera.attachControl(canvas, true);
 
   /* Add lights to the scene */
   var light1 = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(1, 1, 0), scene);
