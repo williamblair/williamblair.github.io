@@ -1,5 +1,0 @@
-<!-- Template for the Main controller -->
-<div class="container-flex homePage">
-  <h1>{{pageTitle}}</h1>
-  <h3>{{pageSubTitle}}</h3>
-</div>
