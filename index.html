@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="mysite">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
+
+    <!-- Bootstrap js -->
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" crossorigin="anonymous"></script>
+    
+    <!-- prism syntax hilighting -->
+    <!-- css is modified version of prism-xonokai: https://github.com/PrismJS/prism-themes -->
+    <link href="prism/bj_prism.css" rel="stylesheet"/>
+    
+    <!-- angular -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+    
+    <!-- directives (Header MUST go first - bootstraps the angular app) -->
+    <script src="angular/HeaderDirective.js"></script>
+    <script src="angular/FooterDirective.js"></script>
+    <script src="angular/NavbarDirective.js"></script>
+    
+    
+    <title>William Blair</title>
+
+    <link type="text/css" rel="stylesheet" href="css/main.css"/>
+
+  </head>
+  <body>
+    <div class="container">
+        
+        <!-- defined in angular/HeaderDirective.js -->
+        <site-header></site-header>
+        
+        <!-- body -->
+        <div class="row">
+            
+            <!-- defined in angular/NavbarDirective.js -->
+            <div class="col-sm-3">
+                <site-nav></site-nav>
+            </div>
+            
+            <!-- main content -->
+            <div id="contentcol" class="col-sm-9">
+                <div id="content">
+                    <p>
+                        Hello World! My name's William (BJ) Blair,
+                        and I'm a CS major at SUNY Polytechnic Institute. 
+                        Here you'll find random tech stuff I've been doing.
+                        Cheers :)
+                    </p>
+                    <b>Some info about your device:</b>
+                    <div>
+                        <table class="table">
+                        <tr>
+                            <td>Code Name       </td>
+                            <td id="codeName">  </td>
+                        </tr>
+                        <tr>
+                            <td>App Name        </td>
+                            <td id="appName">   </td>
+                        </tr>
+                        <tr>
+                            <td>App Version     </td>
+                            <td id="appVers">   </td>
+                        </tr>
+                        <tr>
+                            <td>Language        </td>
+                            <td id="language">  </td>
+                        </tr>
+                        <tr>
+                            <td>Platform        </td>
+                            <td id="platform">  </td>
+                        </tr>
+                        <tr>
+                            <td>User Agent      </td>
+                            <td id="userAgent"> </td>
+                        </tr>
+                        <tr>
+                            <td>Screen Size      </td>
+                            <td id="screenSize"> </td>
+                        </tr>
+                        </table>
+                        <!-- writes the html to all of the above td's in the compInfo table -->
+                        <script src="javascript/userInfo.js"></script>
+                    </div>
+                </div>
+            </div><!-- col-sm-9 -->
+            
+            <!-- defined in angular/FooterDirective.js-->
+            <site-footer></site-footer>
+            
+        </div><!-- body -->
+        
+    </div> <!-- container -->
+    
+    </body>
+</html>

@@ -1,0 +1,78 @@
+/* Monokai Colors:
+ * Pink:         #F7208B
+ * Dark Gray:    #292429
+ * Lighter Gray: #524F52
+ * Cream:        #FDF5A9
+ * */
+
+html, body {
+    background-color: #AAEEEE;
+    color:            #FFFFFF;
+}
+
+.container {
+    background-color: #292429;
+}
+
+/* The div to the right of the logo in the header */
+#titleContainer {
+    
+    height:      100%;
+    
+    display:     flex;
+    align-items: center;
+    
+}
+
+/* Bootstrap column wrapping the #content div */
+#contentcol {
+    padding: 0px;
+}
+
+/* Where the main body of text goes */
+#content {
+    /* moved the dark gray color down by 1 */
+    background-color: #191419;
+    
+    margin-right:10px;
+    min-height: 600px;
+}
+
+#myFooter {
+    width: 100%;
+    height: 60px;
+    line-height: 60px;
+    margin-left: 10px;
+}
+
+/* navbar directive */
+.navbar {
+    /* moved the dark gray color down by 1 */
+    background-color: #191419;
+}
+
+/* Stylize Links */
+a:link {
+    color: #F7208B;
+}
+
+a:visited {
+    color: #F7208B;
+}
+
+a:hover {
+    color: #524F52;
+}
+
+a:active {
+    color: #F7208B;
+}
+
+/* text */
+p {
+    margin-left: 10px;
+}
+
+#headerCode {
+    color: #FFFFFF;
+}

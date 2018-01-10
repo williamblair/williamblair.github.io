@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="mysite">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
+
+    <!-- Bootstrap js -->
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" crossorigin="anonymous"></script>
+    
+    <!-- prism syntax hilighting -->
+    <!-- css is modified version of prism-xonokai: https://github.com/PrismJS/prism-themes -->
+    <link href="prism/bj_prism.css" rel="stylesheet"/>
+    
+    <!-- angular -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+    
+    <!-- directives (Header MUST go first - bootstraps the angular app) -->
+    <script src="angular/HeaderDirective.js"></script>
+    <script src="angular/FooterDirective.js"></script>
+    <script src="angular/NavbarDirective.js"></script>
+    
+    
+    <title>William Blair</title>
+
+    <link type="text/css" rel="stylesheet" href="css/main.css"/>
+    
+    <style>
+    #imageDiv {
+        margin-left: auto;
+        margin-right: auto;
+        width: 100%;
+        max-width: 500px;
+    }
+    p, h1,h2,h3,h4 {
+        margin-left: 5px;
+    }
+    h3 {
+        margin-top: 10px;
+    }
+    </style>
+    
+  </head>
+  <body>
+    <div class="container">
+        
+        <!-- defined in angular/HeaderDirective.js -->
+        <site-header></site-header>
+        
+        <!-- body -->
+        <div class="row">
+            
+            <!-- defined in angular/NavbarDirective.js -->
+            <div class="col-sm-3">
+                <site-nav></site-nav>
+            </div>
+            
+            <!-- main content -->
+            <div id="contentcol" class="col-sm-9">
+                <div id="content">
+                    
+                    <!--<div class="panel">-->
+
+                        <h1 style="text-align: center;">X11 Window Manager</h1>
+                        <h3 style="text-align: center;">Undergraduate Capstone by myself and Ian Kurzrock</h3>
+                        <div id="imageDiv">
+                            <a href="images/window_manager_screenshot.png">
+                                <img src="images/window_manager_screenshot.png" width="100%"/>
+                            </a>
+                        </div>
+                        <h2>How it Works</h2>
+                        <div id="imageDiv">
+                            <a href="images/window_manager_explained.png">
+                                <img src="images/window_manager_explained.png" width="100%"/>
+                            </a>
+                        </div>
+                        <h3>1. The X Server / Root Window</h3>
+                        <p>
+                        Every object in X11 is considered a window. The background/Desktop in X11 is a Window 
+                        itself - it's called the <b>Root Window</b>. Every GUI application on your desktop is 
+                        a child of the Root Window.
+                        </p>
+
+                        <h3>2. Frame Window</h3>
+                        <p>
+                        In a <b>reparenting window manager</b>, all application windows are children of a 
+                        container window, which holds other elements like the title bar and buttons.
+                        In our program the frame windows and their children are stored in a linked list
+                        of structs called <b>WMClient</b>s:
+                        </p>
+                        <div class="card">
+                        <pre>
+                        <code class="language-clike">// groups frame windows and the actual app windows
+typedef struct WMClient
+{   
+    Window frame;    // the border/container window
+    Window titleBar; // the title bar to click/drag
+    Window minWin; // minimize, maximize, and close subwindows
+    Window maxWin;
+    Window closeWin;
+    Window child;  // the actual application content window
+    Window task_icon;
+    
+    unsigned int x; // the x and y position before maximizing the window
+    unsigned int y; 
+    unsigned int w; // the width and height before maximizing the window
+    unsigned int h;
+    
+    Bool maximized; // true if the window is fullscreen
+    Bool minimized; // true if the window is minimized
+    
+    char title[50]; // title of the window
+    
+    struct WMClient *next;
+} WMClient;</code></pre>
+                        </div>
+
+                        <h3>3. Title Bar</h3>
+                        <p>
+                        The window inside the frame that you click and drag on to move and contains the
+                        application title. It's size is equal to frameWidth - (buttonSize*numberOfButtons),
+                        so there's room for the maximize, minimze, and close buttons.
+                        </p>
+
+                        <h3>4. Minimize/Maximize/Close Buttons</h3>
+                        <p>
+                        These are (shocker) also just windows, whose mouse press (called button presses in Xlib)
+                        are mapped to the minimize, maximize, and close functions for the window:
+                        </p>
+                        <div class="card">
+                        <pre>
+                        <code class="language-clike">/* test if any special windows were pressed */
+if(e.window == temp->minWin)
+{
+    hMinimize(e, temp);
+    return True;
+}
+else if(e.window == temp->maxWin)
+{
+       hMaximize(e, temp);
+       return True;
+}
+else if(e.window == temp->closeWin)
+{
+    hClose(e, temp);
+    return True;
+}</code></pre>
+                        </div>
+                        ...
+                        <div class="card">
+                        <pre>
+                        <code class="language-clike">Bool hMinimize(const XButtonEvent e, WMClient *c)
+{
+    printf("Minimize area!\n");
+
+    ...
+}
+
+Bool hMaximize(const XButtonEvent e, WMClient *c) 
+{
+    printf("Maximize Button Clicked!\n");
+
+    ...
+}
+
+Bool hClose(const XButtonEvent e, WMClient *c)
+{
+    printf("Close button pressed!\n");
+
+    ...
+}</code></pre>
+                        </div>
+
+                        <h3>5. Application Window</h3>
+                        <p>
+                        This where the actual program contents are contained. When the
+                        program is first started it sends MapRequest event to the X server.
+                        This is when we reparent the window into a frame and give it a titlebar/
+                        buttons:
+                        </p>
+                        <div class="card">
+                        <pre>
+                        <code class="language-clike">Bool hMapRequest(const XMapRequestEvent e)
+{
+    printf("Map Request Event!\n");
+    
+    reparentWindow(e.window, False);
+    
+    XMapWindow(d, e.window);
+    
+    return True;
+}</code></pre>
+                        </div>
+                        ...
+                        <div class="card">
+                        <pre>
+                        <code class="language-clike">Bool reparentWindow(Window child, Bool before_wm)
+{
+    ...
+
+    XReparentWindow(
+        d,
+        child,
+        c->frame,
+        0, TITLE_HEIGHT
+    );
+
+    ...
+}</code></pre>
+                        </div>
+                        
+                        <p>
+                        Source: <a href="https://github.com/williamblair/capstone-wm-github">https://github.com/williamblair/capstone-wm-github</a>
+                        </p>
+                        <p>
+                        References: <a href="https://seasonofcode.com/posts/how-x-window-managers-work-and-how-to-write-one-part-i.html">Chuan Ji</a>
+                        </p>
+                        
+                    <!--</div>--> <!-- panel -->
+                    
+                </div><!-- content -->
+            </div><!-- col-sm-9 -->
+            
+            <!-- defined in angular/FooterDirective.js-->
+            <site-footer></site-footer>
+            
+        </div><!-- body -->
+        
+    </div> <!-- container -->
+    
+    
+    <!-- testing prism -->
+    <script src="prism/prism.js"></script>
+    
+    </body>
+</html>
