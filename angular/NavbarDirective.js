@@ -16,6 +16,7 @@
 <nav class="navbar sticky-top">
     <ul class="navbar-nav">
         <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="EyeTracker.html">Eye Tracking</a></li>
         <li class="nav-item"><a class="nav-link" href="canvasphysics.html">HTML5 Canvas Physics</a></li>
         <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">WebGL</a>
             <div class="dropdown-menu">
