@@ -15,7 +15,7 @@
 <!-- header -->
 <div class="row">
     <div class="col-sm-3">
-        <img src="images/suny_poly_logo.png" width="100%" height="100%"/>
+        <img src="images/suny_poly_logo.png" width="100%" height="100%" style="max-width:200px;"/>
     </div>
     <div class="col-sm-9">
         <div id="titleContainer">
