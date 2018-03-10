@@ -1,9 +1,15 @@
 # matrix/vector data file for homework 3
 
 # matrix - expects numRows then numColumns
-3 4
+9 4
 # the actual matrix data (expected to be in row/column fashion)
 1 2 3 4
+4 5 6 5
+7 8 9 6
+1 2 3 4
+1 2 3 4
+4 5 6 5
+7 8 9 6
 4 5 6 5
 7 8 9 6
 

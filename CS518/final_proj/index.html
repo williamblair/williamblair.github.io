@@ -20,7 +20,7 @@
             margin-left: auto;
             margin-right: auto;
             min-height: 100%;
-            height:     100%;
+            /*height:     100%;*/
             width: 75%;
 
             background-color: #553A41;
@@ -35,6 +35,16 @@
         }
         a:visited {
             color: #A3E7F0;
+        }
+
+        table {
+            border-collapse: collapse;
+            margin: 5px;
+        }
+
+        table, th, td {
+            border: 2px groove;
+            padding: 5px;
         }
 
         /* mobile styling */
@@ -62,6 +72,73 @@ Processing Element) programming to general parallel systems.
 
 <h3 style="margin-left:5px;">Log</h1>
 <a href="log.txt">log.txt</a>
+
+<h3 style="margin-left:5px;">IBM Cell SDK 3.1 Documentation</h1>
+<a href="https://web.cs.sunyit.edu/~blairw/CellSDK3.1Docs/">Link</a>
+
+<h3 style="margin-left:5px;">Code List</h1>
+<table>
+    <tr>
+        <th>Directory</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td><a href="code/helloworld">Hello World</a></td>
+        <td>Basic SPE thread creation; code from <a href="https://web.cs.sunyit.edu/~blairw/CellSDK3.1Docs/programming/CBE_Programming_Tutorial_v3.1.pdf">here</a></td>
+    </tr>
+    <tr>
+        <td><a href="code/euler">Euler</a></td>
+        <td>Serial/Scalar euler particle simulation; code from <a href="https://web.cs.sunyit.edu/~blairw/CellSDK3.1Docs/programming/CBE_Programming_Tutorial_v3.1.pdf">here</a></td>
+    </tr>
+    <tr>
+        <td><a href="code/euler_simd1">Euler SIMD v1</a></td>
+        <td>SIMD Array-Of-Struct euler particle simulation; code from <a href="https://web.cs.sunyit.edu/~blairw/CellSDK3.1Docs/programming/CBE_Programming_Tutorial_v3.1.pdf">here</a></td>
+    </tr>
+    <tr>
+        <td><a href="code/euler_simd2">Euler SIMD v2</a></td>
+        <td>SIMD Struct-Of-Array euler particle simulation; code from <a href="https://web.cs.sunyit.edu/~blairw/CellSDK3.1Docs/programming/CBE_Programming_Tutorial_v3.1.pdf">here</a></td>
+    </tr>
+    <tr>
+        <td><a href="code/euler_spe1">Euler SPE v1</a></td>
+        <td>Euler particle simulation on a single SPE; code from <a href="https://web.cs.sunyit.edu/~blairw/CellSDK3.1Docs/programming/CBE_Programming_Tutorial_v3.1.pdf">here</a></td>
+    </tr>
+    <tr>
+        <td><a href="code/euler_spe2">Euler SPE v2</a></td>
+        <td>Euler particle simulation across multiple SPE threads; code from <a href="https://web.cs.sunyit.edu/~blairw/CellSDK3.1Docs/programming/CBE_Programming_Tutorial_v3.1.pdf">here</a></td>
+    </tr>
+</table>
+
+<h3 style="margin-left:5px;">IBM SDK 3.1 and Simulator Files</h1>
+
+<table>
+    <tr>
+        <th>Description</th>
+        <th>Link</th>
+    </tr>
+    <tr>
+        <td>Cell 3.1 SDK</td>
+        <td><a href="https://drive.google.com/file/d/1LhCwvrDpFN4euvZUUH1mvzSLedv19yX8/view?usp=sharing">https://drive.google.com/file/d/1LhCwvrDpFN4euvZUUH1mvzSLedv19yX8/view?usp=sharing</a>
+    </tr>
+    <tr>
+        <td>Cell 3.1 SDK Extras</td>
+        <td><a href="https://drive.google.com/file/d/1VcvGTiNhlW-BqUGUeA760CcqnaU5V5Em/view?usp=sharing">https://drive.google.com/file/d/1VcvGTiNhlW-BqUGUeA760CcqnaU5V5Em/view?usp=sharing</a>
+    </tr>
+    <tr>
+        <td>Cell 3.1 SDK Installer RPM</td>
+        <td><a href="https://drive.google.com/file/d/1CyGpQ7SKznZv0LrZ71bPSNJu9vbpnIFU/view?usp=sharing">https://drive.google.com/file/d/1CyGpQ7SKznZv0LrZ71bPSNJu9vbpnIFU/view?usp=sharing</a></td>
+    </tr>
+    <tr>
+        <td>Fedora 9 PPC (PS3 iso)</td>
+        <td><a href="https://drive.google.com/file/d/1b4lpSz_9NFP5R5IRA3VybHTXAzEh0Ts9/view?usp=sharing">https://drive.google.com/file/d/1b4lpSz_9NFP5R5IRA3VybHTXAzEh0Ts9/view?usp=sharing</a></td>
+    </tr>
+    <tr>
+        <td>Fedora 9 x86_64 (PC iso)</td>
+        <td><a href="https://drive.google.com/file/d/1tAk-pcy1OwS8FfENtHn--nXTa7byQEDI/view?usp=sharing">https://drive.google.com/file/d/1tAk-pcy1OwS8FfENtHn--nXTa7byQEDI/view?usp=sharing</a></td>
+    </tr>
+        <td>IBM Full-System Simulator</td>
+        <td><a href="https://drive.google.com/file/d/18_73iImm4PXBr795y5LM3tQhalYo0VSC/view?usp=sharing">https://drive.google.com/file/d/18_73iImm4PXBr795y5LM3tQhalYo0VSC/view?usp=sharing</a></td>
+    </tr>
+</table>
 
 </div> <!-- end bodydiv -->
 </body>    

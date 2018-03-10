@@ -95,3 +95,77 @@ Installing Linux on PS3 CFW
 - Followed tutorial code from here:
     - https://www.kernel.org/pub/linux/kernel/people/geoff/cell/ps3-linux-docs/CellProgrammingTutorial/BasicsOfSIMDProgramming.html
 - SIMD vector addition, Matrix transpose calc, abs. difference calc     
+
+02/21/18
+--------
+09:30am-11:00am
+- Continued following tutorial code from previous entry (02/15)
+    - SIMD partial sum, short->float conversion, basic spe threads/
+      execution
+- Copied Cell 3.1 Docs from ps3 to website here:
+    - https://web.cs.sunyit.edu/~blairw/CellSDK3.1Docs/
+
+02/26/18
+--------
+9:30am-11:00am
+- Installing SDK on virtualbox (in order to test IBM 'Full system simulator'
+
+02/27/18
+--------
+9:30am-11:00am, 12:30pm-1:30pm, 6:30pm-7:30pm, 9:00pm-9:30pm
+- Installed Eclipse IDE on virtual machine for development environment
+- The Simulator comes separately from the SDK now (of course it does,
+  why would it be easy?)
+    - Found here?
+      http://www.psdevwiki.com/ps3/Cell_Programming_IBM
+    - Also this site looks like it has some good links...
+- Uploaded and shared files to google drive for organized/central
+  location since everything is hard to find
+
+02/28/18
+--------
+9:30am-11:00am
+- Running simulator in IDE (Eclipse)
+    - Weird error according to docs: have to run
+        echo "Welcome to Fedora Core"
+        echo "INIT: Entering runlevel: 2"
+      in the eclipse console, apparently the simulator
+      waits for this message before continuing
+- Following IDE tutorial from here:
+   https://web.cs.sunyit.edu/~blairw/CellSDK3.1Docs/programming/IDE_Users_Guide_v3.1.pdf
+
+03/01/18
+--------
+12:30pm-2:00pm
+- Looked at Blue-Steel project:
+    http://groups.csail.mit.edu/cag/ps3/blue-steel.shtml
+- Fails to compile with given makefile - meant for cell sdk 2, not 3,
+  on Yellow Dog Linux
+
+03/03/18
+--------
+4:00pm-5:00pm, 6:00pm-7:00pm
+- Followed Cell Simulator Guide Here:
+    http://ww2.cs.fsu.edu/~west/cell/index.php?tutorial=configfirst
+- For using the simulator with command line tools as opposed to IDE
+
+03/06/18
+--------
+8:45pm-9:30pm
+- Followed IBM Cell SDK 3.1 programming tutorial/guide here (basic spe thread creation):
+    https://web.cs.sunyit.edu/~blairw/CellSDK3.1Docs/programming/CBE_Programming_Tutorial_v3.1.pdf
+
+03/07/18
+--------
+3:00pm-4:00pm, 6:00pm-8:00pm
+- Followed IBM Cell SDK 3.1 programming tutorial/guide from yesterday
+  (Euler particle simulation - example from scalar to SPE parallelism)
+- Found good altivec/PPU SIMD functions reference:
+    https://www.nxp.com/docs/en/reference-manual/ALTIVECPIM.pdf?&srch=1
+
+03/09/18
+--------
+11:00am-12:00pm, 1:00pm-
+- Set up Cell SDK in Codelite IDE
+- Followed DMA transfer tutorial here:
+    https://www.kernel.org/pub/linux/kernel/people/geoff/cell/ps3-linux-docs/CellProgrammingTutorial/BasicsOfSPEProgramming.html

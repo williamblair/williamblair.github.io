@@ -28,6 +28,7 @@
             </div>
         </li>
         <li class="nav-item"><a class="nav-link" href="WindowManager.html">X11 Window Manager</a></li>
+        <li class="nav-item"><a class="nav-link" href="CS518/index.html">CS518</a></li>
     </ul>
 </nav>
             `
