@@ -1,0 +1,19 @@
+CC = mpicc
+LD = mpecc
+OBJ = homework5_mpibcast.o
+SRC = homework5_mpibcast.c
+EXEC = homework5_mpibcast
+CFLAGS = -g
+LDFLAGS = -lm -mpilog -lpthread
+
+all: $(EXEC)
+
+$(EXEC): ${OBJ}
+	$(LD) $(LDFLAGS) $< -o $(EXEC)
+
+homework5_mpibcast.o: ${SRC}
+	$(CC) $(CFLAGS) -c homework5_mpibcast.c
+
+clean:
+	rm -rf $(OBJ) $(EXEC)
+

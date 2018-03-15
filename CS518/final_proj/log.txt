@@ -165,7 +165,18 @@ Installing Linux on PS3 CFW
 
 03/09/18
 --------
-11:00am-12:00pm, 1:00pm-
+11:00am-12:00pm, 1:00pm-3:00pm
 - Set up Cell SDK in Codelite IDE
 - Followed DMA transfer tutorial here:
     https://www.kernel.org/pub/linux/kernel/people/geoff/cell/ps3-linux-docs/CellProgrammingTutorial/BasicsOfSPEProgramming.html
+
+03/10/18
+--------
+8:00pm-10:00pm
+- Continued to follow same DMA transfer tutorial as yesterday; this time
+  ran on multiple SPEs and used SPU intrinsics
+
+03/12/18
+--------
+10:00am-
+- Looked at Blue-Steel code
