@@ -178,5 +178,68 @@ Installing Linux on PS3 CFW
 
 03/12/18
 --------
-10:00am-
+10:00am-11:00am
 - Looked at Blue-Steel code
+
+03/31/18
+--------
+3:00pm-5:00pm
+- Looked at more Blue Steel Code
+- Started looking at multiple video streaming assignment here:
+    http://www.es.ele.tue.nl/~heco/courses/PlatformDesign/Cell-assignment/index.html
+
+04/01/18
+--------
+7:30pm-8:30pm, 9:30pm-11:00pm
+- Looked at Blue Steel Code
+    - Apparently Drawing to the screen is done through 
+      the PS3 Linux built in ps3 framebuffer lib?
+        - header asm/ps3fb.h, linux/fb.h
+    - look at blue steel source file src/fb.cpp (frame buffer)
+
+- Successfully drew to the screen from console using linux frame buffer,
+  code from here:
+    http://betteros.org/tut/graphics1.php#fbdev
+
+04/04/18
+--------
+8:00pm-10:00pm
+- Began implementing serial version of Conway's Game of Life on Cell PPU
+
+04/05/18
+--------
+12:30pm-1:30pm, 5:30pm-8:00pm
+- Finished Serial Conway's Game of Life, Began Parallel Version
+    - Noted - align 16 on data parameters to the SPE is important!
+    - will get a Bus Error without it
+
+- TODO - follow this signaling tutorial:
+    - http://ww2.cs.fsu.edu/~west/cell/index.php?tutorial=mailsignal
+    - That way can synchronize all of the SPEs to wait for all
+      of the others before moving to the next generation (otherwise
+      can have concurrency issues...)
+
+04/08/18
+--------
+2:00pm-5:00pm, 6:30pm-8:00pm, 9:30-11:00pm
+- Have 8 SPE threads running on parallel version (just skeleton),
+  facing concurrency issue w/ splitting up the matrix (multiple threads
+  receiving same part of matrix)
+
+04/11/18
+--------
+9:30am-11:00am, 8:30pm-11:00pm
+- Fixed concurrency issue (create SPE args within the pthread function)
+- added writing to output array from SPE
+- Program can now calculate the total next generation on SPEs
+    - TODO - add multiple generations
+
+04/12/18
+--------
+6:00pm-8:00pm
+- Added multiple generations calculation
+- Started comparing results to serial version
+    - serial version seriously outperforms parallel version
+    - to little data to work on/compute relative to the time
+      to send data and wait for threads to finish (concurrency)
+

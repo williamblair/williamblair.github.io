@@ -326,10 +326,24 @@ int main(int argc, char *argv[])
     calcFinalResult(&finalResult, myResults, matData, vecLength, rank);
 
     if(rank == 0) {
-        printf("Final result: (");
+        printf("Input matrix:\n");
+        for(i=0; i<matData[NUM_ROWS_INDEX]; i++) {
+            for(j=0; j<matData[NUM_COLS_INDEX]; j++) {
+                printf("%d, ", mat[i*matData[NUM_COLS_INDEX] + j]);
+            }
+            printf("\n");
+        }
+
+        printf("\nInput Vector:\n");
+        for(i=0; i<vecLength; i++) {
+            printf("%d, ", sharedVec[i]);
+        }
+        printf("\n");
+
+        printf("\nFinal result: ");
         for(i=0; i<finalResultSize; i++){
             printf("%d, ", finalResult[i]);
-        } printf(")\n");
+        } printf("\n");
     }
 
 
