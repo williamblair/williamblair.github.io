@@ -1,105 +1,91 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="mysite">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
-
-    <!-- Bootstrap js -->
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<html lang="en-US">
+<head>
+    
+    <!-- meta tags -->
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    
+    <!-- angular js -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+    
+    <!-- angular routing -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-route.js"></script>
+    
+    <!-- jquery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" crossorigin="anonymous"></script>
-    
-    <!-- prism syntax hilighting -->
-    <!-- css is modified version of prism-xonokai: https://github.com/PrismJS/prism-themes -->
-    <link href="prism/bj_prism.css" rel="stylesheet"/>
-    
-    <!-- angular -->
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
-    
-    <!-- directives (Header MUST go first - bootstraps the angular app) -->
-    <script src="angular/HeaderDirective.js"></script>
-    <script src="angular/FooterDirective.js"></script>
-    <script src="angular/NavbarDirective.js"></script>
-    
-    
-    <title>William Blair</title>
 
-    <link type="text/css" rel="stylesheet" href="css/main.css"/>
-
-  </head>
-  <body>
-    <div class="container">
-        
-        <!-- defined in angular/HeaderDirective.js -->
-        <site-header></site-header>
-        
-        <!-- body -->
-        <div class="row">
-            
-            <!-- defined in angular/NavbarDirective.js -->
-            <div class="col-sm-3">
-                <site-nav></site-nav>
-            </div>
-            
-            <!-- main content -->
-            <div id="contentcol" class="col-sm-9">
-                <div id="content">
-                    <p>
-                        Hello World! My name's William (BJ) Blair,
-                        and I'm a CS major at SUNY Polytechnic Institute. 
-                        Here you'll find random tech stuff I've been doing.
-                        Cheers :)
-                    </p>
-                    <b>Some info about your device:</b>
-                    <div>
-                        <table class="table">
-                        <tr>
-                            <td>Code Name       </td>
-                            <td id="codeName">  </td>
-                        </tr>
-                        <tr>
-                            <td>App Name        </td>
-                            <td id="appName">   </td>
-                        </tr>
-                        <tr>
-                            <td>App Version     </td>
-                            <td id="appVers">   </td>
-                        </tr>
-                        <tr>
-                            <td>Language        </td>
-                            <td id="language">  </td>
-                        </tr>
-                        <tr>
-                            <td>Platform        </td>
-                            <td id="platform">  </td>
-                        </tr>
-                        <tr>
-                            <td>User Agent      </td>
-                            <td id="userAgent"> </td>
-                        </tr>
-                        <tr>
-                            <td>Screen Size      </td>
-                            <td id="screenSize"> </td>
-                        </tr>
-                        </table>
-                        <!-- writes the html to all of the above td's in the compInfo table -->
-                        <script src="javascript/userInfo.js"></script>
-                    </div>
-                </div>
-            </div><!-- col-sm-9 -->
-            
-            <!-- defined in angular/FooterDirective.js-->
-            <site-footer></site-footer>
-            
-        </div><!-- body -->
-        
-    </div> <!-- container -->
+    <!-- load ace editor -->
+    <script src="ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
     
-    </body>
+    <!-- hilight js, modified css version -->
+    <link rel="stylesheet" href="monokai-sublime-bj.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+    
+    <!-- angular hilight.js -->
+    <script src="https://pc035860.github.io/angular-highlightjs/angular-highlightjs.min.js"></script>
+    
+    <!-- Bulma CSS -->
+    <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.css" />-->
+    <!--<link rel="stylesheet" href="./bulma-0.7.1/css/bulma.min.css" />-->
+    <link rel="stylesheet" href="https://unpkg.com/bulmaswatch/cyborg/bulmaswatch.min.css">
+    
+    <!-- font awesome -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.1/css/all.css" integrity="sha384-O8whS3fhG2OnA5Kas0Y9l3cfpmYjapjI0E4theH4iuMD+pLhbf6JI0jIMfYcK3yZ" crossorigin="anonymous">
+    
+    <!-- angular scripts -->
+    <script src="main.js"></script>
+    <script src="navbar.js"></script>
+    <script src="imageFigure.js"></script>
+    <script src="canvasPhysicsController.js"></script>
+    
+    <!-- site css -->
+    <link rel="stylesheet" href="site.css" />
+    
+</head>
+<body ng-app="myApp" ng-controller="appController">
+
+<!-- defined in navbar.js -->
+<bulma-navbar></bulma-navbar>
+
+<div class="container">
+    <section class="columns is-fullheight">
+
+        <div class="column is-2 is-hidden-mobile">
+            <aside class="menu">
+              <p class="menu-label">
+                General
+              </p>
+              <ul class="menu-list">
+                <li><a id="home" ng-click="changeActiveLink('home')" class="is-active" href="#/!">Home</a></li>
+                <li><a id="about" ng-click="changeActiveLink('about')" href="#!about">About</a></li>
+              </ul>
+              <p class="menu-label">
+                Programming
+              </p>
+              <ul class="menu-list">
+                <li><a id="eyeTracker" ng-click="changeActiveLink('eyeTracker')" href="#!eyeTracker">Eye Tracker</a></li>
+                <li><a id="windowManager" ng-click="changeActiveLink('windowManager')" href="#!windowManager">X11 Window Manager</a></li>
+                <li><a id="canvasPhysics" ng-click="changeActiveLink('canvasPhysics')" href="#!canvasPhysics">HTML5 Canvas</a></li>
+                <li><a id="fbsetbg" ng-click="changeActiveLink('fbsetbg')" href="#!fbsetbg">fbsetbg GUI</a></li>
+                <li><a id="cppmatrix" ng-click="changeActiveLink('cppmatrix')" href="#!cppmatrix">cppmatrix</a></li>
+              </ul>
+              <p class="menu-label">
+                Tech
+              </p>
+              <ul class="menu-list">
+                <li><a id="memcarduino" ng-click="changeActiveLink('memcarduino')" href="#!memcarduino">Memcarduino</a></li>
+                <li><a id="psio" ng-click="changeActiveLink('psio')" href="#!psio">PSIO</a></li>
+              </ul>
+            </aside>
+        </div>
+
+        <div class="column is-10">
+          <div ng-view></div>
+        </div>
+    
+    </section>
+</div>
+
+</body>
 </html>

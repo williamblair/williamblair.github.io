@@ -1,0 +1,85 @@
+
+<!DOCTYPE html>
+<html lang="en-US" ng-app="mysite">
+<head>
+    
+    <!-- meta tags -->
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    
+    <!-- angular js -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+    
+    <!-- jquery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    
+    <!-- angular components 
+         navbar.js must go first because it bootstraps the application -->
+    <script src="navbar.js"></script>
+    <script src="sidenav.js"></script>
+    
+    <!-- Bulma CSS -->
+    <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.css" />-->
+    <!--<link rel="stylesheet" href="./bulma-0.7.1/css/bulma.min.css" />-->
+    <link rel="stylesheet" href="https://unpkg.com/bulmaswatch/cyborg/bulmaswatch.min.css">
+    
+    <!-- font awesome -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.1/css/all.css" integrity="sha384-O8whS3fhG2OnA5Kas0Y9l3cfpmYjapjI0E4theH4iuMD+pLhbf6JI0jIMfYcK3yZ" crossorigin="anonymous">
+    
+    <!-- site css -->
+    <link rel="stylesheet" href="site.css" />
+    
+</head>
+<body>
+
+<!-- defined in navbar.js -->
+<bulma-navbar onload="makeActive()"></bulma-navbar>
+
+<div class="container">
+<section class="columns is-fullheight">
+
+<div class="column is-2 is-hidden-mobile">
+  <!-- defined in sidenav.js -->
+  <side-nav></side-nav>
+</div>
+
+  <div class="column is-10">
+    <div class="section">
+      <div class="card">
+        <div class="card-header"><p class="card-header-title">About Me</p></div>
+        <div class="card-content">
+          <div class="content">
+            <h1>Hello World!</h1>
+            <figure>
+              <img src="images/family.jpg" width="600"/>
+              <figcaption>From Left to Right: Mom, me, my brother, dad</figcaption>
+            </figure>
+            <p>
+              My name's William (BJ) Blair III, and I'm a Computer Science major at SUNY 
+              Polytechnic Institute. As of May 2018 I've graduated with a Bachelor's 
+              degree and I'll be continuing at SUNY Poly for my Master's in the fall.
+            </p>
+            <p>
+              I enjoy playing music (guitar/drums), computer programming, skiing/skating/
+              snowboarding, semi-casually consuming anime and video games, and random
+              tech stuff.
+            </p>
+            <p>
+              In high school I picked up an interest in programming and started to learn
+              C and C++, thanks to the awesome youtube channel 
+              <a href="https://www.youtube.com/user/thenewboston">thenewboston</a>.
+              Shoutout to my man Bucky Roberts here, who probably mostly influenced my 
+              decision to be a CS major:
+            </p>
+            <img src="images/bucky.jpg" width="500"/>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+</div>
+
+</body>
+</html>
