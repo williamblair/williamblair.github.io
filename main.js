@@ -19,7 +19,7 @@
             templateUrl: 'templates/windowManager.html'
         })
         .when("/canvasPhysics", {
-            templateUrl: 'templates/canvasPhysics.html'
+            templateUrl: 'templates/canvasphysics.html'
         })
         .when("/memcarduino", {
             templateUrl: 'templates/memcarduino.html'
