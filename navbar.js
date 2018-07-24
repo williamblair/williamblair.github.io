@@ -6,7 +6,7 @@
     /* Define the component */
     var bulmaNav = function() {
         return {
-            templateUrl: 'bulmaNavbar.html'
+            templateUrl: 'templates/bulmaNavbar.html'
         };
     };
     

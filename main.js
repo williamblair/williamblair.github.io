@@ -4,35 +4,34 @@
     var app = angular.module("myApp", ["ngRoute", "hljs"]);
 
     /* Set routing params */
-    //app.config(function($routeProvider, $hljsProvider){
     app.config(['$routeProvider', 'hljsServiceProvider', function($routeProvider, hljsServiceProvider) {
         $routeProvider
         .when("/", {
-            templateUrl: "home.html"
+            templateUrl: 'templates/home.html'
         })
         .when("/about", {
-            templateUrl: "about.html"
+            templateUrl: 'templates/about.html'
         })
         .when("/eyeTracker", {
-            templateUrl: 'eyeTracker.html'
+            templateUrl: 'templates/eyeTracker.html'
         })
         .when("/windowManager", {
-            templateUrl: 'windowManager.html'
+            templateUrl: 'templates/windowManager.html'
         })
         .when("/canvasPhysics", {
-            templateUrl: 'canvasPhysics.html'
+            templateUrl: 'templates/canvasPhysics.html'
         })
         .when("/memcarduino", {
-            templateUrl: 'memcarduino.html'
+            templateUrl: 'templates/memcarduino.html'
         })
         .when("/psio", {
-            templateUrl: 'psio.html'
+            templateUrl: 'templates/psio.html'
         })
         .when("/fbsetbg", {
-            templateUrl: 'fbsetbg.html'
+            templateUrl: 'templates/fbsetbg.html'
         })
         .when("/cppmatrix", {
-            templateUrl: 'cppmatrix.html'
+            templateUrl: 'templates/cppmatrix.html'
         })
     }]);
 
@@ -40,7 +39,6 @@
     var appController = function($scope) {
         
         $scope.navClick = function() {
-            console.log('in navClick!');
             $('.navbar-burger').toggleClass("is-active");
             $('.navbar-menu').toggleClass("is-active");
         }
