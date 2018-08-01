@@ -1,0 +1,34 @@
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>Test</title>
+<script src="UTF8.encode_decode.js"></script>
+<script src="URIcomponent.js"></script>
+<body>
+</p>
+
+<textarea id='decodeArea'></textarea><br/>
+<button id='decodeButton'>Decode</button>
+<p id='decodeResult'></p> 
+
+<br/>
+
+<textarea id='encodeArea'></textarea><br/>
+<button id='encodeButton'>Encode</button>
+<p id='encodeResult'></p>
+
+<script>
+document.querySelector('#decodeButton').onclick = function() {
+    var text = document.querySelector('#decodeArea').value;
+    var result = utf8.decode(text);
+    document.querySelector('#decodeResult').innerHTML = result;
+}
+
+document.querySelector('#encodeButton').onclick = function() {
+    var text = document.querySelector('#encodeArea').value;
+    var result = utf8.encode(text);
+    document.querySelector('#encodeResult').innerHTML = result;
+}
+</script>
+</body>
+</html>
