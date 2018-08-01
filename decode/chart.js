@@ -98,9 +98,12 @@ function encodeChar(str)
 function decodeString(str)
 {
     var result = '';
-    for (var i = 0; i <= str.length-3; i+=3)
+    var incrAmount = 3;
+    for (var i = 0; i <= str.length-3; i+= incrAmount)
     {
+        incrAmount = 3;
         var nextChar = decodeChar(str.substring(i,i+3));
+        if (nextChar === '?') incrAmount = 1;
         
         result += nextChar;
     }
