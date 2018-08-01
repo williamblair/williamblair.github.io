@@ -1,12 +1,12 @@
 <html>
 <head>
-<meta charset="windows-1252"/>
+<!--<meta charset="windows-1252"/>-->
+<meta charset="utf-8"/>
 <title>Test</title>
-<script src="UTF8.encode_decode.js"></script>
-<script src="URIcomponent.js"></script>
+<script src="chart.js"></script>
 <body>
 </p>
-
+<p></p>
 <textarea id='decodeArea'></textarea><br/>
 <button id='decodeButton'>Decode</button>
 <p id='decodeResult'></p> 
@@ -17,10 +17,16 @@
 <button id='encodeButton'>Encode</button>
 <p id='encodeResult'></p>
 
+<!--<p>ａaｂbｃcｄdｅeｆfｇgｈhｉiｊjｋkｌlｍmｎnｏoｐpｑqｒrｓsｔtｕuｖvｗwｘxｙyｚz　space</p>-->
+
+<p id='chartResult'></p>
+
 <script>
+
 document.querySelector('#decodeButton').onclick = function() {
     var text = document.querySelector('#decodeArea').value;
-    var result = utf8.decode(text);
+    var result = decodeString(text);
+    console.log('result: ', result);
     document.querySelector('#decodeResult').innerHTML = result;
 }
 
@@ -29,6 +35,8 @@ document.querySelector('#encodeButton').onclick = function() {
     var result = utf8.encode(text);
     document.querySelector('#encodeResult').innerHTML = result;
 }
+
 </script>
+
 </body>
 </html>
