@@ -81,7 +81,7 @@ var map = [
 function decodeChar(str)
 {   
     var result = map.filter(entry => entry[0] === str);
-    if (result.length === 0) return '?';
+    if (result.length === 0) return str[0];
     else  {
         return result[0][1];
     }   
@@ -103,7 +103,7 @@ function decodeString(str)
     {
         incrAmount = 3;
         var nextChar = decodeChar(str.substring(i,i+3));
-        if (nextChar === '?') incrAmount = 1;
+        if (nextChar === str.substring(i,i+3)[0]) incrAmount = 1;
         
         result += nextChar;
     }
