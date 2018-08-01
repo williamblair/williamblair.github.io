@@ -1,80 +1,99 @@
 /* This only works if the browser is in utf-8 mode */
-function mapStr(str)
-{
-    //console.log('given str: ', str);
-    switch(str)
-    {
-        case 'ï¼¡': return 'Ａ';
-        case 'ï¼¢': return 'Ｂ';
-        case 'ï¼£': return 'Ｃ';
-        case 'ï¼¤': return 'Ｄ';
-        case 'ï¼¥': return 'Ｅ';
-        case 'ï¼¦': return 'Ｆ';
-        case 'ï¼§': return 'Ｇ';
-        case 'ï¼¨': return 'Ｈ';
-        case 'ï¼©': return 'Ｉ';
-        case 'ï¼ª': return 'Ｊ';
-        case 'ï¼«': return 'Ｋ';
-        case 'ï¼¬': return 'Ｌ';
-        //case 'ï¼': return 'M';
-        case 'ï¼®': return 'Ｎ';
-        case 'ï¼¯': return 'Ｏ';
-        case 'ï¼°': return 'Ｐ';
-        case 'ï¼±': return 'Ｑ';
-        case 'ï¼²': return 'Ｒ';
-        case 'ï¼³': return 'Ｓ';
-        case 'ï¼´': return 'Ｔ';
-        case 'ï¼µ': return 'Ｕ';
-        case 'ï¼¶': return 'Ｖ';
-        case 'ï¼·': return 'Ｗ';
-        case 'ï¼¸': return 'Ｘ';
-        case 'ï¼¹': return 'Ｙ';
-        case 'ï¼º': return 'Ｚ';
-        
-        case 'ï½': return 'ａ';
-        case 'ï½‚': return 'ｂ';
-        case 'ï½ƒ': return 'ｃ';
-        case 'ï½„': return 'ｄ';
-        case 'ï½…': return 'ｅ';
-        case 'ï½†': return 'ｆ';
-        case 'ï½‡': return 'ｇ';
-        case 'ï½ˆ': return 'ｈ';
-        case 'ï½‰': return 'ｉ';
-        case 'ï½Š': return 'ｊ';
-        case 'ï½‹': return 'ｋ';
-        case 'ï½Œ': return 'ｌ';
-        case 'ï½': return 'ｍ';
-        case 'ï½Ž': return 'ｎ';
-        case 'ï½': return 'ｏ';
-        case 'ï½': return 'ｐ';
-        case 'ï½‘': return 'ｑ';
-        case 'ï½’': return 'ｒ';
-        case 'ï½“': return 'ｓ';
-        case 'ï½”': return 'ｔ';
-        case 'ï½•': return 'ｕ';
-        case 'ï½–': return 'ｖ';
-        case 'ï½—': return 'ｗ';
-        case 'ï½˜': return 'ｘ';
-        case 'ï½™': return 'ｙ';
-        case 'ï½š': return 'ｚ';
-        case 'ã€€': return '　';
-        case 'ï¼†': return '＆';
-        
-        default: return  '?';
-    };
+
+var map = [
+    [ 'ï¼¡',  'Ａ'],
+    [ 'ï¼¢',  'Ｂ'],
+    [ 'ï¼£',  'Ｃ'],
+    [ 'ï¼¤',  'Ｄ'],
+    [ 'ï¼¥',  'Ｅ'],
+    [ 'ï¼¦',  'Ｆ'],
+    [ 'ï¼§',  'Ｇ'],
+    [ 'ï¼¨',  'Ｈ'],
+    [ 'ï¼©',  'Ｉ'],
+    [ 'ï¼ª',  'Ｊ'],
+    [ 'ï¼«',  'Ｋ'],
+    [ 'ï¼¬',  'Ｌ'],
+    [ 'ï¼­',  'Ｍ'],
+    [ 'ï¼®',  'Ｎ'],
+    [ 'ï¼¯',  'Ｏ'],
+    [ 'ï¼°',  'Ｐ'],
+    [ 'ï¼±',  'Ｑ'],
+    [ 'ï¼²',  'Ｒ'],
+    [ 'ï¼³',  'Ｓ'],
+    [ 'ï¼´',  'Ｔ'],
+    [ 'ï¼µ',  'Ｕ'],
+    [ 'ï¼¶',  'Ｖ'],
+    [ 'ï¼·',  'Ｗ'],
+    [ 'ï¼¸',  'Ｘ'],
+    [ 'ï¼¹',  'Ｙ'],
+    [ 'ï¼º',  'Ｚ'],
+    
+    [ 'ï½',  'ａ'],
+    [ 'ï½‚',  'ｂ'],
+    [ 'ï½ƒ',  'ｃ'],
+    [ 'ï½„',  'ｄ'],
+    [ 'ï½…',  'ｅ'],
+    [ 'ï½†',  'ｆ'],
+    [ 'ï½‡',  'ｇ'],
+    [ 'ï½ˆ',  'ｈ'],
+    [ 'ï½‰',  'ｉ'],
+    [ 'ï½Š',  'ｊ'],
+    [ 'ï½‹',  'ｋ'],
+    [ 'ï½Œ',  'ｌ'],
+    [ 'ï½',  'ｍ'],
+    [ 'ï½Ž',  'ｎ'],
+    [ 'ï½',  'ｏ'],
+    [ 'ï½',  'ｐ'],
+    [ 'ï½‘',  'ｑ'],
+    [ 'ï½’',  'ｒ'],
+    [ 'ï½“',  'ｓ'],
+    [ 'ï½”',  'ｔ'],
+    [ 'ï½•',  'ｕ'],
+    [ 'ï½–',  'ｖ'],
+    [ 'ï½—',  'ｗ'],
+    [ 'ï½˜',  'ｘ'],
+    [ 'ï½™',  'ｙ'],
+    [ 'ï½š',  'ｚ'],
+    [ 'ã€€',  '　'],
+    [ 'ï¼†',  '＆']
+]
+
+function decodeChar(str)
+{   
+    var result = map.filter(entry => entry[0] === str);
+    if (result.length === 0) return '?';
+    else  {
+        return result[0][1];
+    }   
 }
 
-//var str = 'ï¼¨ï½…ï½Œï½ã€€ï¼†ã€€ï¼§ï½•ï½‰ï½„ï½…ï½Œï½‰ï½Žï½…ï½“';
+function encodeChar(str)
+{
+    console.log('given str: ', str);
+    var result = map.filter(entry => entry[1] === str);
+    if (result.length === 0) return '？';
+    else                     return result[0][0];
+}
 
 function decodeString(str)
 {
     var result = '';
     for (var i = 0; i <= str.length-3; i+=3)
     {
-        var nextChar = mapStr(str.substring(i,i+3));
+        var nextChar = decodeChar(str.substring(i,i+3));
         
-        // if that didn't work, maybe it's a two length one...
-        if (nextChar == '?') nextChar = mapStr(str.substring(i,i+2));
+        result += nextChar;
+    }
+    
+    return result;
+}
+
+function encodeString(str)
+{
+    var result = '';
+    for (var i = 0; i < str.length; i++)
+    {
+        var nextChar = encodeChar(str.charAt(i));       
         
         result += nextChar;
     }

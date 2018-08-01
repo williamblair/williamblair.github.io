@@ -18,6 +18,8 @@
 <p id='encodeResult'></p>
 
 <!--<p>ａaｂbｃcｄdｅeｆfｇgｈhｉiｊjｋkｌlｍmｎnｏoｐpｑqｒrｓsｔtｕuｖvｗwｘxｙyｚz　space</p>-->
+<!--<p>Ｍm</p>-->
+<!--<p>ｐp</p>-->
 
 <p id='chartResult'></p>
 
@@ -32,7 +34,7 @@ document.querySelector('#decodeButton').onclick = function() {
 
 document.querySelector('#encodeButton').onclick = function() {
     var text = document.querySelector('#encodeArea').value;
-    var result = utf8.encode(text);
+    var result = encodeString(text);
     document.querySelector('#encodeResult').innerHTML = result;
 }
 
