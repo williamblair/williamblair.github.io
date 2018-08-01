@@ -91,7 +91,7 @@ function encodeChar(str)
 {
     console.log('given str: ', str);
     var result = map.filter(entry => entry[1] === str);
-    if (result.length === 0) return '？';
+    if (result.length === 0) return 'ã€€';
     else                     return result[0][0];
 }
 
