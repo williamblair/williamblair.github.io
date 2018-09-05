@@ -26,5 +26,31 @@ git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
 </a>, following chapter 2 of the the textbook
 </p>
 
+<p><b>08/30/18</b></p>
+<p>
+Downloaded ubuntu base kernel using 
+<a href="https://help.ubuntu.com/community/Kernel/Compile">this</a>
+guide - was getting build errors from yesterdays source and this
+seemed easier. Build is taking forever! paused it partway through 
+(saved virtual machine state)
+</p>
+
+<p><b>08/31/18</b></p>
+<p>
+Build finished - had to install libssl-dev, other than that the above
+guide seemed to work fine. Trying Torvald's base kernel again
+to see if build issues were just dependencies... and it worked!
+The build was much faster this time than the ubuntu kernel.
+Kernel build was 4.19-rc1, installed with 
+<pre><code>make defconfig 
+make -j2
+make -j2 modules 
+make modules install 
+make install 
+update-grub </code></pre>
+(as root). To verify I was booting the new kernel, I went into
+'Advance options for Ubuntu' in the grub menu.
+</p>
+
 </body>
 </html>
