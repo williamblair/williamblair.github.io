@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>CSS test</title>
+    
+    <!-- jquery, semantic ui -->
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.7/semantic.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.7/semantic.min.js"></script>-->
+    
+    <!-- google font -->
+    <link href="https://fonts.googleapis.com/css?family=PT+Sans" rel="stylesheet">
+    
+    <!--<link rel="stylesheet" type="text/css" href="main.css"/>-->
+    
+    <style>
+        @font-face {
+            font-family: vt323;
+            src: url('vt323/VT323-Regular.ttf');
+        }
+        
+        body, html {
+            background-color: #000000;
+            color:            #00FF00;
+            font-family: 'vt323';
+        }
+        
+        .colorInvert {
+            background-color: #00FF00;
+            color:            #000000;
+        }
+        
+        .headerBar h1{
+            text-align: center;
+            margin:0px;
+        }
+        
+        
+        .navBar {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            list-style: none;
+            text-align: center;
+            margin:0px;
+        }
+        
+        .navBar div {
+            margin-top: 10px;
+            /*background-color: #00FFFF;*/
+            border: 1px solid #00FF00;
+            width: 20%;
+        }
+        
+        .navBar a {
+            display: block;
+            text-decoration: none;
+            margin: 5px;
+            color: #00FF00;
+        }
+        
+        .pageTitle {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+        }
+    </style>
+</head>
+<body>
+    
+<div class="headerBar colorInvert">
+    <h1>WILLIAM D BLAIR III</h1>
+</div>
+    
+<nav class="navBar">
+    <div><a href="http://www.google.com">Item 1</a></div>
+    <div><a href="#">Item 2</a></div>
+    <div><a href="#">Item 3</a></div>
+    <div><a href="#">Item 4</a></div>
+</nav>
+
+<div class="pageTitle">
+    <div><h1>>>></h1></div>
+    <div><h1>Hello World!</h1></div>
+    <div><h1><<<</h1></div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en-US"  ng-app="bjSite">
+  <head>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    
+    <!-- matrix library -->
+    <script src="glMatrix-0.9.5.min.js"></script>
+
+    	<!-- angular -->
+  	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+  
+    <!-- defines the page navbar -->
+    <script src="/javascript/NavbarDirective.js"></script>
+
+    <style>
+      html {
+      position: relative;
+      min-height: 100%;
+      }
+      body {
+      margin-bottom: 60px;
+      background-color: #EAEAEA;
+      }
+      .footer {
+      /* Positioning */
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      /* Set the fixed height of the footer here */
+      height: 60px;
+      line-height: 60px; /* Vertically center the text there */
+      /* Look */
+      /*background-color: #000000;*/
+      }
+      #lastModified {
+      color: #AAAAAA;
+      }
+      .jumbotron {
+      padding:0px;
+      background-color:#000000;
+      }
+      #imageContainer {
+      margin-left: auto; 
+      margin-right: auto; 
+      width:75%; 
+      min-width:800px;
+      }
+    </style>
+    <style>
+      #mycanvas {
+      width: 500px;
+      height: 500px;
+      overflow: hidden;
+      }
+    </style>
+
+    <!-- ace editor -->
+    <style>
+    .codeEditor {
+      height: 300px;
+      margin: 10px;
+    }
+    </style>
+
+    <!-- all of our WebGL scripts -->
+    <script id="shader-fs" src="fragmentShader.js"></script>
+    <script id="shader-vs" src="vertexShader.js"></script>
+    <script src="initGL.js"></script>
+    <script src="getShader.js"></script>
+    <script src="initShaders.js"></script>
+    <script src="initBuffers.js"></script>
+    <script src="initTexture.js"></script>
+    <script src="drawScene.js"></script>
+    <script src="main.js"></script>
+  </head>
+
+  <!-- initially run the WebGL program so it isn't blank when we
+       load the page -->
+  <body onload="webGLStart()">
+    
+    <!-- defined with NavbarDirective.html/.js -->
+    <site-nav></site-nav>
+
+<!-- html5 canvas to draw on -->
+<div class="container">
+  <div class="row">
+    <div class="col-xs-10 col-xs-offset-1">
+      <div style="width:500px; height:500px; margin-left: auto; margin-right: auto;">
+        <canvas id="mycanvas" width="500" height="500"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:20px;">
+
+    <div class="row">
+      <div class="col-sm-10 col-sm-offset-1">
+        <!-- panel throught the different files -->
+          <ul class="nav nav-pills">
+            <li class="active"><a data-toggle="pill" href="#mainJSEmbed">main.js</a></li>
+            <li><a data-toggle="pill" href="#initGLJSEmbed">initGL.js</a></li>
+            <li><a data-toggle="pill" href="#getShaderJSEmbed">getShader.js</a></li>
+            <li><a data-toggle="pill" href="#initShadersJSEmbed">initShaders.js</a></li>
+            <li><a data-toggle="pill" href="#vertexShaderJSEmbed">vertexShader.js</a></li>
+            <li><a data-toggle="pill" href="#fragmentShaderJSEmbed">fragmentShader.js</a></li>
+            <li><a data-toggle="pill" href="#initBuffersJSEmbed">initBuffers.js</a></li>
+            <li><a data-toggle="pill" href="#initTextureJSEmbed">initTexture.js</a></li>
+            <li><a data-toggle="pill" href="#drawSceneJSEmbed">drawScene.js</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- data for the panel - where the code editors go -->
+      <div class="col-sm-12">
+        <div class="tab-content" style="margin-left:20px;margin-right:20px;">
+          <div id="mainJSEmbed" class="tab-pane fade in active codeEditor">
+          </div>
+          <div id="initGLJSEmbed" class="tab-pane fade codeEditor">
+          </div>
+          <div id="getShaderJSEmbed" class="tab-pane fade codeEditor">
+          </div>
+          <div id="initShadersJSEmbed" class="tab-pane fade codeEditor">
+          </div>
+          <div id="vertexShaderJSEmbed" class="tab-pane fade codeEditor">
+          </div>
+          <div id="fragmentShaderJSEmbed" class="tab-pane fade codeEditor">
+          </div>
+          <div id="initBuffersJSEmbed" class="tab-pane fade codeEditor">
+          </div>
+          <div id="initTextureJSEmbed" class="tab-pane fade codeEditor">
+          </div>
+          <div id="drawSceneJSEmbed" class="tab-pane fade codeEditor">
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- button to run the code from the editors -->
+    <div class="row">
+      <div class="col-xs-2">
+        <button class="btn btn-primary" onclick="runGL()" style="margin:10px;">Run</button>
+      </div>
+      <!-- link/acknowledgement to the website where the code
+           is from -->
+      <div class="col-xs-10">
+        <p style="line-height: 20px; margin-top: 20px;">Interactive WebGL examples with code from 
+          <a href="http://learningwebgl.com/">http://learningwebgl.com/</a>
+        </p>
+      </div>
+    </div>
+
+    <script src="/ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script>
+      /* Array of ace instances */
+      var editors = [];
+      /* Array of div ids for each editor */
+      var ids = [
+        "mainJSEmbed",
+        "initGLJSEmbed", 
+        "getShaderJSEmbed", 
+        "initShadersJSEmbed", 
+        "vertexShaderJSEmbed",
+        "fragmentShaderJSEmbed",
+        "initBuffersJSEmbed",
+        "initTextureJSEmbed",
+        "drawSceneJSEmbed"
+      ];
+      /* Array of source files for each id */
+      var sources = [
+        "main.js",
+        "initGL.js",
+        "getShader.js",
+        "initShaders.js",
+        "vertexShader.js",
+        "fragmentShader.js",
+        "initBuffers.js",
+        "initTexture.js",
+        "drawScene.js"
+      ]; 
+
+      /* create each instance */
+      for(var i=0; i<ids.length; i++) {
+        editors.push( ace.edit(ids[i]) );
+        editors[i].setTheme("ace/theme/monokai");
+        editors[i].getSession().setMode("ace/mode/javascript");
+      }
+
+      /* set each editors file contents */
+      editors.forEach(function(editor, index) {
+
+        //var dataHolder=""; // placeholder test
+
+        /* load text into the editor */
+        jQuery.get(sources[index], function(data, status){
+          console.log('file contents:');
+          console.log(data);
+          //dataHolder = data;
+
+          editor.setValue(data);
+          editor.resize();
+  
+          /* loading the text selects it all for some reason */
+          editor.getSession().selection.clearSelection();
+        });
+      });
+  
+    </script>
+
+    <!-- onclick button run -->
+    <script>
+      var runGL = function() {
+        console.log("In RunGL!");
+
+        /* collect all of the javascript from the editors */
+        var allText = "";
+        editors.forEach(function(editor, index){
+          allText += editor.getValue() + "\n";
+        });
+
+        /* we actually need to call main now to
+         * get everything to run */
+        allText += "\nwebGLStart();\n";
+
+        /* create function from selected text and run */
+        var runFunc = new Function(allText);
+        runFunc();
+      };
+    </script>
+
+  </div>
+
+</div>
+  
+    <!-- footer content is filled in with footer.js, using its id -->
+    <footer class="footer" id="pageFooter">
+      <script src="../../javascript/footer.js"></script>
+    </footer>
+  
+  
+    <!-- last modified will exist after footer.js enters the elements
+      into pageFooter -->
+    <script>
+      var p = document.getElementById('lastModified');
+      var modString = "Last Modified: ";
+      modString += document.lastModified;
+      p.innerHTML = modString;
+    </script>
+  </body>
+</html>

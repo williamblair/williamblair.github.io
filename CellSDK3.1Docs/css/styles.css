@@ -1,0 +1,342 @@
+html{margin:0;padding:0;height:100%}
+body {
+margin: 0; padding: 0;
+text-align: center;
+background: url(../images/bottom_bk.jpg) center bottom fixed repeat-x;
+font: 76%/1.35 Helvetica, "Bitstream Vera Sans", verdana, lucida, arial, helvetica, sans-serif;
+}
+/* ---(Instructions)--------------------------- */
+ol.instructions {
+	padding: 0 20px;
+}
+
+li.instructions {
+	margin: 10px 0 0 0;
+	padding: 0px 10px;
+}
+
+i.instructions {
+	margin: 10px 0 0 20px;
+	padding: 5px;
+	background-color:#ddd;
+	display: block;
+	font-family: monospace;
+	font-style: normal;
+}
+
+
+/* ---(Links)---------------------------------- */
+
+
+a:link {
+color: #055780;
+}
+a:visited {
+color: #055780;
+}
+a:hover {
+color: #FF0000;
+text-decoration: none;
+}
+a:active {
+color: #990000;text-decoration: none;
+}
+:-moz-any-link:focus {
+outline: none;
+}
+.spacer {
+  clear: both;
+  height:1px;
+  overflow:hidden;
+  margin-top:-1px;
+  }
+ sup {
+ font-size: .7em;
+ } 
+p {
+	font-size:1em;
+	text-align: left;
+	margin: 0 0 1.3em;
+	}
+	
+	ul {
+	list-style-type: square;
+	margin: 0 0 10px 25px;
+	padding: 0;
+	}
+#outerWrapper {
+margin: 0 auto;padding: 7px 0 0 0;background: transparent url(../images/top_bk.jpg) center top repeat-x;
+}
+#wrapper {
+width: 890px;margin: 0 auto 20px auto; background: url(../images/inner_bottom_gradient.jpg) left bottom no-repeat;text-align: left;
+}
+#header {
+background: url(../images/inner_top_gradient.jpg) left top no-repeat;height: 125px;float: left;margin-bottom: 0;
+}
+#cdTitle {
+margin: 30px 0 0 41px;float: left;
+}
+#logo {
+margin: 35px 41px 0 0;float: right;
+}
+#contentContainer {
+float: left;
+margin: 0 0 200px 0;
+}
+#cplcontent
+{
+width: 593px;
+float: right;
+margin-bottom: 50px;
+}
+
+#content {
+width: 593px;
+float: left;
+margin-bottom: 50px;
+}
+#sideCol {
+width: 246px;
+float: left;
+margin-bottom: 50px;
+}
+#header {
+float: left;width: 890px;
+}
+.clear {
+clear: both;
+}
+
+ol#faqsLinks {
+margin-left: 16px; padding: 0;
+}
+ol#faqsLinks li {
+margin-bottom: .5em;
+}
+/* ---(Main navigation)---------------------------------- */
+
+ul#nav {
+margin:0 0 25px 0;
+padding:0;
+list-style-type: none;display: block;float: left;
+}
+ul#nav li {
+display: inline;
+margin: 0 0 8px 0;float: left;
+}
+ul#nav a {
+display: block;
+width: 246px;
+height: 30px;
+line-height: 30px;
+color: #FFF;
+background-image: url(../images/nav/overview.jpg);
+text-indent: -5000px;
+background-position: right top;background-repeat: no-repeat; 
+text-decoration: none;
+}
+* html ul#nav li a{text-indent:0}
+* html ul#nav li a span{text-indent:-999em} 
+	
+* html ul#nav a  { 
+        height: 1%;
+        }
+ul#nav li#overviewNav a {background-image: url(../images/nav/overview.jpg);}
+ul#nav li#howtoNav a {background-image: url(../images/nav/howto.jpg);}
+ul#nav li#cbesoftwareNav a {background-image: url(../images/nav/cbe_software.jpg);}
+ul#nav li#cbeDocNav a {background-image: url(../images/nav/cbe_standard_doc.jpg);}
+ul#nav li#cbeTechNav a {background-image: url(../images/nav/cbe_tech_articles.jpg);}
+ul#nav li#cbeWebNav a {background-image: url(../images/nav/cbe_web.jpg);}
+ul#nav li#cbeNewsNav a {background-image: url(../images/nav/cbe_news.jpg);}
+ul#nav li#powerpcNav a {background-image: url(../images/nav/powerpc.jpg);}
+ul#nav li#treDemoNav a {background-image: url(../images/nav/tre_demo.jpg);}
+ul#nav li#rayDemoNav a {background-image: url(../images/nav/ray_tracing_demo.jpg);}
+ul#nav li#licensesNav a {background-image: url(../images/nav/licenses.jpg);}
+
+
+ul#nav a:hover {
+background-position: left top;	
+}
+
+body#home ul#nav li#overviewNav a {background-position: left top;}
+body#cbesoftware ul#nav li#cbesoftwareNav a {background-position: left top;}
+body#howto ul#nav li#howtoNav a {background-position: left top;}
+body#cbeDoc ul#nav li#cbeDocNav a {background-position: left top;}
+body#cbeTech ul#nav li#cbeTechNav a {background-position: left top;}
+body#cbeWeb ul#nav li#cbeWebNav a {background-position: left top;}
+body#cbeNews ul#nav li#cbeNewsNav a {background-position: left top;}
+body#powerpc ul#nav li#powerpcNav a {background-position: left top;}
+body#treDemo ul#nav li#treDemoNav a {background-position: left top;}
+body#licenses ul#nav li#licensesNav a {background-position: left top;}
+
+
+
+
+img {
+border: none;
+}
+
+div.updates {
+margin: 300px 0 0 0;display: block;
+}
+
+/* ---(Headers)---------------------------------- */
+h1 {
+color: #000002; font-size: 1.6em;letter-spacing: -1px;padding: 0;margin: 0 0 10px 0;
+}
+h2 {
+font-size: 1.1em;color: #666666;
+}
+
+#cbesoftware h2,#powerpc h2 {
+font-size: 1.5em;color: #666666;border-bottom: 1px dotted #CCC;padding-bottom: 0;
+}
+h3 {
+font-size: 1.1em;margin-bottom: .3em;
+}
+body#cbeDoc #content h2, body#howto #content h2 {
+margin-bottom: 11px;
+}
+
+#cbesoftware #content div.linkSection,#powerpc #content div.linkSection {
+display: block;
+}
+
+#cbesoftware #content div.linkSection h2,#powerpc #content div.linkSection h2 {
+color: #000; font-size: 1.1em;letter-spacing: -1px;padding: 2px 0 2px 0;margin: 0 20px 4px 0;
+border-bottom: 1px solid #3b5686;border-top: 1px solid #3b5686;width: auto;
+max-width: 580px;float: left;
+}
+#cbesoftware div.linkSection,#powerpc div.linkSection {
+float: left;margin: 0;
+}
+#cbesoftware #content div.linkSection h2 a,#powerpc #content div.linkSection h2 a {
+color: #FFF;background: #3b5686;padding: 2px 20px 2px 5px;display: block;text-decoration:none;
+}
+#cbesoftware #content div.linkSection h2 a:hover,#powerpc #content div.linkSection h2 a:hover {
+background: #7a9ecb;
+}
+
+
+
+#moreInfo {
+margin: 0 0 6px 0;
+}
+#content div.linkSection h2 a.externalLink {
+ background-image: url(../images/externalLink.gif);
+ background-repeat: no-repeat;
+ background-position: right top;
+
+}
+
+#content a.externalLinkBlack
+{
+	background-image: url(../images/externalLink_black.gif);
+	background-repeat: no-repeat;
+	background-position: right top;
+	padding-right: 9px;
+}
+
+#cbesoftware #content div.linkSection p {
+clear: both;margin-bottom: 6px;
+}
+#content ul {
+list-style: none;margin-top: 0px;margin-left:4px;padding-left:0;
+}
+#content ul li {
+margin-bottom: .3em;background: url(../images/arrow.gif) no-repeat 0 .3em;padding-left:18px;
+}
+
+#notice {
+background: #EEE; text-align: center; margin: 2px 20px 20px 13px; padding: 4px;border: 1px dotted #666;
+width: 200px; float: right;display: inline;
+}
+
+table {
+border-collapse: collapse;
+}
+th, td {
+border: 1px solid #999;vertical-align: top;padding: 3px;
+}
+th {
+background: #3a5483;color: #FFF;text-align: center;
+}
+.colFilename {
+width: 168px;
+}
+.fileSize {
+width: 70px;
+}
+
+tr {
+background: #FFF;
+}
+tr.alt {
+background: #EEE;
+}
+table.doc {
+color: transparent; padding: 3px; border: 0px; width:890px;
+}
+td.doc{
+border: 0px;vertical-align: top;padding: 3px; color: transparent; align: right;
+}
+td.doc2 {
+border: 0px;vertical-align: top;padding: 20px 20px 20px 20px; color: transparent;
+}
+td.doc3 {
+border: 0px;vertical-align: top; align: right; color: transparent;
+}
+th.doc {
+background: #3a5483;color: #FFF;text-align: left; vertical-align: bottom; padding-top:3px; padding-bottom:4px;
+}
+tr.doc {
+background: transparent; border:0px ;
+}
+tr.doc2 {
+background: transparent; border:1px solid #ccc;  
+}
+
+/* ---(Sub navigation)---------------------------------- */
+#content #navSub
+{
+padding: 0;
+margin:0;
+font: bold 12px Verdana, sans-serif;
+}
+
+#content #navSub li
+{
+list-style: none;
+margin: 0;padding: 0;
+display: inline;background-image: none;
+}
+
+#content #navSub li a
+{
+padding: 0.25em 0.8em 0.25em 0.8em;
+border: 1px solid #666;
+background: #5679b3;
+text-decoration: none;
+color: #FFF;
+}
+#content #navSub li a.activated
+{
+border-color:  #666;
+color: #FFF;
+background: #3a5483;
+}
+
+#content #navSub li a:link { color: #FFF; }
+#navSub li a:visited { color: #FFF; }
+
+#content #navSub li a:hover
+{
+border-color:  #666;
+color: #FFF;
+background: #3a5483;
+}
+
+
+p, h1, h2,h3, ul,ol, table,blockquote {
+margin-right: 25px;
+}

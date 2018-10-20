@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="utf-8"/>
+
+    <!-- mobile responsive -->
+     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+
+    <title>CS 523</title>
+
+    <style>
+        html, body {
+            background-color: #0E0F11;
+            color: #FFFFFF;
+        }
+        #bodydiv {
+            margin-left: auto;
+            margin-right: auto;
+            min-height: 100%;
+            height:     100%;
+            width: 75%;
+
+            background-color: #553A41;
+        }
+
+        a {
+            color: #26C485;
+        }
+        a:visited {
+            color: #A3E7F0;
+        }
+
+        /* mobile styling */
+        @media only screen and (max-width:620px) {
+            #bodydiv {
+                width:100%;
+            }
+        }
+        
+    </style>
+</head>
+<body>
+<!-- to center content -->
+<div id="bodydiv">
+<h1 style="text-align:center;">CS 518 - Parallel Computing</h1>
+<h3 style="text-align:center;"><a href="../../index.html">William (BJ) Blair</a></h3>
+
+<h3 style="margin-left:5px;">Homework 6</h3>
+
+<a href="files/" style="margin: 5px;">Code</a>
+
+<figure width="100%">
+    <a href="homework5screen.png">
+    <img src="homework5screen.png" alt="homework5 Jumpshot" width="100%"/>
+    </a>
+    <figcaption>Jumpshot view of Homework 5 (Click for fullsize)</figcaption>
+</figure>
+
+<figure width="100%">
+    <a href="homework5_mpibcast.png">
+    <img src="homework5_mpibcast.png" alt="homework5 MPI Comparison" width="100%"/>
+    </a>
+    <figcaption>Jumpshot view of Homework 5 using MPI Broadcast instead
+                of our homemade function for comparison (Click for fullsize)
+    </figcaption>
+</figure>
+
+
+</div> <!-- end bodydiv -->
+</body>    
+</html>

@@ -1,0 +1,16 @@
+# copied this file from spetkas site:
+
+#***************************************************************************
+# Change this file to contain the machines that you want to use
+# to run MPI jobs on.  The format is one host name per line, with either
+#    hostname
+# or
+#    hostname:n
+# where n is the number of processors in an SMP.  The hostname should
+# be the same as the result from the command "hostname"
+swaic.cs.sunyit.edu
+fox.cs.sunyit.edu
+coyote.cs.sunyit.edu
+ren.cs.sunyit.edu
+mcgruff.cs.sunyit.edu
+#***************************************************************************

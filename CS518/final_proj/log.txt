@@ -1,0 +1,245 @@
+02/07/2018
+----------
+8:30pm-10:00pm
+Research:
+    - Sony PS3 Linux Kit - Cell BE toolkit - used for PS3s processor
+        i.   explanation pdf here: http://moss.csc.ncsu.edu/~mueller/cluster/ps3/CBE_SDK_Guide_1.1.pdf
+        ii.  Can also be run (I believe) on linux on a pc, has a 
+             'Full system simulator'
+        iii. Fat PS3 $90 gamestop
+
+    - SPE programming - part of Cell programming
+        i. (chp 1) - https://www.kernel.org/pub/linux/kernel/people/geoff/cell/ps3-linux-docs/CellProgrammingTutorial/BasicsOfCellArchitecture.html
+        i. (chp 3) - https://www.kernel.org/pub/linux/kernel/people/geoff/cell/ps3-linux-docs/CellProgrammingTutorial/BasicsOfSPEProgramming.html
+
+    - PS2 - not alot of info on ps2 cluster, says used official
+       ps2 linux kit
+
+02/10/18
+--------
+1:00pm-1:38pm
+Installing IBM Cell/B.E. 2.1 SDK (on pc)
+-Download Fedora core 6 x86 iso, to be virtualized
+    - https://archive.fedoraproject.org/pub/archive/fedora/linux/core/6/i386/iso/
+        i. downloaded FC-6-i386-DVD.iso
+    - installed on VirtualBox
+-Found ps3 example SPE graphics code here (japanese article):
+    https://plaza.rakuten.co.jp/miyazblog/diary/200712270000/
+
+02/11/18
+--------
+10:00pm-2:00am
+Installing CFW for OFW 4.82 on PS3 (so can install linux)
+- Exploit guide (mix of info from all):
+    https://gbatemp.net/threads/guide-ps3-4-82-cfw-installation-for-dummies.491117/
+    https://www.youtube.com/watch?v=EJ9euU2u-EU
+    http://www.psx-place.com/threads/ps3xploit-tools-v2-0-improved-flash-writers-dumpers-even-easier-to-install-cfw-on-4-82-ofw.16139/
+
+02/12/18
+--------
+2:30pm-5:00pm, 6:30pm-10:30pm, 11:30pm-1:30am
+Installing Linux on PS3 CFW
+- First Tried Yellow Dog Linux (Comes with IBM cell SDK built in)
+    - Failed to install via USB due to issue finding boot image
+- Install Red Ribbon Linux (Debian)
+    - Boots successfully via USB
+        i. Installed to a 32gb flash drive (not optimal, yes, but
+           easier than partitioning the ps3 hard drive)
+    - Cell 3.1 SDK can be installed via converted RPMs to DEBs from here:
+        https://github.com/aethyx/ps3linux/tree/master/Cell%20SDK%203.1%20for%20Debian%20Jessie
+        - had to install chkconfig for elfspe2
+            sudo apt-get install chkconfig
+        - elfspe2 fails to install properly regardless
+        - DEBs fail to install properly (ppu-gcc doesn't work)
+- Yellow Dog Linux install via DVD
+    - Run ps3 [video mode] install from petiteboot
+        - DVD only recognized if petiteboot selected from the
+          rebug tools menu
+
+        - add these as additional repos during install?:
+        ftp://ftp.kddlabs.co.jp/Linux/packages/yellowdog/yum/6.1/base/
+        ftp://ftp.kddlabs.co.jp/Linux/packages/yellowdog/yum/6.1/extras/
+       
+        - still have failing to find rpm's issue (maybe iso/cd burn issue?) 
+
+02/12/18
+--------
+8:00am-11:00am, 10:30pm-12:30am
+- Fedora Core 9 DVD install
+    - DVD only recognized if Red Ribbon Live USB also inserted
+      (probably any recognizable USB would do it I imagine)
+    - Having the other Red Ribbon USB messed up the install
+       i. installation seemed to go fine, butn when booting from
+          petiteboot it was looking for the boot image, root, etc.
+          on the red ribbon flash drive (/dev/sde), not our installed 
+          flash drive (/dev/sdd)
+
+02/13/18
+--------
+6:00am-6:30am, 4:15pm-5:15pm, 6:30pm-7:45pm, 8:30pm-10:30pm
+- Fedora Core 9 DVD successfully installed on single usb 
+    - Just have one usb with Red Ribbon on it and overwrite it during
+      install
+- Found Cell 3.1 SDK here (hard to find anywhere else, many dead links):
+    - https://www14.software.ibm.com/webapp/iwm/web/reg/download.do?source=cellsdk&S_PKG=fedora&S_TACT=105AGX16&S_CMP=LP&lang=en_US&cp=UTF-8
+    - https://www-01.ibm.com/marketing/iwm/iwm/web/reg/download.do?source=cellsdk&S_PKG=fedora&S_TACT=105AGX16&S_CMP=LP&lang=en_US&cp=UTF-8&dlmethod=http
+    - need an IBM account (free)
+- Installed SDK on PS3 following instructions for Fedora 9 from here:
+    - http://www.iman1.jo/iman1/images/IMAN1-User-Site-Files/Installation/SDK-Installation_Guide_v3.1.pdf
+- Ran hello world code from here:
+     - https://www.kernel.org/pub/linux/kernel/people/geoff/cell/ps3-linux-docs/CellProgrammingTutorial/BasicsOfSIMDProgramming.html
+
+02/15/18
+--------
+9:30am-11:00am, 8:30pm-9:30pm
+- Followed tutorial code from here:
+    - https://www.kernel.org/pub/linux/kernel/people/geoff/cell/ps3-linux-docs/CellProgrammingTutorial/BasicsOfSIMDProgramming.html
+- SIMD vector addition, Matrix transpose calc, abs. difference calc     
+
+02/21/18
+--------
+09:30am-11:00am
+- Continued following tutorial code from previous entry (02/15)
+    - SIMD partial sum, short->float conversion, basic spe threads/
+      execution
+- Copied Cell 3.1 Docs from ps3 to website here:
+    - https://web.cs.sunyit.edu/~blairw/CellSDK3.1Docs/
+
+02/26/18
+--------
+9:30am-11:00am
+- Installing SDK on virtualbox (in order to test IBM 'Full system simulator'
+
+02/27/18
+--------
+9:30am-11:00am, 12:30pm-1:30pm, 6:30pm-7:30pm, 9:00pm-9:30pm
+- Installed Eclipse IDE on virtual machine for development environment
+- The Simulator comes separately from the SDK now (of course it does,
+  why would it be easy?)
+    - Found here?
+      http://www.psdevwiki.com/ps3/Cell_Programming_IBM
+    - Also this site looks like it has some good links...
+- Uploaded and shared files to google drive for organized/central
+  location since everything is hard to find
+
+02/28/18
+--------
+9:30am-11:00am
+- Running simulator in IDE (Eclipse)
+    - Weird error according to docs: have to run
+        echo "Welcome to Fedora Core"
+        echo "INIT: Entering runlevel: 2"
+      in the eclipse console, apparently the simulator
+      waits for this message before continuing
+- Following IDE tutorial from here:
+   https://web.cs.sunyit.edu/~blairw/CellSDK3.1Docs/programming/IDE_Users_Guide_v3.1.pdf
+
+03/01/18
+--------
+12:30pm-2:00pm
+- Looked at Blue-Steel project:
+    http://groups.csail.mit.edu/cag/ps3/blue-steel.shtml
+- Fails to compile with given makefile - meant for cell sdk 2, not 3,
+  on Yellow Dog Linux
+
+03/03/18
+--------
+4:00pm-5:00pm, 6:00pm-7:00pm
+- Followed Cell Simulator Guide Here:
+    http://ww2.cs.fsu.edu/~west/cell/index.php?tutorial=configfirst
+- For using the simulator with command line tools as opposed to IDE
+
+03/06/18
+--------
+8:45pm-9:30pm
+- Followed IBM Cell SDK 3.1 programming tutorial/guide here (basic spe thread creation):
+    https://web.cs.sunyit.edu/~blairw/CellSDK3.1Docs/programming/CBE_Programming_Tutorial_v3.1.pdf
+
+03/07/18
+--------
+3:00pm-4:00pm, 6:00pm-8:00pm
+- Followed IBM Cell SDK 3.1 programming tutorial/guide from yesterday
+  (Euler particle simulation - example from scalar to SPE parallelism)
+- Found good altivec/PPU SIMD functions reference:
+    https://www.nxp.com/docs/en/reference-manual/ALTIVECPIM.pdf?&srch=1
+
+03/09/18
+--------
+11:00am-12:00pm, 1:00pm-3:00pm
+- Set up Cell SDK in Codelite IDE
+- Followed DMA transfer tutorial here:
+    https://www.kernel.org/pub/linux/kernel/people/geoff/cell/ps3-linux-docs/CellProgrammingTutorial/BasicsOfSPEProgramming.html
+
+03/10/18
+--------
+8:00pm-10:00pm
+- Continued to follow same DMA transfer tutorial as yesterday; this time
+  ran on multiple SPEs and used SPU intrinsics
+
+03/12/18
+--------
+10:00am-11:00am
+- Looked at Blue-Steel code
+
+03/31/18
+--------
+3:00pm-5:00pm
+- Looked at more Blue Steel Code
+- Started looking at multiple video streaming assignment here:
+    http://www.es.ele.tue.nl/~heco/courses/PlatformDesign/Cell-assignment/index.html
+
+04/01/18
+--------
+7:30pm-8:30pm, 9:30pm-11:00pm
+- Looked at Blue Steel Code
+    - Apparently Drawing to the screen is done through 
+      the PS3 Linux built in ps3 framebuffer lib?
+        - header asm/ps3fb.h, linux/fb.h
+    - look at blue steel source file src/fb.cpp (frame buffer)
+
+- Successfully drew to the screen from console using linux frame buffer,
+  code from here:
+    http://betteros.org/tut/graphics1.php#fbdev
+
+04/04/18
+--------
+8:00pm-10:00pm
+- Began implementing serial version of Conway's Game of Life on Cell PPU
+
+04/05/18
+--------
+12:30pm-1:30pm, 5:30pm-8:00pm
+- Finished Serial Conway's Game of Life, Began Parallel Version
+    - Noted - align 16 on data parameters to the SPE is important!
+    - will get a Bus Error without it
+
+- TODO - follow this signaling tutorial:
+    - http://ww2.cs.fsu.edu/~west/cell/index.php?tutorial=mailsignal
+    - That way can synchronize all of the SPEs to wait for all
+      of the others before moving to the next generation (otherwise
+      can have concurrency issues...)
+
+04/08/18
+--------
+2:00pm-5:00pm, 6:30pm-8:00pm, 9:30-11:00pm
+- Have 8 SPE threads running on parallel version (just skeleton),
+  facing concurrency issue w/ splitting up the matrix (multiple threads
+  receiving same part of matrix)
+
+04/11/18
+--------
+9:30am-11:00am, 8:30pm-11:00pm
+- Fixed concurrency issue (create SPE args within the pthread function)
+- added writing to output array from SPE
+- Program can now calculate the total next generation on SPEs
+    - TODO - add multiple generations
+
+04/12/18
+--------
+6:00pm-8:00pm
+- Added multiple generations calculation
+- Started comparing results to serial version
+    - serial version seriously outperforms parallel version
+    - to little data to work on/compute relative to the time
+      to send data and wait for threads to finish (concurrency)
+

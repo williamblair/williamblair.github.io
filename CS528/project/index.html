@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+
+<meta charset="utf-8"/>
+<title>CS 528 - Project</title>
+
+<style>
+  html, body {
+    background-color: #FFFFD0;
+  }
+  h1 {
+    text-align: center;
+  }
+</style>
+
+</head>
+<body>
+
+<h1>CS 528 - Project</h1>
+<h3 style="text-align:center;">Raspberry PI GPIO Kernel Programming</h3>
+
+<h3>Purpose/Topic</h3>
+<p>
+To research how the Raspberry PI's GPIO pins are handled within
+the kernel and develop a kernel based system to be used by
+the programmer in user space
+</p>
+
+<h3>Links</h3>
+
+<ul>
+<li><a href="https://www.theseus.fi/bitstream/handle/10024/74679/Nguyen_Vu.pdf">https://www.theseus.fi/bitstream/handle/10024/74679/Nguyen_Vu.pdf</a> - Implementation of Linux GPIO Device Driver on Raspberry Pi Platform</li>
+<li><a href="http://derekmolloy.ie/kernel-gpio-programming-buttons-and-leds/">http://derekmolloy.ie/kernel-gpio-programming-buttons-and-leds/</a> - GPIO Kernel Module</li>
+<li><a href="https://sysprogs.com/VisualKernel/tutorials/raspberry/leddriver/">https://sysprogs.com/VisualKernel/tutorials/raspberry/leddriver/</a> - Create a sysfs driver for GPIO</li>
+<li><a href="https://elinux.org/RPi_GPIO_Code_Samples#C">https://elinux.org/RPi_GPIO_Code_Samples#C</a> - Userspace GPIO programming in C</li>
+<li><a href="https://www.youtube.com/watch?v=Si1R2gaqE64">https://www.youtube.com/watch?v=Si1R2gaqE64</a> - Managing GPIO status through sysfs</li>
+<li><a href="https://lwn.net/Articles/532714/">https://lwn.net/Articles/532714/</a> - Linux GPIO api</li>
+</ul>
+
+<h3>Updates</h3>
+
+<p><b>10/05/18</b></p>
+
+<p>Got the custom kernel installed on the raspberry pi:</p>
+<img src="../images/orig-pikernel.png"/>
+<img src="../images/bj-pikernel.png"/>
+
+<p>Got LED's/GPIO verified working and managed through sysfs (see log for 10/05)</p>
+<img src="pi_blink.gif" width="500"/>
+
+<p><b>10/08/18</b></p>
+
+<p>
+Have basic system calls implemented for managing GPIO pins.
+The calls are stored in the file bj_gpio.c in the directory
+arch/arm/kernel:
+</p>
+<pre><code>
+#include &lt;linux/gpio.h&gt;
+
+/* Initialize a pin to either input or output
+ * inOrOut: 1: input, 0: output */
+asmlinkage long sys_bj_initpin(const unsigned int pin, int inOrOut)
+{
+    int ret;
+    char pinName[50]; // the label for the pin
+
+    printk("BJ: Initializing pin %d as %s\n",
+            pin, (inOrOut) ? "input" : "output");
+
+    /* Set the pinname */
+    sprintf(pinName, "gpio%d", pin);
+
+    /* Request the pin */
+    ret = gpio_request(pin, pinName);
+    if (ret &lt; 0) {
+        printk("BJ: Bad GPIO request!\n");
+        return -EINVAL;
+        /* http://www-numi.fnal.gov/offline_software/srt_public_context/WebDocs$
+         */
+    }
+
+    /* 1/not zero: input */
+    if (inOrOut) {
+        ret = gpio_direction_input(pin);
+    }
+   /* Otherwise output */
+    else {
+        /* 0 means default the pin to `off`, if its
+         * 1 then the pin will default to `on` */
+        ret = gpio_direction_output(pin, 0);
+    }
+
+    /* Test for failure setting direction */
+    if (ret &lt; 0) {
+        printk("BJ: failed setting direction!\n");
+        gpio_free(pin);
+        return -EINVAL;
+    }
+
+    return 0;
+}
+
+asmlinkage long sys_bj_setpin(const unsigned int pin, const unsigned int val)
+{
+    printk("Somebody called bj setpin: %d, val: %d\n", pin, val);
+
+    /* Set the value of the pin */
+    gpio_set_value(pin, val);
+
+    return 0;
+}
+
+asmlinkage long sys_bj_freepin(const unsigned int pin)
+{
+    printk("BJ: Somebody called freepin: %d\n", pin);
+
+    // dummy to free mem
+    gpio_free(pin);
+
+    return 0;
+}
+</code></pre>
+
+<p>
+In order to get the file to compile, had to add `bj_gpio.o`
+to obj-y in the Makefile in /arch/arm/kernel:
+</p>
+
+<pre><code>
+obj-y           := elf.o entry-common.o irq.o opcodes.o \
+                   process.o ptrace.o reboot.o return_address.o \
+                   setup.o signal.o sigreturn_codes.o \
+                   stacktrace.o sys_arm.o time.o traps.o \
+                   bj_gpio.o
+</code></pre>
+
+<p>
+This is the program used to test the calls on the raspberry pi:
+</p>
+<pre><code>
+#define _GNU_SOURCE
+#include &lt;unistd.h&gt;
+#include &lt;sys/syscall.h&gt;
+#include &lt;stdio.h&gt;
+
+// syscall numbers
+#define SYS_bj_initpin 398
+#define SYS_BJ_setpin  399
+#define SYS_bj_freepin 400
+
+int main(void)
+{
+    const unsigned int pin = 21;
+
+    /* 0 for output */
+    syscall(SYS_bj_initpin, pin, 0);
+
+    /* Turn the pin on */
+    syscall(SYS_bj_setpin, pin, 1);
+
+    /* Sleep for 10 seconds */
+    sleep(10);
+
+    /* Turn the pin off */
+    syscall(SYS_bj_setpin, pin, 0);
+
+    /* Free the pin */
+    syscall(SYS_bj_freepin, pin);
+
+    return 0;
+}
+</code></pre>
+
+<p>
+You can see the `printk`s from `dmesg | tail`:
+</p>
+<img src="bj_syscall_tail.png"/>
+
+</body>
+</html>

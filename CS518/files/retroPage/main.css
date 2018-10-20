@@ -1,0 +1,108 @@
+/* Colors:
+ * 
+ * 
+ * */
+
+/* Test */
+html, body {
+    font-family: 'PT Sans';
+    min-height:  100%;
+    margin:      0px;
+    
+    background-color: #000000;
+    color:            #00FF00;
+}
+
+.colorInvert {
+    color: #000000;
+    background-color: #00FF00;
+}
+
+h1 {
+    /* Size */
+    
+    /* DEBUG */
+    /*background-color: #FFFF00;*/
+}
+
+.banner {
+    /* Flexbox */
+    display: flex;
+
+    /* Sizing */
+    min-height: 600px;
+    
+    /* Style */
+    /*background-color: #000000;*/
+    
+    /* DEBUG */
+    /*background-color: #FF0000;*/
+}
+
+.centerVertical {
+    /* Flexbox */
+    display:         flex;
+    flex-direction:  column;
+    justify-content: center;
+    
+    /* Sizing */
+    
+    /* DEBUG */
+    /*background-color: #00FF00;*/
+}
+
+.centerHorizontal {
+    /* Flexbox */
+    display:         flex;
+    flex-direction:  row;
+    justify-content: center;
+    
+    /* Sizing */
+    
+    /* DEBUG */
+    /*background-color: #00FF00;*/
+}
+
+.navBar {
+    /* Flexbox */
+    display: flex;
+    flex-direction: row;
+    
+
+    /* Sizing */
+    min-height: 50px;
+    width: 100%;
+    
+    /* Styling */
+    /*background-color: #DDDDDD;*/
+}
+
+.navItem {
+}
+
+.navItem a {
+
+    display: block;
+    
+    /* Spacing */
+    padding: 1em;
+    
+    /* Sizing */
+
+    /* Styling */
+    text-decoration: none;
+    color: #00FF00;
+}
+
+.navItem a:hover {
+    /* Styling */
+    border: 1px solid #00FF00;
+    
+    /*border-radius: 3px;*/
+}
+
+.navItem a:visited {
+}
+
+
+

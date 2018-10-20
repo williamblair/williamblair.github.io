@@ -1,0 +1,68 @@
+<style>
+    #mycanvas {
+        width: 500px;
+        height: 500px;
+        overflow: hidden;
+    }
+</style>
+
+<!-- ace editor -->
+<style>
+    .codeEditor {
+        height: 300px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+</style>
+
+<div class="section" ng-controller="canvasPhysicsController" ng-init="init()"> 
+ <div class="content">
+ <h1>HTML5 Canvas Physics</h1>
+ <hr/>
+ <div class="box has-shadow">
+    <div class="content">
+        <!-- canvas to draw on -->
+        <div style="width:500px; height:500px; margin-left: auto; margin-right: auto;">
+            <canvas id="mycanvas" width="500" height="500"></canvas>
+        </div>
+        
+        <!-- codemirror editor area -->
+        <div id="editorArea1" class="codeEditor"></div>
+        
+        <button class="btn btn-primary" id="runButton">Run</button>
+        
+        <!-- load ace editor -->
+        <script src="ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- jquery load text from javascript file, then initialize
+        the editor upon completion -->
+        <script>
+
+            $(function(){
+                $('#editorArea1').load('javascript/canvasPhysics.js', function(){
+
+                    console.log('load performed!');
+
+                    editor = ace.edit("editorArea1");
+                    editor.setTheme("ace/theme/monokai");
+                    editor.getSession().setMode("ace/mode/javascript");
+                    document.getElementById("editorArea1").style.fontSize="14px";
+
+                    /* set the function to run when the button is clicked */
+                    var button = document.getElementById('runButton');
+                    button.onclick = function() {
+                        var animate = new Function(editor.getValue());
+                        animate();
+                    };
+
+                    /* Run the function when the web page loads */
+                    var initialFunc = new Function(editor.getValue());
+                    initialFunc();
+                });
+            });
+        </script>
+        
+    </div>
+ </div>
+</div>
+</div>
