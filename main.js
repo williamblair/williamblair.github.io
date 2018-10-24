@@ -33,6 +33,10 @@
         .when("/cppmatrix", {
             templateUrl: 'templates/cppmatrix.html'
         })
+        .when("/webgl", {
+            templateUrl: 'templates/webgl.html',
+            controller: 'webgl2dcontroller'
+        })
     }]);
 
     /* The controller for the page */
@@ -62,5 +66,30 @@
 
     /* Apply the controller */
     app.controller('appController', appController);
+
+    /* Webgl2d page controller */
+    function webgl2dcontroller($scope) {
+        $scope.title = "Hello World TEST!";
+
+        /* test injecting the script... */
+        var bjtest = function() {
+           document.getElementById('testScript').innerHTML = ` 
+              <p data-height="480" data-theme-id="0" data-slug-hash="pxQjNW" data-default-tab="js,result" data-user="williamblair" data-pen-title="2D WebGL" class="codepen">See the Pen <a href="https://codepen.io/williamblair/pen/pxQjNW/">2D WebGL</a> by williamblair (<a href="https://codepen.io/williamblair">@williamblair</a>) on <a href="https://codepen.io">CodePen</a>.</p>
+           `;
+
+            /* Run the external codepen script */
+            var script = document.createElement('script');
+            script.src = 'https://static.codepen.io/assets/embed/ei.js';
+            var scrDiv = document.getElementById("testScript");
+            testScript.appendChild(script);
+
+            console.log('set inner html!');
+        }
+
+        bjtest();
+    }
+
+    /* Apply the controller */
+    app.controller('webgl2dcontroller', webgl2dcontroller);
     
 })();
