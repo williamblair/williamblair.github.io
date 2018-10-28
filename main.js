@@ -77,11 +77,20 @@
               <p data-height="480" data-theme-id="0" data-slug-hash="pxQjNW" data-default-tab="js,result" data-user="williamblair" data-pen-title="2D WebGL" class="codepen">See the Pen <a href="https://codepen.io/williamblair/pen/pxQjNW/">2D WebGL</a> by williamblair (<a href="https://codepen.io/williamblair">@williamblair</a>) on <a href="https://codepen.io">CodePen</a>.</p>
            `;
 
+            document.getElementById('testScript3d').innerHTML = `
+              <p data-height="480" data-theme-id="0" data-slug-hash="jeQQmm" data-default-tab="js,result" data-user="williamblair" data-pen-title="WebGL3D" class="codepen">See the Pen <a href="https://codepen.io/williamblair/pen/jeQQmm/">WebGL3D</a> by williamblair (<a href="https://codepen.io/williamblair">@williamblair</a>) on <a href="https://codepen.io">CodePen</a>.</p>
+            `;
+
             /* Run the external codepen script */
             var script = document.createElement('script');
             script.src = 'https://static.codepen.io/assets/embed/ei.js';
-            var scrDiv = document.getElementById("testScript");
-            testScript.appendChild(script);
+            var srcDiv = document.getElementById("testScript");
+            srcDiv.appendChild(script);
+
+            /* Same for the 3d version */
+            script = document.createElement('script');
+            script.src = 'https://static.codepen.io/assets/embed/ei.js';
+            document.getElementById("testScript3d").appendChild(script);
 
             console.log('set inner html!');
         }
