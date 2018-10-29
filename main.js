@@ -81,6 +81,14 @@
               <p data-height="480" data-theme-id="0" data-slug-hash="jeQQmm" data-default-tab="js,result" data-user="williamblair" data-pen-title="WebGL3D" class="codepen">See the Pen <a href="https://codepen.io/williamblair/pen/jeQQmm/">WebGL3D</a> by williamblair (<a href="https://codepen.io/williamblair">@williamblair</a>) on <a href="https://codepen.io">CodePen</a>.</p>
             `;
 
+            document.getElementById('testCamera3d').innerHTML = `
+              <p data-height="480" data-theme-id="0" data-slug-hash="bmZmqv" data-default-tab="js,result" data-user="williamblair" data-pen-title="WebGL3dCamera" class="codepen">See the Pen <a href="https://codepen.io/williamblair/pen/jeQQmm/">WebGL3dCamera</a> by williamblair (<a href="https://codepen.io/williamblair">@williamblair</a>) on <a href="https://codepen.io">CodePen</a>.</p>
+            `;
+
+            document.getElementById('testTeapot').innerHTML = `
+              <p data-height="480" data-theme-id="0" data-slug-hash="ePoGLw" data-default-tab="js,result" data-user="williamblair" data-pen-title="WebGLTeapot" class="codepen">See the Pen <a href="https://codepen.io/williamblair/pen/jeQQmm/">WebGLTeapot</a> by williamblair (<a href="https://codepen.io/williamblair">@williamblair</a>) on <a href="https://codepen.io">CodePen</a>.</p>
+            `;
+
             /* Run the external codepen script */
             var script = document.createElement('script');
             script.src = 'https://static.codepen.io/assets/embed/ei.js';
@@ -91,6 +99,17 @@
             script = document.createElement('script');
             script.src = 'https://static.codepen.io/assets/embed/ei.js';
             document.getElementById("testScript3d").appendChild(script);
+
+            /* Same for the camera version */
+            script = document.createElement('script');
+            script.src = 'https://static.codepen.io/assets/embed/ei.js';
+            document.getElementById("testCamera3d").appendChild(script);
+            console.log('set inner html!');
+
+            /* Same for the teapot version */
+            script = document.createElement('script');
+            script.src = 'https://static.codepen.io/assets/embed/ei.js';
+            document.getElementById("testTeapot").appendChild(script);
 
             console.log('set inner html!');
         }
