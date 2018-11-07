@@ -19,7 +19,8 @@
             templateUrl: 'templates/windowManager.html'
         })
         .when("/canvasPhysics", {
-            templateUrl: 'templates/canvasphysics.html'
+            templateUrl: 'templates/canvasphysics.html',
+            controller: 'canvascontroller'
         })
         .when("/memcarduino", {
             templateUrl: 'templates/memcarduino.html'
@@ -119,5 +120,37 @@
 
     /* Apply the controller */
     app.controller('webgl2dcontroller', webgl2dcontroller);
+
+    /* html canvas page controller */
+    function canvascontroller($scope) {
+
+        /* test injecting the script... */
+        var bjtest = function() {
+           document.getElementById('paintScript').innerHTML = ` 
+              <p data-height="480" data-theme-id="0" data-slug-hash="mQepYr" data-default-tab="js,result" data-user="williamblair" data-pen-title="CanvasPaint" class="codepen">See the Pen <a href="https://codepen.io/williamblair/pen/mQepYr/">CanvasPaint</a> by williamblair (<a href="https://codepen.io/williamblair">@williamblair</a>) on <a href="https://codepen.io">CodePen</a>.</p>
+           `;
+
+            document.getElementById('treeScript').innerHTML = `
+              <p data-height="480" data-theme-id="0" data-slug-hash="pQjpXZ" data-default-tab="js,result" data-user="williamblair" data-pen-title="CanvasTrees" class="codepen">See the Pen <a href="https://codepen.io/williamblair/pen/pQjpXZ/">CanvasTrees</a> by williamblair (<a href="https://codepen.io/williamblair">@williamblair</a>) on <a href="https://codepen.io">CodePen</a>.</p>
+            `;
+
+            /* Run the external codepen script */
+            var script = document.createElement('script');
+            script.src = 'https://static.codepen.io/assets/embed/ei.js';
+            var srcDiv = document.getElementById("paintScript");
+            srcDiv.appendChild(script);
+
+            script = document.createElement('script');
+            script.src = 'https://static.codepen.io/assets/embed/ei.js';
+            document.getElementById("treeScript").appendChild(script);
+
+            console.log('set inner html!');
+        }
+
+        bjtest();
+    }
+
+    /* Apply the controller */
+    app.controller('canvascontroller', canvascontroller);
     
 })();
