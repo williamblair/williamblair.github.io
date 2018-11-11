@@ -536,11 +536,10 @@ Cross compiled for the raspberry pi by
 putting driver code in linux/drivers/gpio/gpio-bj.c,
 and adding <code>obj-m += gpio-bj.o</code>
 to linux/drivers/gpio/Makefile, then running
-</p>
-
 <pre><code>
 make -j4 ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- modules
 </code></pre>
+</p>
 
 <p>
 Which means it will only need to compile YOUR module.
