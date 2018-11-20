@@ -134,6 +134,10 @@
               <p data-height="480" data-theme-id="0" data-slug-hash="pQjpXZ" data-default-tab="js,result" data-user="williamblair" data-pen-title="CanvasTrees" class="codepen">See the Pen <a href="https://codepen.io/williamblair/pen/pQjpXZ/">CanvasTrees</a> by williamblair (<a href="https://codepen.io/williamblair">@williamblair</a>) on <a href="https://codepen.io">CodePen</a>.</p>
             `;
 
+            document.getElementById('triangleScript').innerHTML = `
+              <p data-height="480" data-theme-id="0" data-slug-hash="NEbzpP" data-default-tab="js,result" data-user="williamblair" data-pen-title="Sierpenski Triangles" class="codepen">See the Pen <a href="https://codepen.io/williamblair/pen/NEbzpP/">Sierpenski Triangles</a> by williamblair (<a href="https://codepen.io/williamblair">@williamblair</a>) on <a href="https://codepen.io">CodePen</a>.</p>
+            `;
+
             /* Run the external codepen script */
             var script = document.createElement('script');
             script.src = 'https://static.codepen.io/assets/embed/ei.js';
@@ -143,6 +147,10 @@
             script = document.createElement('script');
             script.src = 'https://static.codepen.io/assets/embed/ei.js';
             document.getElementById("treeScript").appendChild(script);
+
+            script = document.createElement('script');
+            script.src = 'https://static.codepen.io/assets/embed/ei.js';
+            document.getElementById("triangleScript").appendChild(script);
 
             console.log('set inner html!');
         }
