@@ -12,7 +12,7 @@
         
         
         #pageContainer {
-            background-color: #8E8D8E;
+            background-color: #5D5D5D;
             
             width: 75%;
             min-width: 800px;
@@ -21,11 +21,21 @@
         }
         
         a {
-            color: #0011FF;
+            color: #AABBFF;
         }
         
         a:visited {
-            color: #0011EE;
+            color: #AADDFF;
+        }
+
+        #titleDiv {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            justify-content: space-between;
+            align-items: flex-end;
+
+            width: 100%;
         }
     </style>
 </head>
@@ -34,8 +44,17 @@
 
 <div id="pageContainer">
 
-<h1>CS 598 - Project</h1>
-<h3><a href="../index.html">William (BJ) Blair</a></h3>
+<div id="titleDiv">
+    <div>
+        <h1>CS 598 - Project</h1>
+        <h3><a href="../index.html">William (BJ) Blair</a></h3>
+    </div>
+
+    <div>
+        <img src="ps1logo.png" width="200" height="200"/>
+        <img src="playstation.png" height="100"/>
+    </div>
+</div>
 
 <hr/>
 
@@ -49,11 +68,12 @@ Port <a href="http://libsdl.org/">SDL</a>
 <ul>
 <li><a href="http://libsdl.org/">http://libsdl.org/</a> - SDL homepage</li>
 <li><a href="http://unhaut.x10host.com/psxsdk/">http://unhaut.x10host.com/psxsdk/</a> - PSX-SDK</li>
+<li><a href="http://hitmen.c02.at/html/psx.html">http://hitmen.c02.at/html/psx.html</a> - Hitmen PSX - PSX System Info</li>
 </ul>
 
 <h3>Code</h3>
 <p>
-<a href="https://bitbucket.org/williamblair/psx_sdl_scratch">https://bitbucket.org/williamblair/psx_sdl_scratch</a>
+<a href="https://bitbucket.org/williamblair/psx_sdl/">https://bitbucket.org/williamblair/psx_sdl/</a>
 </p>
 
 <h3>Log</h3>
