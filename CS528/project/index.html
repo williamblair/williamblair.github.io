@@ -184,5 +184,271 @@ You can see the `printk`s from `dmesg | tail`:
 </p>
 <img src="bj_syscall_tail.png"/>
 
+<p><b>10/09/18</b></p>
+<p>
+Found a way to emulate the raspberry pi so I don't have to constantly move 
+the kernel code back and forth between the pc and raspberry pi:
+<a href="https://ownyourbits.com/2017/02/06/raspbian-on-qemu-with-network-access/">Link</a>.
+</p>
+<p>
+Notes: it has to run on ethernet in order to create a bridge (for network access),
+you have to add some fields in visudo (read the link), and you have to edit 
+qemu-pi.sh (just change a field to 1 instead of 0) to use network.
+</p>
+<p>
+I also found out from 
+another article that you can mount a .img file and whatever changes you 
+make inside will stay there accordingly (same in qemu when you run based
+off the .img file): <a href="https://azeria-labs.com/emulate-raspberry-pi-with-qemu/">
+Link </a>
+</p>
+
+<p>
+Moved the system calls to their own file, `bj_gpio.c`,
+and added 3 system calls: bj_initpin, bj_setpin, and bj_freepin.
+See the project page for more details.
+</p>
+
+<p><b>11/11/18</b></p>
+
+<p>
+Created simple device driver on the raspberry pi, following 
+<a href="http://derekmolloy.ie/writing-a-linux-kernel-module-part-2-a-character-device/">
+this
+</a>
+tutorial; just allows reading and writing short messages to/from
+a buffer by using /dev/bjrpi; going to expand to manipulate GPIO
+pins.
+</p>
+
+<p>The code for the driver:</p>
+
+<pre><code>
+#include &lt;linux/init.h&gt;
+#include &lt;linux/module.h&gt;
+#include &lt;linux/kernel.h&gt;
+#include &lt;linux/device.h&gt;
+#include &lt;linux/fs.h&gt;
+#include &lt;linux/uaccess.h&gt;
+#include &lt;linux/mutex.h&gt; // protect the device so it can only be used by
+                         // 1 user at a time
+
+#define DEVICE_NAME "bjrpi" // device will appear at /dev/bjrpi
+#define CLASS_NAME  "bj"    // device class name (for /sys/class)
+
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR("BJ Blair");
+MODULE_DESCRIPTION("Hello World Driver for RPI");
+MODULE_VERSION("0.1");
+
+static DEFINE_MUTEX(bjrpi_mutex); // creates a new semaphore variable,
+                                  // defaults to 1 (unlocked), to start
+                                  // with locked (0) use DEFINE_MUTEX_LOCKED
+
+static int major_number;        // device number, determined automatically
+static char message[256] = {0}; // store message from userspace
+static short message_size;      // how long the message is
+static int   num_opens = 0;     // how many times the device has been opened
+static struct class  *bjrpi_class  = NULL; // class pointer
+static struct device *bjrpi_device = NULL; // device pointer
+
+/* Function prototypes for IO operations */
+static int bjrpi_open(struct inode *, struct file *);
+static int bjrpi_release(struct inode *, struct file *);
+static ssize_t bjrpi_read(struct file *, char *, size_t, loff_t *);
+static ssize_t bjrpi_write(struct file *, const char *, size_t, loff_t *);
+
+static int __init bjrpi_init(void);
+static void __exit bjrpi_exit(void);
+
+/* Structure defining functions for IO operations */
+static struct file_operations fops = {
+    .open = bjrpi_open,
+    .read = bjrpi_read,
+    .write = bjrpi_write,
+    .release = bjrpi_release
+};
+
+static int __init bjrpi_init(void)
+{
+    printk(KERN_INFO "BJRPI: Initializing character LKM\n");
+
+    /* Initialize the mutex lock dynamically at runtime */
+    mutex_init(&bjrpi_mutex);
+
+    /* Allocate a major driver number */
+    major_number = register_chrdev(0, DEVICE_NAME, &fops);
+    if (major_number &lt; 0) {
+        printk(KERN_ALERT "BJRPI: Failed to register major driver number\n");
+        return major_number;
+    }
+    printk(KERN_INFO "BJRPI: Registered major number %d\n", major_number);
+
+    /* Register the device class */
+    bjrpi_class = class_create(THIS_MODULE, CLASS_NAME);
+    if (IS_ERR(bjrpi_class)) {
+        unregister_chrdev(major_number, DEVICE_NAME);
+        printk(KERN_ALERT "BJRPI: Failed to register device class\n");
+        return PTR_ERR(bjrpi_class);
+    }
+    printk(KERN_INFO "BJRPI: Registerd device class\n");
+
+
+    /* Register the device driver */
+    bjrpi_device = device_create(
+        bjrpi_class,
+        NULL,
+        MKDEV(major_number, 0),
+        NULL,
+        DEVICE_NAME
+    );
+    if (IS_ERR(bjrpi_device)) {
+        printk(KERN_ALERT "BJRPI: Failed to create device\n");
+        class_destroy(bjrpi_class);
+        unregister_chrdev(major_number, DEVICE_NAME);
+        return PTR_ERR(bjrpi_device);
+    }
+    printk(KERN_INFO "BJRPI: Device class created correctly\n");
+
+    return 0;
+}
+
+static void __exit bjrpi_exit(void)
+{
+    mutex_destroy(&bjrpi_mutex);
+    device_destroy(bjrpi_class, MKDEV(major_number, 0));
+    class_unregister(bjrpi_class);
+    class_destroy(bjrpi_class);
+    unregister_chrdev(major_number, DEVICE_NAME);
+    printk(KERN_INFO "BJRPI: Goodbye from LKM Device Driver!\n");
+}
+
+static int bjrpi_open(struct inode *inodep, struct file *fp)
+{
+    /* see if the device is available, and if so lock it */
+    if (!mutex_trylock(&bjrpi_mutex)) {
+        printk(KERN_ALERT "BJRPI: Device busy (checked mutex)\n");
+        return -EBUSY;
+    }
+
+    num_opens++;
+    printk(KERN_INFO "BJRPI: Device has been opened %d times\n", num_opens);
+    return 0;
+}
+
+static ssize_t bjrpi_read(struct file *fp, char *buffer, size_t len, loff_t *offset)
+{
+    int error_count = 0;
+
+    /* Copy what we've read in so far to the user */
+    error_count = copy_to_user(buffer, message, message_size);
+
+    /* Sucess */
+    if (error_count == 0) {
+        printk(KERN_INFO "BJRPI: Sent %d characters to the user\n", message_size);
+        return (message_size = 0); // set the message size to 0 to start overwriting the buffer
+    }
+    /* Failure */
+    else {
+        printk(KERN_INFO "BJRPI: Failed to send %d characters to the user\n", error_count);
+        return -EFAULT; // failed - return a bad address message
+    }
+}
+
+static ssize_t bjrpi_write(struct file *fp, const char *buffer, size_t len, loff_t *offset)
+{
+    sprintf(message, "%s(%zu letters)", buffer, len);
+    message_size = strlen(message);
+    printk(KERN_INFO "BJRPI: Receieved %zu characters from the user\n", len);
+    return len;
+}
+
+static int bjrpi_release(struct inode *indoep, struct file *filep)
+{
+    /* make the device available */
+    mutex_unlock(&bjrpi_mutex);
+    printk(KERN_INFO "BJRPI: Device sucessfully closed\n");
+    return 0;
+}
+
+/* Register the module */
+module_init(bjrpi_init);
+module_exit(bjrpi_exit);
+</code></pre>
+
+<p>And the test file code:</p>
+<pre><code>
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;string.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;fcntl.h&gt;
+
+#define BUFFER_LEN 256
+static char buf[BUFFER_LEN];
+
+int main(int argc, char *argv[])
+{
+    int ret, fd;
+    char sendStr[BUFFER_LEN];
+
+    /* Open the device */
+    fd = open("/dev/bjrpi", O_RDWR); // open with read-write permissions
+    if (fd &lt; 0) {
+        perror("Failed to open the device\n");
+        return errno;
+    }
+
+    printf("Enter a string to send: ");
+    scanf("%[^\n]%*c", sendStr); // read in a string with spaces
+
+    /* Write to the device */
+    ret = write(fd, sendStr, strlen(sendStr));
+    if (ret &lt; 0) {
+        perror("Failed to write to device\n");
+        return errno;
+    }
+
+    /* Read from the device */
+    ret = read(fd, buf, BUFFER_LEN);
+    if (ret &lt; 0) {
+        perror("Failed to read from device\n");
+        return errno;
+    }
+
+    printf("Read message: %s\n", buf);
+
+    return 0;
+}
+</code></pre>
+
+<p>
+Cross compiled for the raspberry pi by
+putting driver code in linux/drivers/gpio/gpio-bj.c,
+and adding <code>obj-m += gpio-bj.o</code>
+to linux/drivers/gpio/Makefile, then running
+<pre><code>
+make -j4 ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- modules
+</code></pre>
+</p>
+
+<p>
+Which means it will only need to compile YOUR module.
+The result is a file named `gpio-bj.ko`, which can be copied
+to the raspberry pi and then loaded running
+<code>sudo insmod gpio-bj.ko</code>.
+You can then compile and run the test code on the
+raspberry pi.
+</p>
+
+<p><b>11/17/18</b></p>
+<p>
+Added GPIO setting to the device driver; now you can write to
+/dev/bjrpi a number and it will output the appropriate pins
+in binary (e.g. echo 7 > /dev/bjrpi =&gt; pin output will be 00111!
+Code is now in the `code` link at the top of the page.
+</p>
+
 </body>
 </html>
