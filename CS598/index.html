@@ -74,11 +74,47 @@ Port <a href="http://libsdl.org/">SDL</a>
 
 <h3>Code</h3>
 <p>
-<a href="https://bitbucket.org/williamblair/psx_sdl/">https://bitbucket.org/williamblair/psx_sdl/</a>
+<a href="https://bitbucket.org/williamblair/psx_sdl/">https://bitbucket.org/williamblair/psx_sdl/</a> <br/>
+<a href="https://bitbucket.org/williamblair/psx_sdl_scratch/">https://bitbucket.org/williamblair/psx_sdl_scratch/</a>
 </p>
 
 <h3>Log</h3>
 
+<p>
+Ideally, we'd wanna use a hardware debugger setup. Just recently, a user by the name of Lameguy64
+released such a thing! However, it requires LiteLoad, a different method uploading from PC to PS1
+using the serial port (as opposed to the parallel port of PSIO), so I won't be using it any time soon :(
+</p>
+
+<p>
+Youtube: <a href="https://www.youtube.com/watch?v=YSgkBlS0oGs">https://www.youtube.com/watch?v=YSgkBlS0oGs</a> <br/>
+Github: <a href="https://github.com/Lameguy64/PSn00b-Debugger">https://github.com/Lameguy64/PSn00b-Debugger</a>
+</p>
+
+<p>
+Instead, I'll mainly be testing on an emulator; <a href="https://problemkaputt.de/psx.htm">NO$PSX</a>,
+which has a good amount of debugging utility - however, it doesn't support C line by line debugging
+(it does for assembly, though) so it's not perfect. Basically this means I'm stuck with printf
+debugging for the most part.
+</p>
+
+<p>
+Testing on physical hardware will be done through <a href="http://ps-io.com/">PSIO</a>.
+You can check out my little page on psio <a href="https://web.cs.sunyit.edu/~blairw/#!/psio">here</a>,
+but basically what it does is plug into the parallel port of the playstation and lets you run
+games off of an SD card.
+</p>
+
+<p>
+The reason for using PSIO for hardware testing is that a) you don't have to burn your image to a CD
+to run it, and b) you don't even have to copy it to an SD card since you can boot directly off your PC
+through a usb cable that plugs into the PSIO!
+</p>
+
+<p>
+You send the game from the PC to PSIO via the systems console program (Windows only, unfortunately)
+<img src="syscon.png"/>
+</p>
 
 </div> <!-- end pageContainer id -->
 
