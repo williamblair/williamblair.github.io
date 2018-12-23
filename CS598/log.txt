@@ -1,0 +1,15 @@
+12/18/18
+--------
+- implemented SDL_FillRect
+- implemented SDL_MapRGB
+- Implemented SDL_PollEvent
+- Implemented Initial Joystick functionality (directional hats)
+- Switched compilation to make libSDL.a instead of source as part of project
+
+12/19/18
+--------
+- Added diagonals to directional buttons
+- Added square/cross/triangle/circle
+- Added a debug print to the screen (in addition to tty)
+- Added select/start/R1/R2/L1/L2
+
