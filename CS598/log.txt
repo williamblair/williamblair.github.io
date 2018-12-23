@@ -13,3 +13,7 @@
 - Added a debug print to the screen (in addition to tty)
 - Added select/start/R1/R2/L1/L2
 
+12/23/18
+--------
+- Added joysticks
+- Changed mapping of buttons/joysticks to match XBox 360 controller mappings on PC
