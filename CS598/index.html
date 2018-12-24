@@ -78,7 +78,7 @@ Port <a href="http://libsdl.org/">SDL</a>
 <a href="https://bitbucket.org/williamblair/psx_sdl_scratch/">https://bitbucket.org/williamblair/psx_sdl_scratch/</a>
 </p>
 
-<h3>Log</h3>
+<h3>Setup</h3>
 
 <p>
 Ideally, we'd wanna use a hardware debugger setup. Just recently, a user by the name of Lameguy64
@@ -113,10 +113,53 @@ through a usb cable that plugs into the PSIO!
 
 <p>
 You send the game from the PC to PSIO via the systems console program (Windows only, unfortunately)
+</p>
 <img src="syscon.png"/>
+
+<h3>Installing PSXSDK</h3>
+
+<p>
+Since the PS1 has a MIPS r3000 CPU, a MIPS GCC compiler needs to be installed
+first (following the `toolchain.txt` instructions included with PSXSDK source).
+</p>
+
+<p>
+Installed binutils 2.31, downloaded from 
+<a href="https://mirror.clarkson.edu/gnu/binutils/">here</a>.
+Configure and install for MIPS with:
+</p>
+<pre>
+./configure --prefix=/usr/local/psxsdk --target=mipsel-unknown-elf --with-float=soft
+make
+sudo make install
+</pre>
+
+<p>
+Configure and install gcc 7.2.0, downloaded from 
+<a href="http://mirrors-usa.go-parts.com/gcc/releases/">here</a>.
+Configure and install with:
+</p>
+<pre>
+mkdir psx_gcc_build && cd psx_gcc_build
+/path/to/gcc/configure --disable-libada --disable-libssp --target=mipsel-unknown-elf \
+	--prefix=/usr/local/psxsdk --with-float=soft --disable-nls \
+	--disable-libstdc++v3 --disable-libstdc__-v3 CFLAGS=-std=c99 \
+	--enable-languages=c,c++
+make
+sudo make install
+</pre>
+
+<p>
+Since PSIO is windows only, all of this was done in a virtual machine
+running Arch Linux, with shared folders configured, so we can compile
+on linux and still run/access the code through windows.
 </p>
 
 </div> <!-- end pageContainer id -->
 
 </body>
 </html>
+
+
+
+
