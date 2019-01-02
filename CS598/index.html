@@ -28,6 +28,11 @@
             color: #AADDFF;
         }
 
+        pre {
+            background-color: #000000;
+            padding: 4px;
+        }
+
         #titleDiv {
             display: flex;
             flex-direction: row;
@@ -150,10 +155,105 @@ sudo make install
 </pre>
 
 <p>
+Finally, install psxsdk, downloaded from <a href="http://unhaut.x10host.com/psxsdk/">
+here</a>, release 20180115. First, edit <pre>Makefile.cfg</pre> to
+set the proper `make`, `toolchain_prefix`, and `examples_vmode`. Examples
+vmode sets whether to initialize video for a PAL or NTSC playstation.
+toolchain_prefix is where to install psxsdk, and 'make' is the make
+executable to use (e.g. 'make', 'gmake', 'mingw32-make', etc.).
+Configure and install with:
+</p>
+
+<pre>
+export PATH=$PATH:/path/to/psxsdkdir
+make
+sudo make install
+</pre>
+
+<p>
+You should then add `export PATH=$PATH:/path/to/psxsdk` to your 
+bashrc or profile. Then you should be able to run `psx-gcc -v` and
+it should output something similar to this:
+<p>
+
+<pre>
+Using built-in specs.
+COLLECT_GCC=mipsel-unknown-elf-gcc
+COLLECT_LTO_WRAPPER=/usr/local/psxsdk/libexec/gcc/mipsel-unknown-elf/7.2.0/lto-wrapper
+Target: mipsel-unknown-elf
+Configured with: /home/bj/gcc-7.2.0/configure --disable-libada --disable-libssp --target=mipsel-unknown-elf --prefix=/usr/local/psxsdk --with-float=soft --disable-nls --disable-libstdc++v3 --disable-libstdc__-v3 CFLAGS=-std=c99 --enable-languages=c,c++
+Thread model: single
+gcc version 7.2.0 (GCC) 
+</pre>
+
+<p>
 Since PSIO is windows only, all of this was done in a virtual machine
 running Arch Linux, with shared folders configured, so we can compile
 on linux and still run/access the code through windows.
 </p>
+
+<h3>Programming with psxsdk</h3>
+
+<p>
+You can find examples for psxsdk contained in the source archive,
+plus more <a href="https://github.com/ColdSauce/psxsdk/tree/master/examples">here</a>.
+</p>
+
+<p>
+Here's a hello world example:
+</p>
+
+<pre>
+<code>#include &lt;psx.h&gt;
+#include &lt;stdio.h&gt;
+
+unsigned int prim_list[0x4000];
+
+volatile int display_is_old = 1;
+volatile int time_counter = 0;
+int  dbuf=0;
+
+void prog_vblank_handler() {
+    display_is_old = 1;
+    time_counter++;
+}
+
+int main() {
+    PSX_Init();                                 // Initialize the PSX
+    GsInit();                                   // Initialize Graphics
+    GsSetList(prim_list);                       // Tells the graphics system what memory to use to order primitives (zbuffering)
+    GsClearMem();
+    GsSetVideoMode(320, 240, EXAMPLES_VMODE);   // either VMODE_PAL or VMODE_NTSC
+    GsLoadFont(768, 0, 768, 256);               // Load the PSX bios font into VRAM memory
+    SetVBlankHandler(prog_vblank_handler);      // calls `prog_vblank_handler()` on vblanks
+
+    while(1) {
+
+        /* don't try to draw unless the screen is ready to redraw */
+        if(display_is_old)    {
+
+            /* switch display and draw locations to create double buffering */
+            dbuf=!dbuf;
+            GsSetDispEnvSimple(0, dbuf ? 0 : 256);
+            GsSetDrawEnvSimple(0, dbuf ? 256 : 0, 320, 240);
+
+            GsSortCls(0,0,0);
+
+            GsPrintFont(70, 120, "Hello world from PSX");
+    
+            /* draw primitives with order based on prim_list */
+            GsDrawList();
+
+            /* Wait for the GPU to finish */
+            while(GsIsDrawing());
+
+            display_is_old=0;
+        }
+    }
+
+    return 0;
+}</code>
+</pre>
 
 </div> <!-- end pageContainer id -->
 
