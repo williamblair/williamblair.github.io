@@ -17,3 +17,17 @@
 --------
 - Added joysticks
 - Changed mapping of buttons/joysticks to match XBox 360 controller mappings on PC
+
+12/26/18
+--------
+- Started working towards SDL_LoadBMP
+    i. Basic File I/O (SDL_rwops) working
+   ii. SDL_AllocFormat
+- Started implementing SDL_CalculateBlit
+
+12/31/18
+--------
+- Finished SDL_CalculateBlit
+- SDL_BlitSurface now basically implemented, but either isn't working
+  or my SDL_CreateRGB surface test isn't done properly 
+
