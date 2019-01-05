@@ -75,6 +75,7 @@ Port <a href="http://libsdl.org/">SDL</a>
 <li><a href="http://unhaut.x10host.com/psxsdk/">http://unhaut.x10host.com/psxsdk/</a> - PSX-SDK</li>
 <li><a href="http://hitmen.c02.at/html/psx.html">http://hitmen.c02.at/html/psx.html</a> - Hitmen PSX - PSX System Info</li>
 <li><a href="http://www.brainycode.com/downloads/LearningSDL011.pdf">http://www.brainycode.com/downloads/LearningSDL011.pdf</a> - In depth SDL tutorial (Good explanation of SDL functions, direct pixel access, etc.)</li>
+<li><a href="https://problemkaputt.de/psx-spx.htm">https://problemkaputt.de/psx-spx.htm</a> - Nocash Playstation specs - the holy grail of playstation hardware information :)</li>
 </ul>
 
 <h3>Code</h3>
@@ -265,6 +266,71 @@ And here's the helloworld example running in the NO$PSX emulator:
 </p>
 
 <img src="nopsx_helloworld.png" width="600px"/>
+
+<h3>About the Playstation 1</h3>
+
+<p>
+Specs: (Information from <a href="https://en.wikipedia.org/wiki/PlayStation_technical_specifications">Wikipedia</a>)
+
+<ul>
+    <li>Modified MIPS R3000A 32-bit RISC CPU, runs at 33.8688 MHz</li>
+    <li>Geometry Transformation Engine (GTE)
+        <ul>
+            <li>Coprocessor inside the CPU</li>
+            <li>Handles Vector Math for 3D Graphics</li>
+            <li>High Speed Matrix Multiplications</li>
+            <li>66 MIPS (Millions of Instructions per Second)</li>
+            <li>Rendered Polygons per Second
+                <ul>
+                    <li>90,000 with texture mapping/lighting/Gouraud Shading</li>
+                    <li>180,000 with texture mapping</li>
+                    <li>360,000 with flat shading</li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+    <li>2MB RAM</li>
+    <li>BIOS ROM stored in 512kb</li>
+    <li>32-bit SONY Gpu
+        <ul>
+            <li>1MB VRAM (1024x512 at 16 bits framebuffer)</li>
+            <li>2KB texture cache</li>
+            <li>Resolutions: 256x224..640x240 progessive, 256x448..640x480 interlaced</li>
+            <li>4bit, 8bit, 15bit, or 24bit color</li>
+            <li>Maximum 4,000 sprites on screen (at 8x8 size), 256x256 maximum sprite size</li>
+        </ul>
+    </li>
+</ul>
+</p>
+
+<h3>Playstation VRAM</h3>
+
+<p>
+Below is a visual representation of the PSX's VRAM from a sprite creation utility called TIM Tool.
+(TIM is the image format normally used by the playstation.) The VRAM is divided into 32 
+texture pages of size 64x256px. The max width of a sprite texture is 256x256px, or 4 texture pages wide. 
+</p>
+<ul>
+   <li>The far left of the VRAM is what is actually displayed on the T.V., and is split into a top and
+bottom half for double buffering.
+   </li>
+   <li>The top right is normally used to store texture data</li>
+   <li>The bottom right is normally used to store CLUTs (Color Lookup Tables) for 8bit and 4bit 
+       display modes.
+   </li>
+</ul>
+
+<img src="timtool2.png" width="800"/><br/>
+Base image courtesy of <a href="http://onorisoft.free.fr/retro.htm">Orion's PSX Page</a>
+
+<p>As you can see on the far left, the standard display buffer takes up 5 texture pages,
+   or 320x256px. This is the normal resolution used by most games for the playstation.
+</p>
+
+<p>
+The frame buffer is NOT directly accessible through memory (no dma); instead you have to send
+commands to the GPU, through registers GP0 and GP1.
+</p>
 
 </div> <!-- end pageContainer id -->
 
