@@ -38,6 +38,10 @@
             templateUrl: 'templates/webgl.html',
             controller: 'webgl2dcontroller'
         })
+        .when("/mandel", {
+            templateUrl: 'templates/mandel.html',
+            controller: 'mandelController'
+        })
     }]);
 
     /* The controller for the page */
