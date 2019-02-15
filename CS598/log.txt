@@ -31,3 +31,60 @@
 - SDL_BlitSurface now basically implemented, but either isn't working
   or my SDL_CreateRGB surface test isn't done properly 
 
+01/04/19
+--------
+-Fixed SDL_BlitSurface
+  i. Turns out the issue was my texture size for the PSX was too large (256px instead of 255)
+-SDL_LoadBMP now fully implemented!
+
+01/29/19
+--------
+-Optimized SDL_BlitSurface
+  i. Surface data is now stored in PSX Vram, so we can draw them as PSX sprites for hardware acceleration
+  ii. If the surface being blitted to is the surface created by SDL_SetVideoMode() (the background),
+      we draw it as a sprite instead of actually 'blitting' (copying pixels) for a huge performance boost!
+
+02/01/19
+--------
+-Optimized SDL_FillRect
+  i. Instead of creating an SDL surface/filling it to the background, we draw a PSX GPU Rectangle primitive
+     (again, for hardware acceleration!)
+
+02/04/19
+--------
+-Working on fixing SDL_LoadBMP
+  i. It turns out the colors are backwards since the PSX stores pixels in BGR format, so we need to switch
+     the R and B components of each pixel on load
+-Removed the two-times scale from all drawing that we were previously using before, as we have
+ hardware acceleration now and don't need to worry about size for performance any more
+-Added automatic texture upload location to vram (for storing multiple surfaces/sprites)
+  i. TODO - what if we want to delete/remove an image or need to make room for new sprites?
+
+02/05/19
+--------
+-Added uv texture offset (texture clipping) support, so you can select an area from INSIDE the texture
+ to use to draw (useful for sprite animations)
+
+02/08/19
+--------
+-Lots of code cleanup
+
+02/12/19
+--------
+-Started setup for SDL_mixer (music library)
+
+02/13/19
+--------
+-Added Mix_OpenAudio()
+-Added Mix_GetError() (TODO - add SDL_GetError())
+-Added wav2vag function for converting .WAV input files to .RAW (copied/modified from psxsdk wav2vag source)
+
+02/15/19
+--------
+-Added Mix_LoadMUS()
+  i. Limitations - file must be in .RAW format, must be single channel, and if converted from a WAV
+     file, must have a frequency of 11025 Hz
+  i. the second argument, 'loops' doesnt do anything
+-Added Mix_PlayMusic()
+
+
