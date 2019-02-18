@@ -87,4 +87,18 @@
   i. the second argument, 'loops' doesnt do anything
 -Added Mix_PlayMusic()
 
+02/16/19
+--------
+-Added SDL_Delay and SDL_SetColorKey as dummy functions
+  i. e.g. they do nothing; they are defined as ';' in the header
+  ii. This is because the PSX already runs at 60Hz approximately,
+      and automatically treats black (0,0,0) as transparent
+
+02/17/19
+--------
+-Added SDL_JoystickUpdate(), SDL_JoystickGetAxis(), SDL_JoystickGetHat()
+  i. This allows for easier programming when checking button/directional
+     presses as you don't have to run them within an SDL_PollEvent loop,
+     and can just directly check if a button is pressed or not instead
+     of checking for an UP or DOWN event in the event loop
 
