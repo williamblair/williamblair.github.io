@@ -102,3 +102,21 @@
      and can just directly check if a button is pressed or not instead
      of checking for an UP or DOWN event in the event loop
 
+02/22/19
+--------
+- Added SDL_Quit(), Mix_CloseAudio(), SDL_WM_ToggleFullScreen() as dummy functions
+- Fixed VRAM loading
+  i. I was incorrectly calculating new texture x locations aligned to widths of 64 (the width of a texture page)
+
+02/24/19
+--------
+- Added 8bit bmp image support
+  i. Re added the SDL code to load bmp images
+  ii. 8bit image palettes are stored underneath the two display buffers
+  iii. added logic to align images width to match 2 bytes
+       display correctly/load correctly in PSX vram (since vram is 16bit --> buffers loaded must be 2 byte aligned)
+
+02/26/19
+--------
+- Added 640x480 resolution support
+  i. However, when running actual 640x480 code on the psx i appear to get screen tearing/flickering
