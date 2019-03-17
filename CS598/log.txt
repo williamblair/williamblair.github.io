@@ -120,3 +120,33 @@
 --------
 - Added 640x480 resolution support
   i. However, when running actual 640x480 code on the psx i appear to get screen tearing/flickering
+
+03/07/19
+--------
+Added project paper repository, initial layout
+
+03/08/19
+--------
+- Added Mix_FreeMusic() and Mix_FreeChunk() dummy functions
+
+03/10/19
+--------
+- Added images for GPU and system hardware to writeup
+
+03/11/19
+--------
+- Added GTE information to writeup and references
+
+03/13/19
+--------
+- Added list of SDL ports to related work in writeup
+
+03/14/19
+--------
+- Added SDL information to writeup
+
+03/16/19
+--------
+- Added Order Table information to writeup
+
+
