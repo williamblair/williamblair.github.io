@@ -149,4 +149,12 @@ Added project paper repository, initial layout
 --------
 - Added Order Table information to writeup
 
+03/18/19
+--------
+- Added psxsdk installation instructions to writeup
+
+03/20/19
+--------
+- Added implementation chapter base, description of psxsdk hello world program and screenshot to writeup
+- Worked on test/example program to test SDL implementation
 
