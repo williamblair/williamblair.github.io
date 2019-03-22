@@ -158,3 +158,18 @@ Added project paper repository, initial layout
 - Added implementation chapter base, description of psxsdk hello world program and screenshot to writeup
 - Worked on test/example program to test SDL implementation
 
+03/21/19
+--------
+- Started optimizing SDL load BMP b/c it's very slow on the PSX
+with all of the file I/O --> converting it to use a buffer
+after loading the entire file into memory instead
+
+03/22/19
+--------
+- Finished Optimized SDL BMP loading
+  i. Had issue at first with 16bit images, made it use my function
+     for loading 16bit images instead
+- Added example of drawing primitives and sprites using PSXSDK 
+  to writeup
+
+
