@@ -172,4 +172,15 @@ after loading the entire file into memory instead
 - Added example of drawing primitives and sprites using PSXSDK 
   to writeup
 
+03/21/19
+--------
+- Added SDL_Init and SDL_SetVideoMode to implementation chapter of writeup
+
+03/22/19
+--------
+- Reformatted code listings for SDL_Init and SDL_SetVideoMode
+  i. SDL_SetVideoMode took up two pages of just the functions code; broke it
+     down into smaller chunks
+- Added original implementation attempt (driver for each subsystem) to writeup
+
 
