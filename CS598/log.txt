@@ -183,4 +183,44 @@ after loading the entire file into memory instead
      down into smaller chunks
 - Added original implementation attempt (driver for each subsystem) to writeup
 
+03/25/19
+--------
+- Started video implementation (SDL_Init())
+
+03/26/19
+--------
+- Reformatted code listings (writeup)
+- Added to original implementation (driver) attempt
+
+03/27/19
+--------
+- Added basic SDL Program description to writeup (annotated example
+  code listing)
+
+03/28/19
+--------
+- Added SDL_BlitSurface() description and image to writeup
+
+03/29/19
+--------
+- Added SDL_JOYSTICK example code to writeup
+
+03/30/19
+--------
+- Added PSXSDK controller usage to writeup
+
+03/31/19
+--------
+- Added sound example for PSXSDK to writeup
+
+04/03/19
+--------
+- Added more PSXSDK sound examples (VAG and MOD format)
+  to writeup
+
+04/04/19
+--------
+- Added MDEC description and screen sprite diagram
+  (original video backend implementation) to writeup
+
 

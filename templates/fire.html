@@ -1,0 +1,39 @@
+<style>
+    #mycanvas {
+        width: 600px;
+        height: 300px;
+        overflow: hidden;
+    }
+</style>
+
+<!-- ace editor -->
+<style>
+    .codeEditor {
+        height: 300px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+</style>
+
+<div class="section" ng-controller="fireController" ng-init="init()">
+  <div class="content">
+    <h1>Fire Effect</h1>
+    <h3>Information from <a href="https://lodev.org/cgtutor/fire.html">here</a> and <a href="https://fabiensanglard.net/doom_fire_psx/">here</a></h3>
+    <hr/>
+    <div class="box has-shadow">
+    <canvas id="mycanvas" width="600" height="300"></canvas>
+      <div>
+      Wind
+      <input type="number" name="wind" id="wind" min="-3" max="3" value="0"/>
+      </div>
+      
+
+      <div id="editorArea1" class="codeEditor"></div>
+      <button class="btn btn-primary" type="button" id="runButton">Run</button>
+
+      <!-- load ace editor -->
+      <script src="ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+      
+    </div>  
+  </div>
+</div>

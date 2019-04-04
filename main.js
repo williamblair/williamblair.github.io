@@ -42,6 +42,10 @@
             templateUrl: 'templates/mandel.html',
             controller: 'mandelController'
         })
+        .when("/fire", {
+            templateUrl: 'templates/fire.html',
+            controller: 'fireController'
+        })
     }]);
 
     /* The controller for the page */
