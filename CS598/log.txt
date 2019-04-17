@@ -223,4 +223,34 @@ after loading the entire file into memory instead
 - Added MDEC description and screen sprite diagram
   (original video backend implementation) to writeup
 
+04/05/19
+--------
+- Added second blit method diagram to writeup
+- Added SDLBlitSurface listing to writeup
+- Added end of SDL bmp listing to writeup
+
+04/09/19
+--------
+- added second sdl blit method description
+
+04/14/19
+--------
+- added vram texture calculation handling description
+- added different load bmp section listings to writeup
+
+04/15/19
+--------
+- added different load bmp section descriptions
+	- 8 bit and 16 bit bmp handling
+
+04/16/19
+--------
+- Added description and image for aligned vs unaligned 8 bit bmp image loading
+
+04/17/19
+--------
+- Added audio implementation section to writeup
+- Added Events implementation section to writeup
+- Added joysticks section
+
 
