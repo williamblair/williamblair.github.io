@@ -253,4 +253,21 @@ after loading the entire file into memory instead
 - Added Events implementation section to writeup
 - Added joysticks section
 
+04/18/19
+--------
+- Added NOPSX emulator and PSIO description to writeup
+- Worked on test/example application using SDL 
+
+04/19/19
+--------
+- Added Mix chunks to SDL_Mixer implementation
+- Worked on test/example application using SDL
+
+04/20/19
+--------
+- Fixed texture page calcuation in SDL
+  i. Didn't account for the texture page Y coordinate when textures start to wrap around towards the bottom half of VRAM; is now calculated as tpage = tpage_y*16+tpage_x
+- Basically finished example SDL application
+    simple space themed shooter; you fire lazers at an alien. utilizes SDL mixer for both music and sounds, controller/joystick events, 8bit and 16bit images, sdl fillrect
+- Added Mix_PauseMusic and Mix_HaltMusic to stop music from playing
 
