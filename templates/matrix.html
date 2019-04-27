@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8"/>
+<style>
+    #mycanvas {
+        width: 100vw;
+        height: 100vh;
+    }
+    html, body {
+        padding: 0px;
+        margin: 0px;
+    }
+</style>
+<title>
+Take the Red Pill
+</title>
+</head>
+<body>
+<canvas id="mycanvas" width="100vw" height="100vh">your browser doesn't support canvas!</canvas>
+<script>
+
+var canvas = document.getElementById("mycanvas");
+var ctx = canvas.getContext("2d");
+
+/* https://stackoverflow.com/questions/3437786/get-the-size-of-the-screen-current-web-page-and-browser-window */
+var width = window.innerWidth
+|| document.documentElement.clientWidth
+|| document.body.clientWidth;
+
+var height = window.innerHeight
+|| document.documentElement.clientHeight
+|| document.body.clientHeight;
+
+canvas.width = width;
+canvas.height = height;
+
+console.log('canvas width, height: ' + width + " " + height);
+
+// fill the canvas black
+ctx.fillStyle = "black";
+ctx.fillRect(0,0,canvas.width, canvas.height);
+
+// generates a random string of characters
+var genString = function(maxLen) {
+    var str = [];
+    for (var i=0; i<8+Math.floor(Math.random()*maxLen); i++)
+    {
+        str.push(String.fromCharCode(32+Math.floor(Math.random()*(126-32))));
+    }
+    return str;
+}
+
+// initialize columns
+var num_cols = Math.floor(canvas.width/35);
+var cols = [];
+for (var i=0; i<num_cols; i++)
+{
+    obj = {
+        'string': genString(80),
+        'x': Math.floor(Math.random()*canvas.width),
+        'y': -50,
+        'speed': 5 + Math.floor(Math.random()*10)
+    };
+    
+    cols.push(obj);
+}
+
+// draw the columns
+var textHeight = 10;
+var drawCols = function() {
+    
+    // draw all but the first guy, who will be white
+    for (var i=0; i<cols.length-1; i++)
+    {
+        ctx.fillStyle = "green";
+        for (var j=0; j<cols[i]['string'].length; j++)
+        {
+            // randomly replace a character
+            if (Math.random() < 0.4) {
+                //var index = Math.floor(Math.random()*cols[i]['string'].length);
+                cols[i]['string'][j] = String.fromCharCode(32+Math.floor(Math.random()*(126-32)));
+            }
+        
+            ctx.fillText(cols[i]['string'][j], cols[i]['x'], cols[i]['y']+(j*textHeight));
+        }
+        
+        // draw the first leading char
+        // randomly replace a character
+        var index = cols[i]['string'].length-1;
+        if (Math.random() < 0.4) {
+            //var index = Math.floor(Math.random()*cols[i]['string'].length);
+            cols[i]['string'][index] = String.fromCharCode(32+Math.floor(Math.random()*(126-32)));
+        }
+        ctx.fillStyle = "white";
+        ctx.fillText(cols[i]['string'][index], cols[i]['x'], cols[i]['y']+(j*textHeight));
+        
+        // update the y coordinate
+        cols[i]['y'] += cols[i]['speed'];
+        
+        // if we've gone past the edge of the screen
+        if (cols[i]['y'] > canvas.height) {
+            cols[i]['y'] = -50;
+            cols[i]['speed'] = 1+Math.floor(Math.random()*10);
+            cols[i]['x'] = Math.floor(Math.random()*canvas.width);
+        }
+    }
+}
+
+function animLoop() {
+    
+    ctx.fillStyle = "black";
+    ctx.fillRect(0,0,canvas.width, canvas.height);
+    
+    drawCols();
+    
+    requestAnimationFrame(animLoop);
+}
+
+// cool shadow effects
+// EDIT - apparently these effects are way too powerful and freeze the browser lol
+//ctx.shadowBlur = 0;
+//ctx.shadowColor = "#00BB00";
+
+requestAnimationFrame(animLoop);
+
+</script>
+</body>
+</html>
