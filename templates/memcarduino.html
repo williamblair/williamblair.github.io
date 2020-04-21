@@ -1,4 +1,10 @@
-<div class="section">
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>williamblair.github.io</title>
+  </head>
+  <body>
+
   <div class="content">
     <h1>MemCARDuino: Copy PS1 Saves To/From Your Memory Card!</h1>
     <hr/>
@@ -21,14 +27,14 @@
 				First, (besides an Arduino), you'll need wire access to your memory cards pins. I used the 
 				controller/memory card slots out of a broken PS2:
 				</p>
-				<a href="images/memcarduino_pic3.jpg"><img src="images/memcarduino_pic3_small.jpg"/></a>
+				<a href="../images/memcarduino_pic3.jpg"><img src="../images/memcarduino_pic3_small.jpg"/></a>
 				<p>
 				Alternatively, you could use the ports from a ps1, or I've seen a '4gamers ps2 memory expansion'
 				with the back cut off used as well (see <a href="http://www.jaskagaming.com/tag/memcarduino/">here</a>)
 				Either way, you'll probably have to do some soldering. The ports from the ps2 were pretty easy to access
 				and are clearly divided into 3 sections just like the memory card:
 				</p>
-				<a href="images/memcarduino_pic2.jpg"><img src="images/memcarduino_pic2_small.jpg"/></a>
+				<a href="../images/memcarduino_pic2.jpg"><img src="../images/memcarduino_pic2_small.jpg"/></a>
 				<p>
 				Next, plug the wires into their specifed ports in the arduino, following 
 				<a href="http://shendohardware.blogspot.com/2013/06/memcarduino.html">Shendo's Guide</a>.
@@ -43,8 +49,8 @@
                 #define AckPin 2           //Acknowledge          <br/>
 				</code>
 				</p>
-				<a href="images/memcarduino_pic4.jpg"><img src="images/memcarduino_pic4_small.jpg"/></a>
-				<a href="images/memcarduino_pic1.jpg"><img src="images/memcarduino_pic1_small.jpg"/></a>
+				<a href="../images/memcarduino_pic4.jpg"><img src="../images/memcarduino_pic4_small.jpg"/></a>
+				<a href="../images/memcarduino_pic1.jpg"><img src="../images/memcarduino_pic1_small.jpg"/></a>
 				<p>
 				I left the third pin (7.6v external power) unconnected. Shendo and others state that it may
 				be required for some third party cards, but I had no problem with my Pelican or
@@ -67,25 +73,25 @@
 				for your Arduino. Next, with your memory card inserted, go to Hardware->Read Save Data->
 				MemCARDuino - this will load the data from your memory card into MemcardRex:
 				</p>
-				<a href="images/memcarduino_screen1.png"><img src="images/memcarduino_screen1.png"/></a>
+				<a href="../images/memcarduino_screen1.png"><img src="../images/memcarduino_screen1.png"/></a>
 				<p>
 				This took about 30s-1 minute for me. The first time I tried, it just sat there and I had to Abort;
 				it turned out one of my wires on the breadboard was loose, so be sure to check those! You should
 				then have all of the memory card's saves being shown on your screen:
 				</p>
-				<a href="images/memcarduino_screen2.png"><img src="images/memcarduino_screen2.png"/></a>
+				<a href="../images/memcarduino_screen2.png"><img src="../images/memcarduino_screen2.png"/></a>
 				<p>To use them with an emulator, or just to save them on your computer, go to File->Save, and
 				it will default to a .mcr format. To import a save into your memory card, Open your emulator's
 				memory card file in MemcardRex, Click on the save you want to use, and then click the green arrow
 				(Export Save) at the top of the program, and save the file somewhere:
 				</p>
-				<a href="images/memcarduino_export_ind_save.png"><img src="images/memcarduino_export_ind_save.png"></a>
+				<a href="../images/memcarduino_export_ind_save.png"><img src="../images/memcarduino_export_ind_save.png"></a>
 				<p>
 				Next, go back to your MemCARDuino tab in MemcardRex, select a 'Free slot', click on the red arrow 
 				(Import save) at the top of the program, and select the exported save file you just created:
 				</p>
-				<a href="images/memcarduino_screen3.png"><img src="images/memcarduino_screen3.png"/></a>
-				<a href="images/memcarduino_screen4.png"><img src="images/memcarduino_screen4.png"/></a>
+				<a href="../images/memcarduino_screen3.png"><img src="../images/memcarduino_screen3.png"/></a>
+				<a href="../images/memcarduino_screen4.png"><img src="../images/memcarduino_screen4.png"/></a>
 				<p>
 				To update the data on your memory card, go to Hardware->Write save data->MemCARDuino. 
 				<b>Be careful - this will overwrite EVERY SLOT on your memory card.</b> You have been warned!
@@ -93,14 +99,18 @@
 				skip the last two steps, and directly File->Load the memory card file and then Hardware->
 				Write save data->MemCARDuino instead.
 				</p>
-				<a href="images/memcarduino_screen5.png"><img src="images/memcarduino_screen5.png"/></a>
+				<a href="../images/memcarduino_screen5.png"><img src="../images/memcarduino_screen5.png"/></a>
 				<p>
 				And that's it! Here's some pics of me testing my save with Castlevania: SoTN
 				</p>
-				<p>In the PS1 Bios:</P>
-				<a href="images/bios_card2.jpg"><img src="images/bios_card2_small.jpg"/></a>
+				<p>In the PS1 Bios:</p>
+				<a href="../images/bios_card2.jpg"><img src="../images/bios_card2_small.jpg"/></a>
 				<p>Loading in game:</p>
-				<a href="images/ingame_card2.jpg"><img src="images/ingame_card2_small.jpg"/></a>
+				<a href="../images/ingame_card2.jpg"><img src="../images/ingame_card2_small.jpg"/></a>
     </div>
-  </div>
-</div>
+    </div>
+    
+    <p><a href="../index.html">&lt;-- Back to Home</a></p>
+    
+  </body>
+</html>

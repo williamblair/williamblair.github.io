@@ -1,108 +1,91 @@
 <!DOCTYPE html>
-<html lang="en-US">
-<head>
+<html>
+  <head>
+    <title>Hello World</title>
+  </head>
+  
+  <style>
     
-    <!-- meta tags -->
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    body, html {
+      background-image: url("images/sandlite.jpeg");
+      background-repeat: repeat;
+      height: 100%;
+    }
     
-    <!-- angular js -->
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+    table, tr, th, td {
+      /*border: groove;*/
+      /*border-collapse: collapse;*/
+    }
     
-    <!-- angular routing -->
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-route.js"></script>
+    .content-table {
+      vertical-align: top;
+      margin: 10px;
+      padding-right:10px;
+    }
     
-    <!-- jquery -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-
-    <!-- load ace editor -->
-    <script src="ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
-
-    <!-- GPU.js -->
-    <script src="javascript/gpu.js" type="text/javascript"></script>
     
-    <!-- hilight js, modified css version -->
-    <link rel="stylesheet" href="monokai-sublime-bj.min.css">
-    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  </style>
+  
+  <body>
+    <h1 style="text-align: center;">williamblair.github.io</h1>
     
-    <!-- angular hilight.js -->
-    <script src="https://pc035860.github.io/angular-highlightjs/angular-highlightjs.min.js"></script>
-    
-    <!-- Bulma CSS -->
-    <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.css" />-->
-    <!--<link rel="stylesheet" href="./bulma-0.7.1/css/bulma.min.css" />-->
-    <link rel="stylesheet" href="https://unpkg.com/bulmaswatch/cyborg/bulmaswatch.min.css">
-    
-    <!-- font awesome -->
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.1/css/all.css" integrity="sha384-O8whS3fhG2OnA5Kas0Y9l3cfpmYjapjI0E4theH4iuMD+pLhbf6JI0jIMfYcK3yZ" crossorigin="anonymous">
-    
-    <!-- angular scripts -->
-    <script src="main.js"></script>
-    <script src="navbar.js"></script>
-    <script src="imageFigure.js"></script>
-    <script src="canvasPhysicsController.js"></script>
-    <script src="mandelController.js"></script>
-    <script src="fireController.js"></script>
-    
-    <!-- site css -->
-    <link rel="stylesheet" href="site.css" />
-    
-</head>
-<body ng-app="myApp" ng-controller="appController">
-
-<!-- defined in navbar.js -->
-<bulma-navbar></bulma-navbar>
-
-<div class="container">
-    <section class="columns is-fullheight">
-
-        <div class="column is-2 is-hidden-mobile">
-            <aside class="menu">
-              <p class="menu-label">
-                General
-              </p>
-              <ul class="menu-list">
-                <li><a id="home" ng-click="changeActiveLink('home')" class="is-active" href="#/!">Home</a></li>
-                <li><a id="about" ng-click="changeActiveLink('about')" href="#!about">About</a></li>
+    <table style="height:90%">
+      <tr>
+        <!-- navigation bar -->
+        <td class="content-table">
+          <ul style="list-style-type: none; padding-left:2px; padding-right:2px;">
+            <li>General
+              <ul style="list-style-type: none;">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="templates/about.html">About</a></li>
               </ul>
-              <p class="menu-label">
-                Programming
-              </p>
-              <ul class="menu-list">
-                <li><a id="eyeTracker" ng-click="changeActiveLink('eyeTracker')" href="#!eyeTracker">Eye Tracker</a></li>
-                <li><a id="windowManager" ng-click="changeActiveLink('windowManager')" href="#!windowManager">X11 Window Manager</a></li>
-                <li><a id="canvasPhysics" ng-click="changeActiveLink('canvasPhysics')" href="#!canvasPhysics">HTML5 Canvas</a></li>
-                <li><a id="fbsetbg" ng-click="changeActiveLink('fbsetbg')" href="#!fbsetbg">fbsetbg GUI</a></li>
-                <li><a id="cppmatrix" ng-click="changeActiveLink('cppmatrix')" href="#!cppmatrix">cppmatrix</a></li>
-                <li><a id="webgl" ng-click="changeActiveLink('webgl')" href="#!webgl">WebGL</a></li>
-                <li><a id="mandel" ng-click="changeActiveLink('mandel')" href="#!mandel">Mandelbrot</a></li>
-                <li><a id="fire" ng-click="changeActiveLink('fire')" href="#!fire">Fire Effect</a></li>
-                <li><a href="templates/matrix.html">Matrix Scrolling Text</a></li>
+            </li>
+            <li>Programming
+              <ul style="list-style-type: none;">
+                <li><a href="templates/canvasphysics.html">HTML5 Canvas</a>
+                <li><a href="templates/cppmatrix.html">CPPMatrix</a></li>
+                <li><a href="templates/eyeTracker.html">Eye Tracker</a></li>
+                <li><a href="templates/fbsetbg.html">Fluxbox BG Setter</a></li>
+                <li><a href="templates/fire.html">Fire Effect</a></li>
+                <li><a href="templates/mandel.html">Mandelbrot</a></li>
+                <li><a href="templates/matrix.html">Matrix Text</a></li>
+                <li><a href="templates/windowManager.html">X11 Window Manager</a></li>
+                <li><a href="templates/webgl.html">WebGL</a></li>
               </ul>
-              <p class="menu-label">
-                Tech
-              </p>
-              <ul class="menu-list">
-                <li><a id="memcarduino" ng-click="changeActiveLink('memcarduino')" href="#!memcarduino">Memcarduino</a></li>
-                <li><a id="psio" ng-click="changeActiveLink('psio')" href="#!psio">PSIO</a></li>
+            </li>
+           
+            <li>Tech
+              <ul style="list-style-type: none;">
+                <li><a href="templates/memcarduino.html">Memcardino</a></li>
+                <li><a href="templates/psio.html">PSIO</a></li>
               </ul>
-              <p class="menu-label">
-                School
-              </p>
-              <ul class="menu-list">
-                <li><a href="CS518">CS 518</a></li>
-                <li><a href="CS528">CS 528</a></li>
-                <li><a href="CS598">CS 598</a></li>
+            </li>
+            
+            <li>School
+              <ul style="list-style: none;">
+                <li><a href="CS518/index.html">CS 518</a></li>
+                <li><a href="CS528/index.html">CS 528</a></li>
+                <li><a href="CS598/index.html">CS 598</a></li>
               </ul>
-            </aside>
-        </div>
-
-        <div class="column is-10">
-          <div ng-view></div>
-        </div>
+            </li>
+            
+          </ul>
+        </td>
+        
+        <!-- content -->
+        <td class="content-table">
+          <div>
+            <h2 style="text-align: center;">BJ's Website</h2>
+            <img src="images/bebop.gif"/>
+            <img src="images/ghostkeyboard.gif"/>
+            <img src="images/goldenboy.gif"/>
+            <img src="images/itsaunixsystem.jpg"/>
+            <img src="images/lain.gif"/>
+          </div>
+        </td>
+      </tr>
+    </table>
     
-    </section>
-</div>
-
-</body>
+  </body>
 </html>
+
