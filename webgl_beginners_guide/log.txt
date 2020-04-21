@@ -1,0 +1,5 @@
+04/20/2020
+----------
+- Started chapter 1
+- Wrote hello world (get gl context) program
+- Wrote basic bg color (gl clear color, clear color buffer bit)

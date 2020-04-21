@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebGL beginner's guide - Setting Up the Canvas</title>
+  
+  <style>
+    #mycanvas {
+      border: 2px solid blue;
+    }
+  </style>
+  
+</head>
+<body onload="main()">
+
+  <div>
+<canvas id="mycanvas" width="640" height="480">
+  Your browser doesn't support the canvas element :(
+</canvas>
+    </div>
+
+<script>
+  
+  // Check for & get the WebGL context
+  var getGLContext = function() {
+    var canvas = document.getElementById('mycanvas');
+    
+    var gl = null;
+    
+    var names = [
+      "webgl",
+      "experimental-webgl",
+      "webkit-3d",
+      "moz-webgl"
+    ];
+    for (var i = 0; i < names.length; i++) {
+      try {
+        gl = canvas.getContext(names[i]);
+        
+        // context was found, so exit early
+        if (gl) {
+          break;
+        }
+        
+      } catch(e) {}
+    }
+    
+    if (gl == null) {
+      alert("No WebGL Context Available");
+    }
+    else {
+      alert("GL Context Available");
+    }
+    
+    return gl;
+  }
+  
+  var main = function() {
+    var ctx = getGLContext();
+  }
+  
+</script>
+
+  <p><a href="log.txt">Log</a></p>
+  
+</body>
+</html>
