@@ -1,4 +1,25 @@
-<style>
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>williamblair.github.io</title>
+    
+    <!-- jquery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <!-- load ace editor -->
+    <script src="../ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+
+    <!-- GPU.js -->
+    <script src="../javascript/gpu.js" type="text/javascript"></script>
+    
+    <!-- hilight js, modified css version -->
+    <link rel="stylesheet" href="monokai-sublime-bj.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+    
+    <!-- angular hilight.js -->
+    <script src="https://pc035860.github.io/angular-highlightjs/angular-highlightjs.min.js"></script>
+    
+    <style>
     #mycanvas {
         width: 640px;
         height: 480px;
@@ -14,8 +35,9 @@
         margin-bottom: 10px;
     }
 </style>
-
-<div class="section" ng-controller="mandelController" ng-init="init()"> 
+    
+  </head>
+  <body>
  <div class="content">
  <h1>Mandelbrot Generation using GPU.js</h1>
  <hr/>
@@ -35,14 +57,14 @@
         <button class="btn btn-primary" id="runButton">Run</button>
         
         <!-- load ace editor -->
-        <script src="ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
 
         <!-- jquery load text from javascript file, then initialize
         the editor upon completion -->
         <script>
 
             $(function(){
-                $('#editorArea1').load('javascript/mandel.js', function(){
+                $('#editorArea1').load('../javascript/mandel.js', function(){
 
                     console.log('load performed!');
 
@@ -68,4 +90,8 @@
     </div>
  </div>
 </div>
-</div>
+    
+    <p><a href="../index.html">&lt;-- Back to Home</a></p>
+    
+  </body>
+</html>
