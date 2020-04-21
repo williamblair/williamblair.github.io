@@ -3,3 +3,7 @@
 - Started chapter 1
 - Wrote hello world (get gl context) program
 - Wrote basic bg color (gl clear color, clear color buffer bit)
+- Finished chapter 1
+  - other example was an existing source file that was included with
+    the physical book
+
