@@ -7,3 +7,7 @@
   - other example was an existing source file that was included with
     the physical book
 
+04/21/2020
+----------
+- Started Chapter 2
+- Finished first example program - basic square/buffer objects
