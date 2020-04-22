@@ -1,43 +1,30 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Hello World</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BJ's Website</title>
+    
+    <link rel="stylesheet" type="text/css" href="site.css"/>
+    
   </head>
   
-  <style>
-    
-    body, html {
-      background-image: url("images/sandlite.jpeg");
-      background-repeat: repeat;
-      height: 100%;
-    }
-    
-    table, tr, th, td {
-      /*border: groove;*/
-      /*border-collapse: collapse;*/
-    }
-    
-    .content-table {
-      vertical-align: top;
-      margin: 10px;
-      padding-right:10px;
-    }
-    
-    
-  </style>
-  
   <body>
-    <h1 style="text-align: center;">williamblair.github.io</h1>
     
-    <table style="height:90%">
-      <tr>
+    <table class="content-table">
+      <tr class="content-table">
+        <td class="content-table"><img src="images/perfect_blue_computer.png" width="300px" style="border:1px solid black;"></td>
+        <td style="vertical-align: bottom;" class="content-table"><h1 style="text-align:left;">BJ's Website</h1></td>
+      </tr>
+      <tr class="content-table">
         <!-- navigation bar -->
-        <td class="content-table">
+        <td class="content-table nav-bar">
           <ul style="list-style-type: none; padding-left:2px; padding-right:2px;">
             <li>General
               <ul style="list-style-type: none;">
                 <li><a href="index.html">Home</a></li>
                 <li><a href="templates/about.html">About</a></li>
+                <li><a href="http://users3.smartgb.com/g/g.php?a=s&i=g36-28645-82">Guestbook</a></li>
               </ul>
             </li>
             <li>Programming
@@ -75,14 +62,150 @@
         
         <!-- content -->
         <td class="content-table">
-          <div>
-            <h2 style="text-align: center;">BJ's Website</h2>
-            <img src="images/bebop.gif"/>
-            <img src="images/ghostkeyboard.gif"/>
-            <img src="images/goldenboy.gif"/>
-            <img src="images/itsaunixsystem.jpg"/>
-            <img src="images/lain.gif"/>
-          </div>
+          <section>
+	<h2>About</h2>
+	<p>
+	I'm a dude who enjoys programming and other techy stuff
+	</p>
+	</section>
+
+	<section>
+	<h2>My Pages</h2>
+	<ul>
+	  <li><a href="webgl.html">WebGL</a> - A WebGL demo I wrote following the tutorial link below</li>
+	  <li><a href="http://users3.smartgb.com/g/g.php?a=s&i=g36-28645-82">Guestbook</a> - leave a message or tell me how my site sucks</li>
+	  <li><a href="sierpinski.html">Sierpinski Triangles</a> - Implementation of the Sierpinski Triangles page from <a href="https://lodev.org/cgtutor/">Lodev Computer Graphics Tutorial</a></li>
+	  <li><a href="trees.html">Recursion Trees</a> - Implementation of the Recursion Trees page from <a href="https://lodev.org/cgtutor/">Lodev Computer Graphics Tutorial</a></li>
+	  <li><a href="julia.html">Julia Set</a> - Implementation of the Julia Sets page from <a href="https://lodev.org/cgtutor/">Lodev Computer Graphics Tutorial</a></li>
+	  <li><a href="mandel.html">Mandelbrot Set</a> - Implementation of the Mandelbrot page from <a href="https://lodev.org/cgtutor/">Lodev Computer Graphics Tutorial</a></li>
+	  <li><a href="mandelGPU.html">Mandelbrot Set GPU</a> - Implementation of the Mandelbrot page from <a href="https://lodev.org/cgtutor/">Lodev Computer Graphics Tutorial, using GPU.js for acceleration</a></li>
+	  <li><a href="plasma.html">Plasma Effect</a> - Implementation of the plasma page from <a href="https://lodev.org/cgtutor/">Lodev Computer Graphics Tutorial</a></li>
+	  <li><a href="fire.html">Fire Effect</a> - Implementation of the fire effect page from <a href="https://lodev.org/cgtutor/">Lodev Computer Graphics Tutorial</a>, Also <a href="https://fabiensanglard.net/doom_fire_psx/">here</a></li>
+	  <li><a href="water.html">Water Effect</a> - Implementation of the water effect page from <a href="https://www.gamedev.net/articles/programming/graphics/the-water-effect-explained-r915/?tab=reviews">gamedev.net</a>, Inspired by <a href="http://fabiensanglard.net/Water/index.php">here</a></li>
+	  <li><a href="raycasting1.html">Simple Raycasting</a> - Implementation of the first raycasting tutorial from <a href="https://lodev.org/cgtutor/">Lodev Computer Graphics Tutorial</a> </li>
+	  <li><a href="matrix.html">Matrix Text</a> - Take the Red Pill</li>
+	  <li><a href="doodle.html">Doodle</a> - Drawings</li>
+	  <li><a href="q_format.html">Q Format Converter</a></li>
+	  <li><a href="clean_code_notes.html">Clean Code Notes</a> - my notes for Clean Code by Robert Martin</li>
+    <li><a href="design_patterns/index.html">Design Patterns Notes</a> - notes for Design Patterns by Gamma et al</li>
+    <li><a href="psx_dev.html">PSYQ Utility Library</a> - Playstation 1 programming log</li>
+    <li><a href="error_control_coding/index.html">Error Control Coding Notes</a></li>
+    <li><a href="music.html">Music List (what I'm listening to)</a></li>
+	</ul>
+	</section>
+
+	<section>
+	<h2>Links</h2>
+	<h3>Emulation Programming</h3>
+	<table class="links-table">
+	  <tr>
+		<th>Link</th>
+		<th>Description</th>
+	  </tr>
+	  <tr>
+		<td><a href="http://fms.komkon.org/EMUL8/HOWTO.html">http://fms.komkon.org/EMUL8/HOWTO.html</a></td>
+		<td>A high level overview of how emulation works</td>
+	  </tr>
+	  <tr>
+		<td><a href="http://www.codeslinger.co.uk/index.html">http://www.codeslinger.co.uk/index.html</a></td>
+		<td>Guides to writing emulators for a couple of systems</td>
+	  </tr>
+	  <tr>
+		<td><a href="http://emulator101.com/">http://emulator101.com</a></td>
+		<td>Space Invaders + Chip 8 emulator guide; plus includes basic math/knowledge (i.e. binary, hexidecimal, 
+		    program counters) - definitely recommend
+		</td>
+	  </tr>
+	  <tr>
+		<td><a href="https://github.com/simias/psx-guide">https://github.com/simias/psx-guide</a></td>
+		<td>Playstation 1 emulator guide in Rust; the guide is in LaTex format; I've compiled it to a pdf
+		    <a href="https://drive.google.com/file/d/1B6XhlOsHQeA9xaJGQixRaDHZX5W2PKws/view?usp=sharing">here</a>
+		</td>
+	  </tr>
+	  <tr>
+		<td><a href="https://www.reddit.com/r/EmuDev/">https://www.reddit.com/r/EmuDev/</a></td>
+		<td>Emulation development community
+		</td>
+	  </tr>
+	</table>
+	<h3>Game Console Dev</h3>
+	<table>
+	  <tr>
+		<th>Link</th>
+		<th>Description</th>
+	  </tr>
+	  <tr>
+		<td><a href="http://www.psxdev.net/">http://www.psxdev.net/</a></td>
+		<td>PSX programming using SONY's official dev kit (psyq). Windows only though, and officially only XP and earlier,
+		    but some stuff works on Windows 7/10
+		</td>
+	  </tr>
+	  <tr>
+		<td><a href="http://unhaut.x10host.com/psxsdk/">http://unhaut.x10host.com/psxsdk/</a></td>
+		<td>Open source PSX dev tools, easier to use but no 3d</td>
+	  </tr>
+	  <tr>
+		<td><a href="https://github.com/ps2dev">https://github.com/ps2dev</a></td>
+		<td>Open source Playstation 2 Devtools - includes an SDL port!</td>
+	  </tr>
+	  <tr>
+		<td><a href="http://www.ps2-home.com/forum/viewtopic.php?p=3884#p3884">http://www.ps2-home.com/forum/viewtopic.php?p=3884#p3884</a></td>
+		<td>Precompiled PS2SDK for windows</td>
+	  </tr>
+	  <tr>
+		<td><a href="http://glampert.com/">http://glampert.com/</a></td>
+		<td>Really good PS2Dev example(s); quake II</td>
+	  </tr>
+	  <tr>
+		<td><a href="http://galileo.dmi.unict.it/utenti/emanuele-f/?post=ps2dev">http://galileo.dmi.unict.it/utenti/emanuele-f/?post=ps2dev</a></td>
+		<td>Some good ps2dev links</td>
+	  </tr>
+	</table>
+
+	<h3>OpenGL</h3>
+	<table>
+	  <tr>
+		<th>Link</th>
+		<th>Description</th>
+	  </tr>
+	  <tr>
+		<td>
+		  <a href="http://www.videotutorialsrock.com/">http://www.videotutorialsrock.com/</a>
+		</td>
+		<td>
+		  Legacy OpenGL (2.1) Video and Text tutorials; but easier to understand
+		</td>
+	  </tr>
+	  <tr>
+		<td>
+		  <a href="http://lazyfoo.net/tutorials/OpenGL/index.php">http://lazyfoo.net/tutorials/OpenGL/index.php</a>
+		</td>
+		<td>
+		  Starts with legacy then transitions into modern opengl; text
+		</td>
+	  </tr>
+	  <tr>
+		<td><a href="https://learnopengl.com/">https://learnopengl.com/</a></td>
+		<td>Modern OpenGL tutorial; I like the pdf book from this website</td>
+	  </tr>
+	</table>
+
+	<h3>WebGL</h3>
+	<table>
+	  <tr>
+		<th>Link</th>
+		<th>Description</th>
+	  </tr>
+	  <tr>
+		<td><a href="https://doc.babylonjs.com/babylon101/">https://doc.babylonjs.com/babylon101/</a></td>
+		<td>Babylon.js (WebGL library) tutorial</td>
+	  </tr>
+	  <tr>
+		<td><a href="http://learningwebgl.com/blog/?page_id=1217">http://learningwebgl.com/blog/?page_id=1217</a></td>
+		<td>WebGL tutorial</td>
+	  </tr>
+	</table>
+	</section>
         </td>
       </tr>
     </table>
