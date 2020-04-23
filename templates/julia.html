@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BJ's Website</title>
+    <link rel="stylesheet" type="text/css" href="../site.css"/>
+
+
+<style>
+    canvas {
+        width: 640px;
+        height: 480px;
+    }
+    textarea {
+        border: 5px solid #00FF00;
+    }
+</style>
+
+</head>
+<body>
+
+<div id="bodyDiv">
+
+<div id="contentDiv">
+
+<canvas id="mycanvas" width="640" height="480"></canvas>
+<br/>
+<br/>
+
+w,a,s,d: move left/right/up/down<br/>
+=,-: zoom in/out<br/>
+
+<textarea cols="80" rows="10" id="codeArea"></textarea>
+<br/>
+<button type="button" id="runButton">Run</button>
+
+
+<script id="juliaCode">
+
+var canvas = document.querySelector("#mycanvas");
+        var ctx = canvas.getContext("2d");
+
+        var imageWidth = 640;
+        var imageHeight = 480;
+        var numChannels = 4; // RGBA
+        var imageData = new ImageData(imageWidth, imageHeight);
+
+        // not part of display; used in the julia set calculation
+        var maxIterations = 300; // how many iterations until stopping
+
+        var Display = {
+
+        width: 0,
+        height: 0,
+        data: null,
+
+        initOpacities: function()
+        {
+            for (var i = 0; i < this.width * this.height * this.numChannels; i++)
+            {
+                /* ImageData.data is an RGBA buffer
+                 * with max's of 255, this sets the
+                 * opacity of each pixel to be 255 */
+                if ((i+1) % 4 === 0)
+                    this.imageData.data[i] = 255;
+            }
+
+        },
+
+        setBackgroundColor: function(r,g,b)
+        {
+            for (var i = 0; i < this.width * this.height * this.numChannels; i+= this.numChannels)
+            {
+                this.imageData.data[i+0] = r;
+                this.imageData.data[i+1] = g;
+                this.imageData.data[i+2] = b;
+            }
+        },
+
+        init: function(width, height, r, g, b)
+        {
+
+            this.width = width;
+            this.height = height;
+            this.numChannels = 4;
+
+            this.imageData = new ImageData(width, height);
+
+            this.initOpacities();
+            this.setBackgroundColor(r,g,b);
+        },
+
+        drawPixel: function(x, y, r, g, b)
+        {
+            var pos = (y * this.width + x) * this.numChannels;
+            this.imageData.data[pos + 0] = r;
+            this.imageData.data[pos + 1] = g;
+            this.imageData.data[pos + 2] = b;
+        },
+
+        /* http://rosettacode.org/wiki/Bitmap/Bresenham%27s_line_algorithm#C */
+        drawLine: function(x1, y1, x2, y2, r, g, b)
+        {
+            var dx = Math.abs(x2-x1), sx = x1<x2 ? 1 : -1;
+            var dy = Math.abs(y2-y1), sy = y1<y2 ? 1 : -1;
+            var err = (dx>dy ? dx : -dy)/2, e2;
+
+            for(;;){
+                this.drawPixel(x1,y1, r, g, b);
+                if (x1==x2 && y1==y2) break;
+                e2 = err;
+                if (e2 >-dx) { err -= dy; x1 += sx; }
+                if (e2 < dy) { err += dx; y1 += sy; }
+            }
+        },
+
+        drawLineCanvas(x1, y1, x2, y2, r, g, b)
+        {
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
+        //    ctx.fillStyle = "#FF0000";
+            ctx.stroke();
+        },
+
+        drawText(x, y, message)
+        {
+            ctx.fillText(message, x, y);
+        },
+
+        update: function()
+        {
+            ctx.putImageData(this.imageData, 0,0);
+        },
+
+        clear: function(r, g, b)
+        {
+            this.imageData.data.fill(0);
+            this.initOpacities();
+            this.setBackgroundColor(r,g,b);
+            this.update();
+        }
+
+        };
+
+        // returns an object with r,g,b values
+        var hsv2rgb = function(num) {
+
+            // Formula from https://www.rapidtables.com/convert/color/hsv-to-rgb.html
+
+            // convert from 0..maxIterations to 0..360
+            var numScaled = num * (360.0 / maxIterations);
+
+            // C = V * S
+            // S = 255, V = 255 * (i < maxIterations) in lodev function:
+            // HSVtoRGB(ColorHSV(i % 256, 255, 255 * (i < maxIterations)))
+            var H = numScaled;
+            if (H > 359) H = 359; // max
+            var S = 1;
+            var V = 1 * (num < maxIterations);
+            var C = V * S;
+
+            var X = C * (1 - Math.abs((H / 60) % 2 - 1));
+            var m = V - C;
+
+            var R = 0, G = 0, B = 0;
+
+            if      ( 0 <= H && H < 60)   { R = C; G = X; B = 0; }
+            else if (60 <= H && H < 120)  { R = X; G = C; B = 0; }
+            else if (120 <= H && H < 180) { R = 0; G = C; B = X; }
+            else if (180 <= H && H < 480) { R = 0; G = X; B = C; }
+            else if (480 <= H && H < 300) { R = X; G = 0; B = C; }
+            else if (300 <= H && H < 360) { R = C; G = 0; B = X; }
+
+            R = (R+m)*255;
+            G = (G+m)*255;
+            B = (B+m)*255;
+
+            return {
+                'r': R,
+                'g': G,
+                'b': B 
+            };
+
+        }
+
+        var imageWidth = 640;
+        var imageHeight = 480;
+        var bgColor = [255,255,255];
+        Display.init(imageWidth, imageHeight, bgColor[0], bgColor[1], bgColor[2]);
+
+        Display.update();
+
+var S_WIDTH = 640;
+var S_HEIGHT = 480;
+
+var cRe, cIm; // real and imaginary component of constant `c`
+var newRe, newIm, oldRe, oldIm; // real and imaginary components of new and old
+var zoom = 1.0;
+var moveX = 0.0;
+var moveY = 0.0; // you can change these to affect zoom and position
+
+console.log('moveX, moveY, zoom: ' + moveX + ' ' + moveY + ' ' + zoom);
+
+var color = 0.0; // the RGB color calue for the pixel
+
+
+// values for constant C, changing these determines the shape of the Julia Set
+cRe = -0.7;
+cIm = 0.27015;
+
+var runJulia = function() {
+
+    // loop through each pixel
+    for (var y = 0; y < S_HEIGHT; y++)
+    {
+        for (var x = 0; x < S_WIDTH; x++)
+        {
+            // calculate the initial real and imaginary part of z, based on the pixel location and zoom position values
+            newRe = 1.5 * (x - S_WIDTH / 2) / (0.5 * zoom * S_WIDTH) + moveX;
+            newIm = (y - S_HEIGHT / 2) / (0.5 * zoom * S_HEIGHT) + moveY;
+    
+            // i will hold number of iterations
+            var i, r, g, b;
+    
+            for (i = 0; i < maxIterations; i++)
+            {
+                // remember previous iteration vals
+                oldRe = newRe;
+                oldIm = newIm;
+    
+                // the acutal iteration, the real and imaginary part are calculated
+                newRe = oldRe * oldRe - oldIm * oldIm + cRe;
+                newIm = 2 * oldRe * oldIm + cIm;
+    
+                // if the point is outside the circle with radius 2 -> stop
+                if ((newRe * newRe + newIm * newIm) > 4) break;
+            }
+    
+            // convert the value from 0..255 to (R,G,B) 
+            color = hsv2rgb(i);
+            //console.log('color: ', color);
+    
+            // draw the pixel
+            Display.drawPixel(x, y, color.r, color.g, color.b);
+        }
+    }
+
+}
+
+runJulia();
+Display.update();
+
+// listen for keyboard input
+document.onkeydown = function(event) {
+
+    console.log('event keycode: ', event.keyCode);
+
+    switch (event.keyCode)
+    {
+        // w
+        case 87:
+            moveY -= 0.03 * 1 / zoom; // 1 should be frameTime instead
+            runJulia();
+            Display.update();
+            break;
+
+        // a
+        case 65:
+            moveX -= 0.03 * 1 / zoom; // 1 should be frameTime instead
+            runJulia();
+            Display.update();
+            break;
+
+        // s
+        case 83:
+            moveY += 0.03 * 1 / zoom; // 1 should be frameTime instead
+            runJulia();
+            Display.update();
+            break;
+
+        // d
+        case 68:
+            moveX += 0.03 * 1 / zoom; // 1 should be frameTime instead
+            runJulia();
+            Display.update();
+            break;
+
+        // equals
+        case 61:
+            zoom += 0.03;
+            runJulia();
+            Display.update();
+            break;
+
+        // minus
+        case 173:
+            zoom -= 0.03;
+            runJulia();
+            Display.update();
+            break;
+
+        default:
+            break;
+    }
+
+    
+    ctx.fillStyle = "#000000";
+    ctx.fillRect(0,0,180,40);
+    ctx.fillStyle= "#00FFFF";
+    Display.drawText(5, 15, "X: " + moveX);
+    Display.drawText(5, 25, "Y: " + moveY);
+    Display.drawText(5, 35, "Zoom: " + zoom);
+
+};
+
+</script>
+
+<script>
+var codeArea = document.querySelector("#codeArea");
+var julia = document.querySelector("#juliaCode");
+
+codeArea.value = julia.text;
+
+document.querySelector("#runButton").onclick = function() {
+    var runFunc = new Function(codeArea.value);
+    runFunc();
+};
+
+</script>
+
+</div> <!-- contentDiv -->
+</div> <!-- bodyDiv -->
+
+<p><a href="../index.html">&lt;-- Back to Home</a></p>
+
+</body>
+</html>
+

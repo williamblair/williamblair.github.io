@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Concurrency</TITLE>
+<META NAME="description" CONTENT="Concurrency">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="main.css">
+
+<LINK REL="next" HREF="node16.html">
+<LINK REL="previous" HREF="node14.html">
+<LINK REL="up" HREF="main.html">
+<LINK REL="next" HREF="node16.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html220"
+  HREF="node16.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="next.png"></A> 
+<A NAME="tex2html218"
+  HREF="main.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="up.png"></A> 
+<A NAME="tex2html212"
+  HREF="node14.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html221"
+  HREF="node16.html">Successive Refinement</A>
+<B> Up:</B> <A NAME="tex2html219"
+  HREF="main.html">clean code notes</A>
+<B> Previous:</B> <A NAME="tex2html213"
+  HREF="node14.html">Emergence</A>
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION000140000000000000000">
+Concurrency</A>
+</H1>
+
+<P>
+
+<UL>
+<LI>concurrency related code should be kept separate from other code.
+</LI>
+<LI>limit the scope of data as much as possible to avoid race conditions - e.g.
+    only access shared data in one point of the code (no duplication!) so you can't
+    accidentally forget to protect/lock the data elsewhere.
+        
+<UL>
+<LI>Change object design of shared data so that you don't force
+            objects using the data to manage sharing as well
+        
+</LI>
+</UL>
+</LI>
+<LI>Use copies instead of sharing when possible (e.g. local copy to a thread
+    to be merged later in the main thread)
+</LI>
+<LI>threads should be as independent as possible - share as little with
+    other threads as possible
+</LI>
+<LI>most concurrent problems are variations of the reader-writer, producer-consumer,
+    and dining philosophers problems
+</LI>
+<LI>keep critical sections as small as possible
+</LI>
+</UL>
+
+<P>
+<BR><HR>
+<ADDRESS>
+bj
+2019-09-22
+</ADDRESS>
+</BODY>
+</HTML>

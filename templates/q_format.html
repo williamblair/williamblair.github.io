@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BJ's Website</title>
+  <link rel="stylesheet" type="text/css" href="../site.css"/>
+
+    <!-- q format funcs -->
+    <script src="../javascript/q_format.js"></script>
+
+</head>
+<body>
+
+<div id="bodyDiv">
+    
+    <div id="contentDiv">
+    
+    <h1 style="text-align:center;">Q Format Converter</h1>
+    
+    <div>
+    <h1>Float ==&gt; Q</h1>
+    
+      <table>
+        <tr>
+          <th>Float Input</th>
+          <th>Qm.n: m</th>
+          <th>Qm.n: n</th>
+          <th>Q value</th>
+        </tr>
+        <tr>
+          <td>
+            <input type="number" name="float_q_number" value="0.0" step="any"/>
+          </td>
+          <td>
+            <input type="number" name="float_q_type_m" value="0"/>
+          </td>
+          <td>
+            <input type="number" name="float_q_type_n" value="1" min="1"/>
+          </td>
+          <td style="text-align:right;">
+            <span id="float_q_out" style='padding-left:20px;'></span>
+          </td>
+        </tr>
+      </table>
+      <br/>
+    
+      <input type="button" value="convert" id="float_q_submit_button" onclick="handle_float_q_submit()"/>
+      <br/>
+    </div>
+    
+    <div>
+    <h1>Q ==&gt; Float</h1>
+    
+      <table>
+        <tr>
+          <th>Q Input</th>
+          <th>Qm.n: m</th>
+          <th>Qm.n: n</th>
+          <th>Float value</th>
+        </tr>
+        <tr>
+          <td>
+            <input type="number" name="q_float_number" value="0"/>
+          </td>
+          <td>
+            <input type="number" name="q_float_type_m" value="0"/>
+          </td>
+          <td>
+            <input type="number" name="q_float_type_n" value="1" min="1"/>
+          </td>
+          <td style="text-align:right;">
+            <span id="q_float_out" style='padding-left:20px;'></span>
+          </td>
+        </tr>
+      </table>
+      <br/>
+    
+      <input type="button" value="convert" id="q_float_submit_button" onclick="handle_q_float_submit()"/>
+      <br/>
+    </div>
+    
+    <script>
+    var handle_float_q_submit = function() {
+    
+        var m = document.getElementsByName("float_q_type_m")[0].value;
+        var n = document.getElementsByName("float_q_type_n")[0].value;
+    
+        if (m === undefined || n === undefined ||
+            m === NaN || n === NaN) 
+        {
+            alert('bad m/n');
+            return;
+        }
+    
+        var result = Float_to_Q(document.getElementsByName("float_q_number")[0].value,
+                    m, n);
+    
+        document.getElementById("float_q_out").innerHTML = '<h3>' + result + '</h3>';
+        
+    }
+    var handle_q_float_submit = function() {
+    
+        var m = document.getElementsByName("q_float_type_m")[0].value;
+        var n = document.getElementsByName("q_float_type_n")[0].value;
+    
+        if (m === undefined || n === undefined ||
+            m === NaN || n === NaN) 
+        {
+            alert('bad m/n');
+            return;
+        }
+    
+        var result = Q_to_Float(document.getElementsByName("q_float_number")[0].value,
+                    m, n);
+    
+        document.getElementById("q_float_out").innerHTML = '<h3>' + result + '</h3>';
+    }
+    </script>
+    
+    <h1 style="text-align:center">What is Q Format?</h3>
+    
+    <p><a href="https://en.wikipedia.org/wiki/Q_%28number_format%29">Q format</a>
+    is a fixed point way to store floating point (decimal) numbers in a computer program.
+    It represents the decimal number as a fraction; storing both the numerator and 
+    denominator in single number using a set amount of bits. In the notation 
+    <i>Qm.n</i>, <i>m</i> and <i>n</i> represent the number of bits used to store the
+    numerator and denominator, respectively. For example, the format <i>Q4.12</i>
+    uses 4 bits for the numerator and 12 bits for the denominator; for a total
+    of 16 bits which can be stored in an <i>int16_t</i> type in C.
+    The denominator is always a power of 2, so in our <i>Q4.12</i> example
+    the denominator is 4096, since 2<sup>12</sup>=4096. Q format is useful on systems
+    which lack real floating point support, such as the Playstation 1 :)
+    </p>
+    
+    </div> <!-- contentDiv -->
+    
+</div> <!-- bodyDiv -->
+
+<p><a href="../index.html">&lt;-- Back to Home</a></p>
+
+</body>
+</html>
+
+
+

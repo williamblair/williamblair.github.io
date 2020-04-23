@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BJ's Website</title>
+  <link rel="stylesheet" type="text/css" href="../site.css"/>
+  
+</head>
+<body>
+
+<div id="bodyDiv">
+
+<div id="contentDiv">
+
+<h1>PSYQ Utility Library</h1>
+<h2>Helpful C++ classes for Playstation 1 programming using PSYQ SDK</h2>
+
+<img src="https://68.media.tumblr.com/01f0cf996e87d51e13771e2cb07eee51/tumblr_nikfulOXaZ1r2inbto1_r1_500.gif" style="float:right; margin:5px;"/>
+
+<p>This will be my development log as I attempt to create a (hopefully!) useful
+toolkit for PSX programming in C++ using the original PSYQ sdk.</p>
+<p>
+I tried to do something similar a few years ago when I was new to programming - 
+<a href="https://github.com/williamblair/PSX_App">PSX_App</a> on my
+github - but now that I've had more experience with both C++ and how the PS1 hardware/system
+works, I'm hoping to make something of higher quality and that can do more than just draw
+a 3D plane, lol.
+</p>
+
+<p>The source code will be stored <a href="https://bitbucket.org/williamblair/psyq_util">here</a> on bitbucket for now but I think I'll
+end up using it to replace the repo on github once I feel its a bit more worth sharing.
+</p>
+
+<h3>10/19/2019</h3>
+<p>I've actually been working on this for a couple of days, but didn't think of keeping a log until today. 
+That being said, I've had some decent progress so far, and have the following classes implemented:</p>
+<ul>
+<li>System
+<ul>Responsible for initializing/updating the PSX graphics system and other hardware init needs</ul>
+</li>
+<li>Model
+	<ul>Represents a generic 3D object which contains vertices, normals, colors, and is drawn by sending
+	all of its vertices to be drawn as triangles by the System class. TODO - texture support</ul>
+</li>
+<li>Cube
+	<ul>A 3d object that inherits from Model, just adds default vertices and normals
+	to the model so it can be drawn instantly without the need for data to be loaded
+	or anything</ul>
+</li>
+<li>Camera
+	<ul>Contains a physical location and view matrix representing camera/view coordinates in 3D space. Can
+	be moved around as an FPS camera currently, by inheriting from the FPS_movable_object class.</ul>
+</li>
+<li>Sprite
+	<ul>A simple textured quad primitive drawn in 2D by the system class. It isn't drawn in the system
+	order table and would be simply overlayed on top of any 3D objects drawn in the same loop, because
+	it is drawn with <i>DrawPrim()</i> (drawn instantly by the GPU) as opposed to <i>AddPrim()</i> (added to packet list
+	and drawn on next update)</ul>
+</li>
+<li>Light
+	<ul>Contains a color, direction, and angle of a light to be used by the GPU/GTE; I think?? that it represents
+	a point light but I'm honestly not a 100% sure; I need to fool around with it more to figure that out...
+	The System class contains a pointer to one of these which is used globally by all Model classes drawn (or NULL
+	for no lighting)</ul>
+</li>
+</ul>
+<p>What I spent most of today working on, however, was the Pad class (as in joy/directional pad).
+This class will be used to access the controllers on the playstation. It turns out that
+getting the analog sticks to work is much tricker than I would've expected!</p>
+<p>
+So PSYQ provides you two ways to access the controllers. The first is much simpler and uses these
+basic functions:
+</p>
+<pre><code>
+PadInit()
+PadRead()
+</code></pre>
+<p>
+Pretty straightforward - you initialize the controller system with PadInit() and get the buttons
+status with PadRead(). This <i>would</i> be great, but there's a slight issue: you can't 
+access the analog sticks or rumble motors this way :(
+</p>
+
+<p>
+So instead you need to use this set of functions:
+</p>
+<pre><code>
+ResetCallback()
+PadInitDirect()
+PadStartCom()
+...
+</code></pre>
+
+<p>Among other functions. Instead of calling PadRead() each time you want to check controller values,
+instead the PSX BIOs auto read and store controller data into the buffers you send to PadInitDirect().
+The PadStartCom() function tells the BIOs to do this. Since this is done automatically every
+vertical sync (I think) in the background, concurrency issues are introduced (reading from your
+data buffers while the BIOs are trying to write to them at the same time) and I kept freezing and
+crashing the emulator/playstation! Thus I spent the afternoon looking at the PSYQ documentation
+and code samples. I ended up finding <a href="http://www.psxdev.net/forum/viewtopic.php?f=54&t=664&p=5096#p5078">this thread</a> 
+in the PSX dev forums which contained an analog controller demo/example. Compiling and running this example
+worked fine on its own, but when I tried to integrate it into my project I was still crashing #!%$^& </p>
+
+<p>After some more tinkering, I figured out that the issue was the order I was initializing things
+with the System and Pad. Basically, the order of important initialization functions I was using was:</p>
+<pre><code>
+ResetGraph()
+InitGeom()
+ResetCallback()
+PadInitDirect()
+...
+</code></pre>
+
+<p>but what I needed was:</p>
+
+<pre><code>
+ResetCallback()
+PadInitDirect()
+...
+ResetGraph()
+InitGeom()
+</code></pre>
+
+<p>So I was initializing graphics first, when instead I needed to initialize BIOs system callbacks (ResetCallback) and do
+controller stuff first. The only issue I have now is that the vibration is set on immediately once you start the program
+and can't stop it, lol. But, I think this should be a pretty easy fix and I'll work on it later.
+</p>
+
+<figure>
+<img src="../images/psyq_util_screenshot_1.png"/>
+<figcaption>Progress so far: 2 spinning cubes with an FPS camera and lighting. yay!</figcaption>
+</figure>
+
+<h3>10/20/2019</h3>
+<p>
+I fixed the controller vibration issue mentioned previously. The issue was that the buffer
+which stores each actuator/motor speed wasn't being initialized, so they had garbage
+starting values when the program starts which had non-zero values, so the controller
+library interpreted that as the motor being 'on'.
+</p>
+
+<pre><code>
+Motor[0] = 0; // the first actuator, which only has an on/off state (0 or 1)
+Motor[1] = 0; // the second actuator, which has a variable speed from 0 to 255
+</code></pre>
+
+<p>Once that was fixed, I cleaned up the class a little and added accessor functions
+to get button values and analog stick values. For the analog sticks, the values for
+each x/y axis is a value from 0 (pushed far left) to 255 (pushed far right). I 
+had the accessor functions offset these values by 128 so instead the client will
+read analog values in a range from -128 to 127, with 0 being the default middle
+value. This makes it easier to distinguish between left/right or up/down.
+</p>
+
+<p>The final steps for the Pad class will be to add vibration accessors for the
+client and add controller 2 support. After that will be either texture loading
+or font loading (although I guess font loading would involve loading a font
+texture anyways, so probably that)</p>
+
+<figure>
+<img src="../images/psyq_util_screenshot_2.gif"/>
+<figcaption>FPS Movement with analog sticks finally working!</figcaption>
+</figure>
+
+<h3>10/21/2019</h3>
+<p>Added second controller options and vibration function options.
+Ez-peasy. and also cleaned up the Pad code.</p>
+
+<p>An interesting note from adding controller 2 support is
+that all of the PSYQ library controller functions use
+0 and 16 (0x00 and 0x10) instead of 0 and 1 for specifying which
+controller the function is using. My guess as to why this is is
+that the controller number argument is used to represent
+the 16th bit of the instruction sent to the controller.
+Meaning, instructions with the 16th bit set to 0/1 are for the
+first/second controller. Just a theory.</p>
+
+<pre><code>
+0b1000000000000000 // 16th bit == 1 --&gt; command for controller 2
+0b0000000000000000 // 16th bit == 0 --&gt; command for controller 1
+</code></pre>
+
+<h3>10/22/2019</h3>
+<p>Added basic texture uploading (texture class) and modified Sprite class to use it. Also added
+<i>bmp2array</i> utility to read 16-bit bmps and print out a C-array with its texture data.
+Other bit depths like 8bit and 24bit are TODO still. Probably more important is 8 bit in order
+to preserve VRAM. The 16-bit bmps can be created by exporting ../images from GIMP as bmp,
+then under 'Advanced Options', select X1 R5 G5 B5 format.
+</p>
+<p>
+Another TODO is to have an option to enable/disable transparency. The PSX treats any exact
+black color in a texture (all zeros) as transparent. I think it'd be nice to have an option
+that automatically slightly increases the brightness of any black colors in the texture
+that way they aren't drawn as transparent by the psx unless desired.
+</p>
+
+<p>I made a simple crate texture to test, and can move it around the screen
+with the directional pads, which can be seen in the screenshots below :)</p>
+
+<figure>
+<img src="../images/psyq_util_screenshot_3.gif"/>
+<figcaption>Test crate sprite moving around the screen</figcaption>
+</figure>
+
+<figure>
+<img src="../images/psyq_util_screenshot_4.png"/>
+<figcaption>PSX VRAM with the crate sprite loaded (top left of black area)</figcaption>
+</figure>
+
+<h3>10/24/2019</h3>
+<p>Added texture to models (Model_textured, Cube_textured) classes. Moved some of the
+primitive setting stuff internally to the texture class; as the functionality
+was more related to textures than models. Finally, sprites and models can now
+call set_texture to share the same texture, which prevents unnecessary multiple
+loadings of the same data.</p>
+<p>I noticed the test program somtimes is freezing on the PS1 hardware; I'm assuming
+it's related to the Pad class again. Oh well for now; it happens seemingly infrequently
+so I'll ignore it.</p>
+
+<figure>
+<img src="../images/psyq_util_screenshot_5.gif"/>
+<figcaption>Cube with texture data now! The bottom left sprite and cube are sharing the same texture</figcaption>
+</figure>
+
+<h3>10/25/2019</h3>
+<p>Added a Font class, to load bitmaps fonts (../images) and render text with them. This
+is done by calculating where in the image the appropriate character is based on its
+input ascii value.</p>
+<p>The fonts I used to test are by <a href="https://opengameart.org/content/bitmap-font-pack">ZiNGOT on opengameart.org</a>
+which I reorganized as 8x4 tables (they came entirely horizontal/vertical, which wouldn't fit well in PSX Vram).</p>
+<img src="../images/psx_font1.png"/>
+<img src="../images/psx_font2.png"/>
+
+<figure>
+<img src="../images/psyq_util_screenshot_6.gif"/>
+<figcaption>Blinky font using the new font class. The top left also has a different, regular font.</figcaption>
+</figure>
+
+<h3>10/29/2019</h3>
+
+<p>Have a 3D model of a car partially loaded. Input was a simple car model from <a href="https://free3d.com/3d-model/low-poly-racing-car-22092.html">here</a>, loaded into
+Blender and exported as a .PLY file, then I wrote a program to parse the .PLY and print out vertex, normal, and face index arrays to store in a header file. The arrays
+are set as options to the Model class in the main program. The PSX does have a specific 3d model format (.TMD) so I suppose that might be worth looking into.</p>
+
+<p>I think something might be off with the normals as the result looks kind of funny:</p>
+
+<figure>
+<img src="../images/psyq_util_screenshot_7.png"/>
+<figcaption>The body of the car model loaded; potentially something wrong with the extracted normals as the colors look kind of funny</figcaption>
+</figure>
+
+<p>But, at least progress was made :)</p>
+
+<h3>10/30/2019</h3>
+
+<p>Fixed the orientation of loaded car model from ply2array. The issue was the combination of two factors: first, the car had the wrong orientation to
+begin with in Blender (it was pointing towards the Y axis, not the Z axis), and second, the Y and Z coordinates needed to be negated in 
+ply2array.c. Now the car points forward and is flat like its supposed to.</p>
+
+<h3>11/04/2019</h3>
+
+<p>Added lookat camera to hopefully use as a third person perspective. The camera currently follows/targets the car model I've loaded.
+The camera code was basically just copied from the PSn00bSDK examples. I think I need to convert the two spinning cube coordinates to fixed
+point format as they both seem to be stuck together now (need to be scaled by ONE aka 4096).</p>
+
+<figure>
+<img src="../images/psyq_util_screenshot_8.gif"/>
+<figcaption>Camera following the car model around. I need to add some gravity/a floor or something as it's
+hard to follow along and goes all over the place, lol</figcaption>
+</figure>
+
+<h3>11/07/2019</h3>
+
+<p>Added third person rotation to the camera. Technically it needs a bit more tweaking (rotation around the x axis is a bit
+wonky, but feels generally smooth so its good enough for now).
+Took me a little while to figure out how the angles work to 
+move the camera around the target like a sphere. These two links were pretty helpful:
+<ul>
+	<li><a href="https://www.youtube.com/watch?v=PoxDDZmctnU">https://www.youtube.com/watch?v=PoxDDZmctnU</a></li>
+	<li><a href="https://gamedev.stackexchange.com/questions/63114/how-do-i-rotate-a-camera-around-the-y-axis-of-the-object-its-looking-at">
+		https://gamedev.stackexchange.com/questions/63114/how-do-i-rotate-a-camera-around-the-y-axis-of-the-object-its-looking-at</a>
+	</li>
+</ul>
+Basically it comes down to the sin/cosine properties of right triangles. (a = hypotenuse * cos(angle), b = hypotenuse * sin(angle)).
+Then in 3d you have two circles to move around (centered about the z axis and x axis) which combine into the x, y, and z offsets
+from the center of the target to place the camera at. I wrote this little javascript animation to test stuff:
+</p>
+
+<div id="canvasDiv">
+<canvas id="myCanvas" width="640px" height="480px">
+Your browser doesn't support the canvas element...
+</canvas>
+
+<p id="angleText"></p>
+</div><script>
+var canvas = document.getElementById('myCanvas');
+var ctx = canvas.getContext('2d');
+
+const canvasWidth  = 640;
+const canvasHeight = 480;
+
+// test drawing location based on angle and radius only
+var curAngle = 120.0 * Math.PI / 180.0; // 120 degrees
+var angleIncrement = 1.0 * Math.PI / 180.0;
+console.log('angleIncrement: ' + angleIncrement);
+
+var animLoop = function() {
+
+ctx.fillStyle = "#EEEEEE";
+ctx.fillRect(0,0, canvasWidth, canvasHeight);
+
+const circleRadius = 200;
+
+ctx.strokeStyle = "#000000";
+ctx.beginPath();
+ctx.arc(
+    canvasWidth/2, canvasHeight/2, // center x,y
+    circleRadius,                  // radius
+    0,                             // start angle (radians)
+    2*Math.PI                      // end angle (radians)
+);
+ctx.stroke();
+
+// x and y position to move from the center of the circle for our final location
+var offsetX = 0;
+var offsetY = 0;
+
+if ( curAngle <= Math.PI / 2.0)
+{
+    // convert from obtuse to acute angle
+    //  no need to do that here
+    var invertedAngle = curAngle;
+
+    offsetX = circleRadius * Math.cos( invertedAngle );
+    offsetY = circleRadius * Math.sin( invertedAngle );
+
+    // set signs based on need to move left or right/up or down
+    offsetX =  offsetX; // move right
+    offsetY = -offsetY; // move up
+}
+else if ( curAngle <= Math.PI )
+{
+    // convert from obtuse to acute angle
+    var invertedAngle = Math.PI - curAngle;
+
+    offsetX = circleRadius * Math.cos( invertedAngle );
+    offsetY = circleRadius * Math.sin( invertedAngle );
+
+    // set signs based on need to move left or right/up or down
+    offsetX = -offsetX; // move left
+    offsetY = -offsetY; // move up
+}
+else if ( curAngle <= 3.0 * Math.PI / 2.0 )
+{
+    // convert from obtuse to acute angle
+    var invertedAngle = curAngle - Math.PI;
+
+    offsetX = circleRadius * Math.cos( invertedAngle );
+    offsetY = circleRadius * Math.sin( invertedAngle );
+
+    // set signs based on need to move left or right/up or down
+    offsetX = -offsetX; // move left
+    offsetY =  offsetY; // move down
+}
+else if ( curAngle <= 2.0 * Math.PI )
+{
+    // convert from obtuse to acute angle
+    var invertedAngle = (2.0 * Math.PI) - curAngle;
+
+    offsetX = circleRadius * Math.cos( invertedAngle );
+    offsetY = circleRadius * Math.sin( invertedAngle );
+
+    // set signs based on need to move left or right/up or down
+    offsetX = offsetX; // move right
+    offsetY = offsetY; // move down
+}
+
+else
+{
+    console.log('unhandled angle!');
+}
+
+// the final location of the dot on the circle
+var circlePosX = (canvasWidth / 2.0) + offsetX;
+var circlePosY = (canvasHeight / 2.0) + offsetY;
+
+// draw the location
+ctx.fillStyle = "#FF0000";
+ctx.fillRect(circlePosX, circlePosY, 10, 10);
+
+// increase the angle
+curAngle += angleIncrement;
+
+if ( curAngle >= 2.0 * Math.PI) {
+    curAngle -= (2.0 * Math.PI);
+}
+
+// show what the angle is
+document.getElementById('angleText').innerHTML = 'curAngle (radians): ' + curAngle;
+
+window.requestAnimationFrame(animLoop);
+
+} // end animLoop function
+
+window.requestAnimationFrame(animLoop);
+</script>
+
+
+
+<p>
+Additionally, I had to experiment a bit with the PSX 'rcos' and 'rsin' functions in combination with fixed point Q4.12 format 
+to get the right combination of divisors/conversions between regular and fixed point formats. What I found is that basically for
+each multiplication between two fixed point numbers, you have to divide the result by 2^n (shift right by n). So for two multiplications
+you have to shift right by n twice. So my final current camera position offsets are calculated as follows:
+</p>
+
+<pre><code>
+offsetX = (rsin( yaw ) * radius ) &gt;&gt; 12;
+offsetY = (rcos( yaw ) * radius ) &gt;&gt; 12;
+offsetZ = (rsin( pitch ) * radius ) &gt;&gt; 12;
+</code></pre>
+
+<p>where the shifts divide out the n in Qm.n format (12 in this case). The result looks like so:</p>
+
+<figure>
+<img src="../images/psyq_util_screenshot_9.gif"/>
+<figcaption>Third person camera rotating around the car target!</figcaption>
+</figure>
+
+<h3>04/04/2020</h3>
+
+<p>It's been a while; I decided to go back and redo the PSYQ toolkit sample tutorials in C++.
+Hopefully I'll actually finish them this time. My intent is to learn more at the 3D level to try
+and help with the car thingy I've logged above up until this point.
+I've followed the dev tutorials up until a certain point previously (apparently 2 years ago!) going
+off of my github repo: <a href="https://github.com/williamblair/PSYQ_cplusplus/">https://github.com/williamblair/PSYQ_cplusplus/</a>
+</p>
+
+<p>Today I sort of finished the first two:</p>
+
+<figure>
+<img src="../images/psyq_tuto0.png"/>
+<img src="../images/psyq_tuto1.png"/>
+<figcaption>C++ implementation of the first two tutorials; they're static and don't move
+with input or anything currently</figcaption>
+</figure>
+
+<p>By sort of I mean they don't move or accept controller input. The background is bright
+green as I wanted to make sure I could tell the main drawing was working and not frozen or
+crashed (would show a black screen if this was the case)</p>
+
+<figure>
+<img src="../images/psyq_tuto0.gif"/>
+<img src="../images/psyq_tuto1.gif"/>
+<figcaption>
+These are what the first two tutorials are supposed to look like based off of the provided
+samples code. There is a single PSX-format executable with a menu that wraps all of the 
+tutorials together
+</figcaption>
+</figure>
+
+<h3>04/05/2020</h3>
+
+<p>Today I caught up where I had previously gotten with the PSYQ tutorials which was tutorial 5,
+a textured and shaded cube. Tutorials 3-5 are a cube, a cube with lighting, then a textured
+cube with lighting. Looking ahead, I see the next sample uses a fog effect, so that'll
+be interesting</p>
+
+<p>These ones actually take input as you can rotate the cube around with the controller</p>
+
+<figure>
+<img src="../images/psyq_tuto3.gif"/>
+<img src="../images/psyq_tuto4.gif"/>
+<img src="../images/psyq_tuto5.gif"/>
+<figcaption>Graphics samples implementations 3-5 in C++</figcaption>
+</figure>
+
+<h3>04/08/2020</h3>
+
+<p>Finished tutorial 6: fog/depth queue lighting. This one is basically the same as tutorial 5,
+except you replace the function call that calculates the color of the cube based on lighting
+to a different one that uses the interpolation value based on depth. You also have to set
+the fog color and the distance range to use for fog</p>
+
+<figure>
+<img src="../images/psyq_tuto6.gif"/>
+<figcaption>Tutorial 6 implementation: Fog/depth lighting</figcaption>
+</figure>
+
+<h3>04/13/2020</h3>
+
+<p>Finished tutorials 7-9: Multiple/Many cubes and world coordinates, seamless scrolling 2d backgrounds and viewports (i.e. 
+what you would use for multiplayer split screens). For tuto 7, each cube shares the same world transformation matrix (how
+they all seem to be grouped together) but have their own local transformation matrix. Tutorial 8 was more interesting: each
+background (the window, hills, and city) are actually each made up of 2 ../images. the ../images are drawn next to each other with
+an offset relative to the current 'x' offset. This offset is updated each frame as the 'x' offset increases or decreases.
+For example, if the screen width is 256 (which it is here), and the x offset is 100, then the left image is drawn with
+an x offset of 100 and the right image is drawn with an x offset of the difference (256-100=156). Finally, for tutorial 9,
+each viewport shares the same display environment (the total screen size = 320x240 pixels), but have their own
+draw environment (each taking a quarter of the screen). All drawing and primitive coordinates are relative
+to the current draw environment.</p>
+
+<figure>
+<img src="../images/psyq_tuto7.gif"/>
+<img src="../images/psyq_tuto8.gif"/>
+<img src="../images/psyq_tuto9.png"/>
+<figcaption>Tutorials 7 through 9. In the last image (tutorial 9), each quarter of the screen has its own defined
+drawing coordinates at its top left corner. The squares drawn inside all have the same internal X,Y coordinates 
+(each have a x,y position of 10,40), but are drawn relative to the current viewport</figcaption>
+</figure>
+
+<h3>04/18/2020</h3>
+
+<p>Tutorial 10: scrolling background done. This one emulates a snes mode-7 style psuedo-3d background. How its done is actually just drawing all
+of the tiles on a real 3D polygon and then rotating it so it looks just right. The trikcy part is offsetting map and uv coordinates properly.
+Additionally, you can notice that moving forwards and backwards produces a kind of jiggle effect. This is due to the entire world plane shifting
+to offset when you're moving between tile coordinates (e.g. moving forward/backward by 3 when tiles have a size of 5). Left and right does this as
+well, however it's not noticable because the far left and right edges are offscreen. It becomes more obvious if you have the background color
+different from the darkening texture color.</p>
+
+<figure>
+<img src="../images/psyq_tuto10.gif"/>
+<figcaption>old school style 3d world map view, with a fakened darkening effect to emphasize the 'distance' towards the horizon. I
+think this could also be done with the fog effect tutorial from earlier...</figcaption>
+</figure>
+
+<h3>04/19/2020</h3>
+
+<p>Did tutorial 11. This one was called a 'mosaic' effect - the sprite is blurred by zooming in on the pixels. How it works
+is you shrink the size of the texture area used by offsetting the uv coordinates, then stretching the smaller area
+out to match the sprite size.</p>
+
+<figure>
+<img src="../images/psyq_tuto11.gif"/>
+<figcaption>The entire image is actually a block of different primitives (each tile is its own primitive)</figcaption>
+</figure>
+
+</div> <!-- contentDiv -->
+
+</div> <!-- bodyDiv -->
+
+</body>
+</html>
+

@@ -1,0 +1,150 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Error Handling</TITLE>
+<META NAME="description" CONTENT="Error Handling">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="main.css">
+
+<LINK REL="next" HREF="node10.html">
+<LINK REL="previous" HREF="node8.html">
+<LINK REL="up" HREF="main.html">
+<LINK REL="next" HREF="node10.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html160"
+  HREF="node10.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="next.png"></A> 
+<A NAME="tex2html158"
+  HREF="main.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="up.png"></A> 
+<A NAME="tex2html152"
+  HREF="node8.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html161"
+  HREF="node10.html">Using Third Party Code/Libraries</A>
+<B> Up:</B> <A NAME="tex2html159"
+  HREF="main.html">clean code notes</A>
+<B> Previous:</B> <A NAME="tex2html153"
+  HREF="node8.html">Objects and Data Structures</A>
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00080000000000000000">
+Error Handling</A>
+</H1>
+
+<P>
+
+<UL>
+<LI>Error handling is important, <SPAN  CLASS="textbf">but if it obscures logic, its wrong</SPAN>.
+</LI>
+<LI>Use exceptions rather than return codes
+        
+<UL>
+<LI>Return codes add clutter (many, many nested if/else status checks and 
+            error logs)
+        
+</LI>
+</UL>
+</LI>
+<LI>write the <SPAN  CLASS="textit">try-catch-finally</SPAN> first.
+        
+<UL>
+<LI>They define a scope to work with, and the catch block adds a
+            "consistent state" to always leave the program/method with
+        
+</LI>
+</UL>
+</LI>
+<LI>Provide context with exceptions - enough information to know where and WHY
+    the exception occurred - not just a stack trace
+</LI>
+<LI>Don't let exceptions break up the "normal flow" of the program - e.g.
+    <PRE>
+        try {
+            MealExpenses expenses = expenseReportDAO.getMeals(employee.getID());
+            m_total += expenses.getTotal();
+        } catch(MealExpensesNotFound e) {
+            m_total += getMealPerDiem();
+        }
+</PRE>
+    should instead be
+    <PRE>
+        MealExpenses expenses = expenseReportDAO.getMeals(employee.getID());
+        m_total += expenses.getTotal();
+</PRE>
+    That is, the no meal expenses found thing should be handled internally. One solution
+    is to have <SPAN  CLASS="textit">getMeals()</SPAN> to return an object, which, depending on if meal expenses
+    exist or not, will be one of two types both of which inherit from a parent class
+    defining their interface. This is called the <SPAN  CLASS="textit">Special Case Pattern</SPAN>.
+
+<P>
+</LI>
+<LI>Don't return null
+        
+<UL>
+<LI>This results in many annoying <SPAN  CLASS="textit">if null</SPAN> checks.
+            It's also possible to accidentally miss adding a null check while
+            coding which could break your program at runtime.
+        
+</LI>
+</UL>
+
+<P>
+</LI>
+<LI>Don't pass null - again, same idea with having <SPAN  CLASS="textit">if null</SPAN> checks.
+</LI>
+</UL>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A NAME="tex2html160"
+  HREF="node10.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="next.png"></A> 
+<A NAME="tex2html158"
+  HREF="main.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="up.png"></A> 
+<A NAME="tex2html152"
+  HREF="node8.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html161"
+  HREF="node10.html">Using Third Party Code/Libraries</A>
+<B> Up:</B> <A NAME="tex2html159"
+  HREF="main.html">clean code notes</A>
+<B> Previous:</B> <A NAME="tex2html153"
+  HREF="node8.html">Objects and Data Structures</A></DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+bj
+2019-09-22
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Beedge</title>
+
+</head>
+<body>
+
+<h1 style="text-align:center">Chapter 4 - Important Linear Block Codes</h1>
+
+<h3>Terms</h3>
+<ul>
+<li>Perfect Code: Has no uncorrectable codewords with &lt;= <i>t</i> errors</li>
+<li>Weight distribution: Set of count of codewords in a code each having the same weight
+    <ul>
+        <li>E.g. 5 codewords have a weight of 1, etc.</li>
+    </ul>
+</li>
+<li>Weight enumerator: Polynomial function used to calculate the weight distribution of a code
+    <ul>
+        <li>The coefficients for each degree are the count for that weight</li>
+    </ul>
+</li>
+<li>SEC-DED: Single error correcting, double error detecting</li>
+</ul>
+
+<h3>Hamming Codes</h3>
+<ul>
+<li>Min distance of 3</li>
+<li>Corrects single bit errors</li>
+<li>Detects all &lt;= 2 errors</li>
+<li>Is a perfect code (only one besides Golay code)</li>
+<li>Easily decoded using lookup table</li>
+<li>For any <i>m</i> &gt;= 3
+<ul>
+<li>Code Length = n = 2<sup><i>m</i></sup>-1</li>
+<li>Num. information bits = k = 2<sup><i>m</i></sup>-<i>m</i>-1</li>
+<li>Num. parity check bits = n - k = <i>m</i></li>
+<li>Num. possible error corrections = t = 1</li>
+<li>Parity check matrix <b>H</b> = [<b>I</b><sub><i>m</i></sub> <b>Q</b>]
+    <ul>
+        <li><b>Q</b> = collection of 2<sup><i>m</i></sup>-<i>m</i>-1 columns with weight &gt;= 2</li>
+        <li><b>I</b><sub><i>m</i></sub> = <i>m</i> x <i>m</i> identity matrix</li>
+    </ul>
+</li>
+<li>Generator matrix <b>G</b> = [<b>Q</b><sup>T</sup> <b>I</b><sub>2<sup><i>m</i></sup>-<i>m</i>-1</sub>]</li>
+<li>Standard array coset leaders = <b>0</b> vector plus all 2<sup><i>m</i></sup>-1 tuples with weight 1
+    <ul><li>This is why "Perfect Code" definition applies (corrects ALL single bit errors, and has NO other coset leaders besides the ones that correct &lt;= t errors)</li></ul>
+</li>
+</ul>
+</li>
+<li>C++ Implementation <a href="code/hamming.cpp.txt">here</a> ((7,4) example from chapter 3)</li>
+</ul>
+
+<h3>Shortened Hamming Codes</h3>
+<ul>
+<li>Made by deleting <i>l</i> columns from <b>H</b> of a hamming code</li>
+<li>Has following parameters:
+<ul>
+<li>Code length = n = 2<sup><i>m</i></sup> - <i>l</i> - 1</li>
+<li>Num. information bits = k = 2<sup><i>m</i></sup> - <i>m</i> - <i>l</i> - 1</li>
+<li>Num. parity bits = n - k = <i>m</i></li>
+<li>Num. possible error corrections = t = min distance &gt; = 3</li>
+</ul>
+</li>
+<li>If the columns are removed correctly, will have a min distance of 4
+    <ul>
+    <li>In this case, can correct single bit errors and detect ALL double errors</li>
+    </ul>
+</li>
+<li>Decoding process
+<ol>
+    <li>If syndrome <b>s</b> is <b>0</b>, no error occured</li>
+    <li>else
+        <ol>
+        <li>If <b>s</b> has odd number of 1s
+            <ul>
+                <li>result = (matching error pattern) + <b>s</b></li>
+            </ul>
+        </li>
+        <li>else
+            <ul>
+                <li>Uncorrectable error detected</li>
+            </ul>
+        </li>
+        </ol>
+    </li>
+</ol>
+</li>
+<li>Weight enumerator: 1/(n+1) [(1+z)<sup>n</sup>) + n(1-z)(1-z<sup>2</sup>)<sup>(n-1)/2</sup>]</li>
+</ul>
+
+<h3>Reed-Muller Codes</h3>
+<ul>
+<li>Multiple random error correction</li>
+<li>Simple construction</li>
+<li>Many choices for decoding (both hard and soft decision)</li>
+<li>Reed decoding algorithm
+    <ul>
+        <li>Majority-Logic decoding algorithm</li>
+        <li>Easily implemented</li>
+    </ul>
+</li>
+<li>Fo<i>r</i> any <i>m</i>,<i>r</i> with 0 &lt;= <i>r</i> &lt;= <i>m</i>, denoted as RM(<i>r</i>,<i>m</i>)
+<ul>
+<li>Code length = n = 2<sup><i>m</i></sup></li>
+<li>Di<i>m</i>ension = k(<i>r</i>,<i>m</i>) = 1 + bin(<i>m</i>,1)+bin(<i>m</i>,2)+...+bin(n,<i>r</i>)
+    <ul><li>bin(x,y) = bino<i>m</i>ial coefficient</li></ul>
+</li>
+<li>Min distance = d<sub><i>m</i>in</sub> = 2<sup><i>m</i>-<i>r</i></sup></li>
+</ul>
+</li>
+<li>Information bits can be reconstructed as different combinations of sums of the encoded bits
+    <ul>
+        <li>e.g. <b>u</b><sub>0</sub> = <b>v</b><sub>0</sub>+<b>v</b><sub>1</sub>+<b>v</b><sub>2</sub>+<b>v</b><sub>3</sub> = <b>v</b><sub>4</sub>+<b>v</b><sub>5</sub>+<b>v</b><sub>6</sub>+<b>v</b><sub>7</sub> = ...</li>
+        <li>These are called checksums</li>
+    </ul>
+</li>
+<li>Using the different possible combinations, majority vote on what the decoded bit should be</li>
+<li>The decoded bits are calculated recursively starting with longer checksums then getting shorter</li>
+<li>This is called "Majority Logic Decoding", with the number of recursive steps
+giving the name "<i>N</i>-step majority logic decoding"</li>
+<li>Errors that happen in earlier steps of decoding affect later steps, called "error propogation"</li>
+</ul>
+
+<h3>Golay Code</h3>
+<ul>
+<li>Two versions
+<ul>
+<li>(23,12)</li>
+<li>(24,12)</li>
+</ul>
+</li>
+<li>(24,12) has an additional parity bit</li>
+<li>Min distance of 8 for (24,12) or 7 for (23,12)</li>
+<li>Many uses, including U.S. space communication programs</li>
+<li>Only other perfect code besides Hamming</li>
+<li>Used as the primary error control system for NASA's <i>Voyager</i>
+between 1979-1981, used to take pictures of Jupiter and Saturn</li>
+<li>For the (24,12) code:
+<ul>
+<li>Generator matrix <b>G</b> = [<b>P</b> <b>I</b><sub>12</sub>]
+<ul><b>P</b> = parity matrix which can be found <a href="https://www.maplesoft.com/applications/view.aspx?SID=1757&view=html">here</a> (matrix <i>B</i>)
+<li><b>P</b><sup>T</sup> = <b>P</b></li>
+</ul>
+</li>
+<li>Parity check matrix <b>H</b> = [<b>I</b><sub>12</sub> <b>P</b>] = [<b>I</b><sub>12</sub> <b>P</b><sup>T</sup>]</li>
+<li>Decoding process:
+<ol>
+    <li>Compute syndrome <b>s</b> = received * <b>H</b><sup>T</sup></li>
+    <li>if weight(<b>s</b>) &lt;= 3
+    <ul>
+        <li>error vec <b>e</b> = (<b>s</b>, <b>0</b>) (<b>0</b> is length 12)</li>
+        <li>Goto 8</li>
+    </ul>
+    </li>
+    <li>if weight(<b>s</b> + <b>p</b><sub>i</sub>) &lt;= 2 for any row <b>p</b><sub>i</sub> in <b>P</b>
+    <ul>
+        <li>error vec <b>e</b> = (<b>s</b> + <b>p</b><sub>i</sub>, <b>u</b><sup>i</sup>) (<b>u</b><sup>i</sup> is 0 vec except a 1 in the <i>i</i>th position)</li>
+        <li>Goto 8</li>
+    </ul>
+    </li>
+    <li>Compute <b>s</b>*<b>P</b></li>
+    <li>if weight(<b>s</b>*<b>P</b>) == 2 or weight(<b>s</b>*<b>P</b>) == 3
+        <ul>
+        <li>error vec <b>e</b> = (<b>0</b>, <b>s</b>*<b>P</b>)</li>
+        <li>goto 8</li>
+        </ul>
+    </li>
+    <li>if weight(<b>s</b>*<b>P</b> + <b>p</b><sub>i</sub>) == 2 for any row <b>p</b><sub>i</sub> in <b>P</b>
+        <ul>
+        <li>error vec <b>e</b> = (<b>u</b><sup>i</sup>, <b>s</b>*<b>P</b> + <b>p</b><sub>i</sub>)</li>
+        <li>goto 8</li>
+        </ul>
+    </li>
+    <li>Decoding error if this step is reached and not skipped</li>
+    <li>Calculate result = (received codeword) + <b>e</b></li>
+</ol>
+</li>
+<li>C++ Implementation <a href="code/golay.cpp.txt">here</a></li>
+</ul>
+</li>
+</ul>
+
+</body>
+</html>

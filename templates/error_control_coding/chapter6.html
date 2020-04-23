@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Beedge</title>
+
+    <style>
+        table, tr, td, th {
+            border: 2px groove #000000;
+            border-collapse: collapse;
+            padding: 10px;
+        }
+    </style>
+
+</head>
+<body>
+
+<h1 style="text-align:center">Chapter 6 - Binary BCH Codes</h1>
+
+<h3>Properties</h3>
+<ul>
+<li>For any m &gt;= 3, t &lt; 2<sup>m-1</sup>
+    <ul>
+    <li>Block Length: n = 2<sup>m</sup>-1</li>
+    <li># parity check bits: n - k &lt; m*t</li>
+    <li>Min distance: d<sub>min</sub> &gt;= 2t + 1</li>
+    <li>Corrects up to t errors; called a "t error correcting BCH Code"</li>
+    </ul>
+</li>
+</ul>
+
+<h3>Generator Polynomial</h3>
+
+<ul>
+<li>The generator g(X) is the lowest degree polynomial in GF(2<sup>m</sup>)
+which has a,a<sup>2</sup>,a<sup>3</sup>,a<sup>4</sup>,...a<sup>2t</sup>
+as its roots</li>
+<li>g(X) = LCM{Q<sub>1</sub>(X),Q<sub>3</sub>(X),...Q<sub>2<sup>t</sup>-1</sub>(X)}
+(Least Common Multiple)
+    <ul><li>Q<sub>i</sub>(X) is the min polynomial for a<sup>i</sup></li></ul>
+</li>
+</ul>
+
+<h3>Parity Check Matrix</h3>
+<ul>
+<li> Format:
+    <figure>
+        <img src="../../images/error_control_coding/bch_parity_check_matrix_example.png"/>
+        <figcaption>BCH Parity Matrix format. a...a<sup>2<sup>t</sup>-1</sup>
+        are the valid codewords under GF(2<sup>m</sup>) formed by the given primitive
+        generator polynomial p(X).
+        </figcaption>
+    </figure>
+</li>
+<li>Example: Parity check matrix for n = 2<sup>4</sup> - 1, t = 2, p(X) = 1+X+X<sup>4</sup>
+    <figure>
+        <img src="../../images/error_control_coding/bch_parity_check_15_7.png"/>
+        <figcaption>The values for a,a<sup>2</sup>,... were taken from
+        table 2.8. See chapter 2 for a refresh on how to form the GF(2<sup>4</sup>)
+        from the given primitive generator polynomial p(X), which is how table 2.8
+        was formed.</figcaption>
+    </figure>
+</li>
+</ul>
+
+<h3>Alternative Syndrome Calculation</h3>
+<ul>
+<li>As usual, S=(S<sub>1</sub>,S<sub>2</sub>,S<sub>3</sub>...S<sub>2t</sub>) = <b>r</b>*<b>H</b><sup>t</sup></li>
+<li>However, they can also be computed via the following:
+  <ul>
+    <li>S<sub>i</sub> = <b>b</b><sub>i</sub>(X), where
+      <ul>
+        <li><b>b</b><sub>i</sub>(X) is the remainder of r(X) / min_poly(a<sup>i</sup>)
+          <ul><li>See chapter two for a refresher of calculting the min polynomial</li></ul>
+        </li>
+        <li>a<sup>i</sup> is the power representation of the i<sup>th</sup> codeword in the BCH code</li>
+      </ul>
+    </li>
+  </ul>
+</li>
+</ul>
+
+<h3>Decoding BCH Codes</h3>
+<ol>
+<li>Compute syndrome <b>S</b> = (S1,S2,S3,...S2t) from received <b>r</b></li>
+<li>Determine Error Polynomial &sigma;(X) from <b>S</b></li>
+<li>Find error location numbers &beta;1,&beta;2,...&beta;v, by finding the roots of &sigma;(X)</li>
+</ol>
+
+<h3>Error location polynomial &sigma;(X)</h3>
+<ul>
+<li>&sigma;(X) = &sigma;<sub>0</sub> + &sigma;<sub>1</sub>X + &sigma;<sub>2</sub>X<sup>2</sup> ... &sigma;<sub>v</sub>X<sup>v</sup>, where v is the number of errors</li>
+<li>Needs to be calculated; hardest step of decoding. One way to calculate it is Berlkamp 
+Iterative Algorithm</li>
+</ul>
+
+<h3>Berlekamp Iterative Algorithm</h3>
+
+<ol>
+<li>Find the minimum degree polynomial &sigma;<sup>&mu;=1</sup>(X) satisfying Newton's &mu;<sup>th</sup> identity (identities below) for the first iteration, &mu; = 1
+    <ul>
+    <li>S<sub>1</sub> + &sigma;<sub>1</sub> = 0</li>
+    <li>S<sub>2</sub> + &sigma;<sub>1</sub>S<sub>1</sub> + 2&sigma;<sub>2</sub> = 0</li>
+    <li>S<sub>3</sub> + &sigma;<sub>1</sub>S<sub>2</sub> + &sigma;<sub>2</sub>S<sub>1</sub>+ 3&sigma;<sub>3</sub> = 0</li>
+    <li>...</li>
+    <li>S<sub>&mu;</sub> + &sigma;<sub>1</sub>S<sub>&mu;-1</sub> + ... + &sigma;<sub>&mu;-1</sub>S<sub>1</sub> + &mu;&sigma;<sub>&mu;</sub> = 0</li>
+    <li>For binary, i&sigma;<sub>i</sub> = &sigma;<sub>i</sub> if i is odd, else 0 if i is even</li>
+    </ul>
+</li>
+<li>Test if &sigma;<sup>&mu;=1</sup>(X) also satisfies the second identity 
+S<sub>2</sub> + &sigma;<sub>1</sub>S<sub>1</sub> + 2&sigma;<sub>2</sub> = 0
+    <ul>
+    <li>If true, then set &sigma;<sup>&mu;=2</sup>(X) equal to &sigma;<sup>&mu;=1</sup>(X)</li>
+    <li>Else add a correction (from a previously calculated &sigma;(X)) to &sigma;<sup>&mu;=2</sup>(X) so that the second identity is
+    satisfied
+        <ul>
+        <li>&sigma;<sup>&mu;+1</sup>(X) = &sigma;<sup>&mu;</sup>(X) + d<sub>&mu;</sub>
+        d<sub>p</sub><sup>-1</sup>X<sup>&mu;-p</sup>&sigma;<sup>p</sup>(X)
+            <ul>
+            <li>d<sub>&mu;</sub> = S<sub>&mu;+1</sub> + &sigma;<sub>1</sub>
+            <sup>&mu;</sup>S<sub>&mu;</sub> + &sigma;<sub>2</sub><sup>&mu;</sup>S<sub>&mu;-1</sub>
+            + ... &sigma;<sub>l<sub>&mu;</sub></sub><sup>&mu;</sup>S<sub>&mu;+1-l<sub>&mu;</sub></sub>
+            </li>
+            <li>d is called the discrepancy</li>
+            <li>p is the iteration number where d<sub>&mu;</sub> is not 0 and p - l<sub>p</sub>
+            has the largest value (l<sub>p</sub> is the degree of &sigma;<sup>p</sup>(X))</li>
+            </li>
+            </ul>
+        </li>
+        </ul>
+    </li>
+    </ul>
+</li>
+<li>Repeat until we have &sigma;<sup>&mu;=2t</sup>(X); this is our error location polynomial
+&sigma;(X)</li>
+<li>Keep track using a table, which 2 previous starting entries:
+<table>
+<tr><th>&mu;</th><th>&sigma;<sup>&mu;</sup>(X)</th><th>d<sub>&mu;</sub></th><th>l<sub>&mu;</sub></th><th>&mu;-l<sub>&mu;</sub></th></tr>
+<tr><td>-1</td><td>1</td><td>1</td><td>0</td><td>-1</td></tr>
+<tr><td>0</td><td>1</td><td>S<sub>1</sub></td><td>0</td><td>0</td></tr>
+<tr><td>1</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>2</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>...</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>2t</td><td></td><td></td><td></td><td></td></tr>
+</table>
+</li>
+</ol>
+
+<h3>BCH Decoding Example</h3>
+
+
+<ul>
+<li>(15,5) triple-error-correcting (t=3) BCH code from example 6.1, generator p(X) = 1 + X + X<sup>4</sup></li>
+<li><b>v</b> = (0000000000000000)</li>
+<li><b>r</b> = (0001010000000100) = X<sup>3</sup> + X<sup>5</sup> + X<sup>12</sup></li>
+<li>Calculate Syndrome: Calculate minimal polynomials
+    <ul>
+    <li>&phi;(a) = &phi;(a<sup>2</sup>) = &phi;(a<sup>4</sup>) = &phi;(a<sup>8</sup>) = 
+        1 + X + X<sup>4</sup>
+    </li>
+    <li>&phi;(a<sup>3</sup>) = &phi;(a<sup>6</sup>) = &phi;(a<sup>12</sup>) = 
+    (X+a<sup>3</sup>)*(X+(a<sup>3</sup>)<sup>2</sup>)*(X+(a<sup>3</sup>)<sup>4</sup>)*
+    (X+(a<sup>3</sup>)<sup>8</sup>)
+        <ul>
+        <li> = (X+a<sup>3</sup>)*(X+a<sup>6</sup>)*(X+a<sup>12</sup>)*(X+a<sup>24</sup>)
+        </li>
+        <li> = (X+a<sup>3</sup>)*(X+a<sup>6</sup>)*(X+a<sup>12</sup>)*(X+a<sup>9</sup>)
+            // 24 MOD 15 == 9
+        </li>
+        <li> = (X<sup>2</sup> + (a<sup>6</sup> + a<sup>3</sup>)X + a<sup>9</sup>) *
+            (X<sup>2</sup> + (a<sup>9</sup> + a<sup>12</sup>)X + a<sup>6</sup>)
+        </li>
+        <li> = (X<sup>2</sup> + (a<sup>2</sup> + a<sup>3</sup> + a<sup>3</sup>)X + a<sup>9</sup>) *
+            (X<sup>2</sup> + (a + a<sup>3</sup> + 1 + a + a<sup>2</sup> + a<sup>3</sup>)X + a<sup>6</sup>) // substitute from table 2.8 (polynomial representations)
+        </li>
+        <li> = (X<sup>2</sup> + a<sup>2</sup>X + a<sup>9</sup>) *
+            (X<sup>2</sup> + a<sup>8</sup>X + a<sup>6</sup>)
+        </li>
+        <li> = X<sup>4</sup> + a<sup>8</sup>X<sup>3</sup> + a<sup>6</sup>X<sup>2</sup> +
+              a<sup>10</sup>X<sup>2</sup> + a<sup>2</sup>X<sup>3</sup> + a<sup>8</sup>X
+              + a<sup>9</sup>X<sup>2</sup>+ a<sup>17</sup>X + a<sup>15</sup>
+        </li>
+        <li> = X<sup>4</sup> + (a<sup>8</sup> + a<sup>2</sup>)X<sup>3</sup>
+        + (a<sup>6</sup> + a<sup>10</sup> + a<sup>9</sup>)X<sup>2</sup>
+        + (a<sup>8</sup> + a<sup>17</sup>)X
+        + 1
+        </li>
+        <li> = X<sup>4</sup> + (1 + a<sup>2</sup> + a<sup>2</sup>)X<sup>3</sup>
+        + (a<sup>2</sup> + a<sup>3</sup> + 1 + a + a<sup>2</sup> + a + a<sup>3</sup>)X<sup>2</sup>
+        + (1 + a<sup>2</sup> + a<sup>2</sup>)X
+        + 1
+        </li>
+        <li> = X<sup>4</sup> + (1)X<sup>3</sup>
+        + (1)X<sup>2</sup>
+        + (1)X
+        + 1
+        </li>
+        <li> = X<sup>4</sup> + X<sup>3</sup> + X<sup>2</sup> + X + 1
+        </li>
+        </ul>
+    </li>
+    <li> &phi;(a<sup>5</sup>) = &phi;(a<sup>10</sup>) = 
+        (X+a<sup>5</sup>)*(X+(a<sup>5</sup>)<sup>2</sup>) 
+        (stop here since a<sup>20 MOD 15</sup> = a<sup>5</sup>)
+        <ul>
+        <li> (X + a<sup>5</sup>)*(X + a<sup>10</sup>)
+        </li>
+        <li> = X<sup>2</sup> + (a<sup>10</sup> + a<sup>5</sup>)X + a<sup>5</sup>a<sup>10</sup>
+        </li>
+        <li> = X<sup>2</sup> + (1 + a + a<sup>2</sup> + a + a<sup>2</sup>)X + a<sup>15</sup>
+        </li>
+        <li> = X<sup>2</sup> + X + 1
+        </li>
+        </ul>
+    </li>
+    </ul>
+</li>
+<li>Syndrome will be of length 6 (2t, t=3 since triple error correcting), so need min polys up to a<sup>6</sup></li>
+<li>Calculate syndrome: Divide <b>r</b> by min polynomials to get remainders
+    <ul>
+    <li>(X<sup>3</sup> + X<sup>5</sup> + X<sup>12</sup>) / (1 + X + X<sup>4</sup>)
+    = X<sup>8</sup> + X<sup>5</sup> + X<sup>4</sup> + X<sup>2</sup> + X + 1
+    <ul><li>
+    remainder <b>b</b><sub>1</sub>(X) = <b>b</b><sub>2</sub>(X) = <b>b</b><sub>4</sub>(X) = 1
+    </li>
+    </ul>
+    </li>
+    <li>(X<sup>3</sup> + X<sup>5</sup> + X<sup>12</sup>) / 
+    (1 + X + X<sup>2</sup> + X<sup>3</sup> + X<sup>4</sup>)
+    = X<sup>8</sup> + X<sup>7</sup> + X<sup>3</sup> + X<sup>2</sup> + X + 1
+        <ul><li>
+            remainder <b>b</b><sub>3</sub>(X) = <b>b</b><sub>6</sub>(X) 
+            = X<sup>3</sup> + X<sup>2</sup> + 1
+        </li></ul>
+    </li>
+    <li>(X<sup>3</sup> + X<sup>5</sup> + X<sup>12</sup>) / 
+    (1 + X + X<sup>2</sup>)
+    = X<sup>10</sup> + X<sup>9</sup> + X<sup>7</sup> + X<sup>6</sup> + X<sup>4</sup> 
+    + X<sup>2</sup>
+    <ul><li>
+    remainder <b>b</b><sub>5</sub>(X) = X<sup>2</sup>
+    </li></ul>
+    </li>
+    </ul>
+</li>
+<li>Calculate Syndromes: plug a...a<sup>6</sup> into remainders
+    <ul>
+    <li><b>b<sub>1</sub></b>(a) 
+    = <b>b<sub>2</sub></b>(a<sup>2</sup>) 
+    = <b>b<sub>4</sub></b>(a<sup>4</sup>) = 1 = S1,S2,S4
+    </li>
+    <li><b>b<sub>3</sub></b>(a<sup>3</sup>)  = S3
+        <ul>
+        <li>= 1 + (a<sup>3</sup>)<sup>2</sup> + (a<sup>3</sup>)<sup>3</sup> </li>
+        <li>= 1 + a<sup>6</sup> + a<sup>9</sup></li> 
+        <li>= 1 + a<sup>2</sup> + a<sup>3</sup> + a + a<sup>3</sup> </li>
+        <li>= 1 + a + a<sup>2</sup> </li>
+        <li>= a<sup>10</sup></li>
+        </ul>
+    </li>
+    <li><b>b<sub>6</sub></b>(a<sup>6</sup>) = S6
+        <ul>
+        <li>= 1 + (a<sup>6</sup>)<sup>2</sup> + (a<sup>6</sup>)<sup>3</sup> </li>
+        <li>= 1 + a<sup>12</sup> + a<sup>18</sup></li> 
+        <li>= 1 + 1 + a + a<sup>2</sup> + a<sup>3</sup> + a<sup>3</sup> </li>
+        <li>= a + a<sup>2</sup> </li>
+        <li>= a<sup>5</sup></li>
+        </ul>
+    </li>
+    <li><b>b<sub>5</sub></b>(a<sup>5</sup>) = S5
+        <ul>
+        <li>= (a<sup>5</sup>)<sup>2</sup></li>
+        <li>= a<sup>10</sup></li>
+        </ul>
+    </li>
+    </ul>
+</li>
+<li>Berlekamp Iterative Algorithm
+    <ul>
+    <li>Start with base table as described earlier
+    <table>
+    <tr><th>&mu;</th><th>&sigma;<sup>&mu;</sup>(X)</th><th>d<sub>&mu;</sub></th><th>l<sub>&mu;</sub></th><th>&mu;-l<sub>&mu;</sub></th></tr>
+    <tr><td>-1</td><td>1</td><td>1</td><td>0</td><td>-1</td></tr>
+    <tr><td>0</td><td>1</td><td>S<sub>1</sub>=1</td><td>0</td><td>0</td></tr>
+    <tr><td>1</td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>2</td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>...</td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>2t</td><td></td><td></td><td></td><td></td></tr>
+    </table>
+    </li>
+    <li>Next, calculate using &mu; = 0
+        <ul>
+        <li>d<sub>&mu;=0</sub> = 1, so need to pick prev. row p</li>
+        <li>p = -1 since only previous row (meets criteria that d<sub>p</sub> =/= 0
+        with highest &mu; - l<sub>&mu;</sub> val)</li>
+        <li>Calculate &sigma;<sup>&mu;+1</sup>(X) = &sigma;<sup>&mu;</sup>(X)
+        + d<sub>&mu;</sub>d<sub>p</sub><sup>-1</sup>X<sup>&mu;-p</sup>
+        &sigma;<sup>p</sup>(X)
+            <ul>
+            <li>= &sigma;<sup>0</sup>(X) + 1(1<sup>-1</sup>)X<sup>0-(-1)</sup>
+            &sigma;<sup>-1</sup>(X)</li>
+            <li>= 1 + 1(1)X<sup>1</sup>(1)</li>
+            <li>= 1 + X</li>
+            </ul>
+        </li>
+        <li>Calculate l<sub>&mu;+1=1</sub>=max(l<sub>&mu;</sub>,l<sub>p</sub>+&mu;-p)
+            <ul>
+            <li>= max(0,0+0-(-1))</li>
+            <li>= 1</li>
+            </ul>
+        </li>
+        <li>Calculate d<sub>&mu;+1=1</sub> = S<sub>&mu;+2</sub> 
+        + &sigma;<sub>1</sub><sup>&mu;+1</sup>S<sub>&mu;+1</sub> ... 
+        + &sigma;<sub>l<sub>&mu;+1</sub></sub><sup>&mu;+1</sup>
+        S<sub>&mu;+2-l<sub>&mu;+1</sub></sub>
+            <ul>
+            <li>Calculate the lowest S<sub>i</sub> used to figure out when to stop
+                <ul><li>&mu;+2-l<sub>&mu;+1</sub> = 0+2-1=1, so the last S is 
+                S<sub>1</sub> = S<sub>&mu;+1</sub> (since &mu;=0)</li></ul>
+            </li>
+            <li>S<sub>&mu;+2</sub> + &sigma;<sub>1</sub><sup>&mu;+1</sup></sub>S<sub>&mu;+1</sub>
+                <ul>
+                <li>= 1 + 1(1)</li>
+                <li>= 0</li>
+                </ul>
+            </li>
+            </ul>
+        </li>        
+        </ul>
+    </li>
+    <li>Fill in the next row &mu;+1 = 1 with the calculated values
+    <table>
+    <tr><th>&mu;</th><th>&sigma;<sup>&mu;</sup>(X)</th><th>d<sub>&mu;</sub></th><th>l<sub>&mu;</sub></th><th>&mu;-l<sub>&mu;</sub></th></tr>
+    <tr><td>-1</td><td>1</td><td>1</td><td>0</td><td>-1</td></tr>
+    <tr><td>0</td><td>1</td><td>S<sub>1</sub>=1</td><td>0</td><td>0</td></tr>
+    <tr><td>1</td><td>1 + X</td><td>0</td><td>1</td><td>0</td></tr>
+    <tr><td>2</td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>...</td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>2t</td><td></td><td></td><td></td><td></td></tr>
+    </table>
+    </li>
+    <li>Next, calculate using &mu; = 1
+        <ul>
+        <li>d<sub>&mu;=1</sub> = 0, so &sigma;<sup>&mu;</sup>(X) matches our next 
+        Newton's identity criteria
+        </li>
+        <li>Set &sigma;<sup>&mu;+1</sup>(X) = &sigma;<sup>&mu;</sup>(X) = 1 + X</li>
+        <li>Set l<sub>&mu;+1</sub> = l<sub>&mu;</sub> = 1</li>
+        <li>Calculate d<sub>&mu;+1=1</sub> = S<sub>&mu;+2</sub> 
+        + &sigma;<sub>1</sub><sup>&mu;+1</sup>S<sub>&mu;+1</sub> ... 
+        + &sigma;<sub>l<sub>&mu;+1</sub></sub><sup>&mu;+1</sup>
+        S<sub>&mu;+2-l<sub>&mu;+1</sub></sub>
+            <ul>
+            <li>Calculate the lowest S<sub>i</sub> used to figure out when to stop
+                <ul><li>&mu;+2-l<sub>&mu;+1</sub> = 1+2-1=2, so the last S is 
+                S<sub>2</sub> = S<sub>&mu;+1</sub> (since &mu;=1)</li></ul>
+            </li>
+            <li>S<sub>&mu;+2</sub> + &sigma;<sub>1</sub><sup>&mu;+1</sup></sub>S<sub>&mu;+1</sub>
+                <ul>
+                <li>= a<sup>10</sup> + 1(1)</li>
+                <li>= 1 + a + a<sup>2</sup> + 1</li>
+                <li>= a + a<sup>2</sup></li>
+                <li>= a<sup>5</sup></li>
+                </ul>
+            </li>
+            </ul>
+        </li>        
+        </ul>
+    </li>
+    <li>Fill in the next row &mu;+1 = 2 with the calculated values
+    <table>
+    <tr><th>&mu;</th><th>&sigma;<sup>&mu;</sup>(X)</th><th>d<sub>&mu;</sub></th><th>l<sub>&mu;</sub></th><th>&mu;-l<sub>&mu;</sub></th></tr>
+    <tr><td>-1</td><td>1</td><td>1</td><td>0</td><td>-1</td></tr>
+    <tr><td>0</td><td>1</td><td>S<sub>1</sub>=1</td><td>0</td><td>0</td></tr>
+    <tr><td>1</td><td>1 + X</td><td>0</td><td>1</td><td>0</td></tr>
+    <tr><td>2</td><td>1 + X</td><td>a<sup>5</sup></td><td>1</td><td>1</td></tr>
+    <tr><td>...</td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>2t</td><td></td><td></td><td></td><td></td></tr>
+    </table>
+    </li>
+    <li>Next, calculate using &mu; = 2
+        <ul>
+        <li>d<sub>&mu;=2</sub> = a<sup>5</sup>, so need to pick previous row p
+            <ul><li>p = 0 since non-zero d<sub>&mu;</sub> with highest 
+            &mu;-l<sub>&mu;</sub></li></ul>
+        </li>
+        <li>Calculate &sigma;<sup>&mu;+1</sup>(X) = &sigma;<sup>&mu;</sup>(X)
+        + d<sub>&mu;</sub>d<sub>p</sub><sup>-1</sup>X<sup>&mu;-p</sup>
+        &sigma;<sup>p</sup>(X)
+            <ul>
+            <li>= &sigma;<sup>2</sup>(X) + a<sup>5</sup>(1<sup>-1</sup>)X<sup>2</sup>
+            (1)</li>
+            <li>= 1 + X + a<sup>5</sup>X<sup>2</sup></li>
+            </ul>
+        </li>
+        <li>Calculate l<sub>&mu;+1=3</sub>=max(l<sub>&mu;</sub>,l<sub>p</sub>+&mu;-p)
+            <ul>
+            <li>= max(0,0+2-0)</li>
+            <li>= 2</li>
+            </ul>
+        </li>
+        <li>Calculate d<sub>&mu;+1=1</sub> = S<sub>&mu;+2</sub> 
+        + &sigma;<sub>1</sub><sup>&mu;+1</sup>S<sub>&mu;+1</sub> ... 
+        + &sigma;<sub>l<sub>&mu;+1</sub></sub><sup>&mu;+1</sup>
+        S<sub>&mu;+2-l<sub>&mu;+1</sub></sub>
+            <ul>
+            <li>Calculate the lowest S<sub>i</sub> used to figure out when to stop
+                <ul><li>&mu;+2-l<sub>&mu;+1</sub> = 2+2-2=2, so the last S is 
+                S<sub>2</sub> = S<sub>&mu;</sub> (since &mu;=2)</li></ul>
+            </li>
+            <li>S<sub>&mu;+2</sub> + &sigma;<sub>1</sub><sup>&mu;+1</sup></sub>S<sub>&mu;+1</sub>
+            + &sigma;<sub>2</sub><sup>&mu;+1</sup></sub>S<sub>&mu;+2-2</sub>
+                <ul>
+                <li>= 1 + 1(a<sup>10</sup>) + a<sup>5</sup>(1)</li>
+                <li>= 1 + a<sup>10</sup> + a<sup>5</sup></li>
+                <li>= 1 + (1 + a + a<sup>2</sup>) + (a + a<sup>2</sup>)</li>
+                <li>= 0</li>
+                </ul>
+            </li>
+            </ul>
+        </li>   
+        </ul>
+    </li>
+    <li>Fill in the next row &mu;+1 = 3 with the calculated values
+    <table>
+    <tr><th>&mu;</th><th>&sigma;<sup>&mu;</sup>(X)</th><th>d<sub>&mu;</sub></th><th>l<sub>&mu;</sub></th><th>&mu;-l<sub>&mu;</sub></th></tr>
+    <tr><td>-1</td><td>1</td><td>1</td><td>0</td><td>-1</td></tr>
+    <tr><td>0</td><td>1</td><td>S<sub>1</sub>=1</td><td>0</td><td>0</td></tr>
+    <tr><td>1</td><td>1 + X</td><td>0</td><td>1</td><td>0</td></tr>
+    <tr><td>2</td><td>1 + X</td><td>a<sup>5</sup></td><td>1</td><td>1</td></tr>
+    <tr><td>3</td><td>1 + X + a<sup>5</sup>X<sup>2</sup></td><td>0</td><td>2</td><td>1</td></tr>
+    </table>
+    </li>
+    <li>&mu; = 3
+        <ul>
+        <li>d<sub>&mu;=3</sub> = 0, so next Newton identity satisfied</li>
+        <li>Set &sigma;<sup>&mu;+1</sup>(X) = &sigma;<sup>&mu;</sup>(X)
+        = 1 + X + a<sup>5</sup>X<sup>2</sup>
+        </li>
+        <li>Set l<sub>&mu;+1</sub> = l<sub>&mu;</sub> = 2</li>
+        <li>Calculate d<sub>&mu;+1=1</sub> = S<sub>&mu;+2</sub> 
+        + &sigma;<sub>1</sub><sup>&mu;+1</sup>S<sub>&mu;+1</sub> ... 
+        + &sigma;<sub>l<sub>&mu;+1</sub></sub><sup>&mu;+1</sup>
+        S<sub>&mu;+2-l<sub>&mu;+1</sub></sub>
+            <ul>
+            <li>Calculate the lowest S<sub>i</sub> used to figure out when to stop
+                <ul><li>&mu;+2-l<sub>&mu;+1</sub> = 3+2-2=3, so the last S is 
+                S<sub>3</sub> = S<sub>&mu;</sub> (since &mu;=3)</li></ul>
+            </li>
+            <li>S<sub>&mu;+2</sub> + &sigma;<sub>1</sub><sup>&mu;+1</sup></sub>S<sub>&mu;+1</sub>
+            + &sigma;<sub>2</sub><sup>&mu;+1</sup></sub>S<sub>&mu;+2-2</sub>
+                <ul>
+                <li>= a<sup>10</sup> + 1(1) + a<sup>5</sup>(a<sup>10</sup>)</li>
+                <li>= 1 + a + a<sup>2</sup> + 1 + a<sup>15</sup></li>
+                <li>= 1 + a + a<sup>2</sup></li>
+                <li>= a<sup>10</sup></li>
+                </ul>
+            </li>
+            </ul>
+        </li>   
+        </ul>
+    </li>
+    <li>Fill in the next row &mu;+1 = 4 with the calculated values
+    <table>
+    <tr><th>&mu;</th><th>&sigma;<sup>&mu;</sup>(X)</th><th>d<sub>&mu;</sub></th><th>l<sub>&mu;</sub></th><th>&mu;-l<sub>&mu;</sub></th></tr>
+    <tr><td>-1</td><td>1</td><td>1</td><td>0</td><td>-1</td></tr>
+    <tr><td>0</td><td>1</td><td>S<sub>1</sub>=1</td><td>0</td><td>0</td></tr>
+    <tr><td>1</td><td>1 + X</td><td>0</td><td>1</td><td>0</td></tr>
+    <tr><td>2</td><td>1 + X</td><td>a<sup>5</sup></td><td>1</td><td>1</td></tr>
+    <tr><td>3</td><td>1 + X + a<sup>5</sup>X<sup>2</sup></td><td>0</td><td>2</td><td>1</td></tr>
+    <tr><td>4</td><td>1 + X + a<sup>5</sup>X<sup>2</sup></td><td>a<sup>10</sup></td><td>2</td><td>2</td></tr>
+    </table>
+    </li>
+    <li>&mu; = 4
+        <ul>
+        <li>d<sub>&mu;=4</sub> = a<sup>10</sup>, not 0/next newton not satisfied
+            <ul><li>p = 2</li></ul>
+        </li>
+        <li>Calculate &sigma;<sup>&mu;+1</sup>(X) = &sigma;<sup>&mu;</sup>(X)
+         + d<sub>&mu;</sub>d<sub>p</sub><sup>-1</sup>X<sup>&mu;-p</sup>
+        &sigma;<sup>p</sup>(X)
+            <ul>
+            <li>= &sigma;<sup>4</sup>(X) + a<sup>10</sup>((a<sup>5</sup>)<sup>-1</sup>)X<sup>2</sup>
+            (1+X)</li>
+            <li>= (1 + X + a<sup>5</sup>X<sup>2</sup>) + (a<sup>10</sup>/a<sup>5</sup>)X<sup>2</sup>(1+X)</li>
+            <li>= (1 + X + a<sup>5</sup>X<sup>2</sup>) + (a<sup>10-5</sup>)X<sup>2</sup>(1+X)</li>
+            <li>= 1 + X + a<sup>5</sup>X<sup>2</sup> + a<sup>5</sup>X<sup>2</sup> + 
+            a<sup>5</sup>X<sup>3</sup></li>
+            <li>= 1 + X + a<sup>5</sup>X<sup>3</sup></li> 
+            </ul>
+        </li>
+        <li>Calculate l<sub>&mu;+1=5</sub>=max(l<sub>&mu;</sub>,l<sub>p</sub>+&mu;-p)
+            <ul>
+            <li>= max(2,1+4-2)</li>
+            <li>= 3</li>
+            </ul>
+        </li>
+        <li>Calculate d<sub>&mu;+1=1</sub> = S<sub>&mu;+2</sub> 
+        + &sigma;<sub>1</sub><sup>&mu;+1</sup>S<sub>&mu;+1</sub> ... 
+        + &sigma;<sub>l<sub>&mu;+1</sub></sub><sup>&mu;+1</sup>
+        S<sub>&mu;+2-l<sub>&mu;+1</sub></sub>
+            <ul>
+            <li>Calculate the lowest S<sub>i</sub> used to figure out when to stop
+                <ul><li>&mu;+2-l<sub>&mu;+1</sub> = 4+2-3=3, so the last S is 
+                S<sub>3</sub>, however S starts at 6 this time (&mu;+2) so
+                there are 4 entries</li></ul>
+            </li>
+            <li>S<sub>&mu;+2</sub> + &sigma;<sub>1</sub><sup>&mu;+1</sup></sub>S<sub>&mu;+1</sub>
+            + &sigma;<sub>2</sub><sup>&mu;+1</sup></sub>S<sub>&mu;+0</sub>
+            + &sigma;<sub>3</sub><sup>&mu;+1</sup></sub>S<sub>&mu;+2-3</sub>
+                <ul>
+                <li>= a<sup>5</sup> + 1(a<sup>10</sup>) + 0(1) + a<sup>5</sup>a<sup>10</sup></li>
+                <li>= a<sup>5</sup> + a<sup>10</sup> + a<sup>15</sup></li>
+                <li>= a<sup>5</sup> + a<sup>10</sup> + 1</li>
+                <li>= a + a<sup>2</sup> + 1 + a + a<sup>2</sup> + 1</li>
+                <li>= 0</li>
+                </ul>
+            </li>
+            </ul>
+        </li>   
+        </ul>
+    </li>
+    <li>Fill in the next row &mu;+1 = 5 with the calculated values
+    <table>
+    <tr><th>&mu;</th><th>&sigma;<sup>&mu;</sup>(X)</th><th>d<sub>&mu;</sub></th><th>l<sub>&mu;</sub></th><th>&mu;-l<sub>&mu;</sub></th></tr>
+    <tr><td>-1</td><td>1</td><td>1</td><td>0</td><td>-1</td></tr>
+    <tr><td>0</td><td>1</td><td>S<sub>1</sub>=1</td><td>0</td><td>0</td></tr>
+    <tr><td>1</td><td>1 + X</td><td>0</td><td>1</td><td>0</td></tr>
+    <tr><td>2</td><td>1 + X</td><td>a<sup>5</sup></td><td>1</td><td>1</td></tr>
+    <tr><td>3</td><td>1 + X + a<sup>5</sup>X<sup>2</sup></td><td>0</td><td>2</td><td>1</td></tr>
+    <tr><td>4</td><td>1 + X + a<sup>5</sup>X<sup>2</sup></td><td>a<sup>10</sup></td><td>2</td><td>2</td></tr>
+    <tr><td>5</td><td>1 + X + a<sup>5</sup>X<sup>3</sup></td><td>0</td><td>3</td><td>2</td></tr>
+    </table>
+    </li>
+    <li>&mu; = 5 = 2t-1 (last calculation)
+        <ul>
+        <li>d<sub>&mu;=5</sub> = 0, so &sigma;<sup>&mu;</sup>(X) satisfies the next
+        Newton identity</li>
+        <li>Set &sigma;<sup>&mu;+1</sup>(X) = &sigma;<sup>&mu;</sup>(X)
+            <ul>
+            <li>= 1 + X + a<sup>5</sup>X<sup>3</sup></li>
+            <li>This is our final result, the error location polynomial</li>
+            </ul>
+        </li>
+        </ul>
+    </li>
+    <li>Final resulting table
+    <table>
+    <tr><th>&mu;</th><th>&sigma;<sup>&mu;</sup>(X)</th><th>d<sub>&mu;</sub></th><th>l<sub>&mu;</sub></th><th>&mu;-l<sub>&mu;</sub></th></tr>
+    <tr><td>-1</td><td>1</td><td>1</td><td>0</td><td>-1</td></tr>
+    <tr><td>0</td><td>1</td><td>S<sub>1</sub>=1</td><td>0</td><td>0</td></tr>
+    <tr><td>1</td><td>1 + X</td><td>0</td><td>1</td><td>0</td></tr>
+    <tr><td>2</td><td>1 + X</td><td>a<sup>5</sup></td><td>1</td><td>1</td></tr>
+    <tr><td>3</td><td>1 + X + a<sup>5</sup>X<sup>2</sup></td><td>0</td><td>2</td><td>1</td></tr>
+    <tr><td>4</td><td>1 + X + a<sup>5</sup>X<sup>2</sup></td><td>a<sup>10</sup></td><td>2</td><td>2</td></tr>
+    <tr><td>5</td><td>1 + X + a<sup>5</sup>X<sup>3</sup></td><td>0</td><td>3</td><td>2</td></tr>
+    <tr><td>6</td><td>1 + X + a<sup>5</sup>X<sup>3</sup></td><td>-</td><td>-</td><td>-</td></tr>
+    </table>
+    </li>
+    </ul>
+</li>
+<li>Calculate the roots of &sigma;(X)
+  <ul>
+    <li>Chapter 2 literally suggests plugging in all power representations in the code for X
+        and seeing which ones result in 0
+      <ul>
+        <li>&sigma;(X) = 1 + X + a<sup>5</sup>X<sup>3</sup></li>
+        <li>&sigma;(0) = 1 + 0 + a<sup>5</sup>(0)<sup>3</sup> = 1</li>
+        <li>&sigma;(1) = 1 + 1 + a<sup>5</sup>(1)<sup>3</sup> = a<sup>6</sup></li>
+        <li>&sigma;(a) = 1 + a + a<sup>5</sup>a<sup>3</sup> = 1 + a + a<sup>8</sup> = 1 + a + 1 + a<sup>2</sup> = a + a<sup>2</sup></li>
+        <li>&sigma;(a<sup>2</sup>) = 1 + a<sup>2</sup> + a<sup>5</sup>(a<sup>2</sup>)<sup>3</sup> = 1 + a<sup>2</sup> + a<sup>11</sup> = 1 + a<sup>2</sup> + a + a<sup>2</sup> + a<sup>3</sup> = 1 + a + a<sup>3</sup></li>
+        <li>&sigma;(a<sup>3</sup>) = 1 + a<sup>3</sup> + a<sup>5</sup>(a<sup>3</sup>)<sup>3</sup> = 1 + a<sup>3</sup> + a<sup>14</sup> = 1 + a<sup>3</sup> + 1 + a<sup>3</sup> = 0 (found a root!)</li>
+        <li>&sigma;(a<sup>4</sup>) = 1 + a<sup>4</sup> + a<sup>5</sup>(a<sup>4</sup>)<sup>3</sup> = 1 + a<sup>4</sup> + a<sup>17</sup> = 1 + 1 + a + a<sup>2</sup> = a + a<sup>2</sup></li>
+        <li>...</li>
+      </ul>
+    </li>
+    <li>Resulting roots for &sigma;(X) = 0 are a<sup>3</sup>, a<sup>5</sup>, a<sup>12</sup></li>
+  </ul>
+</li>
+<li>Take the inverses of te roots, whose powers are the error location numbers
+  <ul>
+    <li>(a<sup>3</sup>)<sup>-1</sup> = a<sup>15-3</sup> = a<sup>12</sup></li>
+    <li>(a<sup>10</sup>)<sup>-1</sup> = a<sup>15-10</sup> = a<sup>5</sup></li>
+    <li>(a<sup>12</sup>)<sup>-1</sup> = a<sup>15-12</sup> = a<sup>3</sup></li>
+  </ul>
+</li>
+<li>Add the error locations to the received vector to get the final decoded word
+  <ul>
+    <li>r(X) + e(X) = (X<sup>3</sup> + X<sup>5</sup> + X<sup>12</sup>) + (X<sup>12</sup> + X<sup>5</sup> + X<sup>3</sup>) = <b>0</b> = (0000000000000) = original codeword v(X)</li>
+  </ul>
+</li>
+</ul>
+
+<h3>Simplified Berlekamp Iterative Algorithm</h3>
+
+<ul>
+<li>For binary BCH, the number of iterations can be reduced to t instead of 2t
+by only calculating even iterations</li>
+<li>Calculating the next row (&mu;+1) of the table is as follows:
+	<ul>
+	<li>If d<sub>&mu;</sub> = 0, then &sigma;<sup>&mu;+1</sup> = &sigma;<sup>&mu;</sup>(X)</li>
+	<li>Else pick previous row p where 2p-l<sub>p</sub> is greatest and d<sub>p</sub> =/= 0
+		<ul><li>Then calculate &sigma;<sup>&mu;+1</sup>(X) = &sigma;<sup>&mu;</sup>(X) + 
+		d<sub>&mu;</sub>d<sub>p</sub><sup>-1</sup>X<sup>2(&mu;-p)</sup>&sigma;<sup>p</sup>(X)</li>
+		</ul>
+	</li>
+	<li>l<sub>&mu;+1</sub> = the degree of &sigma;<sup>&mu;+1</sup></li>
+	<li>d<sub>&mu;+1</sub> = S<sub>2&mu;+3</sub> + &sigma;<sub>1</sub><sup>&mu;+1</sup>S<sub>2&mu;+2</sub> +
+		&sigma;<sub>2</sub><sup>&mu;+1</sup>S<sub>2&mu;+1</sub> + ... 
+		&sigma;<sub>l<sub>&mu;+1</sub></sub><sup>&mu;+1</sup>S<sub>2&mu;+3-l<sub>&mu;+1</sub></sub></li>
+	<li>The difference value in the last column is 2&mu;-l<sub>&mu;</sub></li>
+	</ul>
+</li>
+<li>The starting table is
+<table>
+<tr><th>&mu;</th><th>&sigma;<sup>&mu;</sup>(X)</th><th>d<sub>&mu;</sub></th><th>l<sub>&mu;</sub></th><th>2&mu;-l<sub>&mu;</sub></th></tr>
+<tr><td>-1/2</td><td>1</td><td>1</td><td>0</td><td>-1</td></tr>
+<tr><td>0</td><td>1</td><td>S<sub>1</sub></td><td>0</td><td>0</td></tr>
+<tr><td>1</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>2</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>...</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>t</td><td></td><td></td><td></td><td></td></tr>
+</table>
+</li>
+<li>Additionally, the algorithm can terminate early if
+	<ul>
+	<li>Given &mu;, d<sub>&mu;</sub></li>
+	<li>For the next i=ceil((t-l<sub>&mu;</sub>-1)/2) steps</li>
+	<li>If all d<sub>i</sub> discrepancy values are 0, then &sigma;<sup>&mu;</sup>(X)
+	is the next error location polynomial</li>
+	</ul>
+</li>
+</ul>
+
+<h3>Example of simplified Berlekamp Iterative Alg. for binary BCH</h3>
+
+<ul>
+<li>Using same (15,5), t=3 BCH example above</li>
+<li><b>v</b>,<b>r</b> are still the same</li>
+<li>The syndromes are still the same</li>
+<li>The starting table is now
+<table>
+<tr><th>&mu;</th><th>&sigma;<sup>&mu;</sup>(X)</th><th>d<sub>&mu;</sub></th><th>l<sub>&mu;</sub></th><th>2&mu;-l<sub>&mu;</sub></th></tr>
+<tr><td>-1/2</td><td>1</td><td>1</td><td>0</td><td>-1</td></tr>
+<tr><td>0</td><td>1</td><td>S<sub>1</sub>=1</td><td>0</td><td>0</td></tr>
+<tr><td>1</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>2</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>...</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>t</td><td></td><td></td><td></td><td></td></tr>
+</table>
+</li>
+<li>&mu; = 0
+	<ul>
+	<li>d<sub>&mu; = 1, not zero, so find p</sub></li>
+	<li>p = -1/2 since only other row currently</li>
+	<li>&sigma;<sup>&mu;+1=1</sup>(X) = &sigma;<sup>&mu;=0</sup>(X) + 
+		d<sub>&mu;=0</sub>d<sub>p=-1/2</sub><sup>-1</sup>X<sup>2(&mu;-p=1/2)</sup>&sigma;<sup>p=-1/2</sup>(X)
+		<ul>
+		<li>= 1 + 1(1<sup>-1</sup>)X<sup>1</sup>(1)</li>
+		<li>= 1 + X</li>
+		</ul>
+	</li>
+	<li>l<sub>&mu;+1</sub> = degree(&sigma;<sup>&mu;+1</sup>(X)) = 1</li>
+	<li>d<sub>&mu;+1</sub> = S<sub>2&mu;+3</sub> + &sigma;<sub>1</sub><sup>&mu;+1</sup>S<sub>2&mu;+2</sub> +
+		&sigma;<sub>2</sub><sup>&mu;+1</sup>S<sub>2&mu;+1</sub> + ... 
+		&sigma;<sub>l<sub>&mu;+1</sub></sub><sup>&mu;+1</sup>S<sub>2&mu;+3-l<sub>&mu;+1</sub></sub>
+		<ul>
+		<li>Calculate last i used for S<sub>i</sub>
+			<ul>
+			<li>= 2&mu; + 3 - l<sub>&mu;+1</sub></li>
+			<li>= 2(0) + 3 - 1</li>
+			<li>= 2</li>
+			</ul>
+		</li>
+		<li>So d<sub>&mu;+1</sub> = S<sub>3</sub> + &sigma;<sub>1</sub><sup>&mu;+1</sup>S<sub>2</sub>
+			<ul>
+			<li>= a<sup>10</sup> + 1(1)</li>
+			<li>= 1 + a + a<sup>2</sup> + 1</li>
+			<li>= a<sup>5</sup></li>
+			</ul>
+		</li>
+		</ul>
+	</li>
+	</ul>
+</li>
+<li>Fill in the table with our new data
+	<table>
+	<tr><th>&mu;</th><th>&sigma;<sup>&mu;</sup>(X)</th><th>d<sub>&mu;</sub></th><th>l<sub>&mu;</sub></th><th>2&mu;-l<sub>&mu;</sub></th></tr>
+	<tr><td>-1/2</td><td>1</td><td>1</td><td>0</td><td>-1</td></tr>
+	<tr><td>0</td><td>1</td><td>S<sub>1</sub>=1</td><td>0</td><td>0</td></tr>
+	<tr><td>1</td><td>1 + X</td><td>a<sup>5</sup></td><td>1</td><td>1</td></tr>
+	<tr><td>2</td><td></td><td></td><td></td><td></td></tr>
+	<tr><td>...</td><td></td><td></td><td></td><td></td></tr>
+	<tr><td>t</td><td></td><td></td><td></td><td></td></tr>
+	</table>
+</li>
+<li>&mu; = 1
+	<ul>
+	<li>d<sub>&mu; = a<sup>5</sup>, not zero, so find p</sub></li>
+	<li>p = 0 since largest 2&mu;-l<sub>&mu;</sub> with non-zero discrepancy</li>
+	<li>&sigma;<sup>&mu;+1=2</sup>(X) = &sigma;<sup>&mu;=1</sup>(X) + 
+		d<sub>&mu;=1</sub>d<sub>p=0</sub><sup>-1</sup>X<sup>2(&mu;-p=1)</sup>&sigma;<sup>p=0</sup>(X)
+		<ul>
+		<li>= (1 + X) + (a<sup>5</sup>)(1<sup>-1</sup>)X<sup>2</sup>(1)</li>
+		<li>= 1 + X + a<sup>5</sup>X<sup>2</sup></li>
+		</ul>
+	</li>
+	<li>l<sub>&mu;+1</sub> = degree(&sigma;<sup>&mu;+1</sup>(X)) = 2</li>
+	<li>d<sub>&mu;+1</sub> = S<sub>2&mu;+3</sub> + &sigma;<sub>1</sub><sup>&mu;+1</sup>S<sub>2&mu;+2</sub> +
+		&sigma;<sub>2</sub><sup>&mu;+1</sup>S<sub>2&mu;+1</sub> + ... 
+		&sigma;<sub>l<sub>&mu;+1</sub></sub><sup>&mu;+1</sup>S<sub>2&mu;+3-l<sub>&mu;+1</sub></sub>
+		<ul>
+		<li>Calculate last i used for S<sub>i</sub>
+			<ul>
+			<li>= 2&mu; + 3 - l<sub>&mu;+1</sub></li>
+			<li>= 2(1) + 3 - 2</li>
+			<li>= 3</li>
+			</ul>
+		</li>
+		<li>So d<sub>&mu;+1</sub> = S<sub>3</sub></sub>
+			<ul>
+			<li>= a<sup>10</sup></li>
+			</ul>
+		</li>
+		</ul>
+	</li>
+	</ul>
+</li>
+
+<li>Fill in the table with our new data
+	<table>
+	<tr><th>&mu;</th><th>&sigma;<sup>&mu;</sup>(X)</th><th>d<sub>&mu;</sub></th><th>l<sub>&mu;</sub></th><th>2&mu;-l<sub>&mu;</sub></th></tr>
+	<tr><td>-1/2</td><td>1</td><td>1</td><td>0</td><td>-1</td></tr>
+	<tr><td>0</td><td>1</td><td>S<sub>1</sub>=1</td><td>0</td><td>0</td></tr>
+	<tr><td>1</td><td>1 + X</td><td>a<sup>5</sup></td><td>1</td><td>1</td></tr>
+	<tr><td>2</td><td>1 + X + a<sup>5</sup>X<sup>2</sup></td><td>a<sup>10</sup></td><td>2</td><td>2</td></tr>
+	<tr><td>...</td><td></td><td></td><td></td><td></td></tr>
+	<tr><td>t</td><td></td><td></td><td></td><td></td></tr>
+	</table>
+</li>
+<li>&mu; = 2
+	<ul>
+	<li>d<sub>&mu; = a<sup>10</sup>, not zero, so find p</sub></li>
+	<li>p = 1 since largest 2&mu;-l<sub>&mu;</sub> with non-zero discrepancy</li>
+	<li>&sigma;<sup>&mu;+1=3</sup>(X) = &sigma;<sup>&mu;=2</sup>(X) + 
+		d<sub>&mu;=2</sub>d<sub>p=1</sub><sup>-1</sup>X<sup>2(&mu;-p=1)</sup>&sigma;<sup>p=1</sup>(X)
+		<ul>
+		<li> = (1 + X + a<sup>5</sup>X<sup>2</sup>) + 
+			a<sup>10</sup>(a<sup>5</sup>)<sup>-1</sup>X<sup>2</sup>(1+X)
+		</li>
+		<li>= 1 + X + a<sup>5</sup>X<sup>2</sup> + a<sup>10-5</sup>X<sup>2</sup>(1 + X)</li>
+		<li>= 1 + X + a<sup>5</sup>X<sup>2</sup> + a<sup>5</sup>X<sup>2</sup>(1 + X)</li>
+		<li>= 1 + X + a<sup>5</sup>X<sup>2</sup> + a<sup>5</sup>X<sup>2</sup> + a<sup>5</sup>X<sup>3</sup></li>
+		<li>= 1 + X + a<sup>5</sup>X<sup>3</sup></li>
+		</ul>
+	</li>
+	<li>l<sub>&mu;+1</sub> = degree(&sigma;<sup>&mu;+1</sup>(X)) = 3</li>
+	<li>End here since &sigma;<sup>&mu;+1=3(X)</sup> is the final error location polynomial,
+		since t=3
+	</li>
+	</ul>
+</li>
+<li>Fill in the table with our new data
+	<table>
+	<tr><th>&mu;</th><th>&sigma;<sup>&mu;</sup>(X)</th><th>d<sub>&mu;</sub></th><th>l<sub>&mu;</sub></th><th>2&mu;-l<sub>&mu;</sub></th></tr>
+	<tr><td>-1/2</td><td>1</td><td>1</td><td>0</td><td>-1</td></tr>
+	<tr><td>0</td><td>1</td><td>S<sub>1</sub>=1</td><td>0</td><td>0</td></tr>
+	<tr><td>1</td><td>1 + X</td><td>a<sup>5</sup></td><td>1</td><td>1</td></tr>
+	<tr><td>2</td><td>1 + X + a<sup>5</sup>X<sup>2</sup></td><td>a<sup>10</sup></td><td>2</td><td>2</td></tr>
+	<tr><td>3</td><td>1 + X + a<sup>5</sup>X<sup>3</sup></td><td>-</td><td>-</td><td>-</td></tr>
+	</table>
+</li>
+<li>Finding roots of &sigma;<sup>&mu;=3</sup>(X) is the same as before, and our final error location
+polynomial is the same as before, so our final result is
+	<ul>
+	<li>e(X) + r(X) = (X<sup>3</sup> + X<sup>5</sup> + X<sup>12</sup>) + 
+		(X<sup>12</sup> + X<sup>5</sup> + X<sup>3</sup>) = <b>0</b> = (0000000000000) = original codeword v(X)</li>
+	</ul>
+</li>
+</ul>
+
+<h3>Improved error location calculation (instead of 'finding roots of &sigma;(X)')</h3>
+<ul>
+<li>Given r(X), &sigma;(X)</li>
+<li>For r<sub>n-1</sub>, test if a<sup>n-1</sup> is an error location number
+	<ul>
+	<li>1 + &sigma;<sub>1</sub>a + &sigma;<sub>2</sub>a<sup>2</sup> + ... + &sigma;<sub>v</sub>a<sup>v</sup> = 0</li>
+	</ul>
+</li>
+<li>&sigma;<sub>1</sub>a,&sigma;<sub>2</sub>a<sup>2</sup>, ... are pre calculated</li>
+<li>If sum is not zero then r<sub>n-1</sub> not an error digit</li>
+<li>Circuit for this given in figure 6.1</li>
+</ul>
+</body>
+</html>
+
+

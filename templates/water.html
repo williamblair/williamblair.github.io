@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BJ's Website</title>
+    <link rel="stylesheet" type="text/css" href="../site.css"/>
+
+
+<style>
+    canvas {
+        width: 640px;
+        height: 480px;
+    }
+    textarea {
+        border: 5px solid #00FF00;
+    }
+</style>
+
+</head>
+<body>
+
+<div id="bodyDiv">
+
+<div id="contentDiv">
+
+<canvas id="mycanvas" width="400" height="400"></canvas>
+<br/>
+<div>Click to add droplets!</div>
+<br/>
+
+<textarea cols="80" rows="40" id="codeArea"></textarea>
+<br/>
+<button type="button" id="runButton">Run</button>
+
+<script src="rock_map.js"></script>
+<script id="juliaCode">
+
+var canvas = document.getElementById("mycanvas");
+var ctx = canvas.getContext("2d");
+
+//var BUFF_WIDTH = 300;
+//var BUFF_HEIGHT = 100;
+var BUFF_WIDTH=400;
+var BUFF_HEIGHT=400;
+
+// testing double the size
+var PIX_BUF_WIDTH = rock_width; // defined in rock_map.js
+var PIX_BUF_HEIGHT = rock_height;
+var BYTES_PER_PIXEL = bytes_per_pixel;
+
+var SCALE = BUFF_WIDTH/PIX_BUF_WIDTH; // scale from array to larger pixel texture
+
+var buff = ctx.createImageData(PIX_BUF_WIDTH, PIX_BUF_HEIGHT);
+for (var i=0; i<buff.data.length; ++i) {
+    buff.data[i] = rock_image_map[i];
+}
+
+var temp_wave_map_1 = [];
+var temp_wave_map_2 = [];
+var wave_map = [];
+var NW = 0; // next wave map (index to wave_map)
+var CT = 1; // current wave map
+for (var i=0; i<PIX_BUF_HEIGHT*PIX_BUF_WIDTH; ++i)
+{
+    temp_wave_map_1.push(0);
+    temp_wave_map_2.push(0);
+}
+wave_map.push(temp_wave_map_1);
+wave_map.push(temp_wave_map_2);
+
+// added to when we click on the canvas, taken from by drawWater
+var droplets_queue = [
+    {x: 200, y: 200}
+];
+
+function drawWater() 
+{
+    if (droplets_queue.length > 0) {
+        var droplet = droplets_queue.pop();
+        var x = droplet.x;
+        var y = droplet.y;
+    
+        // TODO - add variable pressure
+        wave_map[NW][y*PIX_BUF_WIDTH+x] = -5000;
+    }
+
+    // Skip edges as we need padding
+    for ( var y = 1; y <= PIX_BUF_HEIGHT - 2; ++y)
+    {
+        for ( var x = 1; x <= PIX_BUF_WIDTH - 2; ++x )
+        {
+            var center_index = ((y*PIX_BUF_WIDTH)+x);
+            var index1 = ((y*PIX_BUF_WIDTH)+(x-1));
+            var index2 = ((y*PIX_BUF_WIDTH)+(x+1));
+            var index3 = (((y-1)*PIX_BUF_WIDTH)+x);
+            var index4 = (((y+1)*PIX_BUF_WIDTH)+x);
+            
+            var pix  = wave_map[NW][center_index];
+
+            var pix1 = wave_map[CT][index1];
+            var pix2 = wave_map[CT][index2];
+            var pix3 = wave_map[CT][index3];
+            var pix4 = wave_map[CT][index4];
+            
+            var n = (pix1 + pix2 + pix3 + pix4) / 2;
+                n -= pix;
+                // TODO - make variable damping
+                n -= n / 16;
+
+            wave_map[NW][center_index] = n;
+        }
+    }
+
+    var waterRefrac = 2.0; // refraction index of water
+    // now calculate colors
+    for ( var y = 1; y < PIX_BUF_HEIGHT - 1; ++y)
+    {
+        for ( var x = 1; x < PIX_BUF_WIDTH - 1; ++x)
+        {
+            var xdiff = wave_map[CT][y*PIX_BUF_WIDTH+x+1] -
+                        wave_map[CT][y*PIX_BUF_WIDTH+x];
+            var ydiff = wave_map[CT][(y+1)*PIX_BUF_WIDTH+x] -
+                        wave_map[CT][y*PIX_BUF_WIDTH+x];
+
+            var xangle = Math.atan(xdiff);
+            var yangle = Math.atan(ydiff);
+
+            var xrefrac = Math.asin( Math.sin(xangle) / waterRefrac );
+            var yrefrac = Math.asin( Math.sin(yangle) / waterRefrac );
+
+            var xdisplace = Math.tan( xrefrac ) * xdiff;
+            var ydisplace = Math.tan( yrefrac ) * ydiff;
+
+            var image_buf_index = (y*PIX_BUF_WIDTH+x)*BYTES_PER_PIXEL;
+
+            var image_index = 0;
+
+            // current position is higher -> clockwise rotation
+            if ( xdiff < 0 )
+            {
+                if (ydiff < 0)
+                {
+                    image_index = (((Math.floor(y-ydisplace))%PIX_BUF_HEIGHT) *
+                                    PIX_BUF_WIDTH                             +
+                                   ((Math.floor(x-xdisplace))%PIX_BUF_WIDTH)
+                                  ) * BYTES_PER_PIXEL;
+                }
+                else
+                {
+                    // TODO - clean these up
+                    image_index = (((Math.floor(y+ydisplace))%PIX_BUF_HEIGHT)*PIX_BUF_WIDTH+((Math.floor(x-xdisplace))%PIX_BUF_WIDTH))*BYTES_PER_PIXEL;
+                }
+            }
+            // current position is lower -> counterclockwise rotation
+            else
+            {
+                if (ydiff < 0)
+                {
+                    image_index = (((Math.floor(y-ydisplace))%PIX_BUF_HEIGHT)*PIX_BUF_WIDTH+((Math.floor(x+xdisplace))%PIX_BUF_WIDTH))*BYTES_PER_PIXEL;
+                }
+                else
+                {
+                    image_index = (((Math.floor(y+ydisplace))%PIX_BUF_HEIGHT)*PIX_BUF_WIDTH+((Math.floor(x+xdisplace))%PIX_BUF_WIDTH))*BYTES_PER_PIXEL;
+                }
+            }
+
+            buff.data[image_buf_index+0] = rock_image_map[image_index+0];
+            buff.data[image_buf_index+1] = rock_image_map[image_index+1];
+            buff.data[image_buf_index+2] = rock_image_map[image_index+2];
+        }
+    }
+
+    // swap buffer indices
+    var temp_val = CT;
+    CT = NW;
+    NW = temp_val;
+     
+    update();
+
+    requestAnimationFrame(drawWater);
+}
+
+function update() {
+    ctx.putImageData(buff, 0,0);
+}
+
+requestAnimationFrame(drawWater);
+
+// click on it!
+canvas.addEventListener('click', function(evt) {
+    // get mouse position, considering offset of the canvas on the html page
+    var rect = canvas.getBoundingClientRect();
+    var x = Math.floor(evt.clientX - rect.left);
+    var y = Math.floor(evt.clientY - rect.top);
+
+    //wave_map[CT][y*PIX_BUF_WIDTH+x] = -2000;
+    droplets_queue.push({x: x, y: y});
+}, false);
+
+</script>
+
+<script>
+var codeArea = document.querySelector("#codeArea");
+var julia = document.querySelector("#juliaCode");
+
+codeArea.value = julia.text;
+
+document.querySelector("#runButton").onclick = function() {
+    var runFunc = new Function(codeArea.value);
+    runFunc();
+};
+
+</script>
+
+</div> <!-- contentDiv -->
+</div> <!-- bodyDiv -->
+
+<p><a href="../index.html">&lt;-- Back to Home</a></p>
+
+</body>
+</html>
+
+

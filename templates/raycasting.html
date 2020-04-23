@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BJ's Website</title>
+    <link rel="stylesheet" type="text/css" href="../site.css"/>
+
+
+<style>
+    canvas {
+        width: 640px;
+        height: 480px;
+    }
+    textarea {
+        border: 5px solid #00FF00;
+    }
+</style>
+
+</head>
+<body>
+
+<div id="bodyDiv">
+
+<div id="navDiv">
+    <h1>BJ's Website</h1>
+    <p>
+      <a href="https://github.com/williamblair">Github</a> |
+      <a href="https://bitbucket.org/williamblair">Bitbucket</a> |
+      <a href="https://codepen.io/williamblair">Github</a> |
+    </p>
+    <!-- actually filled with an image, source set by css using navImage class -->
+	 <p class='navImage'></p>
+</div> <!-- navDiv -->
+
+<div id="contentDiv">
+
+<canvas id="mycanvas" width="640" height="480"></canvas>
+<br/>
+<div>Move with w/a/s/d</div>
+<div><p>
+This demo is cool because instead of real hardware-supported 3D like WebGL,
+Drawing is done via a series of vertical lines in 2D which give the illusion
+of 3D!
+</p></div>
+<br/>
+
+<textarea cols="80" rows="40" id="codeArea"></textarea>
+<br/>
+<button type="button" id="runButton">Run</button>
+
+<script id="juliaCode">
+
+var canvas = document.getElementById("mycanvas");
+var ctx = canvas.getContext("2d");
+
+var BUFF_WIDTH=640;
+var BUFF_HEIGHT=480;
+
+// testing double the size
+var PIX_BUF_WIDTH = BUFF_WIDTH;
+var PIX_BUF_HEIGHT = BUFF_HEIGHT;
+var BYTES_PER_PIXEL = 4;
+
+var SCALE = BUFF_WIDTH/PIX_BUF_WIDTH; // scale from array to larger pixel texture
+
+// 0 - no wall
+// 1 - outer wall of a room
+// 2 - inner wall of a room
+// 3 - pillar
+// 4 - corridor with room
+var worldMap = [
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,2,2,2,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1],
+  [1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,3,0,0,0,3,0,0,0,1],
+  [1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,2,2,0,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,4,0,0,0,0,5,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,4,0,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+];
+
+var posX = 22, posY = 12; // x and y start pos
+var dirX = -1, dirY = 0; // initial direction vector
+var planeX = 0, planeY = 0.66; // 2d raycaster version of camera plane
+
+var time = 0.0; // time of current frame
+var oldtime = 0.0; // time of previous frame
+
+var buff = ctx.createImageData(PIX_BUF_WIDTH, PIX_BUF_HEIGHT);
+for (var i=0; i<buff.data.length; ++i) {
+    buff.data[i] = 255;
+}
+
+// keys array
+var keysObj = {};
+window.onkeyup = function (evt) {
+    keysObj[evt.keyCode] = false;
+};
+window.onkeydown = function (evt) {
+    keysObj[evt.keyCode] = true;
+};
+
+var frameCount = 0; // limit how often we update fps
+var fps = 0.0;
+
+function rayCaster() {
+
+    // we draw one vertical line at a time
+    for ( var x = 0; x < PIX_BUF_WIDTH; ++x )
+    {
+        // calculate ray position and direction
+        var cameraX = 2 * x / PIX_BUF_WIDTH - 1; // x coordinate in camera space
+        var rayDirX = dirX + planeX * cameraX;
+        var rayDirY = dirY + planeY * cameraX;
+
+        // get our current position box
+        var mapX = Math.floor(posX);
+        var mapY = Math.floor(posY);
+
+        // length of ray from current position to next x or y side
+        // this is the simplified form of "sqrt(1 + (rayDirY * rayDirY) / (rayDirX * rayDirX))"
+        //                                "sqrt(1 + (rayDirX * rayDirX) / (rayDirY * rayDirY))"
+        var deltaDistX = Math.abs(1 / rayDirX);
+        var deltaDistY = Math.abs(1 / rayDirY);
+        var perpWallDist;
+
+        // length of ray from current position to next x or y side
+        var sideDistX, sideDistY;
+
+        // left or right for x and y side
+        var stepX, stepY; 
+
+        var hit = false; // true once we've hit a wall
+        var side; // NorthSouth or EastWest wall hit?
+
+        // calculate step and initial side dist
+        if ( rayDirX < 0 ) {
+            stepX = -1;
+            sideDistX = (posX - mapX) * deltaDistX;
+        } else {
+            stepX = 1;
+            sideDistX = (mapX + 1.0 - posX) * deltaDistX;
+        }
+        
+        if ( rayDirY < 0 ) {
+            stepY = -1;
+            sideDistY = (posY - mapY) * deltaDistY;
+        } else {
+            stepY = 1;
+            sideDistY = (mapY + 1.0 - posY) * deltaDistY;
+        }
+
+
+        // perform DDA (digital differential analysis)
+        while ( hit === false )
+        {
+            // jump to the next square
+            if ( sideDistX < sideDistY ) {
+                sideDistX += deltaDistX;
+                mapX += stepX;
+                side = 0;
+            }
+            else {
+                sideDistY += deltaDistY;
+                mapY += stepY;
+                side = 1;
+            }
+
+            // check if we hit a wall
+            if ( worldMap[mapX][mapY] > 0 ) {
+                hit = true;
+            }
+        }
+
+
+        // calculate distance projected on camera direction
+        if ( side == 0 ) perpWallDist = (mapX - posX + (1 - stepX) / 2) / rayDirX;
+        else             perpWallDist = (mapY - posY + (1 - stepY) / 2) / rayDirY;
+
+        // calculate the height of the line to be drawn on screen
+        var lineHeight = Math.floor(PIX_BUF_HEIGHT / perpWallDist);
+
+        // calculate lowest and highest pixel to fill in current range
+        var drawStart = -lineHeight / 2 + PIX_BUF_HEIGHT / 2;
+        if ( drawStart < 0 ) {
+            drawStart = 0;
+        }
+
+        var drawEnd = lineHeight / 2 + PIX_BUF_HEIGHT / 2;
+        if ( drawEnd >= PIX_BUF_HEIGHT ) {
+            drawEnd = PIX_BUF_HEIGHT - 1;
+        }
+
+        // figure out what color to use based on what kind of wall hit
+        var r = 0, g = 0, b = 0;
+        switch( worldMap[mapX][mapY] )
+        {
+            case 1: r = 255; break;
+            case 2: g = 255; break;
+            case 3: b = 255; break;
+            case 4: r = 255; g = 255; b = 255; break; // white
+            case 5: b = 255; g = 255; break; // yellow
+            default:
+                alert('Invalid map wall type ?!?!?!?');
+                break;
+        }
+
+        // give x and y sides a different brightness
+        if ( side == 1 ) {
+            r /= 2;
+            g /= 2;
+            b /= 2;
+        }
+
+        // need to round as we end up with .5 values
+        drawStart = Math.round(drawStart);
+        drawEnd = Math.round(drawEnd);
+        for (var y=0; y<drawStart; ++y){
+            var index = (y*PIX_BUF_WIDTH+x)*BYTES_PER_PIXEL;
+            buff.data[index+0] = 0;
+            buff.data[index+1] = 0;
+            buff.data[index+2] = 0;
+            buff.data[index+3] = 255;
+        }
+        for (var y = drawStart; y <= drawEnd; ++y ) {
+            var index = (y*PIX_BUF_WIDTH+x)*BYTES_PER_PIXEL;
+            buff.data[index+0] = r;
+            buff.data[index+1] = g;
+            buff.data[index+2] = b;
+            buff.data[index+3] = 255;
+        }
+        for (var y = drawEnd+1; y<PIX_BUF_HEIGHT; ++y) {
+            var index = (y*PIX_BUF_WIDTH+x)*BYTES_PER_PIXEL;
+            buff.data[index+0] = 0;
+            buff.data[index+1] = 0;
+            buff.data[index+2] = 0;
+            buff.data[index+3] = 255;
+        }
+    }
+    
+    ctx.putImageData(buff, 0,0);
+
+    // FPS calculation
+    var curTime = new Date();
+    oldtime = time;
+    time = curTime.getTime();
+
+    var frameTime = (time - oldtime) / 1000.0; // convert milliseconds to seconds
+
+    // 1.0 / frameTime = FPS 
+    ctx.fillStyle = "#FFFF00";
+    ctx.fillText("FPS: " + fps, 10, 10);
+    ++frameCount;
+    if (frameCount === 10) {
+        frameCount = 0;
+        fps = 1.0 / frameTime;
+    }
+
+    // movement
+    var moveSpeed = frameTime * 5.0; // constant value is in squares per second
+    var rotSpeed = frameTime * 3.0; // constant value is in radians per second
+
+    // w
+    if ( keysObj[87] ) {
+        if (worldMap[Math.floor(posX + dirX * moveSpeed)][Math.floor(posY)] === 0) {
+            posX += dirX * moveSpeed;
+        }
+        if (worldMap[Math.floor(posX)][Math.floor(posY + dirY * moveSpeed)] === 0) {
+            posY += dirY * moveSpeed;
+        }
+    }
+    // a
+    if ( keysObj[65] ) {
+        // both camera direction and camera plane must be rotated
+        var oldDirX = dirX;
+        dirX = dirX * Math.cos(rotSpeed) - dirY * Math.sin(rotSpeed);
+        dirY = oldDirX * Math.sin(rotSpeed) + dirY * Math.cos(rotSpeed);
+
+        var oldPlaneX = planeX;
+        planeX = planeX * Math.cos(rotSpeed) - planeY * Math.sin(rotSpeed);
+        planeY = oldPlaneX * Math.sin(rotSpeed) + planeY * Math.cos(rotSpeed);
+    }
+    // s
+    if ( keysObj[83] ) {
+        if (worldMap[Math.floor(posX - dirX * moveSpeed)][Math.floor(posY)] === 0) {
+            posX -= dirX * moveSpeed;
+        }
+        if (worldMap[Math.floor(posX)][Math.floor(posY - dirY * moveSpeed)] === 0) {
+            posY -= dirY * moveSpeed;
+        }
+    }
+    // d
+    if ( keysObj[68] ) {
+        // both camera direction and camera plane must be rotated
+        var oldDirX = dirX;
+        dirX = dirX * Math.cos(-rotSpeed) - dirY * Math.sin(-rotSpeed);
+        dirY = oldDirX * Math.sin(-rotSpeed) + dirY * Math.cos(-rotSpeed);
+
+        var oldPlaneX = planeX;
+        planeX = planeX * Math.cos(-rotSpeed) - planeY * Math.sin(-rotSpeed);
+        planeY = oldPlaneX * Math.sin(-rotSpeed) + planeY * Math.cos(-rotSpeed);
+    }
+
+    requestAnimationFrame(rayCaster);
+
+}
+
+requestAnimationFrame(rayCaster);
+
+</script>
+
+<script>
+var codeArea = document.querySelector("#codeArea");
+var julia = document.querySelector("#juliaCode");
+
+codeArea.value = julia.text;
+
+document.querySelector("#runButton").onclick = function() {
+    var runFunc = new Function(codeArea.value);
+    runFunc();
+};
+
+</script>
+
+</div> <!-- contentDiv -->
+</div> <!-- bodyDiv -->
+
+<p><a href="../index.html">&lt;-- Back to Home</a></p>
+
+</body>
+</html>
+
+

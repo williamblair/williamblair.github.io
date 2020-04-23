@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Code at Wrong Level of Abstraction</TITLE>
+<META NAME="description" CONTENT="Code at Wrong Level of Abstraction">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="main.css">
+
+<LINK REL="next" HREF="node39.html">
+<LINK REL="previous" HREF="node37.html">
+<LINK REL="up" HREF="node34.html">
+<LINK REL="next" HREF="node39.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html528"
+  HREF="node39.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="next.png"></A> 
+<A NAME="tex2html526"
+  HREF="node34.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="up.png"></A> 
+<A NAME="tex2html520"
+  HREF="node37.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html529"
+  HREF="node39.html">Base Classes Depending on</A>
+<B> Up:</B> <A NAME="tex2html527"
+  HREF="node34.html">General</A>
+<B> Previous:</B> <A NAME="tex2html521"
+  HREF="node37.html">Duplication</A>
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION000184400000000000000">
+Code at Wrong Level of Abstraction</A>
+</H3>
+
+<P>
+Higher level concepts should be separated from lower level concepts.
+This applies to classes, source files, modules, etc.
+
+<P>
+<PRE>
+public interface Stack {
+    Object pop() throws EmptyException;
+    void push(Object o) throws FullException;
+    double percentFull();
+    class EmptyException extends Exception{}
+    class FullException extends Exception{}
+}
+</PRE>
+
+<P>
+<SPAN  CLASS="textit">percentFull()</SPAN> is a higher level concept than the push-pop
+implementation of a regular stack, which may not have a concept of 'full'
+(a regular stack has a dynamic size).
+
+<P>
+<BR><HR>
+<ADDRESS>
+bj
+2019-09-22
+</ADDRESS>
+</BODY>
+</HTML>

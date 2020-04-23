@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Feature Envy</TITLE>
+<META NAME="description" CONTENT="Feature Envy">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="main.css">
+
+<LINK REL="next" HREF="node45.html">
+<LINK REL="previous" HREF="node43.html">
+<LINK REL="up" HREF="node34.html">
+<LINK REL="next" HREF="node45.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html588"
+  HREF="node45.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="next.png"></A> 
+<A NAME="tex2html586"
+  HREF="node34.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="up.png"></A> 
+<A NAME="tex2html580"
+  HREF="node43.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html589"
+  HREF="node45.html">Obscured Intent</A>
+<B> Up:</B> <A NAME="tex2html587"
+  HREF="node34.html">General</A>
+<B> Previous:</B> <A NAME="tex2html581"
+  HREF="node43.html">Artificial Coupling</A>
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION0001841000000000000000">
+Feature Envy</A>
+</H3>
+
+<P>
+When a class wants to access way too much of another class's internals - 
+it <SPAN  CLASS="textit">wants</SPAN> to be a part of that other class and get all of its data.
+Sometimes, this is unavoidable howerver in order to avoid tight internal
+coupling and provide proper abstraction.
+
+<P>
+<PRE>
+public class HourlyEmployeeReport {
+    private HourlyEmployee employee ;
+    public HourlyEmployeeReport(HourlyEmployee e) {
+        this.employee = e;
+    }
+    String reportHours() {
+        return String.format(
+            "Name: %s\tHours:%d.%1d\n",
+            employee.getName(),
+            employee.getTenthsWorked()/10,
+            employee.getTenthsWorked()%10);
+    }
+}
+</PRE>
+
+<P>
+Here the reportHours function "envies" the data inside of employee;
+however we don't want to expose how the employee report is
+formatted (string.format) to the employee, who doesn't care about
+this information. Thus we will leave it as is.
+
+<P>
+<BR><HR>
+<ADDRESS>
+bj
+2019-09-22
+</ADDRESS>
+</BODY>
+</HTML>

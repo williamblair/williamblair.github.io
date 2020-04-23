@@ -1,0 +1,151 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Duplication</TITLE>
+<META NAME="description" CONTENT="Duplication">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="main.css">
+
+<LINK REL="next" HREF="node38.html">
+<LINK REL="previous" HREF="node36.html">
+<LINK REL="up" HREF="node34.html">
+<LINK REL="next" HREF="node38.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html518"
+  HREF="node38.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="next.png"></A> 
+<A NAME="tex2html516"
+  HREF="node34.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="up.png"></A> 
+<A NAME="tex2html510"
+  HREF="node36.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html519"
+  HREF="node38.html">Code at Wrong Level</A>
+<B> Up:</B> <A NAME="tex2html517"
+  HREF="node34.html">General</A>
+<B> Previous:</B> <A NAME="tex2html511"
+  HREF="node36.html">Overridden Safeties</A>
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION000184300000000000000">
+Duplication</A>
+</H3>
+
+<P>
+"Every time you see duplication in the code, it represents a missed opportunity
+for abstraction." Duplication should be turned into another function
+or another class. Additionally, switch cases and if-else chains can
+represent similar ideas which should be replaced with polymorphism (slightly
+different classes inheriting from the same parent type)"
+
+<P>
+<PRE>
+void a() {
+    doThing1;
+    doThing2;
+    anotherThing1;
+    anotherThing2;
+}
+void b() {
+    doThing3;
+    doThing4;
+    anotherThing1;
+    anotherThing2;
+}
+</PRE>
+
+<P>
+Could instead be
+
+<P>
+<PRE>
+void a() {
+    doThing1;
+    doThing2;
+    doAnotherThing();
+}
+void b() {
+    doThing3;
+    doThing4;
+    doAnotherThing();
+}
+void doAnotherThing() { 
+    anotherThing1;
+    anotherThing2;
+}
+</PRE>
+
+<P>
+In terms of switch cases/if-else:
+
+<P>
+<PRE>
+void internalClassFunction() {
+    switch (internalClassCondition)
+    {
+        case A:
+            doThingForA()
+        case B:
+            doThingForB()
+        case C:
+            doThingForC()
+    }
+}
+</PRE>
+
+<P>
+Could instead be:
+<PRE>
+class Thing {
+    virtual void internalClassFunction() = 0;
+}
+...
+class ThingTypeA {
+    void internalClassFunction() {
+        doThingForA();
+    }
+}
+class ThingTypeB {
+    void internalClassFunction() {
+        doThingForB();
+    }
+}
+class ThingTypeC {
+    void internalClassFunction() {
+        doThingForC();
+    }
+}
+</PRE>
+
+<P>
+<BR><HR>
+<ADDRESS>
+bj
+2019-09-22
+</ADDRESS>
+</BODY>
+</HTML>
