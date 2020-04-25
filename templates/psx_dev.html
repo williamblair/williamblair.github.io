@@ -536,6 +536,43 @@ out to match the sprite size.</p>
 <figcaption>The entire image is actually a block of different primitives (each tile is its own primitive)</figcaption>
 </figure>
 
+<h3>04/25/2020</h3>
+
+<p>Finally finished tutorial 12 - this one took me a while to get working properly! This program does a screen
+stretching effect, as seen below. How it works is the screen is actually drawn as a series of sprites for
+each line (techically in my version, each sprite is 2 horizontal lines) that are offset via a sin wave.
+The sprites read their texture from an area in VRAM offscreen, which is where all the balls are drawn to
+before the main screen sprites are drawn.</p>
+<p>The first issue I had was trying to draw sprites of height 1 - I found out there is a bug in my code somewhere preventing
+this; so all the sprites have a height of 2 now instead. Additionally, at first I tried using the same drawing area
+for the balls AND the screen sprite (so both the balls and screen would be read/drawn to/at 0,0 in VRAM), but the
+sprite texture didn't work properly; so I rewrote the code to separate the areas where the balls are drawn and where
+the main screen lines are drawn. Finally, because the screen line textures are dependant on the system drawing
+the balls first, I had to fiddle with GPU synchronization (DrawSync() and VSync()) for a while. Then, when I tried
+running it on the actual playstation, I had more drawing and sync issues (see the images below). I fixed those
+by implementing double buffering for the screen line sprites (they were single buffered before), as well 
+as fiddling with GPU syncs again. The end result is pretty cool though :)</p>
+
+<figure>
+<img src="../images/psyq_tuto12.gif"/>
+<figcaption>Each pair of 2 lines is a different sprite being drawn, reading its texture from a previously
+drawn to location in memory</figcaption>
+</figure>
+
+<figure>
+<img src="../images/psyq_tuto12_vram.png"/>
+<figcaption>The VRAM layout for the program: the ball sprites are drawn to the area to the right like normal
+by the GPU and system, with single buffering (both draw buffers are located at that same area). Then,
+the screen line sprites are drawn in the normal location with double buffering (left)</figcaption>
+</figure>
+
+<figure>
+<img src="../images/psyq_tuto12_psx1.jpg" width="300px"/>
+<img src="../images/psyq_tuto12_psx2.jpg" width="300px"/>
+<img src="../images/psyq_tuto12_psx3.jpg" width="300px"/>
+<figcaption>Display issues when running on the actual psx; The third one works! yay</figcaption>
+</figure>
+
 </div> <!-- contentDiv -->
 
 </div> <!-- bodyDiv -->
