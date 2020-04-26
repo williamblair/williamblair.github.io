@@ -11,3 +11,8 @@
 ----------
 - Started Chapter 2
 - Finished first example program - basic square/buffer objects
+
+04/25/2020
+----------
+- Finished Chapter 2
+- Finished second example program - asynchronous model loading via AJAX
