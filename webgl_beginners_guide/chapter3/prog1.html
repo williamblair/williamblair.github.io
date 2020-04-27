@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebGL beginner's guide - Asynchronous Object Loading</title>
+  
+  <style>
+    #mycanvas {
+      border: 2px solid blue;
+    }
+  </style>
+  
+</head>
+<body onload="main()">
+
+  <div>
+<canvas id="mycanvas" width="640" height="480">
+  Your browser doesn't support the canvas element :(
+</canvas>
+    </div>
+	
+<!-- program controls -->
+<div>
+<label>Sphere Material Diffuse</label><br/>
+<input type="number" min="0.0" max="1.0" id="material-r" value="0.0" step="0.05"/><label>R</label>
+<input type="number" min="0.0" max="1.0" id="material-g" value="0.0" step="0.05"/><label>G</label>
+<input type="number" min="0.0" max="1.0" id="material-b" value="1.0" step="0.05"/><label>B</label>
+</div>
+<div>
+<label>Light Diffuse</label><br/>
+<input type="number" min="0.0" max="1.0" id="light-r" value="1.0" step="0.05"/><label>R</label>
+<input type="number" min="0.0" max="1.0" id="light-g" value="1.0" step="0.05"/><label>G</label>
+<input type="number" min="0.0" max="1.0" id="light-b" value="1.0" step="0.05"/><label>B</label>
+</div>
+<div>
+<label>Light Direction</label><br/>
+<input type="number" min="-1.0" max="1.0" id="light-x" value="0.0" step="0.05"/><label>X</label>
+<input type="number" min="-1.0" max="1.0" id="light-y" value="-1.0" step="0.05"/><label>Y</label>
+<input type="number" min="-1.0" max="1.0" id="light-z" value="-1.0" step="0.05"/><label>Z</label>
+</div>
+
+<script src="../gl-matrix-min.js"></script>
+
+<script>
+  
+  // Check for & get the WebGL context
+  var getGLContext = function() {
+    var canvas = document.getElementById('mycanvas');
+    
+    var gl = null;
+    
+    var names = [
+      "webgl",
+      "experimental-webgl",
+      "webkit-3d",
+      "moz-webgl"
+    ];
+    for (var i = 0; i < names.length; i++) {
+      try {
+        gl = canvas.getContext(names[i]);
+        
+        // context was found, so exit early
+        if (gl) {
+          break;
+        }
+        
+      } catch(e) {}
+    }
+    
+    if (gl == null) {
+      alert("No WebGL Context Available");
+    }
+    //else {
+    //  alert("GL Context Available");
+    //}
+    
+    return gl;
+  }
+  
+  var gl = getGLContext();
+  
+  var createShader = function(gl, shaderType, source) {
+    var shader = gl.createShader(shaderType);
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+    
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+      alert(gl.getShaderInfoLog(shader));
+      return null;
+    }
+    
+    return shader;
+  }
+  
+  var calculateNormals = function(vs, ind) {
+	var x=0; 
+	var y=1;
+	var z=2;
+	
+	var ns = [];
+	for(var i=0;i<vs.length;i++){ //for each vertex, initialize normal x, normal y, normal z
+		ns[i]=0.0;
+	}
+	
+	for(var i=0;i<ind.length;i=i+3){ //we work on triads of vertices to calculate normals so i = i+3 (i = indices index)
+		var v1 = [];
+		var v2 = [];
+		var normal = [];
+		//p1 - p0
+		 v1[x] = vs[3*ind[i+1]+x] - vs[3*ind[i]+x];
+		 v1[y] = vs[3*ind[i+1]+y] - vs[3*ind[i]+y];
+		 v1[z] = vs[3*ind[i+1]+z] - vs[3*ind[i]+z];
+	   // p0 - p1
+		 v2[x] = vs[3*ind[i+2]+x] - vs[3*ind[i+1]+x];
+		 v2[y] = vs[3*ind[i+2]+y] - vs[3*ind[i+1]+y];
+		 v2[z] = vs[3*ind[i+2]+z] - vs[3*ind[i+1]+z];            
+		//p2 - p1
+		// v1[x] = vs[3*ind[i+2]+x] - vs[3*ind[i+1]+x];
+		// v1[y] = vs[3*ind[i+2]+y] - vs[3*ind[i+1]+y];
+		// v1[z] = vs[3*ind[i+2]+z] - vs[3*ind[i+1]+z];
+	   // p0 - p1
+		// v2[x] = vs[3*ind[i]+x] - vs[3*ind[i+1]+x];
+		// v2[y] = vs[3*ind[i]+y] - vs[3*ind[i+1]+y];
+		// v2[z] = vs[3*ind[i]+z] - vs[3*ind[i+1]+z];
+		//cross product by Sarrus Rule
+		normal[x] = v1[y]*v2[z] - v1[z]*v2[y];
+		normal[y] = v1[z]*v2[x] - v1[x]*v2[z];
+		normal[z] = v1[x]*v2[y] - v1[y]*v2[x];
+		
+		// ns[3*ind[i]+x] += normal[x];
+		// ns[3*ind[i]+y] += normal[y];
+		// ns[3*ind[i]+z] += normal[z];
+		 for(j=0;j<3;j++){ //update the normals of that triangle: sum of vectors
+			ns[3*ind[i+j]+x] =  ns[3*ind[i+j]+x] + normal[x];
+			 ns[3*ind[i+j]+y] =  ns[3*ind[i+j]+y] + normal[y];
+			 ns[3*ind[i+j]+z] =  ns[3*ind[i+j]+z] + normal[z];
+		 }
+	}
+	//normalize the result
+	for(var i=0;i<vs.length;i=i+3){ //the increment here is because each vertex occurs with an offset of 3 in the array (due to x, y, z contiguous values)
+	
+		var nn=[];
+		nn[x] = ns[i+x];
+		nn[y] = ns[i+y];
+		nn[z] = ns[i+z];
+		
+		var len = Math.sqrt((nn[x]*nn[x])+(nn[y]*nn[y])+(nn[z]*nn[z]));
+		if (len == 0) len = 0.00001;
+		
+		nn[x] = nn[x]/len;
+		nn[y] = nn[y]/len;
+		nn[z] = nn[z]/len;
+		
+		ns[i+x] = nn[x];
+		ns[i+y] = nn[y];
+		ns[i+z] = nn[z];
+	}
+	
+	return ns;
+  }
+  
+  // used below once the json object is loaded
+  var sphereObj = null;
+  var vertexBufferObj = null;
+  var indexBufferObj = null;
+  var normalsBufferObj = null;
+  
+  var loadJsonObjectAJAX = function(filename) {
+	var request = new XMLHttpRequest();
+	var resource = "./"+filename;
+	console.log('resource: ' + resource);
+	request.open("GET", resource);
+	request.onreadystatechange = function() {
+	  if (request.readyState == 4) {
+	    if (request.status == 200 || (request.status == 0 && document.domain.length == 0)) {
+		  sphereObj = JSON.parse(request.responseText);
+		  console.log('Obj: ');
+		  console.log(sphereObj);
+		  handleLoadedObj(sphereObj);
+		}
+	  }
+	  else {
+		console.log('readystate not 4: ' + request.readyState);
+	  }
+	}
+	
+	request.send();
+  }
+  
+  var handleLoadedObj = function(obj) {
+    vertexBufferObj = gl.createBuffer();
+    // this buffer object is used internally as the ARRAY_BUFFER
+    // until a new one is set or this one is cleared
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBufferObj);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(obj.vertices), gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARAY_BUFFER, null); // 'clear' the internal array buffer to use
+    
+    // Indices
+    //var indices = [1,3,0,
+    //              3,2,0];
+    indexBufferObj = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBufferObj);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(obj.indices),  gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+	
+	// Normals
+	normalsBufferObj = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, normalsBufferObj);
+	var normals = calculateNormals(obj.vertices, obj.indices);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
+	gl.bindBuffer(gl.ARRAY_BUFFER, null);
+  }
+  
+  var main = function() {
+	
+	loadJsonObjectAJAX("sphereModel.json");
+    
+    // Shaders
+    var vertexShaderCode = `attribute vec3 aVertexPosition;
+							attribute vec3 aVertexNormal;
+							
+							uniform mat4 uTranslateMatrix;
+							uniform mat4 uPerspectiveMatrix;
+							uniform mat4 uNormalMatrix;
+							
+							uniform vec3 uLightDirection;
+							uniform vec4 uLightDiffuse;
+							uniform vec4 uMaterialDiffuse;
+							
+							// Sent to the fragment shader to use
+							varying vec4 vFinalColor;
+                        
+							void main(void) {
+								vec3 NormalDirection = normalize(vec3(uNormalMatrix * 
+																	  vec4(aVertexNormal, 1.0)));
+								vec3 LightDirection = normalize(uLightDirection);
+								
+								float lambert = dot(NormalDirection,-LightDirection);
+								
+								vec4 color = uMaterialDiffuse * uLightDiffuse * lambert;
+								vFinalColor = vec4(color.rgb, 1.0);
+								
+								gl_Position = uPerspectiveMatrix * 
+											uTranslateMatrix * 
+											vec4(aVertexPosition, 1.0);
+							}
+                      `;
+                       
+    var fragmentShaderCode = `precision mediump float;
+                          
+						  // Passed from the vertex shader
+						  varying vec4 vFinalColor;
+						  
+                          void main(void) { 
+                            gl_FragColor = vFinalColor;
+                          }
+                        `;
+    var vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderCode);
+    var fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderCode);
+    
+    var shaderProgram = gl.createProgram();
+    gl.attachShader(shaderProgram, vertexShader);
+    gl.attachShader(shaderProgram, fragmentShader);
+    gl.linkProgram(shaderProgram);
+    
+    if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+      alert("Failed to link shaders!");
+    }
+    gl.useProgram(shaderProgram);
+    
+    // get shader locations
+    var aVertexPosition = gl.getAttribLocation(shaderProgram, "aVertexPosition");
+	var aVertexNormal = gl.getAttribLocation(shaderProgram, "aVertexNormal");
+	
+	var uTranslateMatrix = gl.getUniformLocation(shaderProgram, "uTranslateMatrix");
+	var uPerspectiveMatrix = gl.getUniformLocation(shaderProgram, "uPerspectiveMatrix");
+	var uNormalMatrix = gl.getUniformLocation(shaderProgram, "uNormalMatrix");
+	
+	var uLightDirection = gl.getUniformLocation(shaderProgram, "uLightDirection");
+	var uLightDiffuse = gl.getUniformLocation(shaderProgram, "uLightDiffuse");
+	var uMaterialDiffuse = gl.getUniformLocation(shaderProgram, "uMaterialDiffuse");
+	
+    // transformation matrices
+	var transMatrix = mat4.create(); // The Model-View matrix
+	var perspMatrix = mat4.create(); // The projection matrix
+	var normalMatrix = mat4.create(); // the Normal matrix
+	
+    // enable 3d
+    gl.enable(gl.DEPTH_TEST);
+    
+    // draw
+    var draw = function()
+    {
+      gl.viewport(0,0,640,480);
+      gl.clearColor(0, 0.5, 0.5, 1.0);
+	  gl.clearDepth(100.0);
+	  gl.depthFunc(gl.LEQUAL);
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	  
+	  // calculate transform matrices
+	  mat4.perspective(45, 640/480, 0.1, 10000.0, perspMatrix);
+	  mat4.identity(transMatrix);
+	  mat4.translate(transMatrix, [0.0, 0.0, -1.5]);
+	  
+	  mat4.set(transMatrix, normalMatrix);
+	  mat4.inverse(normalMatrix);
+	  mat4.transpose(normalMatrix);
+	  
+	  // send matrices to the shader
+	  gl.uniformMatrix4fv(uTranslateMatrix, false, transMatrix);
+	  gl.uniformMatrix4fv(uPerspectiveMatrix, false, perspMatrix);
+	  gl.uniformMatrix4fv(uNormalMatrix, false, normalMatrix);
+	  
+	  gl.enableVertexAttribArray(aVertexPosition);
+	  gl.enableVertexAttribArray(aVertexNormal);
+	  
+	  // Update input config values
+	  	var r = document.getElementById("material-r").value;
+		var g = document.getElementById("material-g").value;
+		var b = document.getElementById("material-b").value;
+		gl.uniform4fv(uMaterialDiffuse, [r, g, b, 1.0]);
+		
+		r = document.getElementById("light-r").value;
+		g = document.getElementById("light-g").value;
+		b = document.getElementById("light-b").value;
+		gl.uniform4fv(uLightDiffuse, [r, g, b, 1.0]);
+		
+		var x = document.getElementById("light-x").value;
+		var y = document.getElementById("light-y").value;
+		var z = document.getElementById("light-z").value;
+		gl.uniform3fv(uLightDirection, [x, y, z]);
+      
+	  // don't try to draw if the object hasn't been loaded
+	  if (indexBufferObj != null && vertexBufferObj != null && normalsBufferObj != null) {
+        // bind data to use for drawing
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexBufferObj);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBufferObj);
+		
+		gl.vertexAttribPointer(aVertexPosition, // shader attrib index
+                            3,                // entries per vertex
+                            gl.FLOAT,         // data type
+                            false,            // calculate normals?
+                            0,                // stride (space between vertices)
+                            0);               // offset from beginning of array
+		gl.enableVertexAttribArray(aVertexPosition);
+		
+		gl.bindBuffer(gl.ARRAY_BUFFER, normalsBufferObj);
+		gl.vertexAttribPointer(aVertexNormal,
+								3,
+								gl.FLOAT,
+								false,
+								0,
+								0);
+      
+        // draw the bounded data
+        gl.drawElements(gl.TRIANGLES,     // draw mode
+                        sphereObj.indices.length,   // number of elements to draw
+                        gl.UNSIGNED_SHORT, // type of values in indices
+                        0); // offset element to start from
+	  }
+      
+      // redraw again
+      window.requestAnimationFrame(draw);
+      
+    }
+    
+    // call the initial draw loop
+    window.requestAnimationFrame(draw);
+    
+  } // end main()
+  
+</script>
+
+  <p><a href="log.txt">Log</a></p>
+  
+</body>
+</html>

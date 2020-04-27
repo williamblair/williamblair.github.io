@@ -16,3 +16,8 @@
 ----------
 - Finished Chapter 2
 - Finished second example program - asynchronous model loading via AJAX
+
+04/26/2020
+----------
+- Started chapter 3
+- Finished prog 1: lambert shading on a sphere, with UI controls
