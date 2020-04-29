@@ -21,3 +21,7 @@
 ----------
 - Started chapter 3
 - Finished prog 1: lambert shading on a sphere, with UI controls
+
+04/28/2020
+----------
+- Finished chapter 3 prog 2: phong shading with UI controls
