@@ -25,3 +25,12 @@
 04/28/2020
 ----------
 - Finished chapter 3 prog 2: phong shading with UI controls
+
+04/29/2020
+-----------
+- Finished chapter 3 prog 3: wall phong shading with UI
+
+04/30/2020
+----------
+- Finished chapter 3 prog 4: sphere phong shading with positional light
+
