@@ -34,3 +34,7 @@
 ----------
 - Finished chapter 3 prog 4: sphere phong shading with positional light
 
+05/01/2020
+----------
+- Finished final chapter 3 prog: prog 5: car model with phong shading, positional light,
+rotating camera (I added the rotation part)
