@@ -587,6 +587,64 @@ with 3D that I'm interested in like loading models and cameras, hopefully...</p>
 <figcaption>Multiple viewports (DRAWENVs) sharing the same OT to draw</figcaption>
 </figure>
 
+<h3>05/09/2020</h3>
+
+<p>Working through a video streaming example from PSYQ</p>
+
+<p>This sample streams a video in the STR format (SAMPLE.STR). The original 
+PSYQ sample (psyq/psx/sample/cd/MOVIE/TUTO0.C) uses a file named MOV.STR,
+in an XDATA folder, however I couldn't find that one. I found SAMPLE.STR
+instead from a different directory.</p>
+
+<p>Also, kinda as a sidenote, I was playing around with looking in my
+FF7 disc 1 BIN/CUE copy for STR files; they're contained in the 
+'movie' folder in the top level CD directory. I was able to mount
+the disc on Linux and explore the CD that way via</p>
+<ul>
+ <li>Convert the BIN/CUE pair to an ISO file:
+  <pre>bchunk &lt;binfile&gt;.bin &lt;cuefile&gt;.cue &lt;out iso name&gt;.iso</pre>
+  </li>
+  <li>mount the ISO file as read only
+  <pre>
+mkdir ~/cd_mount
+mount &lt;out iso name&gt;.iso ~/cd_mount
+  </pre>
+  </li>
+</ul>
+
+<p>Then I was able to play/preview any of the STR files on Linux via the
+jPSXdec program: <a href="https://github.com/m35/jpsxdec">https://github.com/m35/jpsxdec</a>.
+It's a java program, so you'll need the java runtime to run it (on linux
+at least, not sure about windows)
+Run with `java -jar jpsxdec.jar`</p>
+
+<p>Then you can open and play STR files; this way I know what the video
+should look like when it's streaming</p>
+
+<figure>
+<img src="../images/jpsxdec_str.gif"/>
+<figcaption>jPSXdec playing the SAMPLE.STR</figcaption>
+</figure>
+
+<p>In code, there are 2 systems working in tandem to play the video:
+The STR, and cd libraries. These Open/Init the file from CD and read
+STR 'sectors'</p>
+
+<p>Then there's the VLC/Decode libraries (What does VLC mean in this case?
+Not the video player, I presume? lol). These take the VLC data and decode
+it, storing the resulting image data into a given buffer. We then load
+the buffer into VRAM using LoadImage(). This VRAM data can be either
+used as a texture, or sent directly to the drawing environemt area
+directly (which is done here).</p>
+
+<p>TODO - synchronization/timeing/handle timeouts related to CD reads
+and safety and stuff</p>
+
+<figure>
+<img src="../images/psyq_str1.png"/>
+<figcaption>The STR streaming in code; currently crashes towards the end</figcaption>
+</figure>
+
 </div> <!-- contentDiv -->
 
 </div> <!-- bodyDiv -->
