@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Chapter 3</title>
+
+  <style>
+    pre {
+        border: 1px solid black;
+        padding: 2px;
+    }
+
+    table, tr, td, th {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+  </style>
+
+</head>
+<body>
+<h1>Chapter 3</h1>
+
+<h3>Addition Instructions</h3>
+<table>
+<tr>
+  <th>Operation</th>
+  <th>Meaning</th>
+</tr>
+<tr>
+  <td>add Rd,Rs,Rt</td>
+  <td>Rd = Rs + Rt</td>
+</tr>
+<tr>
+  <td>addi Rt,Rs,Immediate</td>
+  <td>Rt = Rs + Immediate</td>
+</tr>
+<tr>
+  <td>addu Rd,Rs,Rt</td>
+  <td>Rd = Rs + Rt (unsigned)</td>
+</tr>
+<tr>
+  <td>addiu Rt, Rs, Immediate</td>
+  <td>Rt = Rs + Immediate (unsigned)</td>
+</tr>
+</table>
+
+<h3>Subtraction Instructions</h3>
+<table>
+<tr>
+  <th>Operation</th>
+  <th>Meaning</th>
+</tr>
+<tr>
+  <td>sub Rd,Rs,Rt</td>
+  <td>Rd = Rs - Rt</td>
+</tr>
+<tr>
+  <td>subu Rd,Rs,Rt</td>
+  <td>Rd = Rs - Rt (unsigned)</td>
+</tr>
+</table>
+
+<h3>Multiplication Instructions</h3>
+<p>The results of mult ops are stored in special hi,lo registers for the high
+   32 bits of the result and the low 32 bits of the result.</p>
+<p>These values can be then extracted into local regs via 'mflo &lt;reg&gt;' and 'mfhi &lt;reg&gt;'
+   operations
+</p>
+
+<table>
+<tr>
+  <th>Operation</th>
+  <th>Meaning</th>
+</tr>
+<tr>
+  <td>mult Rs, Rt</td>
+  <td>[hi,lo] = Rs * Rt</td>
+</tr>
+<tr>
+  <td>mult Rd, Rs, Rt</td>
+  <td>Rd = Rs * Rt</td>
+</tr>
+</table>
+
+<h3>Boolean Instructions</h3>
+<table>
+<tr>
+  <th>Operation</th>
+  <th>Meaning</th>
+</tr>
+<tr>
+  <td>and Rd, Rs, Rt</td>
+  <td>Rd = Rs &amp; Rt</td>
+</tr>
+<tr>
+  <td>andi Rt, Rs, Immediate</td>
+  <td>Rt = Rs &amp; Immediate</td>
+</tr>
+<tr>
+  <td>or Rd, Rs, Rt</td>
+  <td>Rd = Rs | Rt</td>
+</tr>
+<tr>
+  <td>ori Rt, Rs, Immediate</td>
+  <td>Rt = Rs | Immediate</td>
+</tr>
+<tr>
+  <td>xor Rd, Rs, Rt</td>
+  <td>Rd = Rs ^ Rt</td>
+</tr>
+<tr>
+  <td>xori Rt, Rs, Immediate</td>
+  <td>Rt = Rs ^ Immediate</td>
+</tr>
+<tr>
+  <td>nor Rd, Rs, Rt</td>
+  <td>Rd = ~(Rs | Rt)</td>
+</tr>
+</table>
+
+<h3>Division Instructions</h3>
+<p>For division, the result is stored in the 'lo' register
+   and the remainder is stored in the 'hi' register (for integers, at
+   least). These can also be extracted with mflo and mfhi like for
+   multiplication.
+</p>
+
+<table>
+<tr>
+  <th>Operation</th>
+  <th>Meaning</th>
+</tr>
+<tr>
+  <td>div Rs,Rt</td>
+  <td>[hi,lo] = Rs/Rt</td>
+</tr>
+</table>
+
+<h3>Shift Instructions</h3>
+<table>
+<tr>
+  <th>Operation</th>
+  <th>Meaning</th>
+</tr>
+<tr>
+  <td>sll Rd, Rt, Immediate</td>
+  <td>Rd = Rt &lt;&lt; Immediate (use zeros to fill in (logical shift))</td>
+</tr>
+<tr>
+  <td>sllv Rd, Rt, Rs</td>
+  <td>Rd = Rt &lt;&lt; Rs (use zeros to fill in (logical shift))</td>
+</tr>
+<tr>
+  <td>srl Rd, Rt, Immediate</td>
+  <td>Rd = Rt &gt;&gt; Immediate (use zeros to fill in (logical shift))</td>
+</tr>
+<tr>
+  <td>srlv Rd, Rt, Rs</td>
+  <td>Rd = Rt &gt;&gt; Rs (use zeros to fill in (logical shift))</td>
+</tr>
+<tr>
+  <td>sra Rd, Rt, Immediate</td>
+  <td>Rd = Rt &gt;&gt; Immediate (use sign bit to fill in (arithmatic shift; preserves sign))</td>
+</tr>
+<tr>
+  <td>srav Rd, Rt, Rs</td>
+  <td>Rd = Rt &gt;&gt; Rs (use sign bit to fill in (arithmatic shift; preserves sign))</td>
+</tr>
+<tr>
+  <td>rol Rd, Rt, Immediate</td>
+  <td>Rd = Rt &lt;&lt; Immediate (circular shift; fill in with shifted out bits)</td>
+</tr>
+<tr>
+  <td>ror Rd, Rt, Immediate</td>
+  <td>Rd = Rt &gt;&gt; Immediate (circular shift; fill in with shifted out bits)</td>
+</tr>
+</table>
+
+<h3>Addition Pseudo Instructions</h3>
+<table>
+<tr>
+  <th>Pseudo Operation</th>
+  <th>Translation</th>
+</tr>
+<tr>
+  <td>add Rt,Rs,Immediate (16 bit value)</td>
+  <td>addi Rt,Rs,Immediate</td>
+</tr>
+<tr>
+  <td>[add|addi|addiu] Rt,Rs,Immediate (32 bit value)</td>
+  <td>lui $at, Immediate (upper 16 bits) <br/>
+      ori $at, Immediate (lower 16 bits) <br/>
+      add Rt, Rs, $at
+  </td>
+</tr>
+</table>
+
+<h3>Subtraction Pseudo Instructions</h3>
+<table>
+<tr>
+  <th>Pseudo Operation</th>
+  <th>Translation</th>
+</tr>
+<tr>
+  <td>sub Rt,Rs,Immediate (16 bit value)</td>
+  <td>addi $at,$zero,Immediate <br/>
+      sub Rt, Rs, $at
+  </td>
+</tr>
+<tr>
+  <td>[subi|subiu] Rt,Rs,Immediate (16 bit value)</td>
+  <td>addi $at,$zero,Immediate (signed or unsigned) <br/>
+      [sub|subu] Rt, Rs, $at
+  </td>
+</tr>
+<tr>
+  <td>[sub|subi|subiu] Rt,Rs,Immediate (32 bit value)</td>
+  <td>lui $at, Immediate (upper 16 bits) <br/>
+      ori $at, Immediate (lower 16 bits) <br/>
+      sub Rt, Rs, $at
+  </td>
+</tr>
+</table>
+
+<h3>Multiplication Pseudo Instructions</h3>
+<table>
+<tr>
+  <th>Pseudo Operation</th>
+  <th>Translation</th>
+</tr>
+<tr>
+  <td>mult Rd,Rs,Immediate</td>
+  <td>addi $Rt, $zero, Immediate <br/>
+      mult Rd, Rs, Rt
+  </td>
+</tr>
+<tr>
+  <td>mulo Rd,Rs,Immediate</td>
+  <td>addi $Rt, $zero, Immediate <br/>
+      mulo Rd, Rs, Rt
+  </td>
+</tr>
+<tr>
+  <td>mulo Rd, Rs, Rt</td>
+  <td>Rd = Rs * Rt; throws exception if overflow occurs</td>
+</tr>
+</table>
+
+<h3>Division Pseudo Instructions</h3>
+<table>
+<tr>
+  <th>Pseudo Operation</th>
+  <th>Translation</th>
+</tr>
+<tr>
+  <td>div Rd, Rs, Rt</td>
+  <td>
+     if Rt != 0; Rd = Rs / Rt </br>
+     else break
+  </td>
+</tr>
+<tr>
+  <td>div Rd,Rs,Immediate</td>
+  <td> addi $Rt, $zero, Immediate <br/>
+       div Rs, Rt <br/>
+       mflo Rd
+  </td>
+</tr>
+<tr>
+  <td>rem Rd, Rs, Rt</td>
+  <td>if Rt != 0; Rd = Rs % Rt <br/>
+      else break
+  </td>
+</tr>
+<tr>
+  <td>rem Rd, Rs, Immediate</td>
+  <td>addi $Rt, $zero, Immediate <br/>
+      div Rs, Rt <br/>
+      mfhi Rd
+  </td>
+</tr>
+</table>
+
+<h3>Boolean Pseudo Instructions</h3>
+<table>
+<tr>
+  <th>Pseudo Operation</th>
+  <th>Translation</th>
+</tr>
+<tr>
+  <td>[and|or|xor] Rt, Rs, Immediate</td>
+  <td>[andi|ori|xori] Rt, Rs, Immediate</td>
+</tr>
+<tr>
+  <td>[and|or|xor] Rs,Immediate</td>
+  <td>[and|or|xor] Rs, Rs, Immediate</td>
+</tr>
+<tr>
+  <td>not Rs, Rt</td>
+  <td>nor Rs, Rt, $zero (Rs = !Rt)</td>
+</tr>
+</table>
+<p>Also, the auto handling of 16bit vs 32bit immediates, same as done for addition,etc</p>
+
+<h3>Addition Sample Prog</h3>
+<pre>
+<code>
+.text
+
+main:
+
+  # add 3 + 5 into $t0
+  li $t0, 3
+  addi $t0, $t0, 5
+
+  # print out result
+  li $v0, 1 # 1 = print int
+  move $a0, $t0
+  syscall
+
+  # exit
+  li $v0, 10
+  syscall
+
+.data
+</code>
+</pre>
+
+<h3>IsEven: Division/Remainder Sample Prog</h3>
+<pre>
+<code>
+# Is Odd/Even checker
+# shows division and remainder
+
+.text
+
+main:
+  # Get user input number, stored in $t0
+  li $v0, 4 # print string
+  la $a0, prompt
+  syscall
+  li $v0, 5 # get integer
+  syscall
+  move $t0, $v0
+
+  # Divide by 2 so we get the remainder (stored in hi)
+  div $t1, $t0, 2 # t1 = t0 / 2
+  
+  # print out the division result
+  li $v0, 4 # print string
+  la $a0, divresstr
+  syscall
+  li $v0, 1 # print int
+  move $a0, $t1
+  syscall
+  
+  # print out remainder (is even?)
+  li $v0, 4
+  la $a0, isevenstr
+  syscall
+  li $v0, 1
+  mfhi $a0
+  syscall
+  
+  # exit
+  li $v0, 10
+  syscall
+
+.data
+prompt:       .asciiz "enter a number to check if odd or even:"
+divresstr:    .ascii "Input / 2: \0" # \0 so the string is null terminated
+isevenstr:    .ascii "\nIs Even: \0"
+</code>
+</pre>
+
+<h3>XOR Bit Flipper: Bit flips users input using XOR instead of nor or not</h3>
+<pre>
+<code>
+# Program's logical not (bitwise flip) using xor
+# assumes using 32bit integer
+
+.text
+
+main:
+
+	# prompt for a number, storing in $t0
+	li $v0, 4 # print string
+	la $a0, prompt
+	syscall
+	li $v0, 5 # get int
+	syscall
+	move $t0, $v0
+	
+	# bit flip it using (a XOR 0b11111111... = ~a), storing in $t1
+	xori $t1, $t0, 0xffffffff
+	
+	# print out the result
+	li $v0, 1 # print int
+	move $a0, $t1
+	syscall
+	
+	# exit
+	li $v0, 10
+	syscall
+
+.data:
+prompt: .asciiz "Enter a number to bit flip: "
+
+</code>
+</pre>
+
+</body>
+</html>
+
