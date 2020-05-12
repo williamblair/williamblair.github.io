@@ -29,6 +29,24 @@
 <input id="camera-z" type="number" value="2000" min="-4000" max="4000"/> <label>z</label> 
 </div>
 
+<div>
+<h3>Viewport</h3>
+<input id="viewport-x" type="number" value="50" min="0" max="640"/> <label>x</label> 
+<input id="viewport-y" type="number" value="50" min="0" max="480"/> <label>y</label>
+<input id="viewport-w" type="number" value="590" min="100" max="640"/> <label>width</label> 
+<input id="viewport-h" type="number" value="430" min="100" max="480"/> <label>height</label> 
+</div>
+
+<div>
+<h3>Projection Type</h3>
+<form>
+<input id="projection-perspective" type="radio" name="cameratype" value="perspective" checked="checked" onchange="changeProjMatType()">
+<label for="perspective">Perspective</label>
+<input id="projection-ortho" type="radio" name="cameratype" value="ortho" onchange="changeProjMatType()">
+<label for="ortho">Orthogonal</label>
+</form>
+</div>
+
 
 <div>
 
@@ -133,7 +151,7 @@ function initTransforms(){
 *   Called once per rendering cycle.
 */
 function updateTransforms(){
-    mat4.perspective(30, c_width / c_height, 10, 5000.0, pMatrix);  // We can resize the screen at any point so the perspective matrix should be updated always.
+    //mat4.perspective(30, c_width / c_height, 10, 5000.0, pMatrix);  // We can resize the screen at any point so the perspective matrix should be updated always.
 }
 
 
@@ -227,6 +245,21 @@ function updateSliders(){
 function displayMatrix(m){
 }
 
+function changeProjMatType(){
+  var perspectiveChecked = document.getElementById("projection-perspective").checked;
+  console.log("Perspective checked: ");
+  console.log(perspectiveChecked);
+
+  if (perspectiveChecked) {
+    console.log('perspective type');
+    mat4.perspective(30, c_width / c_height, 10, 5000.0, pMatrix);  // We can resize the screen at any point so the perspective matrix should be updated always.
+  }
+  else {
+    console.log("Ortho type!");
+   mat4.ortho(-c_width, c_width, -c_height, c_height, -5000,5000, pMatrix);
+  }
+}
+
 
 /**
 * Loads the scene
@@ -248,7 +281,13 @@ function draw() {
     // some options to try...
     //gl.viewport(0, 0, c_width/2, c_height/2);
     //gl.viewport(c_width/2,c_height/2, c_width, c_height);
-	gl.viewport(50, 50, c_width-100, c_height-100);
+	//gl.viewport(50, 50, c_width-100, c_height-100);
+
+    var x = document.getElementById("viewport-x").value;
+    var y = document.getElementById("viewport-y").value;
+    var w = document.getElementById("viewport-w").value;
+    var h = document.getElementById("viewport-h").value;
+    gl.viewport(x,y,w,h);
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         
@@ -323,7 +362,6 @@ function runWebGLApp() {
 }
 </script>
 
-  <p><a href="log.txt">Log</a></p>
   
 </body>
 </html>

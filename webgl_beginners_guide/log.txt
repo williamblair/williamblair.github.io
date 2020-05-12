@@ -38,3 +38,8 @@
 ----------
 - Finished final chapter 3 prog: prog 5: car model with phong shading, positional light,
 rotating camera (I added the rotation part)
+
+05/11/2020
+----------
+- Finished chapter 4 and example prog: projection types, viewport, matrix types
+
