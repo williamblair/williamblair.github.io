@@ -645,6 +645,29 @@ and safety and stuff</p>
 <figcaption>The STR streaming in code; currently crashes towards the end</figcaption>
 </figure>
 
+<h3>05/16/2020</h3>
+
+<p>Continuing with the STR video from last time; made the following updates:</p>
+<ul>
+<li>Added video reset and timing checks (the TODO from last time)</li>
+<li>Tried doing video stream synchronously (loading one frame at a time strictly in main, no callback func).
+Worked in the emulator but not on hardware; TODO is figure this out. Perhaps theres another video example that
+does this.
+</li>
+<li>Based off the code, made a 'StrVideo' namespace which streams the video to a specified location in VRAM
+(single buffer) to be used as a texture. It'd be nice to make this a class but would have to figure out
+how to handle the callback function requirement</li>
+<li>Tested using this streaming video texture with the Sprite_textured class; confirmed works on hardware</li>
+</ul>
+
+<figure>
+<img src="../images/psyq_str2.jpg" width="300px"/>
+<figcaption>STR video as a texture being drawn with the Sprite_textured class.
+Interestingly you can see remnants of the PSX bios 3d logo; I think its because
+I set the sprite size larger than the decoded video size so its reading extra
+from VRAM memory</figcaption>
+</figure>
+
 </div> <!-- contentDiv -->
 
 </div> <!-- bodyDiv -->
