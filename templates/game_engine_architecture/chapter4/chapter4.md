@@ -68,9 +68,9 @@ called predication or a select operation
     * two quad-core AMD Jaguars in a single die with a GPU, memory controller, and video codec
     * Of the 8 total cores, 7 are available to game applications
 * PS4 Architecture:
-  !(PS4 CPU arch)[ps4_arch.png]
+  ![PS4 CPU arch](ps4_arch.png)
 * XBox One Architecture:
-  !(Xbox one CPU arch)[xboxone_arch.png]
+  ![Xbox one CPU arch](xboxone_arch.png)
 
 ## Symmetric vs Assymetric Parallelism
 
