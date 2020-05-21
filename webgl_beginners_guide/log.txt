@@ -43,3 +43,8 @@ rotating camera (I added the rotation part)
 ----------
 - Finished chapter 4 and example prog: projection types, viewport, matrix types
 
+05/21/2020
+----------
+- Finished chapter 5 first two progs: frame-independant animation and parametric
+  positioning (position based on time)
+
