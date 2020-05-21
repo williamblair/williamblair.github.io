@@ -217,7 +217,7 @@ void EveryCriticalOperation()
   END_ASSERT_LOCK_NOT_NECESSARY(g_lock);
 }
 ```
-4.10 SIMD/Vector Processing
+
 
 
 
