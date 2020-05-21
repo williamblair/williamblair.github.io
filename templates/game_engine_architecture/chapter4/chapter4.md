@@ -102,7 +102,7 @@ called predication or a select operation
     * A semaphore can be be decremented/incremented by different threads; thus
       is more commonly used as a signal
 * Semaphore example:
-  ```
+```
 Queue g_queue;
 sem_t g_semUsed; // initialized to 0
 sem_t g_semFree; // initialized to 1
@@ -142,13 +142,13 @@ void* ConsumerThreadSem(void*)
     }
     return nullptr;
 }
-  ```
+```
 
 ## C++ Atomic
 
 * Protects variables without the need for a mutex via CPU specific instructions
   (normally)
-* ```
+```
 std::atomic<float> g_data;
 std::atomic_flag g_ready = false;
 void ProducerThread()
@@ -177,33 +177,31 @@ void ConsumerThread()
   race condition never happens. This code can then be
   defined out for production builds
 * Has been used and been successful at Naughy Dog
-* ```
+```
 class UnnecessaryLock
 {
-volatile bool
-m_locked;
+  volatile bool m_locked;
 public:
-void Acquire()
-{
-// assert no one already has the lock
-assert(!m_locked);
-// now lock (so we can detect overlapping
-// critical operations if they happen)
-m_locked = true;
-}
-void Release()
-{
-// assert correct usage (that Release()
-// is only called after Acquire())
-assert(m_locked);
-// unlock
-m_locked = false;
-}
+  void Acquire()
+  {
+    // assert no one already has the lock
+    assert(!m_locked);
+    // now lock (so we can detect overlapping
+    // critical operations if they happen)
+    m_locked = true;
+  }
+  void Release()
+  {
+    // assert correct usage (that Release()
+    // is only called after Acquire())
+    assert(m_locked);
+    // unlock
+    m_locked = false;
+  }
 };
 #if ASSERTIONS_ENABLED
 #define BEGIN_ASSERT_LOCK_NOT_NECESSARY(L) (L).Acquire()
-#define END_ASSERT_LOCK_NOT_NECESSARY(L)
-(L).Release()
+#define END_ASSERT_LOCK_NOT_NECESSARY(L) (L).Release()
 #else
 #define BEGIN_ASSERT_LOCK_NOT_NECESSARY(L)
 #define END_ASSERT_LOCK_NOT_NECESSARY(L)
@@ -214,9 +212,9 @@ UnnecessaryLock g_lock;
 
 void EveryCriticalOperation()
 {
-    BEGIN_ASSERT_LOCK_NOT_NECESSARY(g_lock);
-    printf("perform critical op...\n");
-    END_ASSERT_LOCK_NOT_NECESSARY(g_lock);
+  BEGIN_ASSERT_LOCK_NOT_NECESSARY(g_lock);
+  printf("perform critical op...\n");
+  END_ASSERT_LOCK_NOT_NECESSARY(g_lock);
 }
 ```
 4.10 SIMD/Vector Processing
