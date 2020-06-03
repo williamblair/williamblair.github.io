@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Chapter 8</title>
+
+  <style>
+    pre {
+        border: 1px solid black;
+        padding: 2px;
+    }
+
+    table, tr, td, th {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+  </style>
+
+</head>
+<body>
+<h1>Chapter 8</h1>
+
+<h3>The program stack and multi-level function calls</h3>
+<p>If a function calls another function, the initial return
+    address needs to be saved; otherwise, when the second
+    function returns, the first function won't know what 
+    address to return to as the second function overwrote
+    the return address register ($ra). Thus the stack is used to store the
+    return address and any other desired data
+</p>
+<pre><code>
+# multi-function call example; $ra is not saved to it fails to get back
+# to main (nextLine1)
+main:
+    jal Func1   # $ra = nextLine1
+    nextLine1
+    ...
+Func1:
+    jal Func2   # $ra = nextLine2
+    nextLine2
+    ...
+    jr $ra      # $ra = ??
+Func2:
+    jr $ra      # back to nextLine2
+</code></pre>
+<p>The stack pointer ($sp) register starts at 
+0x7ffffe00 and grows backwards (i.e. after storing 8 bytes,
+subtract $sp by 8)
+</p>
+
+<p>Multiply via recursive additions example, which uses the stack
+   to store return addresses ($ra) and input arguments ($a0)
+</p>
+<pre><code>
+.text
+.globl main
+main:
+	# register conventions
+	# $s0 - m
+	# $s1 - n
+	# $s2 - answer
+	
+	la $a0, prompt1
+	jal PrintString
+	jal PromptInt
+	move $s0, $v0
+	
+	la $a0, prompt2
+	jal PrintString
+	jal PromptInt
+	move $s1, $v0
+	
+	move $a0, $s0
+	move $a1, $s1
+	
+	jal Multiply
+	move $s2, $v0
+	
+	la $a0, result
+	jal PrintString
+	move $a0, $s2
+	jal PrintInt
+	
+	jal Exit
+	
+Multiply:
+	# Increase the stack size (grows backwards) and save the first multiply number
+	# and the current return address stored via the call to jal Multiply
+	addi $sp, $sp, -8
+	sw $a0, 4($sp)
+	sw $ra, 0($sp)
+	
+	# if our counter has reached zero, we can start doing the adds
+	# (skip the jal Multiply so we start adding)
+	seq $t0, $a1, $zero
+	addi $v0, $zero, 0 	# initialize $v0 = 0 in case we start doing the actual adds
+	bnez $t0, Return
+	
+	# store m-1 in m (e.g. for 2*3, $a1 = 3,2,1,0)
+	addi $a1, $a1, -1
+	# when this jump and link is called, the next line (lw) is stored in $ra
+	# hence, once we get to the Return label, the stack has the lw line
+	# in it due to the line 'sw $ra, 0($sp)' above
+	jal Multiply
+
+	# Do the recursive adds ($v0 = a+a+a+a... b times)	
+	lw $a0, 4($sp)		# get the first multiply number (a in a*b)
+	add $v0, $a0, $v0	# $v0 = a + $v0
+	
+	Return:
+	lw $ra, 0($sp)		# retrieve the next $ra stored from above (points to 'Do the recursive adds')
+	addi $sp, $sp, 8	# pop the stack
+	jr $ra			# go to the retrieved value
+	
+.data
+	prompt1: .asciiz "Enter the multiplicand: "
+	prompt2: .asciiz "Enter the multiplier: "
+	result: .ascii "The answer is: "
+	
+.include "utils.asm"
+</code></pre>
+
+</body>
+</html>
+
