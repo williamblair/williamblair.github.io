@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Chapter 4</title>
+</head>
+<body>
+<h1 id="chapter-5">Chapter 5</h1>
+<h2 id="left-handed-vs-right-handed-coordinate-systems">Left handed vs. Right Handed Coordinate Systems</h2>
+<p><img src="coordinatesystem.gif" alt="Left vs. Right Coordinate System"></p>
+<ul>
+<li>To switch between the two, switch the direction of one of the axes</li>
+<li>More common in 3d graphics to use left handed coordinate system
+(z axis points away; larger Z = further away)</li>
+</ul>
+<h2 id="vector-magnitude">Vector magnitude</h2>
+<ul>
+<li>magnitude = length = |<strong>v</strong>| = 
+ sqrt(<strong>v</strong> * <strong>v</strong>) = sqrt(vx*vx + vy*vy + vz*vz)</li>
+</ul>
+<h2 id="normalizing-a-vector">Normalizing a vector</h2>
+<ul>
+<li>normal vector <strong>u</strong> = <strong>v</strong>/|<strong>v</strong>|</li>
+</ul>
+<h2 id="vector-projection">Vector projection</h2>
+<ul>
+<li><strong>u</strong> = unit vector (|<strong>u</strong>| = 1)</li>
+<li>dot product <strong>a</strong> * <strong>u</strong> = the length of the projection
+of <strong>a</strong> onto direction <strong>u</strong></li>
+</ul>
+<h2 id="dot-product-applications">Dot Product Applications</h2>
+<p><img src="dotproduct.png" alt="dot product diagrams"></p>
+<h2 id="cross-product">Cross product</h2>
+<ul>
+<li><strong>a</strong> x <strong>b</strong> = [(aybz - azby), (azbx - axbz), (axby - aybx)]</li>
+</ul>
+<h2 id="cross-product-to-find-the-normal-vector-of-a-plane">Cross product to find the normal vector of a plane</h2>
+<ul>
+<li>Given points <strong>P</strong>1, <strong>P</strong>2, <strong>P</strong>3</li>
+<li>normal vector <strong>n</strong> = normalize((<strong>P</strong>2 - <strong>P</strong>1)x(<strong>P</strong>3 - <strong>P</strong>1))</li>
+</ul>
+<h2 id="linear-interpolation-lerp-">Linear Interpolation (LERP)</h2>
+<ul>
+<li>Finds an intermediate point between 2 other points</li>
+<li>LERP(<strong>A</strong>,<strong>B</strong>,&beta;) = (1-&beta;)<strong>A</strong> + &beta;<strong>B</strong></li>
+<li>= [(1-&beta;)Ax + &beta;x, (1-&beta;)Ay + &beta;y, (1-&beta;)Az + &beta;z]</li>
+<li>&beta; = percent between <strong>A</strong> and <strong>B</strong></li>
+</ul>
+<h2 id="row-vs-column-vectors">Row vs Column Vectors</h2>
+<ul>
+<li>Row vectors: multiply with matrices left-to-right<ul>
+<li><strong>v</strong>&#39; = <strong>v</strong>*<strong>A</strong> * <strong>B</strong> * <strong>C</strong></li>
+</ul>
+</li>
+<li>Col vectors: multiply with matrices right-to-left<ul>
+<li><strong>v</strong>&#39; = <strong>C</strong>*<strong>B</strong>*<strong>A</strong>*<strong>v</strong></li>
+</ul>
+</li>
+</ul>
+<h2 id="affine-transformations-and-matrix-inverse">Affine transformations and matrix inverse</h2>
+<ul>
+<li>All affine transformation matrices have inverses:
+<strong>A</strong> <em> <strong>A</strong><sup>-1</sup> = <em>*I</em></em></li>
+<li>Rotate, translate, scale, and shear</li>
+<li>(<strong>A</strong><strong>B</strong><strong>C</strong>)<sup>-1</sup> = <strong>C</strong><sup>-1</sup><strong>B</strong><sup>-1</sup><strong>A</strong><sup>-1</sup></li>
+</ul>
+<h2 id="matrix-transpose">Matrix transpose</h2>
+<ul>
+<li><strong>M</strong><sup>T</sup> = values reflected across the diagonal<ul>
+<li><strong>M</strong><sub>i,j</sub> = <strong>M</strong><sub>j,i</sub></li>
+</ul>
+</li>
+<li>(<strong>A</strong><strong>B</strong><strong>C</strong>)<sup>T</sup> = <strong>C</strong><sup>T</sup><strong>B</strong><sup>T</sup><strong>A</strong><sup>T</sup></li>
+</ul>
+<h2 id="homogeneous-coordinates">Homogeneous coordinates</h2>
+<ul>
+<li>Point has w component = 1</li>
+<li>Direction has w component = 0</li>
+<li>Homoegeneous transformation matrices have w component = 1
+since they deal with transforming points</li>
+</ul>
+<h2 id="yaw-pitch-roll">Yaw, pitch, roll</h2>
+<ul>
+<li>Pitch: rotation around left/right/x axis</li>
+<li>Yaw: rotation around up/y axis</li>
+<li>Roll: rotation around front/z axis</li>
+</ul>
+<h2 id="coordinate-spaces">Coordinate Spaces</h2>
+<ul>
+<li>Model space: origin is at the center of the object/model</li>
+<li>World space: all objects/models are relative to this center</li>
+<li>View space/camera space: origin is center of the camera</li>
+</ul>
+<h2 id="change-of-basis-converting-between-coordinate-spaces-">Change of Basis (converting between coordinate spaces)</h2>
+<ul>
+<li>Pp = result parent space vector</li>
+<li>Pc = initial child space vector to convert</li>
+<li>i,j,k,t are the unit basis vectors for the child space<ul>
+<li>t is the translation of the child coordinate system
+relative to the parent space</li>
+</ul>
+</li>
+<li><p>Mc-&gt;p = change of basis matrix
+<img src="changeofbasis.png" alt="Change of basis matrix"></p>
+</li>
+<li><p>Given any affine 4x4 transform matrix, you can
+extract the child space basis vectors be isolating
+the appropriate row (if in the row format as shown above)
+or column</p>
+</li>
+</ul>
+<h2 id="transforming-normal-vectors">transforming normal vectors</h2>
+<ul>
+<li>Normals are transformed from space A to B by the
+transpose of the inverse of the matrix shown
+above (given change of basis matrix Ma-&gt;b, the
+normal transformation matrix is 
+(Ma-&gt;b<sup>-1</sup>)<sup>T</sup>)</li>
+</ul>
+<h2 id="quaternions">Quaternions</h2>
+<ul>
+<li>Alternative and simpler way to represent rotations</li>
+<li>Looks like a 4d vector but behaves differently</li>
+<li>q = [qx qy qz qw]<ul>
+<li>alternative representations:</li>
+<li>q = [qv qs] (qv is the vector part, qs is a scalar)</li>
+</ul>
+</li>
+<li>Unit length quaternions represent 3d rotations<ul>
+<li>qx*qx + qy*qy + qz*qz + qw*qw = 1</li>
+</ul>
+</li>
+</ul>
+<h2 id="quaternion-multiplication-grassman-product-">Quaternion multiplication (grassman product)</h2>
+<ul>
+<li>pq = [(ps*qv + qs*pv + cross(pv,qv)) (ps*qs - dot(pv,qv))]<ul>
+<li>the left part results in a vector</li>
+<li>the right part results in a scalar</li>
+</ul>
+</li>
+</ul>
+<h2 id="quaternion-inverse-conjugate">Quaternion inverse/conjugate</h2>
+<ul>
+<li>conjugate = q<sup>*</sup> = [-qv qs]</li>
+<li>inverse = q<sup>-1</sup> = q<sup>*</sup>/|q|<sup>2</sup><ul>
+<li>In our case, using unit length quaternions,
+|q|<sup>2</sup> = 1, so inverse = conjugate</li>
+</ul>
+</li>
+<li>(pq)<sup>*</sup> = q<sup>*</sup>p<sup>*</sup></li>
+<li>(pq)<sup>-1</sup> = q<sup>-1</sup>p<sup>-1</sup></li>
+</ul>
+<h2 id="rotating-a-vector-with-a-quaternion">Rotating a vector with a quaternion</h2>
+<ul>
+<li>Convert vector v into quaternion form<ul>
+<li>for a 3d vec, add a fourth w component = 0</li>
+<li>v quaternion = [vx vy vz 0]</li>
+</ul>
+</li>
+<li>multiply by the quaternion</li>
+<li>multiply by its inverse</li>
+<li>result quaternion v&#39; = qv<sub>quat</sub>q<sup>-1</sup><ul>
+<li>extract the first 3 components of v&#39; back into vector
+form</li>
+</ul>
+</li>
+<li>Multiplcations can be concatenated/combined into a single
+quaternion like matrix multiplications<ul>
+<li>e.g. Rnet = R3*R2*R1</li>
+<li>v&#39; = q3q2q1v<sub>quat</sub>q1<sup>-1</sup>q2<sup>-1</sup>q3<sup>-1</sup></li>
+</ul>
+</li>
+</ul>
+<h2 id="quaternions-to-rotation-matrix">Quaternions to Rotation matrix</h2>
+<ul>
+<li>Can be converted to and from 3d rotation matrix rep:
+<img src="quat_to_mat.png" alt="Quaternion to matrix"></li>
+</ul>
+<h2 id="rotational-linear-interpolation">Rotational Linear Interpolation</h2>
+<ul>
+<li>Can find a quaternion point between two other quaternions via LERP:
+<img src="qlerp.png" alt="Quaternion LERP"></li>
+<li>Results in the weighted average between qA and qB (&Beta; percent
+between qA and qB)</li>
+</ul>
+<h2 id="spherical-linear-interpolation">Spherical Linear Interpolation</h2>
+<ul>
+<li>Spherical Linear Interpolation: SLERP
+<img src="qslerp.png" alt="Quaternion SLERP"></li>
+<li>On PS3 SPUs, Naughty Dog&#39;s Ice Team&#39;s SLERP implementation
+takes 20 cycles per joint, while LERP takes 16.25 cycles per
+joint.</li>
+<li>SLERP as opposed to LERP can result in better looking animations</li>
+<li>However LERP is usually good enough for most purposes</li>
+</ul>
+<h2 id="euler-angles">Euler Angles</h2>
+<ul>
+<li>[&theta;y &theta;p &theta;r] = yaw, pitch, roll</li>
+<li>Cannot be easily interpolated</li>
+<li>Gimbal lock: 90 degree rotation causes 1 of the axis to collapse
+onto one of the other axis</li>
+<li>Order in which the axis are rotated matters, e.g. Pitch,Yaw,then Roll
+will result differently than Yaw,Pitch,then Roll</li>
+<li>3x3 rotation matrices are not intuitive in terms of understanding
+the transformation, and cannot be easily interpolated.</li>
+<li>3x3 rotation matrices take up 9 float numbers as opposed to
+3 float numbers for euler angles</li>
+</ul>
+<h2 id="axis-angle-representation">Axis+Angle representation</h2>
+<ul>
+<li>A unit vector representing axis (x,y,z) then the angle =
+[ax ay az &theta;]</li>
+<li>Cannot be easily interpolated</li>
+</ul>
+<h2 id="srt-transformation">SRT Transformation</h2>
+<ul>
+<li>Combines quaternions (rotation representation) with 
+a translation vector and scale factor, resulting
+in an alternative to 4x4 affine transformation matrices</li>
+<li>SRT = scale, rotation, translation</li>
+<li>Alternatively, SQT = scale, quaternion, translation</li>
+<li>SRT = [s q <strong>t</strong>], where s is either a single scale value
+or a nonuniform scale vector <strong>s</strong></li>
+<li>either 8 floats (uniform scalar) or 10 floats (nonuniform),
+as opposed to 12 floats for a 4x3 matrix</li>
+<li>easily interpolated</li>
+</ul>
+<h2 id="pseudo-random-number-generation">Pseudo-Random number generation</h2>
+<ul>
+<li>Linear Congruential Generator<ul>
+<li>Sometimes used in C-library rand() function</li>
+<li>Not very high quality </li>
+</ul>
+</li>
+<li>Mersenne Twister<ul>
+<li>Very large period before repeats: 2<sup>19937</sup>-1</li>
+<li>High distribution</li>
+<li>Passes statistical randomness tests</li>
+<li>Fast</li>
+<li><a href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index.htm">http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index.htm</a></li>
+</ul>
+</li>
+<li>Mother of All Pseudo-Random, Xorshift, KISS99<ul>
+<li>Simpler than Mersenne, period of 2<sup>250</sup></li>
+<li>Xorshift: faster than Mother-of</li>
+<li>KISS: series collectively known as keep it simple stupid</li>
+<li><a href="http://en.wikipedia.org/wiki/George_Marsaglia">http://en.wikipedia.org/wiki/George_Marsaglia</a></li>
+<li>ftp://ftp.forth.org/pub/C/mother.c</li>
+<li><a href="http://www.agner.org/random">http://www.agner.org/random</a></li>
+<li><a href="http://www.jstatsoft.org/v08/i14/paper">http://www.jstatsoft.org/v08/i14/paper</a></li>
+</ul>
+</li>
+<li>PCG<ul>
+<li>Combines congruential (CG) with permutation functions (P)</li>
+<li><a href="http://www.pcg-random.org">http://www.pcg-random.org</a>    </li>
+</ul>
+</li>
+</ul>
+</body>
+</html>

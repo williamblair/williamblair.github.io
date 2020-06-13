@@ -147,4 +147,75 @@
 * Can be converted to and from 3d rotation matrix rep:
   ![Quaternion to matrix](quat_to_mat.png)
 
+## Rotational Linear Interpolation
+
+* Can find a quaternion point between two other quaternions via LERP:
+  ![Quaternion LERP](qlerp.png)
+* Results in the weighted average between qA and qB (&Beta; percent
+  between qA and qB)
+
+## Spherical Linear Interpolation
+
+* Spherical Linear Interpolation: SLERP
+  ![Quaternion SLERP](qslerp.png)
+* On PS3 SPUs, Naughty Dog's Ice Team's SLERP implementation
+  takes 20 cycles per join, while LERP takes 16.25 cycles per
+  joint.
+* SLERP as opposed to LERP can result in better looking animations
+* However LERP is usually good enough for most purposes
+
+## Euler Angles
+
+* \[&theta;y &theta;p &theta;r\] = yaw, pitch, roll
+* Cannot be easily interpolated
+* Gimbal lock: 90 degree rotation causes 1 of the axis to collapse
+  onto one of the other axis
+* Order in which the axis are rotated matters, e.g. Pitch,Yaw,then Roll
+  will result differently than Yaw,Pitch,then Roll
+* 3x3 rotation matrices are not intuitive in terms of understanding
+  the transformation, and cannot be easily interpolated.
+* 3x3 rotation matrices take up 9 float numbers as opposed to
+  3 float numbers for euler angles
+  
+## Axis+Angle representation
+
+* A unit vector representing axis (x,y,z) then the angle =
+  \[ax ay az &theta;\]
+* Cannot be easily interpolated
+
+## SRT Transformation
+
+* Combines quaternions (rotation representation) with 
+  a translation vector and scale factor, resulting
+  in an alternative to 4x4 affine transformation matrices
+* SRT = scale, rotation, translation
+* Alternatively, SQT = scale, quaternion, translation
+* SRT = [s q **t**], where s is either a single scale value
+  or a nonuniform scale vector **s**
+* either 8 floats (uniform scalar) or 10 floats (nonuniform),
+  as opposed to 12 floats for a 4x3 matrix
+* easily interpolated
+
+## Pseudo-Random number generation
+
+* Linear Congruential Generator
+    * Sometimes used in C-library rand() function
+    * Not very high quality 
+* Mersenne Twister
+    * Very large period before repeats: 2<sup>19937</sup>-1
+    * High distribution
+    * Passes statistical randomness tests
+    * Fast
+    * http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/SFMT/index.htm
+* Mother of All Pseudo-Random, Xorshift, KISS99
+    * Simpler than Mersenne, period of 2<sup>250</sup>
+    * Xorshift: faster than Mother-of
+    * KISS: series collectively known as keep it simple stupid
+    * http://en.wikipedia.org/wiki/George_Marsaglia
+    * ftp://ftp.forth.org/pub/C/mother.c
+    * http://www.agner.org/random
+    *  http://www.jstatsoft.org/v08/i14/paper
+* PCG
+    * Combines congruential (CG) with permutation functions (P)
+    * http://www.pcg-random.org    
 
