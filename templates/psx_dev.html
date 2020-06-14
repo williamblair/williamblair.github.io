@@ -685,6 +685,224 @@ and can play the video through mc32 just fine:
 
 <p>Perhaps I can try converting my own videos (must be avi ...)</p>
 
+<h3>06/13/2020</h3>
+
+<p>Starting to put what I've been learning from "Intro to MIPS Assembly Language Programming" 
+to use - I got a minimum assembly language program to compile and run with NO$PSX using
+PSn00bSDK/mipsel-unknown-elf-gcc.</p>
+
+<p>First, starting with the basic-of-basics hello world c program:</p>
+<pre><code>
+int main(void)
+{
+    return 0;
+}
+</code></pre>
+
+<p>If we ONLY compile it (no assembling or linking) using the -S option with GCC:</p>
+<pre><code>
+mipsel-unknown-elf-gcc -g -O2 -fno-builtin -fdata-sections -ffunction-sections \
+                        -I../../../libpsn00b/include \
+                        -I/d/mipsel-unknown-elf/lib/gcc/mipsel-unknown-elf/7.4.0/include \
+                        -S hello.c -o hello.s
+</code></pre>
+
+<p>We get the following assembly program:</p>
+
+<pre><code>
+	.section .mdebug.abi32
+	.previous
+	.nan	legacy
+	.module	softfloat
+	.module	nooddspreg
+	.text
+$Ltext0:
+	.cfi_sections	.debug_frame
+	.section	.text.startup.main,"ax",@progbits
+	.align	2
+	.globl	main
+$LFB0 = .
+	.file 1 "hello.c"
+	.loc 1 4 0
+	.cfi_startproc
+	.set	nomips16
+	.set	nomicromips
+	.ent	main
+	.type	main, @function
+main:
+	.frame	$sp,0,$31		# vars= 0, regs= 0/0, args= 0, gp= 0
+	.mask	0x00000000,0
+	.fmask	0x00000000,0
+	.set	noreorder
+	.set	nomacro
+	.loc 1 6 0
+	jr	$31
+	move	$2,$0
+
+	.set	macro
+	.set	reorder
+	.end	main
+	.cfi_endproc
+$LFE0:
+	.size	main, .-main
+	.text
+$Letext0:
+	.section	.debug_info,"",@progbits
+$Ldebug_info0:
+	.4byte	0x3e
+	.2byte	0x4
+	.4byte	$Ldebug_abbrev0
+	.byte	0x4
+	.uleb128 0x1
+	.4byte	$LASF0
+	.byte	0xc
+	.4byte	$LASF1
+	.4byte	$LASF2
+	.4byte	$Ldebug_ranges0+0
+	.4byte	0
+	.4byte	$Ldebug_line0
+	.uleb128 0x2
+	.4byte	$LASF3
+	.byte	0x1
+	.byte	0x3
+	.4byte	0x3a
+	.4byte	$LFB0
+	.4byte	$LFE0-$LFB0
+	.uleb128 0x1
+	.byte	0x9c
+	.uleb128 0x3
+	.byte	0x4
+	.byte	0x5
+	.ascii	"int\000"
+	.byte	0
+	.section	.debug_abbrev,"",@progbits
+$Ldebug_abbrev0:
+	.uleb128 0x1
+	.uleb128 0x11
+	.byte	0x1
+	.uleb128 0x25
+	.uleb128 0xe
+	.uleb128 0x13
+	.uleb128 0xb
+	.uleb128 0x3
+	.uleb128 0xe
+	.uleb128 0x1b
+	.uleb128 0xe
+	.uleb128 0x55
+	.uleb128 0x17
+	.uleb128 0x11
+	.uleb128 0x1
+	.uleb128 0x10
+	.uleb128 0x17
+	.byte	0
+	.byte	0
+	.uleb128 0x2
+	.uleb128 0x2e
+	.byte	0
+	.uleb128 0x3f
+	.uleb128 0x19
+	.uleb128 0x3
+	.uleb128 0xe
+	.uleb128 0x3a
+	.uleb128 0xb
+	.uleb128 0x3b
+	.uleb128 0xb
+	.uleb128 0x27
+	.uleb128 0x19
+	.uleb128 0x49
+	.uleb128 0x13
+	.uleb128 0x11
+	.uleb128 0x1
+	.uleb128 0x12
+	.uleb128 0x6
+	.uleb128 0x40
+	.uleb128 0x18
+	.uleb128 0x2117
+	.uleb128 0x19
+	.byte	0
+	.byte	0
+	.uleb128 0x3
+	.uleb128 0x24
+	.byte	0
+	.uleb128 0xb
+	.uleb128 0xb
+	.uleb128 0x3e
+	.uleb128 0xb
+	.uleb128 0x3
+	.uleb128 0x8
+	.byte	0
+	.byte	0
+	.byte	0
+	.section	.debug_aranges,"",@progbits
+	.4byte	0x1c
+	.2byte	0x2
+	.4byte	$Ldebug_info0
+	.byte	0x4
+	.byte	0
+	.2byte	0
+	.2byte	0
+	.4byte	$LFB0
+	.4byte	$LFE0-$LFB0
+	.4byte	0
+	.4byte	0
+	.section	.debug_ranges,"",@progbits
+$Ldebug_ranges0:
+	.4byte	$LFB0
+	.4byte	$LFE0
+	.4byte	0
+	.4byte	0
+	.section	.debug_line,"",@progbits
+$Ldebug_line0:
+	.section	.debug_str,"MS",@progbits,1
+$LASF1:
+	.ascii	"hello.c\000"
+$LASF0:
+	.ascii	"GNU C11 7.4.0 -msoft-float -g -O2 -fno-builtin -fdata-se"
+	.ascii	"ctions -ffunction-sections\000"
+$LASF2:
+	.ascii	"D:\\Programming\\psx\\psn00bsdk\\examples\\bj_progs\\asm"
+	.ascii	"1\000"
+$LASF3:
+	.ascii	"main\000"
+	.ident	"GCC: (GNU) 7.4.0"
+</code></pre>
+
+<p>I think its interesting to note the metadata inserted by the compiler such as the file
+location and compiler version. We can strip all of this down to a kind of mimium next
+(I added the infinite loop just so I could try and run it on an emulator):</p>
+
+<pre><code>
+    .section .text
+    .globl main
+    .ent main
+    .type main, @function
+main:
+	.frame	$sp,0,$31		# vars= 0, regs= 0/0, args= 0, gp= 0
+	.mask	0x00000000,0
+	.fmask	0x00000000,0
+
+   
+# forever loop
+infloop:
+    li      $v0, 4
+    li      $v1, 76
+    b       infloop 
+
+    .end    main           # mark end of main function
+</code></pre>
+
+
+<p>Finally, after finishing the compilation using our minimal asm program,
+we can trace the code while running it on NO$PSX:</p>
+
+<figure>
+<img src="../images/no_psx_basic_asm.png"/>
+<figcaption>I set a breakpoint in NO$PSX to 0x80010000, the program entry point for PSX
+programs. There we can see the to load instructions and the branch back to the infinite loop.
+The affected $v0 and $v1 registers as expected have the appropriate numbers in them (in hex)
+in the top right!</figcaption>
+</figure>
+
 </div> <!-- contentDiv -->
 
 </div> <!-- bodyDiv -->
