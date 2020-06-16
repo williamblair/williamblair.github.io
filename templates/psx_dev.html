@@ -903,8 +903,34 @@ The affected $v0 and $v1 registers as expected have the appropriate numbers in t
 in the top right!</figcaption>
 </figure>
 
-</div> <!-- contentDiv -->
+<h3>06/16/2020</h3>
 
+<p>Further into MIPs assembly - Now I have a blue screen :). Following Peter Lemon's PSX
+assembly (although he uses a different assembler). Basically there are two registers for the 
+GPU: GP0 and GP1 that you write to in order to give the GPU commands, such as setting
+screen info and drawing primitives. In NO$PSX, the status of the two registers is shown
+in the I/O map window under the GPU tab:</p>
+
+<figure>
+<img src="../images/psx_asm_bluescreen_iomap.png"/>
+<figcaption>NO$PSX GP0 and GP1 register status</figcaption>
+</figure>
+
+<p>An example command is GPU reset, where GPURESET = 0x00&lt;&lt;24, GP1 = 0x1814, IO_BASE = 0x1F800000:</p>
+<pre><code># Write GP1 - Reset GPU
+    li $t0, GPURESET + (0 & 0xFFFFFF) # command = GPURESET, parameter = 0
+    sw $t0, GP1($a0) # $a0 = IO_BASE
+</code></pre>
+
+<p>After initializing the GPU via writing to GP1, then sending render commands to GP0,
+we get the following blue screen</p>
+
+<figure>
+<img src="../images/psx_asm_bluescreen.png"/>
+<figcaption>Infinite blue screen drawing with assembly</figcaption>
+</figure>
+
+</div> <!-- contentDiv -->
 </div> <!-- bodyDiv -->
 
 </body>
