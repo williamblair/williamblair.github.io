@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+  <meta charset="utf-8"/>
+  <title>Chapter 8</title>
+<head>
+</head>
+<body>
+<h2 id="frame-based-vs-time-based-events">Frame Based vs Time Based Events</h2>
+<ul>
+<li>Use time based!!! Bad to have game speed be dependant
+on frame rate as the game will run differently depending
+on your machine</li>
+<li>Modern CPUs have high resolution clocks to base time off of</li>
+<li>Can also calculate time based on number of CPU ticks and CPU 
+frequency (e.g. 100 Ticks @ 3 Hz = 100 Ticks @ 3 Ticks/sec = ~33 Seconds)</li>
+</ul>
+<h2 id="event-system">Event System</h2>
+<ul>
+<li>If you store game changes via events (e.g. movement, collision, etc.),
+you can store and replay the gameplay by storing all of the events and
+game starting state<ul>
+<li>You can then play back at any speed you want, as long as you have control
+of the game speed (i.e. not frame rate based), which is useful for debugging</li>
+</ul>
+</li>
+</ul>
+<h2 id="managing-breakpoints">Managing Breakpoints</h2>
+<ul>
+<li><p>Its important to handle the case of breakpoints, otherwise the program
+will likely crash and burn when resuming, assuming the timer/frame
+system hasn&#39;t stopped</p>
+<pre><code>  <span class="hljs-comment">// If dt is too large, we must have resumed from a </span>
+  <span class="hljs-comment">// breakpoint; in this case frame-lock the target rate</span>
+  <span class="hljs-comment">// for this frame</span>
+  <span class="hljs-keyword">if</span> (delta_time &gt; <span class="hljs-number">1.0f</span>)
+  {
+    delta_time = <span class="hljs-number">1.0f</span>/<span class="hljs-number">30.0</span>F;
+  }
+</code></pre></li>
+</ul>
+<h2 id="game-job-system">Game Job System</h2>
+<ul>
+<li><p>To make use of multithreading, suggested to use a thread pool
+job system</p>
+<pre><code>  <span class="hljs-keyword">namespace</span> job
+  {
+  <span class="hljs-comment">// signature of all job entry points</span>
+  <span class="hljs-function"><span class="hljs-keyword">typedef</span> <span class="hljs-keyword">void</span> <span class="hljs-title">EntryPoint</span><span class="hljs-params">(<span class="hljs-keyword">uintptr_t</span> param)</span></span>;
+  <span class="hljs-comment">// allowable priorities</span>
+  <span class="hljs-keyword">enum</span> <span class="hljs-keyword">class</span> Priority
+  {
+      LOW, NORMAL, HIGH, CRITICAL
+  };
+  <span class="hljs-comment">// counter (implementation not shown)</span>
+  <span class="hljs-keyword">struct</span> Counter ... ;
+  <span class="hljs-function">Counter* <span class="hljs-title">AllocCounter</span><span class="hljs-params">()</span></span>;
+  <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">FreeCounter</span><span class="hljs-params">(Counter* pCounter)</span></span>;
+  <span class="hljs-comment">// simple job declaration</span>
+  <span class="hljs-keyword">struct</span> Declaration
+  {
+      EntryPoint *m_pEntryPoint; 
+      <span class="hljs-keyword">uintptr_t</span> m_param;
+      Priority m_priority;
+      Counter* m_pCounter;
+  };
+  <span class="hljs-comment">// kick a job</span>
+  <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">KickJob</span><span class="hljs-params">(<span class="hljs-keyword">const</span> Declaration&amp; decl)</span></span>;
+  <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">KickJobs</span><span class="hljs-params">(<span class="hljs-keyword">int</span> count, <span class="hljs-keyword">const</span> Declaration aDecl[])</span></span>;
+  <span class="hljs-comment">// wait for job to terminate (for its Counter to become zero)</span>
+  <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">WaitForCounter</span><span class="hljs-params">(Counter* pCounter)</span></span>;
+  <span class="hljs-comment">// kick jobs and wait for completion</span>
+  <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">KickJobAndWait</span><span class="hljs-params">(<span class="hljs-keyword">const</span> Declaration&amp; decl)</span></span>;
+  <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">KickJobsAndWait</span><span class="hljs-params">(<span class="hljs-keyword">int</span> count, <span class="hljs-keyword">const</span> Declaration aDecl[])</span></span>;
+
+  <span class="hljs-function"><span class="hljs-keyword">void</span>* <span class="hljs-title">JobWorkerThread</span><span class="hljs-params">(<span class="hljs-keyword">void</span>*)</span>
+  </span>{
+      <span class="hljs-comment">// keep on running jobs forever...</span>
+      <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>)
+      {
+          Declaration declCopy;
+          <span class="hljs-comment">// wait for a job to become available</span>
+          pthread_mutex_lock(&amp;g_mutex);
+          <span class="hljs-keyword">while</span> (!g_ready)
+          {
+              pthread_cond_wait(&amp;g_jobCv, &amp;g_mutex);
+          }
+          <span class="hljs-comment">// copy the JobDeclaration locally and</span>
+          <span class="hljs-comment">// release our mutex lock</span>
+          declCopy = GetNextJobFromQueue();
+          pthread_mutex_unlock(&amp;g_mutex);
+          <span class="hljs-comment">// run the job</span>
+          declCopy.m_pEntryPoint(declCopy.m_param);
+          <span class="hljs-comment">// job is done! rinse and repeat...</span>
+      }
+  }
+
+  }
+  <span class="hljs-comment">// example usage</span>
+  <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">NpcThinkJob</span><span class="hljs-params">(<span class="hljs-keyword">uintparam_t</span> param)</span>
+  </span>{
+      Npc* pNpc = <span class="hljs-keyword">reinterpret_cast</span>&lt;Npc*&gt;(param);
+      pNpc-&gt;StartThinking();
+      pNpc-&gt;DoSomeMoreUpdating();
+      <span class="hljs-comment">// ...</span>
+
+      <span class="hljs-comment">// BAD! calling another job/thread won't work:</span>
+          <span class="hljs-comment">// now let's cast a ray to see if we're aiming</span>
+          <span class="hljs-comment">// at anything interesting -- this involves</span>
+          <span class="hljs-comment">// kicking off another job that will run on</span>
+          <span class="hljs-comment">// a different code (worker thread)</span>
+      RayCastHandle hRayCast = CastGunAimRay(pNpc);
+      <span class="hljs-comment">// the results of the ray cast aren't going to</span>
+      <span class="hljs-comment">// be ready until later this frame, so let's</span>
+      <span class="hljs-comment">// go to sleep until it's ready</span>
+      WaitForRayCast(hRayCast);
+      <span class="hljs-comment">// zzz...</span>
+      <span class="hljs-comment">// wake up!</span>
+      <span class="hljs-comment">// now fire my weapon, but only if the ray</span>
+      <span class="hljs-comment">// cast indicates that we are aiming at an</span>
+      <span class="hljs-comment">// enemy</span>
+      pNpc-&gt;TryFireWeaponAtTarget(hRayCast);
+  }
+</code></pre></li>
+<li>Note that in this version, a job cannot sleep/block/call another job,
+as that would cause call stack issues</li>
+<li>To handle this, use coroutines/fibers/job counters<ul>
+<li>Job counters are like semaphores in that they have a Count, and 
+when the count goes to zero that means all sub-jobs (called by
+the current job) and the current job have finished</li>
+</ul>
+</li>
+<li>Recommend using spin locks instead of regular sleeping/blocking
+locks, otherwise the entire current job-thread will go to sleep</li>
+<li>Recommend implementing visualization and profiling tools for the
+system otherwise its very hard to debug<ul>
+<li>Naughty dog job system has visual tool which shows each cpu core
+and color-coded jobs ran:
+<img src="thread_vis.png" alt="Naughty Dog Job Visualization"></li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>For an excellent in-depth discussion of how the Naughty Dog job sys-
+tem was built, and why it was built that way, check out Christian Gyrling’s
+excellent GDC 2015 talk entitled, “Parallelizing the Naughty Dog Engine,”
+which is available at <a href="https://bit.ly/2H6v0J4">https://bit.ly/2H6v0J4</a>. Christian’s slides are available
+at <a href="https://bit.ly/2ETr5x9">https://bit.ly/2ETr5x9</a>.</p>
+</blockquote>
+</body>
+</html>
