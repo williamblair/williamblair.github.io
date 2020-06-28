@@ -1,0 +1,100 @@
+## Logging
+* Can log to separate channels, for example one channel for each
+  subsystem
+  * 'Channels' can be different color printouts, separate files, 
+  separate TTY consoles, etc.
+  * Naughty Dog uses http://redis.io to log to a web based interface
+* Use log verbosity to control how much debug info is printed out
+* Can use bitmasks to set the log channel or verbosity (1 bit per channel/
+  verbosity)
+  * Test if to print out the log message if the bit for that level is
+    enabled
+* Important to 'flush' printouts to files to ensure the last message before
+  crashes are actually logged
+  * However, flushing can be expensive so there is a tradeoff
+
+## Debug Drawing
+* Useful to have support for simple drawing primitives to aid in 
+  graphical debugging, especially in 3d, such as
+  * lines
+  * spheres
+  * points (small cross/box as single pixel difficult to see)
+  * coordinate axis (x,y,z pointing lines)
+  * bounding boxes
+  * formatted text
+* Example images:
+![Debug Draw Image 1](debug_img_1.png)
+![Debug Draw Image 2](debug_img_2.png)
+![Debug Draw Image 3](debug_img_3.png)
+![Debug Draw Image 4](debug_img_4.png)
+
+## In Game Menu/Debug Console
+* Useful to have HUD or in-game console to toggle flags, run game in
+  slow motion, set values, execute commands, etc.
+* Usually bringing up the HUD pauses the game, then unpauses after exiting
+  the menu
+![Debug Menu Image 4](debug_menu_1.png)
+
+## In Game Time-profiling/FPS calc
+* For testing the speeds of various functions or code sections
+  * Can implement hierarchical programming 
+   (Call-stack, e.g. function a calls function b, etc.)
+  * This is helpful to narrow down high-cpu functions from top level
+* Useful to break down both number of times called and time spent in call
+  call
+  * determine if number of calls is low but CPU time high, or 
+  * number of calls high but CPU time low
+* Example impl:
+
+		while !(quitGame)
+		{
+			{
+				PROFILE(SID("Poll Joypad"));
+				PollJoypad();
+			}
+			{
+				PROFILE(SID("Game Object Update"));
+				UpdateGameObjects();
+			}
+			{
+				PROFILE(SID("Physics"));
+				Physics();
+			}
+			...
+		}
+
+		struct AutoProfile
+		{
+			AutoProfile(const char *name)
+			{
+				m_name = name;
+				m_startTime = getTime();
+			}
+			~AutoProfile()
+			{
+				m_stopTime = getTime();
+				m_totalTime = m_stopTime - m_startTime;
+				
+				g_profileManager.storeSample(m_name, m_totalTime);
+			}
+		}
+
+## Memory Usage Tracking
+
+* This is hard
+* Things to think about:
+  * Controlling/Tracking memory in third party libraries
+  * Video Memory vs. System RAM memory
+  * Memory allocators/types
+    * E.g. our custom stack allocators or other types discussed earlier
+* On consoles, SDKs can come with more memory than is acually available
+  on the system
+  * In this case, must keep track of when memory would run out on a real
+    system
+![Naughty Dog Memory Display 1](memory_1.png)
+![Naughty Dog Memory Display 2](memory_2.png)
+
+## Other useful in-game debugging
+* Cheats, such as making your character free-fly around the level
+* Unlimited Ammo/Invincibility
+* Screen shots or gameplay recording
