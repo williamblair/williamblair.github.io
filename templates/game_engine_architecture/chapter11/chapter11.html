@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Chapter 11</title>
+</head>
+<body>
+<h2 id="why-triangle-meshes-">Why Triangle Meshes?</h2>
+<ul>
+<li>Simplest Type of Polygon</li>
+<li>Always planar (3 vertices always form a plane)</li>
+<li>Mostly always remain triangles after transformations (at worst becomes line segment)</li>
+<li>Most graphics hardware designed around triangles</li>
+</ul>
+<h2 id="triangle-edges-and-face-normal">Triangle edges and face normal</h2>
+<ul>
+<li>e1,2 = p2 - p1</li>
+<li>e1,3 = p3 - p1</li>
+<li>e2,3 = p3 - p2</li>
+<li>N = e1,2 x e1,3 / |e1,2 x e1,3|<ul>
+<li>(cross product and vector length)</li>
+</ul>
+</li>
+<li><img src="tri_face_normal.png" alt="Triangle Plane and Face Normal"></li>
+</ul>
+<p>Back faced normals are culled (not drawn) based on winding order:
+whether the vertices are defined in clockwise or counter-clockwise order</p>
+<h2 id="coordinate-spaces-model-space-local-space-object-space">Coordinate Spaces: Model Space/Local Space/Object Space</h2>
+<ul>
+<li>Origin/Center point 0,0,0 is the center of the current model/object or another
+point relative to that object</li>
+<li>Axes Front, Left, Right (<strong>F</strong>,<strong>L</strong>,<strong>R</strong>) are defined as basis vectors 
+<strong>i</strong>,<strong>j</strong>, and <strong>k</strong>, e.g.
+<strong>L</strong> = <strong>i</strong>, <strong>U</strong> = <strong>j</strong>, <strong>F</strong> = <strong>k</strong></li>
+</ul>
+<h2 id="coordinate-spaces-world-space">Coordinate Spaces: World Space</h2>
+<ul>
+<li>Center coordinates 0,0,0 relative to the total/entire drawing scene</li>
+<li>Model to World Matrix, a.k.a the world matrix<ul>
+<li><img src="model_to_world_mat.png" alt="Model to World Matrix"></li>
+<li>Upper Left 3x3 mat RS is the rotate and scale matrix, then bottom left tm
+vector is translation from model space expressed in world space</li>
+</ul>
+</li>
+<li>Model to World matrix using model space unit vectors i,j,k from above,<ul>
+<li><img src="model_to_world_ijk.png" alt="World Matrix using model i,j,k"></li>
+</ul>
+</li>
+<li>Translating a vertex from model to world space using this world matrix:<ul>
+<li><strong>v</strong><sub>w</sub> = <strong>v</strong><sub>m</sub><strong>M</strong><sub>w</sub></li>
+</ul>
+</li>
+</ul>
+<h2 id="light-object-interactions">Light-Object interactions</h2>
+<p>Light can be:</p>
+<ul>
+<li>absorbed</li>
+<li>reflected</li>
+<li>transmitted via refraction (bent while going through an object)</li>
+<li>diffracted (when going through a small opening)</li>
+</ul>
+<p>Sub-surface scattering: light enters and object, bounces around, then
+exits at a different location and angle. Gives skin, wax, marble their
+warm appearance</p>
+<h2 id="vertex-attributes-possible-data-included-for-each-vertex-">Vertex Attributes (possible data included for each vertex)</h2>
+<ul>
+<li>Position vector</li>
+<li>Vertex Normal</li>
+<li>Vertex tangent and bitangent<ul>
+<li>When combined with the vertex normal, defines &#39;tangent space&#39;, used
+for per-pixel calculations like normal and environment mapping</li>
+</ul>
+</li>
+<li>Diffuse Color</li>
+<li>Specular Color</li>
+<li>Texture coordinates (u,v)<ul>
+<li>0,0 is bottom left and 1,1 is top right</li>
+</ul>
+</li>
+<li>Skinning weights (k,w)<ul>
+<li>for skeletal animation: vertices are attached to a joint via index k,
+with each joint weighted influence w</li>
+</ul>
+</li>
+</ul>
+<h2 id="gouraud-shading">Gouraud shading</h2>
+<ul>
+<li>Shading on a per-vertex basis, coloring pixels in-between interpolated</li>
+</ul>
+<h2 id="texture-types">Texture Types</h2>
+<ul>
+<li>Diffuse map/Albedo map<ul>
+<li>Contains the diffuse color at each texel</li>
+</ul>
+</li>
+<li>Normal Map<ul>
+<li>stores unit normal vectors at each texel as RGB values</li>
+</ul>
+</li>
+<li>Gloss Map<ul>
+<li>how shiny a surface should be at each texel</li>
+</ul>
+</li>
+<li>Environment Map<ul>
+<li>picture of the surrounding environment for reflection rendering</li>
+</ul>
+</li>
+</ul>
+<h2 id="mip-mapping">Mip-mapping</h2>
+<ul>
+<li>Making smaller versions of the texture, half the size each time, for use
+when rendering the textured surface further away</li>
+<li><img src="mip_mapping.png" alt="Mip Mapping Example"></li>
+</ul>
+<h2 id="materials">Materials</h2>
+<ul>
+<li>Used to store all visual properties of a mesh<ul>
+<li>i.e. textures, shader programs to use, input params to shader, etc.</li>
+</ul>
+</li>
+<li>does NOT include vertex attributes - are instead paired with the material
+for the complete picture</li>
+</ul>
+<h2 id="lighting-models">Lighting Models</h2>
+<ul>
+<li>Lighting makes a huge difference in realism:<ul>
+<li>Just lighting
+<img src="lou_just_lighting.png" alt="Last of Us scene with just lighting"></li>
+<li>Without lighting
+<img src="lou_no_lighting.png" alt="Last of Us scene without lighting"></li>
+<li>With Lighting:
+<img src="lou_lighting.png" alt="Last of Us scene with lighting"></li>
+</ul>
+</li>
+<li>Direct lighting<ul>
+<li>light is emitted and bounces off a single object</li>
+<li>called &quot;local illumination models&quot; - objects do not affect each others
+appearance</li>
+</ul>
+</li>
+<li>Indirect Lighting<ul>
+<li>bounces off multiple objects</li>
+<li>called &quot;global illumination models&quot; - object affect each other as light
+bounces and hits others</li>
+<li>ray tracing and radiosity methods are examples</li>
+</ul>
+</li>
+</ul>
+<h2 id="phong-lighting">Phong lighting</h2>
+<ul>
+<li>most common local lighting (local illumination) method</li>
+<li>Uses the following vertex attributes:<ul>
+<li>ambient: overall lighting level</li>
+<li>diffuse: main color of the object when light is reflected off it</li>
+<li>specular: bright hilights for shiny objects</li>
+</ul>
+</li>
+<li><img src="phong_lighting.png" alt="Phong Diagram"></li>
+<li>Uses the following values:<ul>
+<li>view direction vector V</li>
+<li>Ambient intensity A</li>
+<li>surface normal N</li>
+<li>ambient reflectivity, diffuse reflectivity, specular reflectivity, glossiness
+exponent &alpha;</li>
+<li>light color intensity Ci, direction vector Li from reflectino point to light source<ul>
+<li>one i for each light source</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><img src="phong_diagram.png" alt="Phong Diagram"></li>
+</ul>
+<h2 id="bi-directional-reflection-distribution-function-brdf-">Bi-directional Reflection Distribution Function (BRDF)</h2>
+<ul>
+<li>Terms used by phong lighting are an example of this</li>
+<li>calculates ratio of reflected radiance (V) along 
+a view direction to incoming irradiance (L)</li>
+</ul>
+<h2 id="light-types">Light types</h2>
+<ul>
+<li>Static<ul>
+<li>light is pre-calculated and stored per-pixel in a light map</li>
+</ul>
+</li>
+<li>ambient<ul>
+<li>global/independant of position and directon, simply applied to all
+areas</li>
+</ul>
+</li>
+<li>Directional<ul>
+<li>like sun-rays; infinite distance but has direction</li>
+</ul>
+</li>
+<li>Point/omnidirectional<ul>
+<li>light emits in all directions from a single point</li>
+</ul>
+</li>
+<li>Spot light<ul>
+<li>emits rays in a cone-shape, like a flashlight; closer to center
+of cone the higher the light intensity</li>
+</ul>
+</li>
+<li>Area lights<ul>
+<li>lights that don&#39;t emit from a single point; instead from 
+an area</li>
+</ul>
+</li>
+<li>Emissive objects<ul>
+<li>such as glowing crystal ball, flames, etc.</li>
+<li>use emissive texture map, so the texture at the desired emit locations
+are always full intensity, such as a neon sign, car headlights</li>
+<li><img src="luigi_mansion.png" alt="Luigi Mansion Example"></li>
+</ul>
+</li>
+</ul>
+<h2 id="view-space-camera-space">View Space/Camera Space</h2>
+<ul>
+<li>Origin point is the &#39;camera&#39;</li>
+<li><img src="camera_space.png" alt="Camera Space Diagram"></li>
+<li>World to View space matrix is inverse of View to World space Matrix<ul>
+<li><img src="view_to_world_mat.png" alt="View to World Mat"></li>
+</ul>
+</li>
+<li>Can combine both model-to-world and world-to-view matrices in a single
+matrix:<ul>
+<li><img src="model_to_view.png" alt="Model to View space"></li>
+</ul>
+</li>
+</ul>
+<h2 id="perspective-and-orthographic-projection">Perspective and Orthographic projection</h2>
+<p><img src="ortho_diagram.png" alt="Orthographic Diagram">
+<img src="ortho_matrix.png" alt="Orthographic OpenGL Matrix">
+<img src="perspective_diagram.png" alt="Perspective Diagram">
+<img src="perspective_matrix.png" alt="Perspective OpenGL Matrix"></p>
+<h2 id="depth-buffering-z-buffering">Depth Buffering/Z Buffering</h2>
+<ul>
+<li>each fragment stores its depth in the depth buffer when its color is
+stored in the frame buffer</li>
+<li>When another fragment from a different triangle trys to draw at the same
+location, the depths are compared and the one that is smaller is stored</li>
+</ul>
+<h2 id="rendering-pipeline-stages">Rendering pipeline stages</h2>
+<ul>
+<li>The first two stages: tools (Creation of the assets) and the asset conditioning
+pipeline (ACP, conversion of formats and storage, etc.) are done before and outside
+of the actual program</li>
+<li><img src="rendering_pipeline.png" alt="Rendering pipeline diagram"></li>
+</ul>
+<h2 id="gpu-pipeline">GPU pipeline</h2>
+<p><img src="gpu_pipeline.png" alt="GPU Pipeline Diagram"></p>
+<h2 id="alpha-blending">Alpha Blending</h2>
+<ul>
+<li>Combines the color of two pixels based on the alpha of the incoming component
+(that is writing to the pixel with an existing color)<ul>
+<li><strong>C&#39;</strong><sub>D</sub> = A<sub>S</sub><strong>C</strong><sub>S</sub> + (1-A<sub>S</sub>)<strong>C</strong><sub>D</sub><ul>
+<li>S = source, D = destination</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="heterogeneous-system-architecture">Heterogeneous System Architecture</h2>
+<ul>
+<li>On playstation 4, AMD Jaguar System on a Chip (Soc)
+CPU and GPU share memory via heterogeneous
+unified memory architecture (hUMA)</li>
+<li>Shaders are given input via a shader resource
+table (SRT) that can be accessed by both CPU and GPU</li>
+</ul>
+<h2 id="non-heterogenous-shader-memory-registers-">Non-heterogenous shader memory (registers)</h2>
+<ul>
+<li>GPUs contain registers which are accessed by the shader</li>
+<li>128-bit SIMD format, allowing for 4 32-bit float values (a vec4) per register</li>
+<li>Input registers (incoming vertex data)</li>
+<li>Constant Registers (attributes such as model-view matrix)</li>
+<li>Temporary registers (internal calculations)</li>
+<li>Output registers (filled in by the shader, i.e. output pixel color)</li>
+<li>Texutre maps (read-only memory for the shader) via coordinates as oppsed to
+memory addresses</li>
+</ul>
+<h2 id="anti-aliasing-types">Anti-aliasing types</h2>
+<ul>
+<li>Full-Screen Antialiasing (FSAA)/Super-sampled antialiasing (SSAA)<ul>
+<li>Scene rendered first to frame buffer larger than the actual screen, then
+downsampled to actual screen size</li>
+<li>rarely used due to memory requirements and computation</li>
+</ul>
+</li>
+<li>Multisampled Antialiasing (MSAA)<ul>
+<li>focuses on the edges of triangles since that&#39;s where the jaggedness occurs</li>
+<li>uses subsamples based on a number of points (2,3,5,8 or 16)</li>
+<li><img src="msaa_diagram.png" alt="MSAA diagram"></li>
+</ul>
+</li>
+<li>Coverage Sample Anti-aliasing (CSAA)<ul>
+<li>optimization of MSAA</li>
+<li>pixel coverage test is performed for 16 &#39;coverage subsamples&#39; per fragment<ul>
+<li>gives quality of 16x MSAA with cost of 4x MSAA</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Morphological Anti-aliasing (MLAA)<ul>
+<li>focuses on scene points that suffer from AA</li>
+<li>scene rendered at normal size, then scanned to look for stair-stepped patterns
+then blurs those areas</li>
+</ul>
+</li>
+<li>Subpixel Morphological Anti-aliasing (SMAA)<ul>
+<li>combines morphological and multisamples AA that blurs less than MLAA</li>
+<li>Arguably best solution currently</li>
+<li><a href="http://www.iryoku.com/smaa/">http://www.iryoku.com/smaa/</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="application-stage-of-rendering-pipeline">Application stage of rendering pipeline</h2>
+<ul>
+<li>Visibility determination: don&#39;t submit non-visible objects for drawing in order
+to save performance<ul>
+<li>frustum culling</li>
+<li>occlusion and potentially visible sets</li>
+<li>portals/occlusion volumes (anti-portals)<ul>
+<li><img src="portals_diagram.png" alt="Portals Diagram"></li>
+<li><img src="antiportals_diagram.png" alt="Anti-portals diagram"></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>submit geometry to GPU for drawing<ul>
+<li>creates a GPU command list, i.e. &quot;set render state for material 1, submit prim A, submit prim B, ...&quot;</li>
+</ul>
+</li>
+<li>control shader parameters and render state</li>
+</ul>
+<h2 id="scene-graphs">Scene Graphs</h2>
+<ul>
+<li>Way to store objects in scene so that its easier to tell what and what not
+to submit to the GPU for drawing</li>
+<li>Usually some kind of tree structure</li>
+<li>Quadtrees/Octtrees<ul>
+<li><img src="quadtree_diagram.png" alt="Quadtree diagram"></li>
+</ul>
+</li>
+<li>Bounding Sphere trees</li>
+<li>BSP (binary space paritioning) tree<ul>
+<li><img src="bsp_diagram.png" alt="BSP diagram"></li>
+</ul>
+</li>
+</ul>
+<h2 id="when-to-use-a-scene-graph">When to use a scene graph</h2>
+<ul>
+<li>don&#39;t need one for mostly static environment like a fighting game</li>
+<li>mostly indoor environments: portal or BSP system</li>
+<li>mostly outdoors, flat terrain, from above: quad tree</li>
+<li>outdoors from person on ground with many objects: antiportal system</li>
+</ul>
+<h2 id="advanced-lighting">Advanced lighting</h2>
+<ul>
+<li><p>Image based lighting</p>
+<ul>
+<li>use 2d texture maps</li>
+<li>normal map: surface normal direction vector at each texel<ul>
+<li><img src="normal_map_example.png" alt="Normal Map Example"></li>
+</ul>
+</li>
+<li>Height maps (bump, parallax, displacement): height of surface 
+above or below the base triangle<ul>
+<li><img src="height_map_example.png" alt="Height map example"></li>
+<li><img src="height_map_render_example.png" alt="Height map rendered example"></li>
+</ul>
+</li>
+<li>Specular/gloss map: stores the k<sub>s</sub> intensity value for 
+specular calculation at each pixel, allowing for different areas of the surface
+to be differently shiny<ul>
+<li><img src="specular_map_example.png" alt="Specular Map Example"></li>
+</ul>
+</li>
+<li>Environment Map: 360 degree photo of the environment; cubic or spherical</li>
+</ul>
+</li>
+<li><p>3D textures: use u,v,w coordinates</p>
+</li>
+<li>High Dynamic Range (HDR) lighting:
+compensate for the lack of realistic dynamic range on T.V. screens; uses tone
+mapping to shift intensity values and results in effects such as temporary
+blindness when entering light from dark area, or bloom (light bleeds from behind
+darkened surface)</li>
+</ul>
+<h2 id="global-illumination">Global Illumination</h2>
+<ul>
+<li>Shadow rendering<ul>
+<li>Penumbra: blurred edges of a shadow</li>
+<li>Shadow volumes: each shadow casting object viewed from light source,
+silhouette edges identified; uses stencil buffer to mask shadowed pixels<ul>
+<li><img src="shadow_volumes.png" alt="Shadow Volumes Example">    </li>
+</ul>
+</li>
+<li>Shadow maps: per-fragment depth test from light viewpoint, shadow map
+texture generated and saved in depth buffer; scene then rendered, then shadow
+map used to determine if each fragment in shadow or not<ul>
+<li><img src="shadow_map.png" alt="Shadow Map Example"></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Ambient Occlusion<ul>
+<li>contact shadows; describes how accessible each point on a surface is to
+light</li>
+<li><img src="ambient_occlusion.png" alt="Ambient Occlusion Example"></li>
+</ul>
+</li>
+<li>Reflection: A static texture of the background scene surrounding the surface
+(i.e. the mirror) is drawn on the surface, then the scene to be reflected is
+rendered from the reflected POV of the camera and drawn on top of the surface
+as another texture<ul>
+<li><img src="reflection_example.png" alt="Reflection Example"></li>
+</ul>
+</li>
+<li>Caustic highlights: hilights from highly reflective surfaces like water/metal,
+and when the surface moves it causes the reflections to move, like when under water.
+Done via a possible animated texture with semi-random bright hilights<ul>
+<li><img src="cuastics_example.png" alt="Caustics Example">  </li>
+</ul>
+</li>
+<li>Subsurface Scattering  <ul>
+<li>light enters, bounces, leaves, results in warm glow (skin, marble, etc)</li>
+<li>BSSRDF (bidirectional surface scattering reflectance distribution function)</li>
+<li>Use shadow map but instead of determining shadowed pixels, instead how far
+beam of light travels to pass through the object</li>
+<li><img src="subsurface_scattering_example.png" alt="Subsurface Scattering Example"></li>
+</ul>
+</li>
+<li>Precomputed Radiance Transfer (PRT)<ul>
+<li>pre computes how light ray would interace with a surface from every possible
+direction</li>
+<li><a href="http://web4.cs.ucl.ac.uk/staff/j.kautz/publications/prtSIG02.pdf">http://web4.cs.ucl.ac.uk/staff/j.kautz/publications/prtSIG02.pdf</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="deferred-rendering">Deferred Rendering</h2>
+<ul>
+<li>Majority of lighting calculation done in screen space instead of view space</li>
+<li>Rendering is done without lighting as usual, then stores necessary lighting info
+in the &quot;G-buffer&quot;</li>
+<li>Much more efficient than view space lighting</li>
+<li><img src="g_buffer_example.png" alt="G buffer components example"></li>
+<li><a href="http://www.slideshare.net/guerrillagames/deferred-rendering-in-killzone-2-9691589">http://www.slideshare.net/guerrillagames/deferred-rendering-in-killzone-2-9691589</a></li>
+</ul>
+<h2 id="physically-based-rendering">Physically Based Rendering</h2>
+<ul>
+<li>Attempts to approximate light travel and interaction with the real world</li>
+<li><a href="https://www.marmoset.co/toolbag/learn/pbr-theory">https://www.marmoset.co/toolbag/learn/pbr-theory</a></li>
+</ul>
+<h2 id="particle-effects">Particle Effects</h2>
+<ul>
+<li>Composed of very large number of simple geometry</li>
+<li>often camera-facing</li>
+<li>semitransparent or translucent</li>
+<li>animated</li>
+<li>spawned and killed continuously</li>
+<li><img src="particle_example.png" alt="Particle Examples">  </li>
+</ul>
+<h2 id="decals">Decals</h2>
+<ul>
+<li>simple geometry overlayed on objects like bullet holes, foot prints, scratches</li>
+<li>defined by a rectangular area that is projected along a ray into the scene,
+and is applied to whatever the ray hits first</li>
+<li><img src="decal_example.png" alt="Decal Example"></li>
+</ul>
+<h2 id="skies">Skies</h2>
+<ul>
+<li>Sky rendering usually done after the rest of the scene is rendered,
+so only need to draw non-occluded areas</li>
+<li>Z buffer val set to maximum since its the furthest away</li>
+<li>Can uses a sky dome or sky box</li>
+<li>Clouds can be done via camera-facing cards (billboards), particle effect,
+or volumetric effects</li>
+</ul>
+<h2 id="terrain">Terrain</h2>
+<ul>
+<li>Height field terrain: stored in grayscale texture map<ul>
+<li><img src="height_field_map.png" alt="Height Field Map example"></li>
+</ul>
+</li>
+</ul>
+<h2 id="water">Water</h2>
+<ul>
+<li>Can use dynamic motion simulation, dynamic tesselation, other 
+level of detail (LOD) methods based on closeness</li>
+<li>Can interact with physics system (e.g. flotation, slippery surface, swimming)<ul>
+<li>Combination of different systems such as shaders, scrolling textures, particle
+effects for mist, etc.)</li>
+</ul>
+</li>
+</ul>
+<h2 id="overlays">Overlays</h2>
+<ul>
+<li>Rendered after scene finished, with Z-test disabled so they&#39;re always on top</li>
+<li>Typically rendered in view or screen space so not effected by world-view
+etc.</li>
+</ul>
+<h2 id="text-fonts">Text/Fonts</h2>
+<ul>
+<li>Texture map known as &#39;glyph atlas&#39;</li>
+<li>Another option is rendering via library like FreeType which uses besier curves</li>
+</ul>
+<h2 id="gamma-correction">Gamma correction</h2>
+<ul>
+<li>Adjust color intensity via a gamma power to compensate for screen range</li>
+<li>V<sub>out</sub> = pow(V<sub>in</sub>, &gamma;)</li>
+<li><img src="gamma_diagram.png" alt="Gamma Diagram"></li>
+</ul>
+<h2 id="full-screen-post-effects">Full screen post effects</h2>
+<ul>
+<li>Applied after 3d scene rendered for special effect:</li>
+<li>Motion blur via a convolutional kernel</li>
+<li>Depth of field blur: uses depth buffer to adjust blur for each pixel</li>
+<li>Vignette: brightness/saturation at corners decreased or a texture
+is overlayed on screen, for example binocular view effect or scope</li>
+<li>colorization, for example make al pixels grayscale except red</li>
+</ul>
+<h2 id="further-reading">Further Reading</h2>
+<ul>
+<li>Overview of entire 3d process for games/film: <ul>
+<li>The Art of 3-D Computer Animation and Imaging, 2nd ed, Isaac Kerlow</li>
+</ul>
+</li>
+<li>modern real time rendering:<ul>
+<li>Real Time Rendering, 3rd ed, (2008), Hoffman, Haines, Moller</li>
+</ul>
+</li>
+<li>definitive reference guide for graphics:<ul>
+<li>Computer Graphics: Principles and Practice in C, 2nd ed, Foley, Dam, Feiner, Hughes</li>
+</ul>
+</li>
+<li>Math of rendering:<ul>
+<li>Mathematics for 3d Game Programming and Computer Graphics, 2nd ed, by Lengyel</li>
+</ul>
+</li>
+<li>Graphics gems series</li>
+<li>Gpu gems series</li>
+</ul>
+</body>
+</html>
