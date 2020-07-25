@@ -1,0 +1,75 @@
+## Frequency Modulation (FM)
+
+Manipulates frequency instead of amplitude. The amplitude of the
+information signal causes the resulting modulated signal frequency
+to increase (higher amplitude) or decrease (lower amplitude).
+
+![Amplitude to Frequency mapping](amplitude\_frequency.png)
+
+## VCO (Voltage Controlled Oscillator)
+
+Simple FM modulator
+![Voltage Controller Oscillator](vco.png)
+
+## Modulation Index and Signal Bandwidth (&Beta;<sub>fm</sub>)
+
+* Frequency modulation can either be narrowband or sideband
+* Narrowband if the modulation index &Beta;<sub>fm</sub> << 1
+  * ![Narrowband Frequencies](narrowband.png)
+  * ![Narrowband Frequencies generation in Matlab](narrowband_matlab.png)
+* Wideband if the modulation index &Beta;<sub>fm</sub> >> 1
+  * This is what FM radio stations use
+  * Carson's Rule: The bandwidth of a wide band FM signal can
+    be approximated as (2 \* num\_sidebands \* info frequency).
+    The number of sidebands can be replaced with &Beta;<sub>fm</sub>+1
+    which equals 2\*(&delta;f + f<sub>i</sub>) Hz
+  * ![Wideband Frequencies](wideband.png)
+  * ![Wideband Frequencies in Matlab](wideband_matlab.png)
+    * Note the matlab circuit is exactly the same as narrowband except
+      the modulation index is larger
+
+## Differential Demodulation
+
+* Take the derivative of the received signal
+
+## Receiving FM into Complex Baseband
+* Quadrature Demodulation
+* ![FM to Complex Baseband](fm_to_complex.png)
+
+## Complex Differentiation Discriminator (Non-coherent Demodulation)
+ 
+* Demodulates the real and imaginary component separately
+* Digital Version uses a differentiator, with FIR filters
+  with components -1,0,1 or 1,-1
+  * ![Digital differentiator](dsp_demodulator.png)
+  * When combined:
+  * ![Complex Differentiaion Discriminator](dsp_demod_combined.png)
+
+## Complex Delay Line Discriminator
+
+* Simpler version of above that demodulates the real and imaginary
+  components in parallel
+* ![Delay Line Demodulator](delay_line_demodulator.png)
+
+## Phased Locked Loop Demodulator (Coherent demodulation)
+
+* Just uses the real component of the signal
+* ![PLL Demodulator](pll_demodulator.png)
+
+## Other concerns specific to commercial FM radio
+
+* De-emphasis filtering
+  * need to filter a 'pre-emphasis' which was added to the signal
+    before transmission. The pre-emphasis filters signals
+    above a certain frequency in order to maintain the modulation index
+    and signal bandwidth.
+* De-multiplexing the signal
+  * The received commercial FM signal is multiplexed and contains mono,
+    stereo, and a 'pilot' component, as well as possibly RDS
+    digital information stream (song title, station, etc.)
+  * ![Received FM multiplexed spectrum](fm_multiplexed.png)
+  * FM encoder and multiplexer:
+    * ![FM multiplexer circuit](fm_encode_circuit.png)
+  * FM decoder and de-multiplexer:
+    * ![FM demultiplexer circuit](fm_decode_circuit.png)
+

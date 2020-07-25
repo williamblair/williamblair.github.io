@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Chapter 9</title>
+</head>
+<body>
+<h2 id="frequency-modulation-fm-">Frequency Modulation (FM)</h2>
+<p>Manipulates frequency instead of amplitude. The amplitude of the
+information signal causes the resulting modulated signal frequency
+to increase (higher amplitude) or decrease (lower amplitude).</p>
+<p><img src="amplitude_frequency.png" alt="Amplitude to Frequency mapping"></p>
+<h2 id="vco-voltage-controlled-oscillator-">VCO (Voltage Controlled Oscillator)</h2>
+<p>Simple FM modulator
+<img src="vco.png" alt="Voltage Controller Oscillator"></p>
+<h2 id="modulation-index-and-signal-bandwidth-beta-sub-fm-sub-">Modulation Index and Signal Bandwidth (&beta;<sub>fm</sub>)</h2>
+<ul>
+<li>Frequency modulation can either be narrowband or sideband</li>
+<li>Narrowband if the modulation index &beta;<sub>fm</sub> &lt;&lt; 1<ul>
+<li><img src="narrowband.png" alt="Narrowband Frequencies"></li>
+<li><img src="narrowband_matlab.png" alt="Narrowband Frequencies generation in Matlab"></li>
+</ul>
+</li>
+<li>Wideband if the modulation index &beta;<sub>fm</sub> &gt;&gt; 1<ul>
+<li>This is what FM radio stations use</li>
+<li>Carson&#39;s Rule: The bandwidth of a wide band FM signal can
+be approximated as (2 * num_sidebands * info frequency).
+The number of sidebands can be replaced with &beta;<sub>fm</sub>+1
+which equals 2*(&Delta;f + f<sub>i</sub>) Hz</li>
+<li><img src="wideband.png" alt="Wideband Frequencies"></li>
+<li><img src="wideband_matlab.png" alt="Wideband Frequencies in Matlab"><ul>
+<li>Note the matlab circuit is exactly the same as narrowband except
+the modulation index is larger</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="differential-demodulation">Differential Demodulation</h2>
+<ul>
+<li>Take the derivative of the received signal</li>
+</ul>
+<h2 id="receiving-fm-into-complex-baseband">Receiving FM into Complex Baseband</h2>
+<ul>
+<li>Quadrature Demodulation</li>
+<li><img src="fm_to_complex.png" alt="FM to Complex Baseband"></li>
+</ul>
+<h2 id="complex-differentiation-discriminator-non-coherent-demodulation-">Complex Differentiation Discriminator (Non-coherent Demodulation)</h2>
+<ul>
+<li>Demodulates the real and imaginary component separately</li>
+<li>Digital Version uses a differentiator, with FIR filters
+with components -1,0,1 or 1,-1<ul>
+<li><img src="dsp_demodulator.png" alt="Digital differentiator"></li>
+<li>When combined:</li>
+<li><img src="dsp_demod_combined.png" alt="Complex Differentiaion Discriminator"></li>
+</ul>
+</li>
+</ul>
+<h2 id="complex-delay-line-discriminator">Complex Delay Line Discriminator</h2>
+<ul>
+<li>Simpler version of above that demodulates the real and imaginary
+components in parallel</li>
+<li><img src="delay_line_demodulator.png" alt="Delay Line Demodulator"></li>
+</ul>
+<h2 id="phased-locked-loop-demodulator-coherent-demodulation-">Phased Locked Loop Demodulator (Coherent demodulation)</h2>
+<ul>
+<li>Just uses the real component of the signal</li>
+<li><img src="pll_demodulator.png" alt="PLL Demodulator"></li>
+</ul>
+<h2 id="other-concerns-specific-to-commercial-fm-radio">Other concerns specific to commercial FM radio</h2>
+<ul>
+<li>De-emphasis filtering<ul>
+<li>need to filter a &#39;pre-emphasis&#39; which was added to the signal
+before transmission. The pre-emphasis filters signals
+above a certain frequency in order to maintain the modulation index
+and signal bandwidth.</li>
+</ul>
+</li>
+<li>De-multiplexing the signal<ul>
+<li>The received commercial FM signal is multiplexed and contains mono,
+stereo, and a &#39;pilot&#39; component, as well as possibly RDS
+digital information stream (song title, station, etc.)</li>
+<li><img src="fm_multiplexed.png" alt="Received FM multiplexed spectrum"></li>
+<li>FM encoder and multiplexer:<ul>
+<li><img src="fm_encode_circuit.png" alt="FM multiplexer circuit"></li>
+</ul>
+</li>
+<li>FM decoder and de-multiplexer:<ul>
+<li><img src="fm_decode_circuit.png" alt="FM demultiplexer circuit"></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</body>
+</html>
