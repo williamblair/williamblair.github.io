@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Chapter 12</title>
+</head>
+<body>
+<h2 id="rigid-hierarchical-animation">Rigid Hierarchical Animation</h2>
+<ul>
+<li>Used in early 3D animation</li>
+<li>Characters are a collection of rigid pieces
+(pelvis, torso, arms, etc)</li>
+<li>Joints &#39;crack&#39; as each piece is not flexible or
+connected</li>
+</ul>
+<h2 id="per-vertex-animation-and-morph-targets">Per-vertex animation and Morph Targets</h2>
+<ul>
+<li>per-vertex: the vertices of the mesh are animated by
+an artist, and motion data is exported, which tells the game engine how to 
+move each vertex at runtime.<ul>
+<li>data intensive; little use in real-time games</li>
+</ul>
+</li>
+<li>morph-target animation: vertices of a mesh are moved by
+an animator to create a relatively small set of fixed, extreme poses. Animations
+are produced by blending between two or more of these fixed poses at runtime.<ul>
+<li>LERP between poses</li>
+<li>often used for facial animation<ul>
+<li><img src="morph_target_face.png" alt="Morph Target Face Animation"></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="skinned-animation">Skinned Animation</h2>
+<ul>
+<li>More efficient performance and memory usage</li>
+<li>first used in games such as Super Mario 64</li>
+<li>most prevalent technique, used in both games and films<ul>
+<li>the dinosaurs from Jurrassic Park, Solid Snake (Metal Gear
+Solid 4), Gollum (Lord of the Rings), Nathan Drake (Uncharted), Buzz Lightyear
+(Toy Story), Marcus Fenix (Gears of War) and Joel (The Last of Us)</li>
+</ul>
+</li>
+<li>Uses &#39;Skeleton&#39;<ul>
+<li>skin is bound to the joints of the skeleton; its vertices track the movements of
+the joints. Each vertex of the skin mesh can be weighted to multiple joints, so
+the skin can stretch in a natural way as the joints move.</li>
+<li><img src="skeleton_joints.png" alt="Skeleton and Joints Example"></li>
+</ul>
+</li>
+<li>Skeletons made out of joints</li>
+<li>Joints made out of<ul>
+<li>joint name (string or hash)</li>
+<li>parent joint index</li>
+<li>Inverse bind pose transform matrix: position, orientation, etc. of the joint</li>
+</ul>
+</li>
+</ul>
+<h2 id="bind-pose-rest-pose-t-pose">Bind pose/rest pose/T-pose</h2>
+<ul>
+<li>Base pose prior to binding/transformation/movement</li>
+<li><img src="t_pose.png" alt="Bind Pose"></li>
+</ul>
+<h2 id="local-pose">Local pose</h2>
+<ul>
+<li>Each joint pose is a transformation relative to its parent joint<ul>
+<li>an affine transform</li>
+</ul>
+</li>
+<li>Can be stored as a 3 entry struct (R,T,S):<ul>
+<li>rotation quaternion (R)</li>
+<li>translation vector (T)</li>
+<li>Scale value (for uniform scaling) or vector (non-uniform scaling) (S)</li>
+</ul>
+</li>
+<li>Poses can be represented in world-space coordinates using a &#39;global pose&#39;
+transformation matrix</li>
+</ul>
+<h2 id="clip">Clip</h2>
+<ul>
+<li>A single animation sequence</li>
+<li>Usually a well defined action such as walk, run, throw, etc.</li>
+<li>Can affect a single set of joints in the character (such as an arm)</li>
+<li>Game character movements are typically broken down into literally
+thousands of clips</li>
+</ul>
+<h2 id="timelines">Timelines</h2>
+<ul>
+<li>Represent the animation over time</li>
+<li>Key poses/key frames are present within the timeline with
+linear interpolation (LERP) blending between them</li>
+<li><img src="key_poses.png" alt="Key Poses"></li>
+<li>Slow motion/playing in reverse/etc. is just a matter of 
+expanding/compressing/reversing the timeline</li>
+<li>Mixing multiple clips requires normalizing their timelines
+if the clips each have different base durations in order to remain
+in sync<ul>
+<li><img src="normalized_time.png" alt="Normalized Local Time"></li>
+</ul>
+</li>
+</ul>
+<h2 id="frames-and-samples">Frames and Samples</h2>
+<ul>
+<li>A &#39;frame&#39; is a time period, e.g. 1/30 or 1/60 seconds</li>
+<li>A &#39;sample&#39; is a single point in time</li>
+<li><img src="frames_and_samples.png" alt="Frames and samples"></li>
+</ul>
+<h2 id="clock-synchronization">Clock synchronization</h2>
+<ul>
+<li>A global clock can be used to synchronize multiple animations
+between multiple characters</li>
+<li><img src="global_clock.png" alt="Global Clock Timeline"></li>
+</ul>
+<h2 id="animation-data-storage-format">Animation data storage format</h2>
+<ul>
+<li>The animation data can contain things besides joint poses,
+called &#39;metachannels&#39;<ul>
+<li>Event triggers</li>
+<li>locators</li>
+<li>texture coordinate scrolling</li>
+<li>texture animation</li>
+<li>animated material parameters</li>
+<li>animated lighting parameters</li>
+<li>any other parameters that need to change over time and are in some way
+synchronized with an animation.</li>
+</ul>
+</li>
+<li>Can be stored in code via the following UML:<ul>
+<li><img src="animation_uml.png" alt="Animation UML"></li>
+</ul>
+</li>
+</ul>
+<h2 id="skinning">Skinning</h2>
+<ul>
+<li>Attaching the vertices of a 3D mesh to a posed skeleton</li>
+<li>Each vertex is bound to one or more joints, with a weight
+associated with each joint (the &#39;weighting factor&#39;)</li>
+<li>Uses a &#39;skinning matrix&#39; to transform the vertices relative
+to the joint poses</li>
+<li><img src="vertex_skinning_transform.png" alt="Vertex Skinning Transform"></li>
+</ul>
+<h2 id="lerp-blending">LERP blending</h2>
+<ul>
+<li>Used to combine multiple animations which affect the same
+joints</li>
+<li>Temporal Interpolation: used to find the location in between
+non-integer frame indices</li>
+<li>Cross Fading: blending between the end of one animation and the
+beginning of another in order to achieve a smooth transition<ul>
+<li><img src="smooth_transition.png" alt="Smooth Transition"></li>
+<li><img src="freeze_transition.png" alt="Freeze Transition"></li>
+</ul>
+</li>
+<li>Directional Locomotion: To blend animations when the character
+is both turning and moving at the same time<ul>
+<li>Targeted or pivoting movement</li>
+<li><img src="targeted_and_pivoting_movement.png" alt="Targeted and Pivoting Movement"></li>
+</ul>
+</li>
+</ul>
+<h2 id="additive-blending-additive-animation-clips">Additive Blending/Additive Animation Clips</h2>
+<ul>
+<li>Uses a &#39;difference clip&#39;/&#39;additive animation clip&#39; which contains
+the changes needed to move from a &#39;reference clip&#39; into a &#39;source
+clip&#39;<ul>
+<li>D = S - R</li>
+</ul>
+</li>
+<li>Once a difference clip is calculated, it can be used on other unrelated
+clips, not just the original reference</li>
+<li>Weaknesses: Tends to over-rotate the joints in a skeleton, especially
+when multiple difference clips are combined<ul>
+<li>Keep hip rotations to a minimum in the reference clip.</li>
+<li>The shoulder and elbow joints should usually be in neutral poses in the
+reference clip to minimize over-rotation of the arms when the difference
+clip is added to other targets.</li>
+<li>Animators should create a new difference animation for each core pose
+(e.g., standing upright, crouched down, lying prone, etc.). This allows
+the animator to account for the way in which a real human would move
+when in each of these stances.</li>
+</ul>
+</li>
+</ul>
+<h2 id="applications-of-additive-blending">Applications of additive blending</h2>
+<ul>
+<li>Stance Variation<ul>
+<li><img src="stance_variation.png" alt="Stance Variation"></li>
+</ul>
+</li>
+<li>Locomotion Noise<ul>
+<li><img src="locomotion_noise.png" alt="Locomotion Noise"></li>
+</ul>
+</li>
+<li>Aim and Look At<ul>
+<li><img src="aim_and_look_at.png" alt="Aim and Look At"></li>
+</ul>
+</li>
+<li>Overloading the time axis</li>
+</ul>
+<h2 id="procedural-animations-animation-post-processing-">Procedural Animations (animation Post Processing)</h2>
+<ul>
+<li>Animations generated/calculated at run time<ul>
+<li>Bounce vehicle when driving</li>
+<li>Sway trees and bushes with wind</li>
+</ul>
+</li>
+</ul>
+<h2 id="inverse-kinematics-animation-post-processing-">Inverse Kinematics (animation post processing)</h2>
+<ul>
+<li>Attempts to lock a joint to a target location<ul>
+<li>e.g. a hand picks up an object</li>
+</ul>
+</li>
+<li>Uses error minimization to find the closest possible
+location<ul>
+<li><img src="inverse_kinematics_error.png" alt="Inverse Kinematics Error"></li>
+</ul>
+</li>
+</ul>
+<h2 id="rag-dolls-animation-post-processing-">Rag Dolls (Animation post processing)</h2>
+<ul>
+<li>Physically simulated rigid bodies (limp/lifeless)</li>
+</ul>
+<h2 id="data-compression-techniques">Data compression techniques</h2>
+<ul>
+<li>Things to do to save memory/disk space:<ul>
+<li>Channel omission (e.g. channels which do not change over time)</li>
+<li>Quantization (reduce size of each channel, e.g. 32 to 16 bits)</li>
+<li>Sampling Frequency/Key Omission (reduce sample rate/omit some samples)</li>
+<li>Curved based compression (calculates B-splines based on sample data
+and stores the generated function instead)<ul>
+<li><img src="b_splines_graph.png" alt="B Splines graph"></li>
+</ul>
+</li>
+<li>Wavelet compression (split animation curve into sum or orthonormal wavelets)</li>
+<li>Selective Loading/Streaming</li>
+</ul>
+</li>
+</ul>
+<h2 id="animation-pipeline">Animation Pipeline</h2>
+<p><img src="animation_pipeline.png" alt="Animation Pipeline"></p>
+<h2 id="action-state-machines">Action State Machines</h2>
+<ul>
+<li>Used to abstract the current &#39;state&#39; of movement in the character
+(e.g. running, walking, etc.)</li>
+<li>Each state has its own animation (e.g. idle animation, etc.)</li>
+<li>Ensures smooth transition between states</li>
+<li>Each state machine exists in a separate state layer<ul>
+<li><img src="layered_asm.png" alt="Layered Action State Machine"></li>
+</ul>
+</li>
+<li>All current clips on the same character can be combined via a
+flat weighted average or blend trees<ul>
+<li><img src="blend_trees.png" alt="Blend Trees"></li>
+</ul>
+</li>
+<li><p>Naughty dog engine uses Scheme script to define state machines</p>
+<pre><code>  (define-state complex
+      :name <span class="hljs-string">"move-b-to-f"</span>
+      :tree
+          (anim-<span class="hljs-keyword">node</span><span class="hljs-title">-lerp</span>
+          (anim-<span class="hljs-keyword">node</span><span class="hljs-title">-additive</span>
+              (anim-<span class="hljs-keyword">node</span><span class="hljs-title">-additive</span>
+                  (anim-<span class="hljs-keyword">node</span><span class="hljs-title">-clip</span> <span class="hljs-string">"move-f"</span>)
+                  (anim-<span class="hljs-keyword">node</span><span class="hljs-title">-clip</span> <span class="hljs-string">"move-f-look-lr"</span>)
+                  (anim-<span class="hljs-keyword">node</span><span class="hljs-title">-clip</span> <span class="hljs-string">"move-f-look-ud"</span>)
+              )
+          (anim-<span class="hljs-keyword">node</span><span class="hljs-title">-additive</span>
+              (anim-<span class="hljs-keyword">node</span><span class="hljs-title">-additive</span>
+                  (anim-<span class="hljs-keyword">node</span><span class="hljs-title">-clip</span> <span class="hljs-string">"move-b"</span>)
+                  (anim-<span class="hljs-keyword">node</span><span class="hljs-title">-clip</span> <span class="hljs-string">"move-b-look-lr"</span>)
+              )
+              (anim-<span class="hljs-keyword">node</span><span class="hljs-title">-clip</span> <span class="hljs-string">"move-b-look-ud"</span>)
+          )
+  )
+</code></pre></li>
+</ul>
+<h2 id="transitions-between-states">Transitions between states</h2>
+<ul>
+<li>Parameters:<ul>
+<li>Source and Destination states</li>
+<li>Transition type (immediate, cross faded, etc.?)</li>
+<li>Duration</li>
+<li>Ease in/ease out curve</li>
+<li>transition window (time when transition is valid)</li>
+</ul>
+</li>
+<li><p>Transition matrix: represents the valid states that can
+be transitioned between (e.g. walk to run is a valid transition)  </p>
+<ul>
+<li><p>In Medal of Honor: Pacific Assault, the matrix was represented
+via wildcard naming</p>
+<pre><code><span class="hljs-tag">&lt;<span class="hljs-name">transitions</span>&gt;</span>
+    <span class="hljs-comment">&lt;!-- global default --&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">trans</span> <span class="hljs-attr">from</span>=<span class="hljs-string">"\*"</span> <span class="hljs-attr">to</span>=<span class="hljs-string">"\*"</span> <span class="hljs-attr">type</span>=<span class="hljs-string">frozen</span> <span class="hljs-attr">duration</span>=<span class="hljs-string">0.2</span>&gt;</span>
+    <span class="hljs-comment">&lt;!-- default for any walk to any run --&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">trans</span> <span class="hljs-attr">from</span>=<span class="hljs-string">"walk\*"</span> <span class="hljs-attr">to</span>=<span class="hljs-string">"run\*"</span> <span class="hljs-attr">type</span>=<span class="hljs-string">smooth</span> <span class="hljs-attr">duration</span>=<span class="hljs-string">0.15</span>&gt;</span>
+   <span class="hljs-comment">&lt;!-- special handling from any prone to any getting-up
+     -- action (only valid from 2 sec to 7.5 sec on the
+     -- local timeline) --&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">trans</span> <span class="hljs-attr">from</span>=<span class="hljs-string">"\*prone"</span> <span class="hljs-attr">to</span>=<span class="hljs-string">"\*get-up"</span> <span class="hljs-attr">type</span>=<span class="hljs-string">smooth</span> <span class="hljs-attr">duration</span>=<span class="hljs-string">0.1</span> <span class="hljs-attr">window-start</span>=<span class="hljs-string">2.0</span> <span class="hljs-attr">window-end</span>=<span class="hljs-string">7.5</span>&gt;</span>
+    ...
+<span class="hljs-tag">&lt;/<span class="hljs-name">transitions</span>&gt;</span>
+</code></pre></li>
+<li><p>Uncharted/Naughty Dog Used Scheme definitions:</p>
+<pre><code>(<span class="hljs-name">define-state</span> complex
+  <span class="hljs-symbol">:name</span> <span class="hljs-string">"s_turret-idle"</span>
+  <span class="hljs-symbol">:tree</span> (<span class="hljs-name">aim-tree</span>
+            (<span class="hljs-name">anim-node-clip</span> <span class="hljs-string">"turret-aim-all--base"</span>)
+                <span class="hljs-string">"turret-aim-all--left-right"</span>
+                <span class="hljs-string">"turret-aim-all--up-down"</span>
+            )
+  <span class="hljs-symbol">:transitions</span> (
+     (<span class="hljs-name">transition</span> <span class="hljs-string">"reload"</span> <span class="hljs-string">"s_turret-reload"</span>
+         (<span class="hljs-name"><span class="hljs-builtin-name">range</span></span> - -) <span class="hljs-symbol">:fade-time</span> <span class="hljs-number">0.2</span>)
+     (<span class="hljs-name">transition</span> <span class="hljs-string">"step-left"</span> <span class="hljs-string">"s_turret-step-left"</span>
+         (<span class="hljs-name"><span class="hljs-builtin-name">range</span></span> - -) <span class="hljs-symbol">:fade-time</span> <span class="hljs-number">0.2</span>)
+     (<span class="hljs-name">transition</span> <span class="hljs-string">"step-right"</span> <span class="hljs-string">"s_turret-step-right"</span>
+         (<span class="hljs-name"><span class="hljs-builtin-name">range</span></span> - -) <span class="hljs-symbol">:fade-time</span> <span class="hljs-number">0.2</span>)
+     (<span class="hljs-name">transition</span> <span class="hljs-string">"fire"</span> <span class="hljs-string">"s_turret-fire"</span>
+         (<span class="hljs-name"><span class="hljs-builtin-name">range</span></span> - -) <span class="hljs-symbol">:fade-time</span> <span class="hljs-number">0.1</span>)
+     (<span class="hljs-name">transition-group</span> <span class="hljs-string">"combat-gunout-idle^move"</span>)
+    (<span class="hljs-name">transition-end</span> <span class="hljs-string">"s_turret-idle"</span>)
+  )
+)
+</code></pre></li>
+</ul>
+</li>
+</ul>
+<h2 id="attachments">Attachments</h2>
+<ul>
+<li>Used to constrain a joint within an area/range,
+e.g. to within a parent joint&#39;s range of movement<ul>
+<li>stored just like regular joints</li>
+<li><img src="attachment.png" alt="Attachment"></li>
+</ul>
+</li>
+</ul>
+<h2 id="reference-locator">Reference Locator</h2>
+<ul>
+<li>A common reference point used to orient
+multiple animated characters  <ul>
+<li><img src="reference_locator.png" alt="Reference Locator"></li>
+</ul>
+</li>
+</ul>
+<h2 id="hand-and-foot-inverse-kinematics">Hand and foot inverse kinematics</h2>
+<ul>
+<li>Used to make sure hand grabbing/foot movement
+along ground looks realistic</li>
+<li>Usually can be enabled or disabled within the animation
+pipeline</li>
+<li>Well suited for minor corrections if the joint is near the
+target</li>
+<li>Does not necessarily ensure proper orientation<ul>
+<li>May have significant performance costs</li>
+<li>May not necessarily &#39;feel&#39; realistic/fun to play</li>
+</ul>
+</li>
+</ul>
+<h2 id="other-movement-constraints">Other movement constraints</h2>
+<ul>
+<li>Look-at</li>
+<li>Cover-registration (align the character behind &#39;cover&#39; objects)  </li>
+<li>Cover entry and departure</li>
+<li>Traversal aids (guided movement through an area/obstacle(s))</li>
+</ul>
+</body>
+</html>
