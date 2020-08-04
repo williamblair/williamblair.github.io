@@ -92,6 +92,19 @@ Reference image (no gamma correction)
 <img src="images/25_tex_rgb_no_gamma.png"/>
 </figure>
 
+<figure>
+<figcaption>26 - Basic Shadows with using Depth Maps</figcaption>
+<table>
+  <tr><td>Depth Map Texture</td><td><img src="images/26_depth_map_texture.png"/></td></tr>
+  <tr><td>Result render with "shadow acne"</td><td><img src="images/26_depth_map_uncorrected_shadow.png"/></td></tr>
+  <tr><td>Result render with "shadow acne"</td><td><img src="images/26_depth_map_uncorrected_shadow_2.png"/></td></tr>
+  <tr><td>Result render with bias calculation to prevent "shadow acne"</td><td><img src="images/26_depth_map_shadow_bias.png"/></td></tr>
+  <tr><td>Result render with oversampling issue</td><td><img src="images/26_depth_map_oversampling.png"/></td></tr>
+  <tr><td>Result render fixed oversampling issue (clamp depth map texture and border color)</td><td><img src="images/26_depth_map_fixed_oversampling.png"/></td></tr>
+  <tr><td>Result render with PCF smoothing on the shadows</td><td><img src="images/26_depth_map_pcf_smoothing.png"/></td></tr>
+</table>
+</figure>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
