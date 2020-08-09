@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Pluto SDR</title>
+</head>
+<body>
+<h1>Pluto SDR</h1>
+<h3>Some notes on setting up the ADALM-Pluto SDR device on Windows</h3>
+
+<figure>
+<img alt="Pluto SDR" src="../images/pluto_sdr.jpg" width="300px"/>
+</figure>
+
+<a href="https://wiki.analog.com/university/tools/pluto/users">Getting Started Guide</a>
+
+<h3>Sample Rate/USB</h3>
+ USB 2.0 is a 480 Mbit/s half-duplex serial protocol.
+
+<p>
+    Assuming 100% utilization, 480 Mbits/s would be 60 Mbytes/second.
+    According to a USB-IF chairman, “at least 10-15% of the stated peak 60 MB/s (480 Mbit/s) of Hi-Speed USB goes to overhead — the communication protocol between the card and the peripheral.” 2), that would bring things down to ~50 Mbytes/second.
+    There are Control Transfers, Interrupt Transfers, Isochronous Transfers, and Bulk Transfers. We use bulk, but you can't turn off the others, so you loose another 10% overhead, this brings things down to ~45 Mbytes/second
+    Since it is half duplex, that would be ~22.5 Mbytes/second for transmission, and ~22.5 Mbytes/second for reception.
+    Since each sample is two bytes (12-bit samples), that would be ~11 MSamples/second.
+</p>
+
+<h3>Frequency Range</h3>
+The tuning range of the AD9363 found inside the PlutoSDR is specified by LO center frequencies between 325 and 3800 MHz
+
+<h3>Loopback Warning:</h3>
+Do not set the TX attenuation to anything less than -10dB and loop the Tx (output) signal into the Rx (input) connector
+
+<h3>Setting Up Drivers on Windows</h3>
+https://wiki.analog.com/university/tools/pluto/drivers/windows
+
+<h3>USB Console Access</h3>
+Shows up on COM port 3 (PlutoSDR Serial Console)
+
+Serial
+
+<p>
+You need to have find your favorite Terminal program, here are a few of the ones we use (but don't support - if you have questions, please check with the internet/google).
+</p>
+<ul>
+    <li>Putty</li>
+    <li>Tera Term</li>
+    <li>Or other Terminal program</li>
+</ul>
+
+<p>
+The terminal settings are 115200 baud, 8 bits, no parity, 1 stop bit. This is referred to as 115200-8N1. The default username is root, and the default root password is analog. 
+</p>
+
+<p>
+On windows, followed this guide:
+https://wiki.cdot.senecacollege.ca/wiki/Connect_to_Serial_Console_from_Windows
+</p>
+
+<figure>
+<figcaption>installed 'screen' in cygwin:
+<img src="../images/cygwin_screen_setup.png"/>
+</figure>
+
+<p>
+run the command 'screen.exe /dev/ttyS2 115200'
+<img src="../images/cygwin_screen_pluto_running.png"/>
+To quit screen, enter 'Ctrl+a d' (after logging out)
+I noticed it seems like you always have to kill the process though after this
+</p>
+
+<p>
+You can also log in via ssh over usb:
+ssh root@192.168.2.1
+</p>
+<p>
+(an ifconfig shows that the usb0 interface has this IP addr)
+</p>
+
+<figure>
+<figcaption>
+Installing the MATLAB support package (ADALM-Pluto) can auto upgrade
+the Pluto Firmware:
+</figcaption>
+<img src="../images/pluto_matlab_firmware_upgrade.png"/>
+</figure>
+
+<h3>Installing libIIO</h3>
+<p>
+<a href="https://github.com/analogdevicesinc/libiio">https://github.com/analogdevicesinc/libiio</a>
+Or direct link specifically this EXE for windows:
+<a href="https://github.com/analogdevicesinc/libiio/releases/download/v0.21/libiio-0.21.g565bf68-Windows-setup.exe">https://github.com/analogdevicesinc/libiio/releases/download/v0.21/libiio-0.21.g565bf68-Windows-setup.exe</a>
+</p>
+
+<h3>Pluto USB drive</h3>
+<p>Pluto shows up as an external drive in windows (E: for me) which
+contains an info.html page with most of this info contained as well
+as other links</p>
+
+</body>
+</html>

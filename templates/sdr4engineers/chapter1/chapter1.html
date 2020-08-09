@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>SDR4Engineers Chapter 1</title>
+</head>
+<body>
+
+<h1>Chapter 1:Introduction to Software-Defined Radio</h1>
+
+<figure>
+<figcaption>SDR functional steps overview</figcaption>
+<img alt="Figure 1.3" src="fig_1.3.png"/>
+</figure>
+
+<h3>Modulation</h3>
+ convert the binary information into unique
+electromagnetic waveform properties such as amplitude, carrier frequency, and
+phase
+
+<h3>Networking Layers and Models</h3>
+
+<figure>
+<figcaption>
+2 major models: OSI 7 layer protocol and TCP/IP 5 layer protocol
+</figcaption>
+<img alt="Figure 1.4" src="fig_1.4.png"/>
+</figure>
+
+<h3>TCP/IP Layers (highest to lowest, levels 5 through 1)</h3>
+<ol reversed>
+<li>Application Layer: Interfaces user with the data from the communication
+system. For instance, the application layer would include data originating
+from or intended for software running Web browsers, email clients, and
+streaming media interfaces. These applications are usually addressed via
+designated socket</li>
+<li>Transport Layer: Responsible for transporting application layer messages
+between the client application and server application. This layer ensures
+reliable data transmission</li>
+<li>Network Layer: Responsible for moving network layer packets from one
+host to another host. Defines format of datagrams and how end systems and
+routers act on datagram, as well as determine routes that datagrams take
+between sources and destinations</li>
+<li>Link Layer: Handles problem of exchanging data between two or more
+directly connected devices. Reliability: This includes error detection and error
+correction as well as addressing of different communication systems</li>
+<li>Physical Layer: Sends individual bits from one communication system
+directly to another communication system. It also covers the physical
+interface between data transmission device and transmission medium.
+<b>Most of SDR application is in this layer</b></li>
+</ol>
+
+<figure>
+<figcaption>Example: 802.11 WiFi protocol:</figcaption>
+<img alt="Figure 1.5" src="fig_1.5.png"/>
+</figure>
+
+<h3>Zero IF architecture (ZIF)</h3>
+Uses a single frequency mixing stage with the local oscillator (LO)
+set directly to the frequency band of interest, translating the received signal down
+to baseband in phase (I) and quadrature (Q) signals
+
+<img alt="Figure 1.7" src="fig_1.7.png"/>
+
+</body>
+</html>
