@@ -1,0 +1,47 @@
+<h3>Fourier Transform</h3>
+Converts signal representation from time-domain to frequency domain
+
+<ul>
+<li>Fourier Transform</li>
+<li>Fourier Series</li>
+<li>Discrete Fourier Transform (DFT)
+  <ul><li>Fast FT (FFT) and the inverse FFT (IFFT) are specific implementations of this</li></ul>
+</li>
+<li>Discrete Time Fourier Transform</li>
+</ul>
+
+<figure>
+<figcaption>&omega; = 2*&pi;*frequency</figcaption>
+<img src="fig_2.2.png"/>
+<img src="fig_2.3.png"/>
+</figure>
+
+<p>How to calc definite integral: https://www.mathsisfun.com/calculus/integration-introduction.html</p>
+
+<h3>Signal Period and Windows</h3>
+<p>
+The discrete FT views a sample set as 
+a periodic signal (repeating infinitely) even
+though its just a fixed set of samples, so window functions
+need to be applied BEFORE applying FFT
+</p>
+
+<h3>Fast Fourier Transform (FFT)</h3>
+<figure>
+<figcaption>FFT Setup. M is the fft size (number of input samples),
+point spacing is fs/M, frequency range is DC to fs/2 (fs = sample rate)
+</figcaption>
+<img src="fig_2.3.1.png"/>
+</figure>
+<p>The FFT output can be used like an analog spectrum analyzer to measure the
+amplitude of the various harmonics and noise components of a digitized signal. The
+harmonics of the input signal can be distinguished from other distortion products
+by their location in the frequency spectrum</p>
+
+<h3>Decimation</h3>
+Decreasing the number of samples by ignoring samples between sample
+points. Need to be careful not to decrease so much that you fall
+below the Nyquist rate (2*frequency)
+
+<h3>Interpolation</h3>
+Increasing the number of samples by inserting zeros between samples
