@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BJ's Website</title>
+  <link rel="stylesheet" type="text/css" href="../../site.css"/>
+  
+</head>
+<body>
+
+<div id="bodyDiv">
+
+<div id="contentDiv">
+
+<h1>PS2 Programming Log</h1>
+<img alt="PS2 Logo" style="float:right; margin:5px;" src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fi.ytimg.com%2Fvi%2FuyH4uFjgaIg%2Fhqdefault.jpg&f=1&nofb=1"/>
+
+<p>My working log for learning programming for the Playstation 2. The goal
+is to have an abstraction/library layer that will be cross platform for
+the Playstation 1 as well, to leverage my existing psyq_lib stuff,
+hence the repository name is 'GameLib' currently</p>
+
+<p>The source code is currently here: <a href="https://bitbucket.org/williamblair/gamelib">https://bitbucket.org/williamblair/gamelib</a></p>
+
+<h3>08/22/2020</h3>
+<p>The ps2sdk is set up, and have a basic Render/Model/Mesh setup.
+It was easier to set up a virtual machine with Linux to install the SDK,
+which you can then install via a single script from here:
+<a href="https://github.com/ps2dev/ps2dev">https://github.com/ps2dev/ps2dev</a>.
+(I really should just re-install Linux on my machine to dual boot!)
+The code is adapted from the teapot example included with the ps2sdk.</p>
+
+<p>The main loop is currently quite simple:</p>
+<pre><code>/*
+ * GameLib test program
+ */
+
+#include "PS2Includes.h"
+#include "PS2Renderer.h"
+#include "PS2Model.h"
+
+#include "mesh_data.c"
+
+int main(int argc, char **argv)
+{
+    PS2Renderer Renderer;
+
+    MeshData TeapotMeshData;
+    PS2Model TeapotModel;
+
+    Renderer.Init();
+    
+    TeapotMeshData.Normals = normals;
+    TeapotMeshData.Colors = colours;
+    TeapotMeshData.Vertices = vertices;
+    TeapotMeshData.Indices = points;
+    TeapotMeshData.VertexCount = vertex_count;
+    TeapotMeshData.IndexCount = points_count;
+    TeapotModel.SetMeshData( TeapotMeshData );
+
+    for (;;)
+    {
+        TeapotModel.Rotate( 0.0f, 0.01f, 0.0f );
+        Renderer.DrawModel( TeapotModel );
+
+        Renderer.Update();
+    }
+
+    // Sleep
+    SleepThread();
+
+    // End program.
+    return 0;
+
+}
+</code></pre>
+
+<p>Which is shown running in pcsx2 and on a PS2 Slim:</p>
+<img src="images/pcsx2_teapot.png" width="500px"/>
+<img src="images/teapot_ps2.gif"/>
+<img src="images/ps2slim.jpg" width="300px"/>
+
+<p>The PS2 is running the ELF file over ethernet via
+ps2link and ps2client. ps2link is running on the PS2 off of
+the memory card (thanks to Free McBoot), which in turn is started
+via uLaunchElf. The IP configuration in order to find the PS2 over TCP from
+your computer is set in the file IPCONFIG.DAT</p>
+<img src="images/ulaunchelf.jpg" width="300px"/>
+<img src="images/ps2link_text_edit.jpg" width="300px"/>
+
+<p>On the pc side, ps2client runs by specifying the PS2's IP address,
+then specifying to run your ELF file on the Emotion Engine (the PS2
+main CPU) via execee</p>
+<img src="images/ps2client_screenshot.png"/>
+
+<p>Current TODOs include lighting, camera, and controller management.
+The lighting and camera are currently hard coded in the renderer.</p>
+
+<p>The following links were helpful for getting started:</p>
+<ul>
+  <li><a href="http://lukasz.dk/playstation-2-programming/an-introduction-to-ps2dev/">http://lukasz.dk/playstation-2-programming/an-introduction-to-ps2dev/</a></li>
+  <li><a href="https://www.ps2-home.com/forum/viewtopic.php?f=103&t=9616">https://www.ps2-home.com/forum/viewtopic.php?f=103&t=9616</a></li>
+  <li><a href="https://www.ps2-home.com/forum/viewtopic.php?f=103&t=337">https://www.ps2-home.com/forum/viewtopic.php?f=103&t=337</a></li>
+</ul>
+
+<p><a href="../../index.html">&lt;-- Back to Home</a></p>
+
+</div> <!-- contentDiv -->
+</div> <!-- bodyDiv -->
+
+</body>
+</html>
+
