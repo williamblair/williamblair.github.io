@@ -104,6 +104,127 @@ The lighting and camera are currently hard coded in the renderer.</p>
   <li><a href="https://www.ps2-home.com/forum/viewtopic.php?f=103&t=337">https://www.ps2-home.com/forum/viewtopic.php?f=103&t=337</a></li>
 </ul>
 
+<h3>08/23/2020</h3>
+<p>Added Camera and Controller classes (for the gamepad), as well as a simple floor mesh/model. 
+The gamepad code I copied from 
+another PS2 C++ class I had made when I was experimenting with PS2SDK years ago: <a href="https://github.com/williamblair/PS2Pad">https://github.com/williamblair/PS2Pad</a>.
+Additionally, the Camera class I adapted from my learnopengl code for FPS camera movement: 
+<a href="https://github.com/williamblair/learnopengl/tree/master/07_fps_camera">https://github.com/williamblair/learnopengl/tree/master/07_fps_camera</a>.
+It felt good to see the fruits of previous labor ripen into use!</p>
+<p>The camera movement/rotation calculation isn't optimized and probably could be using VU0 vector math; currently each x/y/z camera point
+is calculated individually.</p>
+<p>Interestingly, moving around the world you can see the geometry freak out in places; I think this is because I need to manually
+do clipping and back face culling, which I read in Glampert's PS2 page: 
+<a href="https://glampert.com/2015/03-23/ps2-homebrew-hardware-and-ps2dev-sdk/">https://glampert.com/2015/03-23/ps2-homebrew-hardware-and-ps2dev-sdk/</a></p>
+
+<p>The resulting main code is a little longer now but still not totally complicated:</p>
+<pre><code>/*
+ * GameLib test program
+ */
+
+#include "PS2Includes.h"
+#include "PS2Renderer.h"
+#include "PS2Model.h"
+#include "PS2Camera.h"
+#include "PS2Controller.h"
+
+#include "mesh_data.c"
+
+... // Floor class impl is here
+
+static void RotateCamera( Controller&amp; Pad, Camera&amp; Cam )
+{
+    int RightStickX = Pad.GetRightJoyX();
+    int RightStickY = Pad.GetRightJoyY();
+    const float Scale = 0.0001f;
+    
+    if (RightStickX &gt; 150 || RightStickX &lt; 100)
+    {
+        RightStickX -= 127; // scale from 0..255 to -128, 127
+        Cam.Rotate( 0.0f, -Scale * (float)RightStickX, 0.0f );
+    }
+    
+    if (RightStickY &gt; 150 || RightStickY &lt; 100)
+    {
+        RightStickY -= 127;
+        Cam.Rotate( -Scale * (float)RightStickY, 0.0f, 0.0f );
+    }
+}
+
+static void TranslateCamera( Controller&amp; Pad, Camera&amp; Cam )
+{
+    int LeftStickX = Pad.GetLeftJoyX();
+    int LeftStickY = Pad.GetLeftJoyY();
+    const float Scale = 0.01f;
+    
+    if (LeftStickX &gt; 150 || LeftStickX &lt; 100)
+    {
+        LeftStickX -= 127; // scale from 0..255 to -128, 127
+        Cam.Translate( Scale * (float)LeftStickX, 0.0, 0.0f );
+    }
+    
+    if (LeftStickY &gt; 150 || LeftStickY &lt; 100)
+    {
+        LeftStickY -= 127;
+        // negative is forwards
+        Cam.Translate( 0.0f, 0.0f, Scale * (float)LeftStickY );
+    }
+}
+
+int main(int argc, char **argv)
+{
+    PS2Renderer Render;
+    PS2Camera Cam;
+    MeshData TeapotMeshData;
+    PS2Model TeapotModel;
+    PS2Floor Floor;
+    PS2Controller Pad;
+
+    SifInitRpc(0);
+
+    Render.Init();
+    Render.AttachCamera( Cam );
+    
+    TeapotMeshData.Normals = normals;
+    TeapotMeshData.Colors = colours;
+    TeapotMeshData.Vertices = vertices;
+    TeapotMeshData.Indices = points;
+    TeapotMeshData.VertexCount = vertex_count;
+    TeapotMeshData.IndexCount = points_count;
+    TeapotModel.SetMeshData( TeapotMeshData );
+
+    Floor.Init();
+    
+    Pad.Init(0);
+
+    for (;;)
+    {
+        Pad.Update();
+        RotateCamera( Pad, Cam );
+        TranslateCamera( Pad, Cam );
+        
+        TeapotModel.Rotate( 0.0f, 0.01f, 0.0f );
+        Render.DrawModel( TeapotModel );
+        
+        //Floor.Rotate( 0.01f, 0.0f, 0.0f );
+        Render.DrawModel( Floor );
+
+        Render.Update();
+    }
+
+    // Sleep
+    SleepThread();
+
+    // End program.
+    return 0;
+
+}
+</code></pre>
+
+<p>Here's the result in PCSX2 and via PS2Client:</p>
+<img src="images/teapot_fpscam.gif"/>
+<img src="images/teapot_withfloor.png"/>
+
 <p><a href="../../index.html">&lt;-- Back to Home</a></p>
 
 </div> <!-- contentDiv -->
@@ -111,4 +232,3 @@ The lighting and camera are currently hard coded in the renderer.</p>
 
 </body>
 </html>
-
