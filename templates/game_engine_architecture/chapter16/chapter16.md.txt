@@ -1,0 +1,254 @@
+# Chapter 16
+
+## Higher Level Game Engine Components
+
+* Runtime game object model
+  * Spawning/Destroying game objects
+  * Linkage to low level engine systems
+  * Real time simulation of object behaviors
+  * Ability to define new game object types
+  * Unique object IDs
+  * Game object queries
+  * Game object references
+  * Finite state machine support
+  * Network replication (for online multiplayer)
+  * Saving and loading/object persistence
+* Level management and streaming
+* Real time object model updating
+* messaging and event handling
+* Scripting
+* Objectives and game flow management
+
+## Runtime game object model architecture
+
+* Can be either
+  * Object centric: each game object is a single class instance/small connection
+    of instances
+  * Property centric: each game object is a unique ID which connects properties
+    in different data tables. The properties define the behavior. Each property
+    can be a class.
+
+## Object centric example
+
+* Example is Hydro Thunder game by Midway.
+* There is a WorldOb_t representing a 3D object, with 3D mesh, orientation, etc.
+* Written in C, uses function pointers and void pointers to implement polymorphism
+* Example:
+    struct WorldOb_s
+	{
+		Orient_t m_transform;
+		Mesh3d* m_pMesh;
+		void* m_pUserData;
+		void (*m_pUpdate)(); // polymorphic update
+		void (*m_pDraw)(); // polymorphic draw
+	}
+
+## Object centric Monolithic Class design
+
+* ![Pacman Monolith](pacman_monolith.png)
+* Example: Unreal engine; each game object derives from a master,
+  root object, with a wide tree of inheritance going down. The
+  master object in Unreal is called an *Actor*
+  * ![Unreal Monolith](unreal_monolith.png)
+* Issue: The more deep and wide the inheritance goes, the more
+  limited you are in terms of flexibility, and you can end up
+  wasting memory and resources from unused properties inherited
+  from parents
+* Better to compose or aggregate classes rather than inherit them
+  (remember from Clean Code: "Prefer composition over inheritance")
+  * ![Composition Diagram](composition_diagram.png)
+
+
+## Property Centric game model architecture
+
+* ![Property Centric Chart](property_centric_chart.png)
+* Have been used in Deus Ex 2, Thief games
+* More like a relational database, with primary keys and
+  attributes
+* Properties which define behavior can either be implemented
+  as classes/objects or via scripting
+* Pros: can be more memory efficient (only store properties that
+  are used), cache coherency (contiguous memory storage)
+  * Struct-of-arrays approach
+* Cons: difficult to enforce relationship between properties,
+  harder to define higher-level behavior through a property collection
+  
+## World Chunk Data Formats
+
+* Store world properties and objects such as static/dynamic mesh
+  data, region volumes, objects initial values, etc.
+* Can be stored in:
+  * Binary files (uneditable, pointer handling, inflexible)
+  * Serialized object file such as json, xml
+    * Use spawner objects, have schema, default values
+
+## Air Locks
+
+* Can be used as a small buffer area between two levels/large
+  game areas for seamless transitioning the player in real time,
+  without a loading screen or anything
+
+## Level loading and object spawning
+
+* Can use a stack based allocator to load and unload levels
+  * ![Stack Level Loading](stack_level_loading.png)
+* Objects can be spawned using memory pools, or 'small memory
+  allocators'
+  * Have blocks of fixed sizes, such as 2,4,8,16,32, and allocate
+    an object into an area of the nearest larger size
+
+## Game Saves
+
+* Stores the current state of the world
+* Can get away with partial state saving in some cases
+  where the player won't notice the difference (e.g. an AI
+  location)
+* Can have save points so limited to a certain area/location
+
+## Object references
+
+* Suggest smart pointers over raw pointers
+* Handles: index/indices into a global handle table, which
+  contains the pointer/reference to a specific object
+  * All handles are now valid when an object becomes NULL,
+    since this is indicated in the handle table
+  * ![Handle Table](handle_table.png)
+  
+## Updating game objects in real time
+
+* The simple 'call an update function' for each object in the main
+  loop doesn't always work
+  * Due to concurrency and dependance on subsystems and order-matters
+    between objects
+* Common to have multiple update calls (e.g. pre and post animation update, pre and post
+  physics update) in order to account for changes calculated by the engine
+* Common to cache the previous state of an object so for each frame, other
+  objects can reference a stable value
+  * The states of all game objects are consistent *Before* and *After* the 
+    update loop, but NOT *during* it
+* For performance, it is good to batch related updates and perform them all at once,
+  possibly in parallel with SIMD
+* Bucketed updates: only call a certain update for objects in the same 'bucket' to avoid
+  calling the update on unnecessary objects
+
+		enum Bucket
+		{
+			kBucketVehiclesPlatforms,
+			kBucketCharacters,
+			kBucketAttachedObjects,
+			kBucketCount
+		};
+		
+		void UpdateBucket(Bucket bucket)
+		{
+			for (each gameObject in bucket)
+			{
+				gameObject.PreAnimUpdate(dt);
+			}
+			
+			g_animationEngine.CalculateIntermediatePoses(bucket, dt);
+			
+			for (each gameObject in bucket)
+			{
+				gameObject.PostAnimUpdate(dt)
+			}
+			...
+		}
+		
+		void main()
+		{
+			while (true)
+			{
+				UpdateBucket(kBucketVehiclesPlatforms);
+				UpdateBucket(kBucketCharacters);
+				...
+			}
+		}
+
+* Concurrency: can call asynchronous functions to kick off a task,
+  then perform other tasks while it is running, then call a sync
+  when we need to wait for the concurrent task to be completed
+  * Can improve performance by waiting longer if the task is not
+    critical to happen at that timepoint
+  * Degree of Parallelism: the theoretical maximum number of jobs
+    that can be executed at once in parallel based on order dependency
+	between tasks
+	* ![Degree of Parallelism](degree_of_parallelism.png)
+	* ![Sync Points](sync_points.png)
+	* ![Sync Points 2](sync_points2.png)
+  * Job system is also possible
+  
+## Events and message passing
+
+* Common to use events between systems and objects, like
+  SDL_Event and SDL_PollEvent
+* Events can contain arguments/parameters either hard-coded
+  or via *Variants,* which cast the same amount of memory as different
+  types
+  * ![Variant Example](variant_example.png)
+* *Chain of Responsibility* Can be used to pass up an event
+  through the object hierarchy until it reaches its desired location
+  (each object passes to its parent)
+  * ![Chain of Responsibility](chain_of_responsibility.png)
+  
+## Data driven event/message passing
+
+* Design responses to events in the object/data via
+  scripting or some other method
+* Implemented via 'data streams', where objects have
+  input/output ports, each defined with a certain type
+  (e.g. bool), which can be edited in a GUI graph editor
+  such as Unreal Blueprints
+  * ![Data Stream Graph](data_stream_graph.png)
+  * ![Unreal Blueprint](unreal_blueprint.png)
+  
+## Scripting: Popular languages
+
+* QuakeC
+* UnrealScript
+* Lua
+* Python
+* Pawn/Small/Small-C
+
+## Script handling in the engine
+
+* The language interpreter is contained within
+  the game engine, 'emulating' the system for the
+  script to run in (example from Naughty Dog's DC language)
+		
+		void DcExecuteScript(DCByteCode* pCode)
+		{
+			DCStackFrame* pCurStackFrame = DcPushStackFrame(pCode);
+			
+			while (pCurStackFrame != nullptr)
+			{
+				DCInstruction& instr = pCurStackFrame->GetNextInstruction();
+				
+				...
+			}
+		}
+		
+* Language calls can be tied/binded to engine calls
+  via the language function string or similar
+* Data types can be mapped to engine specific types
+* Arguments can use Variants for dynamic object typing
+* Events/messages can be sent to the script
+* Script 'multithreading' can happen by the interpreter
+  managing time between multiple scripts running at once
+  (via preemptive or cooperative scheduling)
+  
+## Chapter 17 (Other game systems)
+
+* Movie Playing / FMVs
+* Multiplayer Networking
+* Game Camera
+  * Look-at camera
+  * Follow Cameras
+  * Real Time Strategy Camera
+  * Cinematic Camera
+* Weapons
+* Cover
+* Specialized traversal (ladders, ropes)
+* Vehicle Systems
+* Puzzle Mechanics
+* Artificial Intelligence
