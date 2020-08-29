@@ -930,6 +930,169 @@ we get the following blue screen</p>
 <figcaption>Infinite blue screen drawing with assembly</figcaption>
 </figure>
 
+<h3>08/29/2020</h3>
+<p>Started merging psyq_util into the GameLib repository, where the PS2
+programming code is. So far the PSX Renderer and PSX model class 
+implementations are there. TODOs include the Camera, Light, Controller, and 
+Vector/Matrix type generics (so vector/matrix code isn't specific to
+the platform, perhaps?). The easiest thing would be to have both
+impls use floating point, but that could possibly be quite slow
+on the playstation...</p>
+
+<p>Here's a rotating floor object and then Suzanne, the blender monkey
+(the triangle colors are hard coded red currently in the renderer, as
+you can see):</p>
+
+<figure>
+<img src="psximages/gamelib_floorquad.png"/>
+<img src="psximages/gamelib_suzannemodel.png"/>
+</figure>
+
+<p>The main loop code (from the PS2 Programming page) is now:
+</p>
+
+<pre><code>/*
+ * GameLib test program
+ */
+
+#include "PlatformIncludes.h"
+#include "SuzanneModel.h"
+
+class FloorObject : public ModelImpl
+{
+public:
+    
+    FloorObject()
+    {
+        printf("FloorObject Constructor\n");
+    }
+    
+    virtual ~FloorObject() {}
+    
+    void Init()
+    {
+        // TODO - make vector type agnostic
+        // Top-down view
+        static SVECTOR FloorVertices[4];// = {
+        FloorVertices[0] = (SVECTOR){ -200, 0, -200, ONE }; // top left (right handed coords)
+        FloorVertices[1] = (SVECTOR){  200, 0, -200, ONE }; // top right
+        FloorVertices[2] = (SVECTOR){ -200, 0,  200, ONE }; // bottom left
+        FloorVertices[3] = (SVECTOR){  200, 0,  200, ONE }; // bottom right
+        //};
+        static int FloorIndices[6] = (int[6]){
+            0, 1, 2,    // bottom left triangle
+            1, 3, 2     // top right triangle
+        };
+        static SVECTOR FloorColors[4];// = {
+        FloorColors[0] = (SVECTOR){ ONE, 0, 0, ONE };
+        FloorColors[1] = (SVECTOR){ 0, ONE, 0, ONE };
+        FloorColors[2] = (SVECTOR){ 0, 0, ONE, ONE };
+        FloorColors[3] = (SVECTOR){ 0, ONE,  ONE, ONE };
+        //};
+        static SVECTOR FloorNormals[4];// = {
+        FloorNormals[0] = (SVECTOR){ 0, ONE, 0, ONE };
+        FloorNormals[1] = (SVECTOR){ 0, ONE, 0, ONE };
+        FloorNormals[2] = (SVECTOR){ 0, ONE, 0, ONE };
+        FloorNormals[3] = (SVECTOR){ 0, ONE, 0, ONE };
+        //};
+        
+        // internal member var
+        mesh_data.Colors = FloorColors;
+        mesh_data.Vertices = FloorVertices;
+        mesh_data.Normals = FloorNormals;
+        mesh_data.Indices = FloorIndices;
+        mesh_data.VertexCount = 4;
+        mesh_data.IndexCount = 6;
+        
+        // TODO - rename to match existing Model func
+        UpdateModelMatrix();
+    }    
+};
+
+...
+
+int main(int argc, char **argv)
+{
+#ifdef PS2_BUILD
+    PS2Renderer Render;
+    PS2Camera Cam;
+    PS2Floor Floor;
+    PS2Controller Pad;
+    PS2Light Lights[4];
+#endif
+
+    FloorObject Floor;
+    RendererImpl Render;
+    MeshData ModelMeshData;
+    ModelImpl SuzanneModel;
+    ModelMeshData.IndexCount = num_suzanne_test_indices;
+    ModelMeshData.VertexCount = num_suzanne_test_vertices;
+    ModelMeshData.Vertices = suzanne_test_vertices;
+    ModelMeshData.Indices = suzanne_test_indices;
+    ModelMeshData.Normals = suzanne_test_normals;
+    ModelMeshData.Colors = NULL;
+    SuzanneModel.SetMeshData( ModelMeshData );
+    
+    // TODO - make units platform agnostic
+    SuzanneModel.Translate( 0, 0, 4000 ); // notice pos z is forwards, left handed system
+
+#ifdef PS2_BUILD
+    Lights[0].SetDirection(  0.00f,  0.00f,  0.00f );
+    Lights[1].SetDirection(  1.00f,  0.00f, -1.00f );
+    Lights[2].SetDirection(  0.00f,  1.00f, -1.00f );
+    Lights[3].SetDirection( -1.00f, -1.00f, -1.00f );
+    Lights[0].SetColor( 0.00f, 0.00f, 0.00f );
+    Lights[1].SetColor( 1.00f, 0.00f, 0.00f );
+    Lights[2].SetColor( 0.30f, 0.30f, 0.30f );
+    Lights[3].SetColor( 0.50f, 0.50f, 0.50f );
+    Lights[0].SetType( Light::AMBIENT );
+    Lights[1].SetType( Light::DIRECTIONAL );
+    Lights[2].SetType( Light::DIRECTIONAL );
+    Lights[3].SetType( Light::DIRECTIONAL );
+
+    SifInitRpc(0);
+#endif
+
+    Render.Init();
+    //Render.AttachCamera( Cam );
+    //Render.AttachLight( Lights[0] );
+    //Render.AttachLight( Lights[1] );
+    //Render.AttachLight( Lights[2] );
+    //Render.AttachLight( Lights[3] );
+
+    Floor.Init();
+    Floor.Translate( 0, 0, 500 );
+    
+    //Pad.Init(0);
+
+    for (;;)
+    {
+        //Pad.Update();
+        //RotateCamera( Pad, Cam );
+        //TranslateCamera( Pad, Cam );
+        
+        //TeapotModel.Rotate( 0.0f, 0.01f, 0.0f );
+        //Render.DrawModel( TeapotModel );
+        
+        //Floor.Rotate( 0.01f, 0.0f, 0.0f );
+        //Floor.Rotate( 3, 0, 0 );
+        //Render.DrawModel( Floor );
+
+        SuzanneModel.Rotate( 1, 3, 0 );
+        Render.DrawModel( SuzanneModel );
+
+        Render.Update();
+    }
+
+    // Sleep
+    //SleepThread();
+
+    // End program.
+    return 0;
+
+}
+</code></pre>
+
 </div> <!-- contentDiv -->
 </div> <!-- bodyDiv -->
 
