@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>Joint JS UML Test</title>
+
+<!-- dependencies -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.3.3/backbone.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jointjs/2.1.0/joint.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jointjs/3.0.4/joint.shapes.uml.js"></script>
+
+<script src="uml_js.js"></script>
+
+</head>
+<body>
+
+<div id="compositeDiv">
+
+<h1>Composite</h1>
+
+<p>Used to implement a hierarchy of components,
+with leaves, a root, and subtrees. Client calls to a component
+function recursively call the same function for its sub-components,
+or just the function for itself if the call is on a leaf node.</p>
+
+<!-- uml content -->
+<div id="umlHolder"></div>
+
+<!-- code -->
+<script>
+
+var graph = new joint.dia.Graph;
+
+var paper = new joint.dia.Paper({
+    el: document.getElementById("umlHolder"),
+
+    model: graph,
+    width: 800,
+    height: 350,
+    gridSize: 10,
+    drawGrid: true/*,
+    background: {
+        color: "rgba(0, 255, 0, 0.3)"
+    }*/
+});
+
+// https://resources.jointjs.com/tutorial/multiple-links-between-elements
+//var adjustGraphVertices = _.partial(adjustVertices, graph);
+//graph.on('add remove change:source change:target', adjustGraphVertices);
+//paper.on('cell:pointerup', adjustGraphVertices);
+
+var component = UMLCreateAbstractClass('Component', ['Operation()',
+                                                    'Add(Component)',
+                                                    'Remove(Component)',
+                                                    'GetChild(int)']);
+component.position(100, 10);
+var leaf = UMLCreateClass('Leaf', ['Operation()']);
+leaf.size(100, 50);
+leaf.position(10, 150);
+var leafInheritance = UMLCreateInheritance(leaf, component);
+
+var composite = UMLCreateClassWithMembers('Composite',
+                                            ['children: vector<Component>'],
+                                            ['Operation()',
+                                            'Add(Component)',
+                                            'Remove(Component)',
+                                            'GetChild(int)']);
+composite.position(150, 150);
+var compositeInheritance = UMLCreateInheritance(composite, component);
+var compositionLink = UMLCreateCompositionConnection(composite, component);
+compositionLink.appendLabel({
+        attrs: {
+            text: {
+                text: 'children'
+            }
+        },  
+        position: {
+            distance: 60
+        }   
+    }); 
+compositionLink.vertices([
+    new g.Point(450, 200),
+]);
+compositionLink.router('orthogonal');
+compositionLink.connector('rounded');
+
+var operationDesc = UMLCreateDescription('Operation()', 
+    'forall g in children, call g.Operation();');
+operationDesc.position(500, 230);
+var operationDescConn = UMLCreateDescriptionConnection(composite, operationDesc);
+
+var client = UMLCreateClass('Client', []);
+client.position(10, 10);
+client.size(50, 50);
+var clientDel = UMLCreateDelegation(client, component);
+
+component.addTo(graph);
+leaf.addTo(graph);
+leafInheritance.addTo(graph);
+composite.addTo(graph);
+compositeInheritance.addTo(graph);
+compositionLink.addTo(graph);
+operationDesc.addTo(graph);
+operationDescConn.addTo(graph);
+client.addTo(graph);
+clientDel.addTo(graph);
+
+/*adjustVertices(graph, composite);*/
+
+</script>
+
+<p>Use when:
+<ul>
+<li>Building parts-of-a-whole with components with a hierarchy</li>
+<li>Clients should ignore/not care where they  are within the hierarchy
+to act upon a component and all of its subcomponents (if there are any)</li>
+</ul>
+</p>
+
+<p>Example C++ Code</p>
+
+<pre><code>// component interface (root type)
+class Equipment
+{
+public:
+    virtual ~Equipment();
+
+    const char* Name() { return m_name; }
+
+    // the 'operation' that all components have
+    virtual Currency Price();
+
+    // provides tree structure util funcs
+    virtual void Add(Equipment*);
+    virtual void Remove(Equipment*);
+    virtual Iterator&lt;Equipment*&gt;* CreateIterator(); // for traversing all children
+protected:
+    Equipment(const char*);
+private:
+    const char* m_name;
+};
+
+// a leaf node type that has no sub-components
+class FloppyDisk : public Equipment
+{
+public:
+    FloppyDisk(const char*);
+    virtual ~FloppyDisk();
+
+    // 'Operation()' implementation
+    virtual Currency Price();
+};
+
+// the Composite which contains sub-components
+class CompositeEquipment : public Equipment
+{
+public:
+
+    // will iterate and add price of all sub-children
+    virtual Currency Price()
+    {
+        Iterator&lt;Equipment*&gt;* i = CreateIterator();
+        Currency total = 0;
+
+        for (i-&gt;First(); !i-&gt;IsDone(); i++)
+        {
+            total += i-&gt;CurrentItem()-&gt;Price();
+        }
+        
+        delete i;
+        return total;
+    }
+
+    // provides tree structure util funcs
+    virtual void Add(Equipment*);
+    virtual void Remove(Equipment*);
+    virtual Iterator&lt;Equipment*&gt;* CreateIterator(); // for traversing all children
+protected:
+    CompositeEquipment(const char*);
+private:
+    List&lt;Equipment*&gt;* m_equipment;
+};
+
+// implementation of a composite, parent node
+class ComputerChassis : public CompositeEquipment
+{
+public:
+    ComputerChassis(const char*);
+    virtual ~ComputerChassis();
+
+    virtual Currency Price();
+};
+</code>
+</pre>
+
+</div>
+
+</body>
+</html>
