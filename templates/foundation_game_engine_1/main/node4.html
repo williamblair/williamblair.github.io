@@ -1,0 +1,166 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2019.2 (Released June 5, 2019) -->
+<HTML lang="EN">
+<HEAD>
+<TITLE>Quaternions</TITLE>
+<META NAME="description" CONTENT="Quaternions">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2019.2">
+
+<LINK REL="STYLESHEET" HREF="main.css">
+
+<LINK REL="next" HREF="node5.html">
+<LINK REL="previous" HREF="node3.html">
+<LINK REL="next" HREF="node5.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node5.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="main.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node3.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A
+ HREF="node5.html">Geometry</A>
+<B> Up:</B> <A
+ HREF="main.html">Foundations of Game Engine</A>
+<B> Previous:</B> <A
+ HREF="node3.html">Transformations</A>
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H1><A ID="SECTION00040000000000000000">
+Quaternions</A>
+</H1>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><!-- MATH
+ $\textbf{q} = xi + yj + zk + w$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.29ex; vertical-align: -0.57ex; " SRC="img65.svg"
+ ALT="$\textbf{q} = xi + yj + zk + w $"></SPAN></TD>
+<TD CLASS="RIGHT">Quaternion rep; i,j,k imaginary values, w is scalar val</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $\textbf{q} = \textbf{v} + s$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.03ex; vertical-align: -0.57ex; " SRC="img66.svg"
+ ALT="$\textbf{q} = \textbf{v} + s $"></SPAN></TD>
+<TD CLASS="RIGHT">alt rep. v = xyz, s = w scalar</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $\textbf{q} = (sin \frac{\theta}{2})\textbf{a} + cos\frac{\theta}{2}$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 3.07ex; vertical-align: -0.92ex; " SRC="img67.svg"
+ ALT="$\textbf{q} = (sin \frac{\theta}{2})\textbf{a} + cos\frac{\theta}{2}$"></SPAN></TD>
+<TD CLASS="RIGHT">rep. where rotation of <SPAN CLASS="MATH"><IMG STYLE="height: 1.84ex; vertical-align: -0.12ex; " SRC="img68.svg"
+ ALT="$\theta$"></SPAN> about axis <SPAN  CLASS="textbf">a</SPAN></TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $\textbf{q}_1\textbf{q}_2 = \textbf{v}_1 \times \textbf{v}_2 + s_1 \textbf{v}_2 + s_2 \textbf{v}_1 + s_1 s_2 - \textbf{v}_1 \cdot \textbf{v}_2$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.15ex; vertical-align: -0.68ex; " SRC="img69.svg"
+ ALT="$\textbf{q}_1\textbf{q}_2 = \textbf{v}_1 \times \textbf{v}_2 + s_1 \textbf{v}_2 + s_2 \textbf{v}_1 + s_1 s_2 - \textbf{v}_1 \cdot \textbf{v}_2
+$"></SPAN></TD>
+<TD CLASS="RIGHT">Quaternion multiplication</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $\textbf{q}_2\textbf{q}_1 = \textbf{q}_1\textbf{q}_2 - 2(\textbf{v}_1 \times \textbf{v}_2)$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.55ex; vertical-align: -0.70ex; " SRC="img70.svg"
+ ALT="$\textbf{q}_2\textbf{q}_1 = \textbf{q}_1\textbf{q}_2 - 2(\textbf{v}_1 \times \textbf{v}_2) $"></SPAN></TD>
+<TD CLASS="RIGHT">Order of multiplication property</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $\textbf{q}^*  = -\textbf{v} + s$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.28ex; vertical-align: -0.57ex; " SRC="img71.svg"
+ ALT="$\textbf{q}^* = -\textbf{v} + s $"></SPAN></TD>
+<TD CLASS="RIGHT">Quaternion conjugate</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $\textbf{q}\textbf{q}^* = \textbf{q}^*\textbf{q} = v^2 + s^2$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.57ex; vertical-align: -0.57ex; " SRC="img72.svg"
+ ALT="$\textbf{q}\textbf{q}^* = \textbf{q}^*\textbf{q} = v^2 + s^2 $"></SPAN></TD>
+<TD CLASS="RIGHT">Conjugate multiply</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $||\textbf{q}|| = \sqrt{\textbf{q}\textbf{q}^*} = \sqrt{v^2 + s^2}$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.92ex; vertical-align: -0.70ex; " SRC="img73.svg"
+ ALT="$\vert\vert\textbf{q}\vert\vert = \sqrt{\textbf{q}\textbf{q}^*} = \sqrt{v^2 + s^2} $"></SPAN></TD>
+<TD CLASS="RIGHT">Quaternion magnitude</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $\textbf{q}^{-1} = \frac{\textbf{q}^*}{\textbf{q}\textbf{q}^*} = \frac{-\textbf{v} + s}{v^2 + s^2}$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 3.61ex; vertical-align: -1.23ex; " SRC="img74.svg"
+ ALT="$\textbf{q}^{-1} = \frac{\textbf{q}^*}{\textbf{q}\textbf{q}^*} = \frac{-\textbf{v} + s}{v^2 + s^2}$"></SPAN></TD>
+<TD CLASS="RIGHT">Quaternion inverse</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $\textbf{v}^\lq = \textbf{q} \textbf{v} \textbf{q}^{-1}$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.65ex; vertical-align: -0.57ex; " SRC="img75.svg"
+ ALT="$\textbf{v}^\lq = \textbf{q} \textbf{v} \textbf{q}^{-1}$"></SPAN></TD>
+<TD CLASS="RIGHT">Vector rotation using quaternion (uses quat. mult.) 
+v is quaternion of form <!-- MATH
+ $v_x i + v_y j + v_z k + 0$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.50ex; vertical-align: -0.78ex; " SRC="img76.svg"
+ ALT="$v_x i + v_y j + v_z k + 0$"></SPAN>.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $\textbf{v}^\lq = \textbf{q} \textbf{v} \textbf{q}^*$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.65ex; vertical-align: -0.57ex; " SRC="img77.svg"
+ ALT="$\textbf{v}^\lq = \textbf{q} \textbf{v} \textbf{q}^*$"></SPAN></TD>
+<TD CLASS="RIGHT">Vector rotation using quaternion if quat is unit (magnitude = 1)</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $\textbf{v}^\lq = (\textbf{q}_2\textbf{q}_1)\textbf{v}(\textbf{q}_2\textbf{q}_1)^*$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.78ex; vertical-align: -0.70ex; " SRC="img78.svg"
+ ALT="$\textbf{v}^\lq = (\textbf{q}_2\textbf{q}_1)\textbf{v}(\textbf{q}_2\textbf{q}_1)^*$"></SPAN></TD>
+<TD CLASS="RIGHT">Multiple rotations combined</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $\textbf{M}_{rot}(\textbf{q}) = \begin{bmatrix}
+1 - 2y^2 - 2z^2 & 2(xy -wz) & 2(xz + wy) \\
+2(xy + wz) & 1 - 2x^2 -2z^2 & 2(yz -wx) \\
+2(xz - wy) & 2(yz + wx) & 1 - 2x^2 - 2y^2
+\end{bmatrix}
+$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 8.56ex; vertical-align: -3.72ex; " SRC="img79.svg"
+ ALT="$\textbf{M}_{rot}(\textbf{q}) = \begin{bmatrix}
+1 - 2y^2 - 2z^2 &amp; 2(xy -wz) &amp; 2...
+...z^2 &amp; 2(yz -wx) \\
+2(xz - wy) &amp; 2(yz + wx) &amp; 1 - 2x^2 - 2y^2
+\end{bmatrix}
+$"></SPAN></TD>
+<TD CLASS="RIGHT">Convert quaternion to rotation matrix</TD>
+</TR>
+</TABLE>
+
+<P>
+<BR><HR>
+
+</BODY>
+</HTML>

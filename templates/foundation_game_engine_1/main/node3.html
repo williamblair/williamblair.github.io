@@ -1,0 +1,283 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2019.2 (Released June 5, 2019) -->
+<HTML lang="EN">
+<HEAD>
+<TITLE>Transformations</TITLE>
+<META NAME="description" CONTENT="Transformations">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2019.2">
+
+<LINK REL="STYLESHEET" HREF="main.css">
+
+<LINK REL="next" HREF="node4.html">
+<LINK REL="previous" HREF="node2.html">
+<LINK REL="next" HREF="node4.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node4.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="main.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node2.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A
+ HREF="node4.html">Quaternions</A>
+<B> Up:</B> <A
+ HREF="main.html">Foundations of Game Engine</A>
+<B> Previous:</B> <A
+ HREF="node2.html">Matrix Formulas</A>
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H1><A ID="SECTION00030000000000000000">
+Transformations</A>
+</H1>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><!-- MATH
+ $\textbf{M}\textbf{v} = v_x \textbf{a} + v_y \textbf{b} + v_z \textbf{c}$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.50ex; vertical-align: -0.78ex; " SRC="img33.svg"
+ ALT="$\textbf{M}\textbf{v} = v_x \textbf{a} + v_y \textbf{b} + v_z \textbf{c}$"></SPAN></TD>
+<TD CLASS="RIGHT">Where a,b,c are the columns of M</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $\textbf{M}^T \textbf{M} = \begin{bmatrix}
+a^2 & \textbf{a} \cdot \textbf{b} & \textbf{a} \cdot \textbf{c} \\
+\textbf{b} \cdot \textbf{a} & b^2 & \textbf{b} \cdot \textbf{c} \\
+\textbf{c} \cdot \textbf{a} & \textbf{c} \cdot \textbf{b} & c^2
+\end{bmatrix}
+$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 8.56ex; vertical-align: -3.72ex; " SRC="img48.svg"
+ ALT="$\textbf{M}^T \textbf{M} = \begin{bmatrix}
+a^2 &amp; \textbf{a} \cdot \textbf{b} &amp; ...
+...textbf{c} \cdot \textbf{a} &amp; \textbf{c} \cdot \textbf{b} &amp; c^2
+\end{bmatrix}
+$"></SPAN></TD>
+<TD CLASS="RIGHT">Orthogonal transform; a,b,c are cols of M. Unit cols and all perpindicular. 
+<!-- MATH
+ $M^T = M^-1$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.18ex; vertical-align: -0.12ex; " SRC="img49.svg"
+ ALT="$M^T = M^-1$"></SPAN></TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $\textbf{B} = \textbf{M} \textbf{A} \textbf{M}^{-1}$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.29ex; vertical-align: -0.12ex; " SRC="img50.svg"
+ ALT="$\textbf{B} = \textbf{M} \textbf{A} \textbf{M}^{-1} $"></SPAN></TD>
+<TD CLASS="RIGHT">Transform from coord space A applied in coord space B. M = coord space transform.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $M_{rot_x}(\theta) = \begin{bmatrix}
+1 & 0 & 0 \\
+0 & cos \theta & -sin \theta \\
+0 & sin \theta & cos \theta
+\end{bmatrix}
+$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 8.56ex; vertical-align: -3.72ex; " SRC="img51.svg"
+ ALT="$M_{rot_x}(\theta) = \begin{bmatrix}
+1 &amp; 0 &amp; 0 \\
+0 &amp; cos \theta &amp; -sin \theta \\
+0 &amp; sin \theta &amp; cos \theta
+\end{bmatrix}
+$"></SPAN></TD>
+<TD CLASS="RIGHT">Rotation matrix about X axis</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $M_{rot_y}(\theta) = \begin{bmatrix}
+ cos \theta & 0 & sin \theta \\
+0 & 1 & 0 \\
+sin \theta & 0 & cos \theta
+\end{bmatrix}
+$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 8.56ex; vertical-align: -3.72ex; " SRC="img52.svg"
+ ALT="$M_{rot_y}(\theta) = \begin{bmatrix}
+cos \theta &amp; 0 &amp; sin \theta \\
+0 &amp; 1 &amp; 0 \\
+sin \theta &amp; 0 &amp; cos \theta
+\end{bmatrix}
+$"></SPAN></TD>
+<TD CLASS="RIGHT">Rotation matrix about Y axis</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $M_{rot_z}(\theta) = \begin{bmatrix}
+cos \theta & -sin \theta & 0 \\
+sin \theta & cos \theta & 0 \\
+0 & 0 & 1
+\end{bmatrix}
+$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 8.56ex; vertical-align: -3.72ex; " SRC="img53.svg"
+ ALT="$M_{rot_z}(\theta) = \begin{bmatrix}
+cos \theta &amp; -sin \theta &amp; 0 \\
+sin \theta &amp; cos \theta &amp; 0 \\
+0 &amp; 0 &amp; 1
+\end{bmatrix}
+$"></SPAN></TD>
+<TD CLASS="RIGHT">Rotation matrix about Z axis</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $M_{rot}(\theta, \textbf{a}) = \begin{bmatrix}
+c + (1-c)a_x^2 & (1-c)a_x a_y - s a_z & (1-c)a_x a_z + s a_y \\
+(1-c)a_x a_y + s a_z & c + (1-c)a_y^2 & (1-c)a_y a_z - s a_x \\
+(1-c)a_x a_z - s a_y & (1-c)a_y a_z + s a_x & c + (1-c) a_z^2
+\end{bmatrix}
+$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 8.62ex; vertical-align: -3.74ex; " SRC="img54.svg"
+ ALT="$M_{rot}(\theta, \textbf{a}) = \begin{bmatrix}
+c + (1-c)a_x^2 &amp; (1-c)a_x a_y - ...
+...
+(1-c)a_x a_z - s a_y &amp; (1-c)a_y a_z + s a_x &amp; c + (1-c) a_z^2
+\end{bmatrix}
+$"></SPAN></TD>
+<TD CLASS="RIGHT">Rotation matrix about arbitrary axis <SPAN  CLASS="textbf">a</SPAN>. c = <!-- MATH
+ $cos \theta$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 1.84ex; vertical-align: -0.12ex; " SRC="img55.svg"
+ ALT="$cos \theta$"></SPAN>, s = <!-- MATH
+ $sin \theta$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 1.84ex; vertical-align: -0.12ex; " SRC="img56.svg"
+ ALT="$sin \theta $"></SPAN></TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $M_{reflect}(\textbf{a}) = \begin{bmatrix}
+1 - 2a_x^2 & -2a_x a_y & -2a_x a_z \\
+-2a_x a_y & 1 -2a_y^2 & -2a_y a_z \\
+-2a_x a_z & -2a_y a_z & 1 - 2a_z^2
+\end{bmatrix}
+$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 8.62ex; vertical-align: -3.74ex; " SRC="img57.svg"
+ ALT="$M_{reflect}(\textbf{a}) = \begin{bmatrix}
+1 - 2a_x^2 &amp; -2a_x a_y &amp; -2a_x a_z \...
+... 1 -2a_y^2 &amp; -2a_y a_z \\
+-2a_x a_z &amp; -2a_y a_z &amp; 1 - 2a_z^2
+\end{bmatrix}
+$"></SPAN></TD>
+<TD CLASS="RIGHT">Reflection matrix about axis <SPAN  CLASS="textbf">a</SPAN>, assumes a unit length.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $M_{invol}(\textbf{a}) = \begin{bmatrix}
+2a_x^2 - 1 & 2a_x a_y & 2a_x a_z \\
+2a_x a_y & 2a_y^2 - 1 & 2a_y a_z \\
+2a_x a_z & 2a_y a_z & 2a_z^2 - 1
+\end{bmatrix}
+$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 8.62ex; vertical-align: -3.74ex; " SRC="img58.svg"
+ ALT="$M_{invol}(\textbf{a}) = \begin{bmatrix}
+2a_x^2 - 1 &amp; 2a_x a_y &amp; 2a_x a_z \\
+...
+... &amp; 2a_y^2 - 1 &amp; 2a_y a_z \\
+2a_x a_z &amp; 2a_y a_z &amp; 2a_z^2 - 1
+\end{bmatrix}
+$"></SPAN></TD>
+<TD CLASS="RIGHT">Involution matrix about axis <SPAN  CLASS="textbf">a</SPAN>, assumes a unit length. Negation of reflect mat.</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $M_{scale}(s_x,s_y,s_z) = \begin{bmatrix}
+s_x & 0 & 0 \\
+0 & s_y & 0 \\
+0 & 0 & s_z
+\end{bmatrix}
+$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 8.56ex; vertical-align: -3.72ex; " SRC="img59.svg"
+ ALT="$M_{scale}(s_x,s_y,s_z) = \begin{bmatrix}
+s_x &amp; 0 &amp; 0 \\
+0 &amp; s_y &amp; 0 \\
+0 &amp; 0 &amp; s_z
+\end{bmatrix}
+$"></SPAN></TD>
+<TD CLASS="RIGHT">Scale matrix about x,y,z axes</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $M_{scale}(s,\textbf{a}) = \begin{bmatrix}
+(s-1)a_x^2 + 1 & (s-1)a_x a_y & (s-1) a_x a_z \\
+(s-1)a_x a_y & (s-1) a_y^2 + 1 & (s-1)a_y a_z \\
+(s-1)a_x a_z & (s-1) a_y a_z & (s-1)a_z^2 + 1
+\end{bmatrix}
+$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 8.62ex; vertical-align: -3.74ex; " SRC="img60.svg"
+ ALT="$M_{scale}(s,\textbf{a}) = \begin{bmatrix}
+(s-1)a_x^2 + 1 &amp; (s-1)a_x a_y &amp; (s-1...
+...s-1)a_y a_z \\
+(s-1)a_x a_z &amp; (s-1) a_y a_z &amp; (s-1)a_z^2 + 1
+\end{bmatrix}
+$"></SPAN></TD>
+<TD CLASS="RIGHT">Scale matrix along direction <SPAN  CLASS="textbf">a</SPAN></TD>
+</TR>
+</TABLE>  
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><!-- MATH
+ $M_{skew}(\theta, \textbf{a}, \textbf{b}) = \begin{bmatrix}
+a_x b_x tan \theta + 1 & a_x b_y tan \theta & a_x b_z tan \theta \\
+a_y b_x tan \theta & a_y b_y tan \theta + 1 & a_y b_z tan \theta \\
+a_z b_x tan \theta & a_z b_y tan \theta & a_z b_z tan \theta + 1
+\end{bmatrix}
+$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 8.56ex; vertical-align: -3.72ex; " SRC="img61.svg"
+ ALT="$M_{skew}(\theta, \textbf{a}, \textbf{b}) = \begin{bmatrix}
+a_x b_x tan \theta ...
+...z b_x tan \theta &amp; a_z b_y tan \theta &amp; a_z b_z tan \theta + 1
+\end{bmatrix}
+$"></SPAN></TD>
+<TD CLASS="RIGHT">Skew matrix along direction <SPAN  CLASS="textbf">a</SPAN> based on length projection <SPAN  CLASS="textbf">b</SPAN></TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $M_{skew}(\theta, \textbf{a}, \textbf{b}) = \textbf{I} + tan \theta (\textbf{a} \otimes \textbf{b})$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.55ex; vertical-align: -0.70ex; " SRC="img62.svg"
+ ALT="$M_{skew}(\theta, \textbf{a}, \textbf{b}) = \textbf{I} + tan \theta (\textbf{a} \otimes \textbf{b})$"></SPAN></TD>
+<TD CLASS="RIGHT">Alternative skew matrix formation</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $\textbf{H} = \begin{bmatrix}\textbf{M} & \textbf{t} \\\textbf{0} & 1 \end{bmatrix}$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 5.79ex; vertical-align: -2.32ex; " SRC="img63.svg"
+ ALT="$\textbf{H} = \begin{bmatrix}\textbf{M} &amp; \textbf{t} \\ \textbf{0} &amp; 1 \end{bmatrix} $"></SPAN></TD>
+<TD CLASS="RIGHT">Homogenous transformation matrix; M = 3x3 transf mat, t = translate vec</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $\textbf{H}^{-1} = \begin{bmatrix}
+\textbf{M}^{-1} & -\textbf{M}^{-1}\textbf{t} \\\textbf{0} & 1 
+\end{bmatrix} $
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 5.90ex; vertical-align: -2.38ex; " SRC="img64.svg"
+ ALT="$\textbf{H}^{-1} = \begin{bmatrix}
+\textbf{M}^{-1} &amp; -\textbf{M}^{-1}\textbf{t} \\ \textbf{0} &amp; 1
+\end{bmatrix} $"></SPAN></TD>
+<TD CLASS="RIGHT">Homogenous transformation matrix inverse</TD>
+</TR>
+</TABLE>
+
+<P>
+<BR><HR>
+
+</BODY>
+</HTML>
