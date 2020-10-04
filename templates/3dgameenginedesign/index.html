@@ -279,6 +279,50 @@ var Math3D = {
         ];
     },
 
+    // [0,  1,  2,  3,
+    //  4,  5,  6,  7,
+    //  8,  9,  10, 11,
+    //  12, 13, 14, 15]
+    matInverse4x4: function(mat) {
+        
+        // a cross b
+        var s = [ mat[4]*mat[9] - mat[8]*mat[5],
+                  mat[8]*mat[1] - mat[0]*mat[9],
+                  mat[0]*mat[5] - mat[4]*mat[1] ];
+        // c cross d
+        var t = [ mat[6]*mat[11] - mat[10]*mat[7],
+                  mat[10]*mat[3] - mat[2]*mat[11],
+                  mat[2]*mat[7] - mat[6]*mat[3] ];
+        // y*a - x*b
+        var u = [ mat[13]*mat[0] - mat[12]*mat[1],
+                  mat[13]*mat[4] - mat[12]*mat[5],
+                  mat[13]*mat[8] - mat[12]*mat[9] ];
+        // w*c - z*d
+        var v = [ mat[15]*mat[2] - mat[14]*mat[3],
+                  mat[15]*mat[6] - mat[14]*mat[7],
+                  mat[15]*mat[10] - mat[14]*mat[11] ];
+
+        var divisor = 1.0 / ((s[0]*v[0] + s[1]*v[1] + s[2]*v[2]) + // s dot v
+                            (t[0]*u[0] + t[1]*u[1] + t[2]*u[2])) // t dot u
+
+        return [(mat[5]*v[2] - mat[9]*v[1] + mat[13]*t[0])*divisor, // b cross v + yt
+                (mat[9]*v[0] - mat[1]*v[2] + mat[13]*t[1])*divisor,
+                (mat[1]*v[1] - mat[5]*v[0] + mat[13]*t[2])*divisor,
+                (-(mat[1]*t[0] + mat[5]*t[1] + mat[9]*t[2]))*divisor, // -b dot t
+                (v[1]*mat[8] - v[2]*mat[4] - mat[12]*t[0])*divisor, // v cross a - xt
+                (v[2]*mat[0] - v[0]*mat[8] - mat[12]*t[1])*divisor,
+                (v[0]*mat[4] - v[1]*mat[0] - mat[12]*t[2])*divisor,
+                (mat[0]*t[0] + mat[4]*t[1] + mat[8]*t[2])*divisor, // a dot t
+                (mat[7]*u[2] - mat[11]*u[1] + mat[15]*s[0])*divisor, // d cross u + ws
+                (mat[11]*u[0] - mat[3]*u[2] + mat[15]*s[1])*divisor,
+                (mat[3]*u[1] - mat[7]*u[0] + mat[15]*s[2])*divisor,
+                (-(mat[3]*s[0] + mat[7]*s[1] + mat[11]*s[2]))*divisor, // -d dot s
+                (u[1]*mat[10] - u[2]*mat[6] - mat[14]*s[0])*divisor, // u cross c - zs
+                (u[2]*mat[2] - u[0]*mat[10] - mat[14]*s[1])*divisor,
+                (u[0]*mat[6] - u[1]*mat[2] - mat[14]*s[2])*divisor,
+                (mat[2]*s[0] + mat[6]*s[1] + mat[10]*s[2])*divisor ]; // c dot s
+    },
+
     // matrices are in row major order
     translation4x4: function(dX, dY, dZ) {
         return [
@@ -501,6 +545,18 @@ var renderLoop = function()
 
 time = new Date().getTime();
 window.requestAnimationFrame(renderLoop);
+
+var testMat1 = [ 2.0, 0.0, 3.0, 6.0,
+                 0.2, 0.5, 1.5, 7.5,
+                 -8.6, 1.3, 4.5, 3.2,
+                -1.0, -2.0, -3.0, -4.0];
+var testMat2 = Math3D.matInverse4x4(testMat1);
+
+var testMat3 = Math3D.matTimesMat4x4(testMat1, testMat2);
+
+Math3D.printMat4x4('testmat1', testMat1);
+Math3D.printMat4x4('testmat2', testMat2);
+Math3D.printMat4x4('testmat3', testMat3)
 
 </script>
 

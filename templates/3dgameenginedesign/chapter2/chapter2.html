@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>BJ's Website</title>
+</head>
+<body>
+<h1>Chapter 2</h1>
+
+<h3>Geometric Pipeline</h3>
+<img src="geometric_pipeline.png"/>
+
+<h3>Lighting</h3>
+<ul>
+<li> Final lighting equation
+    <ul><li><img src="final_lighting_1.png"/></li></ul>
+</li>
+<li> Alternative final lighting equation
+    <ul><li><img src="final_lighting_2.png"/></li></ul>
+</li>
+<li>operator &deg; represents componentwise multiplication</li>
+<li> Ambient Calculation
+    <ul><li><img src="ambient_calculation.png"/></li>
+    </ul>
+</li>
+<li> Diffuse Calculation
+    <ul><li><img src="diffuse_calculation.png"/></li>
+    </ul>
+</li>
+<li>Specular Calculation
+    <ul><li><img src="specular_final.png"/></li>
+        <li>Phong Equation <img src="phong_attenuation.png"/></li>
+        <li>Blinn Equation <img src="blinn_attenuation.png"/></li>
+    </ul>
+</li>
+<li>Spotlight Attenuation options (&sigma; = 1.0 if not spotlight)
+    <ul><li><img src="spot_attenuation_1.png"/></li>
+        <li><img src="spot_attenuation_2.png"/></li>
+        <li><img src="spot_attenuation_3.png"/></li>
+    </ul>
+</li>
+</ul>
+
+<h3>Filtering and mipmapping methods</h3>
+<img src="nearest_neighbor.png"/>
+<img src="bilinear.png"/>
+<img src="linear_linear_mipmap.png"/>
+<img src="anisotropic_16samples.png"/>
+
+<h3>Matrix Storage Methods</h3>
+<img src="api_conventions.png"/>
+
+<h3>Transformation Matrices</h3>
+<img src="viewmat_d3d.png"/>
+<img src="viewmat_opengl.png"/>
+<img src="projmat_d3d.png"/>
+<img src="projmat_opengl.png"/>
+
+<h3>Window Handedness</h3>
+<p><b>OpenGL</b> thinks of the window coordinates as being right-handed. The origin (0, 0)
+is the <b>lower-left</b> corner of the window. The x-values increase as you move from left
+to right. The y-values increase as you move from bottom to top.</p>
+<p><b>Direct3D</b> thinks of the window coordinates as being left-
+handed. The origin (0, 0) is the <b>upper-left</b> corner of the window. The x-values in-
+crease as you move from left to right. The y-values increase as you move from top
+to bottom</p>
+
+</body>
+</html>
+
