@@ -1,0 +1,59 @@
+## Digital Phase Modulation Schemes
+
+* Binary Phase Shift Keying (BPSK): 1 bit per symbol
+    * ![BPSK Constellation](bpsk_constellation.png)
+* Quaternary Phase Shift Keying (QPSK): 2 bits per symbol
+    * ![QPSK Constellation](qpsk_constellation.png)
+* 8-Phase Shift Keying (8PSK): 3 bits per symbol
+    * ![8PSK Constellation](8psk_constellation.png)
+* ![QPSK Symbols Amplitudes](qpsk_iq_amplitudes.png)
+
+## Digital Amplitude Modulation Schemes
+
+* 4-position Quadrature Amplitude Modulation (4-QAM): 2 bits per symbol
+* 16-position Quadrature Amplitude Modulation (16-QAM): 4 bits per symbol
+* 64-position Quadrature Amplitude Modulation (64-QAM): 6 bits per symbol
+* ![QAM Constellations](qam_constellations.png)
+
+## Decision Boundaries
+* ![Descision Boundaries](decision_boundaries.png)
+
+## Pulse Shaping
+* Purpose: limit the bandwidth of the transmission
+* Happens after bit-to symbol mapping above
+* Have to avoid introducing inter-symbol-interference (ISI)
+* Popular implementation: raised cosine filter (RC)
+    * One-half implemented on transmitter end, other half implemented
+      on receive end
+    * Each half is a root-raised cosine filter (RRC) filter
+    * When combined, the RRC filters provide zero-ISI
+    * ![RRC Filter Results](rrc_results.png)
+
+## Digital Upconversion and Downconversion
+* Modulates and Demodulates a signal
+* Additionally moves between the symbol rate f_symbol and the DAC or ADC
+ sampling rate f_system
+* Digital Upconverter (DUC): transmitter, f_symbol -> f_system through filtering
+    * ![DUC Diagram](duc_diagram.png)
+* Digital Downconverter (DDC): receiver, f_system -> f_symbol
+    * ![DDC Diagram](ddc_diagram.png)
+* Multirate R_multirate = f_system/f_symbol
+
+## Carrier Synchronization
+* On receive side, need to account for phase and frequency offset
+  errors
+    * ![Carrier Synchronization](carrier_synchronization.png)
+* Phase error calculation:
+    * Decision Directed: transmitted data symbols unknown, phase error
+      is generated based on symbol decision (closest symbol to received
+      sample)
+        * Generally use this method
+        * Possible that there is still phase rotation (e.g., a multiple
+          of 90 degrees)
+    * Data aided: receiver knows transmitted symbols, derives phase
+      error based on that
+* ![Carrier Synchronization Diagram](carrier_synchronization_circuit.png)
+* ![Phase Error Diagram](phase_error_diagram.png)
+
+Left off on timing errors and symbol recovery
+
