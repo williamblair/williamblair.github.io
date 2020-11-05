@@ -1093,6 +1093,61 @@ int main(int argc, char **argv)
 }
 </code></pre>
 
+<h3>11/04/2020</h3>
+
+<p>Working on getting an FPS camera implemented how it's done in the
+learnopengl tutorials, with a lookat matrix at the eye location + 
+normalized front vector</p>
+
+<p>Having trouble debugging because I can't seem to get floating
+point values to print out properly; they just show 'f'!:</p>
+
+<pre><code>float testNum = 3.14159;
+printf("Test float: %f\n", testNum);
+</code></pre>
+
+<img src="psximages/printfloat_float.png"/>
+
+<p>Printing the hex value of the float shows as follows:</p>
+
+<pre><code>float testNum = 3.14159;
+printf("Test float: 0x%X\n", *((unsigned int*)&amp;testNum));
+</code></pre>
+
+<img src="psximages/printfloat_hex.png"/>
+
+<p>Which can be interpreted using a IEEE-754 Floating Point Converter:
+<a href="https://www.h-schmidt.net/FloatConverter/IEEE754.html">https://www.h-schmidt.net/FloatConverter/IEEE754.html</a>
+</p>
+
+<img src="psximages/ieee_float_conv.png"/>
+
+<p>This shows the value is relatively close to our expected value of 3.14, however
+is inaccurate by about 0.01.
+
+What came to me as a simple solution is to multiply the float by 10000 to shift the decimal
+point left by 4, then print it as a decimal:</p>
+
+<pre><code>float testNum = 3.14159;
+printf("Test float: %ld\n", (long)(testNum*10000.0));
+</code></pre>
+
+<img src="psximages/printfloat_scaled_int.png"/>
+
+<p>Which we can see gives us 31415. That'll probably have to be close enough.</p>
+
+<p>During this I ended up reading about the binary ieee-754 floating point
+format: 
+<a href="http://www.cs.yale.edu/homes/aspnes/pinewiki/C(2f)FloatingPoint.html">http://www.cs.yale.edu/homes/aspnes/pinewiki/C(2f)FloatingPoint.html</a>
+</p>
+
+<p>The only part I think wasn't explained very well is the 23 bits of mantissa; what that
+represents. I figured out that the mantissa binary value for ieee-754 is
+equal to 1.X, where X = (binary value)/(highest possible binary value).
+For example, 0b10000000000000000000000 translates to 0b10000000000000000000000/0b11111111111111111111111
+= 4194304/8388608 = 0.5, but since the mantissa represents 1.X, the
+final mantissa value is 1.5.</p>
+
 </div> <!-- contentDiv -->
 </div> <!-- bodyDiv -->
 
