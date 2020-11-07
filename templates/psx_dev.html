@@ -1148,6 +1148,40 @@ For example, 0b10000000000000000000000 translates to 0b10000000000000000000000/0
 = 4194304/8388608 = 0.5, but since the mantissa represents 1.X, the
 final mantissa value is 1.5.</p>
 
+<h3>11/06/2020</h3>
+<p>Got the FPS camera working, as well as adding the controller class
+back into the code.</p>
+
+<img src="psximages/fps_cam_working.gif"/>
+
+<p>It was interesting that in the first iteration of the code,
+using floats, the rotation calculation was extremely slow; you could
+visibly see the slowdown when running.</p>
+
+<pre><code>float dirX = cos( deg2rad(yaw) ) * cos( deg2rad(pitch) );
+float dirY = sin( deg2rad(pitch) );
+float dirZ = sin( deg2rad(yaw) ) * cos( deg2rad(pitch) );
+setVector( &unnormalizedFront, (long)(dirX*ONE), (long)(dirY*ONE), (long)(dirZ*ONE) );
+VectorNormal( &unnormalizedFront, &front );
+</code></pre>
+
+<p>After switching the floating point sin/cosine to the PSX
+fixed point sin/cosine, the code sped back up:</p>
+
+<pre><code>float radYaw = deg2rad( yaw );
+float radPitch = deg2rad( pitch );
+
+int cosYaw = rcos( (int)(radYaw*ONE) );
+int cosPitch = rcos( (int)(radPitch*ONE) );
+int sinYaw = rsin( (int)(radYaw*ONE) );
+int sinPitch = rsin( (int)(radPitch*ONE) );
+
+unnormalizedFront.vx = (cosYaw * cosPitch)>>12;
+unnormalizedFront.vy = sinPitch;
+unnormalizedFront.vz = (sinYaw * cosPitch)>>12;
+VectorNormal( &unnormalizedFront, &front );
+</code></pre>
+
 </div> <!-- contentDiv -->
 </div> <!-- bodyDiv -->
 
