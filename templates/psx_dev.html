@@ -1182,6 +1182,70 @@ unnormalizedFront.vz = (sinYaw * cosPitch)>>12;
 VectorNormal( &unnormalizedFront, &front );
 </code></pre>
 
+<h3>11/08/2020</h3>
+
+<p>Basic lighting is working. It seems like you can have a maximum of 
+3 lights as they are all stored in a single set of matrices (color, position,
+rotation). Todo is to extract and store the matrices inside the renderer
+instead so you can have multiple light objects (currently there can
+only be one light object since it stores the matrix).</p>
+
+<p>Another important note is the order of setting the GTE
+values and matrix calculation: this order worked</p>
+<pre><code>PushMatrix();
+CompMatrixLV( (MATRIX*)&camera->viewMat, (MATRIX*)&model.modelMat, &workMat );
+if ( light != NULL )
+{
+    light->Use();
+    light->Translate( workMat );
+}
+SetRotMatrix( &workMat );
+SetTransMatrix( &workMat );
+</code></pre>
+
+<p>While this order didn't:</p>
+
+<pre><code>PushMatrix();
+CompMatrixLV( (MATRIX*)&camera->viewMat, (MATRIX*)&model.modelMat, &workMat );
+SetRotMatrix( &workMat );
+SetTransMatrix( &workMat );
+if ( light != NULL )
+{
+    light->Use();
+    light->Translate( workMat );
+}
+</code></pre>
+
+<p>where Light::Use() and Light::Translate() contain</p>
+<pre><code>void Light::Use()
+{
+    // TODO - setbackcolor - variable - is this ambient?
+    SetBackColor( 63, 63, 63 );
+    SetColorMatrix( &colorMat );
+}
+void Light::Translate( MATRIX& rottrans )
+{
+    MATRIX res; // resulting calculated matrix
+
+    // calculate the angle matrix in relative screen coords
+    RotMatrix( &angle, &angleMat );
+    MulMatrix( &angleMat, &rottrans );
+
+    // calculate the rottrans matrix for the light
+    MulMatrix0( &posMat, &angleMat, &res );
+
+    // send the resulting light matrix to the GTE
+    SetLightMatrix( &res );
+}
+</code></pre>
+
+<p>Which I think has to do with the fact that certain matrix calculation
+functions overwrite some GTE registers or something similar to that.</p>
+
+<p>Here's the result:</p>
+
+<img src="psximages/monkey_lighting.gif"/>
+
 </div> <!-- contentDiv -->
 </div> <!-- bodyDiv -->
 
