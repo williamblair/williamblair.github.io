@@ -320,6 +320,40 @@ int main(int argc, char **argv)
 }
 </code></pre>
 
+<h3>11/11/2020</h3>
+
+<p>Investigating 
+<a href="http://glampert.com/">Glampert's PS2Dev programs</a>
+(repo here: <a href="https://bitbucket.org/glampert/ps2dev-tests/src/master/">https://bitbucket.org/glampert/ps2dev-tests/src/master/</a>)
+to see how they're implemented. Got the cubes application to
+compile after a few changes (presumably this was needed due to
+updates/more modern ps2sdk changes)</p>
+
+<p>First, replaced fio* IO functions with c standard library
+ones (fioOpen() with open(), fioLseek with lseek(), etc.)</p>
+
+<p>
+Second, removed the virtual CameraBase deconstructor and deconstructor
+from the thirdperson camera classes, due to the following error:
+Undefined reference to '__cxa_pure_virtual' with regards to the 
+third person camera deconstructor
+</p>
+
+<p>Third, removed `-lmf` from the compiler flags as mf wasn't found</p>
+
+<p>After building, the result running in pcsx2 was having controller
+issues:</p>
+<img src="images/glampert_controller_error.png"/>
+
+<p>So I replaced the game controller pad implementation with my own
+I had created a while back: <a href="https://github.com/williamblair/PS2Pad">https://github.com/williamblair/PS2Pad</a></p>
+
+<p>Success! The result:</p>
+
+<img src="images/cubes_demo.gif"/>
+
+<p>My forked version of Glampert's repo is here: <a href="https://bitbucket.org/williamblair/ps2dev-tests/src/master/">https://bitbucket.org/williamblair/ps2dev-tests/src/master/</a></p>
+
 <p><a href="../../index.html">&lt;-- Back to Home</a></p>
 
 </div> <!-- contentDiv -->
