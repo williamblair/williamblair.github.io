@@ -356,6 +356,44 @@ I had created a while back: <a href="https://github.com/williamblair/PS2Pad">htt
 
 <p><a href="../../index.html">&lt;-- Back to Home</a></p>
 
+<h3>11/15/2020</h3>
+
+<p>Finished the main setup/system initialization re-writing of Glampert's cube demo.
+This only required part of the Renderer class to be implemented along with the RenderPacket
+class.</p>
+
+<p>I had an issue where would never pass 'draw_wait_finish()', however after removing some printf
+statements it worked. I assume then that the PS2/library are sensitive to timing with regards to hardware
+status, which I guess makes sense:</p>
+
+<pre><code>dma_wait_fast();
+dma_channel_send_chain(DMA_CHANNEL_GIF, currentFramePacket->GetQwordPtr(), currentFramePacket->GetDisplacement(currentFrameQwPtr), 0, 0);
+
+// V-Sync wait
+graph_wait_vsync();
+draw_wait_finish();
+</code></pre>
+
+<p>The above worked, while below did not:</p>
+
+<pre><code>printf("end frame dma wait fast\n");
+dma_wait_fast();
+printf("end frame dma wait channel send chain\n");
+dma_channel_send_chain(DMA_CHANNEL_GIF, currentFramePacket->GetQwordPtr(), currentFramePacket->GetDisplacement(currentFrameQwPtr), 0, 0);
+
+// V-Sync wait
+printf("end frame wait vsync\n");
+graph_wait_vsync();
+printf("end frame draw wait finish\n");
+draw_wait_finish();
+</code></pre>
+
+<p>The result isnt very exciting yet, just a brown screen:</p>
+
+<img src="images/glampert_01_clearscreen.png"/>
+
+<p>The code can be found here: <a href="https://bitbucket.org/williamblair/glampert_rewrite/src/master/">link</a>
+
 </div> <!-- contentDiv -->
 </div> <!-- bodyDiv -->
 
