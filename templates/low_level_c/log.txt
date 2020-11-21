@@ -11,6 +11,7 @@ Pages 1-24
 	- mov
 
 11/19/2020: 6:00pm-7:45pm
+----------
 Pages 24-31
 (continuing basic assembly with nasm)
 	- jg/jz/je/ja
@@ -20,5 +21,12 @@ Pages 24-31
 	- endianness
 
 11/20/2020: 6:00pm-7:49pm
+----------
 Pages 31-34
 (function creation assignments and string length)
+
+11/21/2020: 1:30pm-3:41pm
+----------
+Pages 34
+	- div, sub, dec
+	- printUint finished

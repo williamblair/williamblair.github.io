@@ -75,3 +75,12 @@ function calling pattern:
 4) after the function returns rax will hold the return value
 5) restore caller-saved registers
 
+div: unsigned integer divide
+syntax: div, <reg or memaddress>
+divides rax by <reg or memaddress>, storing the result back in rax,
+and the remainder in rdx
+
+rdx appears to need to be set to zero before calling (mov rdx, 0) - without
+doing this I get floating point exception:
+	Floating point exception (core dumped)
+
