@@ -1,0 +1,77 @@
+x86_64 architecture:
+16 64-bit registers, r0...r15
+r1 = rcx; c = "cycle"
+	"loop" uses rcx as a cycle counter
+
+r0 = rax = accumulator
+r3 = rbx = base register
+r1 = rcx = cycles (ex "loop")
+r2 = rdx = data for input/output
+r4 = rsp = topmost stack element pointer
+r5 = rbp = stack frame's base
+r6 = rsi = source index in string manipulation
+r7 = rdi = destionation index in string manip
+r8...r15 = (no aliases)
+
+suffixes to access different portions of registrers:
+d = double word = lower 32 bits
+w = word = lowest 16 bits
+b = byte = lowest 8 bits
+ ex) r7b, r3w, r0d
+
+rip register = address of the next instruction to be executed
+
+128bit registers:
+xmm0...xmm15
+
+Protection rings:
+limit application capabilities for security and robustmess
+Each ring represents a different privilege level
+x86_64 has 4 levels, only 2 used: ring-0 (most privileged), ring-3 (least privileged
+
+current level stored in lowest two bits of cs register
+which can only be changed via interrupt or system call
+
+hardware stack:
+rsp = stack pointer
+push <arg>
+	depending on arg size, rsp is decreased by 2,4,6, or 8
+	arg stored in memory at new rsp address
+pop <arg>
+	top of stack copied into arg
+	rsp increased by arg size
+
+3 Files automatically opened at the start of a program:
+stdin, stdout, and stderr. They have file descriptor
+values of 0, 1, and 2 (fd)
+
+asm programming:
+square brackets indicate indirect addressing
+	value inside brackets indicate the address
+	to get the value from
+	the amount of memory to copy is equal to the size
+	of the first operand
+
+lea = load effective address
+	allows calculation of an address and store that
+	address somewhere
+
+callee saved registers:
+must be restored by the function itself before returning (if they were modified):
+	rbx, rbp, rsp, r12-r15
+
+caller saved registers: the caller of the function is reponsible for saving these if necessary
+	any other not in callee-saved
+
+The above are only enforced via convention
+
+Returning values:
+generally return values are stored in rax, and rdx if you return a second one
+
+function calling pattern:
+1) save all caller-saved registers (can use push)
+2) store arguments in relevant registers (rdi, rsi, etc.)
+3) invoke the function via 'call'
+4) after the function returns rax will hold the return value
+5) restore caller-saved registers
+

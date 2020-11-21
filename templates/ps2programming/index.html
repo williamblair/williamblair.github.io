@@ -354,7 +354,6 @@ I had created a while back: <a href="https://github.com/williamblair/PS2Pad">htt
 
 <p>My forked version of Glampert's repo is here: <a href="https://bitbucket.org/williamblair/ps2dev-tests/src/master/">https://bitbucket.org/williamblair/ps2dev-tests/src/master/</a></p>
 
-<p><a href="../../index.html">&lt;-- Back to Home</a></p>
 
 <h3>11/15/2020</h3>
 
@@ -393,6 +392,38 @@ draw_wait_finish();
 <img src="images/glampert_01_clearscreen.png"/>
 
 <p>The code can be found here: <a href="https://bitbucket.org/williamblair/glampert_rewrite/src/master/">link</a>
+
+<h3>11/21/2020</h3>
+
+<p>Got a triangle drawn, continuing the glampert code re-implementation.
+This required addition of basic geometry renderering and the vector/matrix
+library. Originally I was stuck on thinking there was an error and the
+triangle wasn't getting drawn; however, it turned out to be that the triangle
+needed to be rotated 180 degrees about the Y axis due to the original code's
+camera placement. Without this rotation the triangle was back-facing and thus culled.
+My current re-write does not cull any triangles, so you can see when it spins
+you can see both sides</p>
+
+<img src="images/glampert_02_triangle.gif"/>
+
+<p>The code to render the triangle looks like this:</p>
+<pre><code>renderer.SetViewProjMatrix(gViewMatrix * gProjectionMatrix);
+
+PS2Matrix trans, rotX, rotY;
+trans.makeTranslation(0.0f, 0.0f, -3.0f);
+rotX.makeRotationX(deg2rad(0.0f));
+rotY.makeRotationY(deg2rad(triRotation));
+triRotation += 1.0f;
+if ( triRotation &gt;= 360.0f )
+{
+    triRotation -= 360.0f;
+}
+
+renderer.SetModelMatrix(rotX * rotY * trans);
+renderer.DrawIndexedTriangles(triIndi, 3, triVertices, 3);
+</code></pre>
+
+<p><a href="../../index.html">&lt;-- Back to Home</a></p>
 
 </div> <!-- contentDiv -->
 </div> <!-- bodyDiv -->

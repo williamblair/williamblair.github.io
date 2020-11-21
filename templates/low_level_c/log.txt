@@ -1,0 +1,24 @@
+11/18/2020: 9:00pm-11:30pm
+----------
+Pages 1-24
+(started basic assembly with nasm)
+	- system call write, exit
+	- jump
+	- test
+	- shift (sar, shr)
+	- add
+	- lea
+	- mov
+
+11/19/2020: 6:00pm-7:45pm
+Pages 24-31
+(continuing basic assembly with nasm)
+	- jg/jz/je/ja
+	- push/pop
+	- dq (data)
+	- call/ret
+	- endianness
+
+11/20/2020: 6:00pm-7:49pm
+Pages 31-34
+(function creation assignments and string length)
