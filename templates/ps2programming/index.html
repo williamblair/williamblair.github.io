@@ -423,6 +423,40 @@ renderer.SetModelMatrix(rotX * rotY * trans);
 renderer.DrawIndexedTriangles(triIndi, 3, triVertices, 3);
 </code></pre>
 
+<h3>11/22/2020</h3>
+
+<p>A group of cubes is now drawn instead of a single triangle.
+The cube data is stored in a Cube object (the vertices, texture
+coords, colors, and faces/indices). Each cube is drawn 3 times
+in a different location:</p>
+
+<pre><code>Cube gRedCube;
+Cube gWhiteCube;
+Cube gGreenCube;
+float gCubeRotation = 0.0f;
+
+static inline void DrawCubeGroup(const Cube &amp; cube, const float y)
+{
+	for (u32 z = 0; z &lt; 3; ++z)
+	{
+		for (u32 x = 0; x &lt; 3; ++x)
+		{
+			PS2Matrix trans, rotX, rotY;
+			trans.makeTranslation((x * 5.0f) - 5.0f, y, (z * -5.0f) - 20.0f);
+			rotX.makeRotationX(deg2rad(gCubeRotation));
+			rotY.makeRotationY(deg2rad(gCubeRotation));
+
+			renderer.SetModelMatrix(rotX * rotY * trans);
+			renderer.DrawIndexedTriangles(cube.indexes, Cube::INDEX_COUNT, cube.vertexes, Cube::VERT_COUNT);
+		}
+	}
+}
+</code></pre>
+
+<p>Which looks like:</p>
+
+<img src="images/glampert_03_cubes.png"/>
+
 <p><a href="../../index.html">&lt;-- Back to Home</a></p>
 
 </div> <!-- contentDiv -->
