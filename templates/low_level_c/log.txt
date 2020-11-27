@@ -30,3 +30,11 @@ Pages 31-34
 Pages 34
 	- div, sub, dec
 	- printUint finished
+
+11/27/2020: 5:30pm-7:00pm
+-----------
+Pages 34
+  - syscall return value,
+  - sycall read
+  - finished readChar
+
