@@ -1,14 +1,28 @@
-body, html {
-  background-image: url("images/sandlite.jpeg");
+body {
+  /*background-image: url("images/sandlite.jpeg");*/
+  background-image: url("images/ffvi3_16x16.png");
   background-repeat: repeat;
   height: 100%;
+  color: white;
 }
-    
+
+a:link {
+  color: #AAFFAA;
+}
+
+a:visited {
+  color: #FFFFFF;
+}
+
 table, tr, th, td {
   border: 2px groove black;
   border-collapse: collapse;
   margin: 10px;
   padding: 2px;
+}
+
+pre {
+	background-color: #000000;
 }
 
 .content-table {
