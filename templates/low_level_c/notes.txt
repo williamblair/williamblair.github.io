@@ -84,3 +84,22 @@ rdx appears to need to be set to zero before calling (mov rdx, 0) - without
 doing this I get floating point exception:
 	Floating point exception (core dumped)
 
+in nasm labels starting with a period are local, eg:
+label1  ; some code
+.loop   ; some more code
+        jne .loop
+        ret
+label2  ; some code
+.loop   ; some more code
+        jne .loop
+        ret
+
+In the above code fragment, each JNE instruction jumps to the line immediately before it, because the two definitions of .loop are kept separate by virtue of each being associated with the previous non-local label.
+
+from https://www.tortall.net/projects/yasm/manual/html/nasm-local-label.html
+
+memory size specifiers:
+mov byte[addr], val	; 1 byte of memory from val
+mov word[addr], val	; 2 bytes of memory from val (short)
+mov dword[addr], val	; 4 bytes of memory from val (int)
+mov qword[addr], val	; 8 bytes of memory from val (long int)

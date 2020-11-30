@@ -30,3 +30,9 @@ Pages 31-34
 Pages 34
 	- div, sub, dec
 	- printUint finished
+
+11/22/2020: 1:00pm-1:40pm
+----------
+Pages 34
+	- idiv
+	- byte[], word[], dword[], qword[]
