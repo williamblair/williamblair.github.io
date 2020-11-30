@@ -103,3 +103,11 @@ mov byte[addr], val	; 1 byte of memory from val
 mov word[addr], val	; 2 bytes of memory from val (short)
 mov dword[addr], val	; 4 bytes of memory from val (int)
 mov qword[addr], val	; 8 bytes of memory from val (long int)
+
+syscall return value is stored in rax
+  read: rax = the number of bytes read or a negative errno val on error
+    rax = 0   (sycall value)
+    rdi = fd  (file descriptor; 0 = stdin)
+    rsi = addr (address to read into, can use rsp)
+    rdx = size (amount of bytes to read)
+

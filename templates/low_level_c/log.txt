@@ -36,3 +36,11 @@ Pages 34
 Pages 34
 	- idiv
 	- byte[], word[], dword[], qword[]
+
+11/27/2020: 5:30pm-7:00pm
+-----------
+Pages 34
+  - syscall return value,
+  - sycall read
+  - finished readChar
+
