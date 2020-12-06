@@ -111,3 +111,5 @@ syscall return value is stored in rax
     rsi = addr (address to read into, can use rsp)
     rdx = size (amount of bytes to read)
 
+need to be careful to check which registers get overwritten when calling functions
+(had issue when writing readWord which internally calls readChar that was overwriting reg vals)

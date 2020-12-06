@@ -1259,6 +1259,25 @@ width and height for each character:</p>
 
 <img src="psximages/terminal_font_screenshot.png"/>
 
+<h3>12/06/2020</h3>
+
+<p>Updated the light class to reflect previous changes. Now the
+test program is using 2 lights, a red and blue. I need to fix
+the angle calculation as the light's angle moves along with the
+camera's currently.</p>
+
+<p>Also, I may have fixed the hardware-crashing due to the controller
+class. Looking at one of the Pad examples in PSYQ showed that the
+graphics system was initted first, then the controller, without
+the call to ResetCallback(). Changing this *seems* to make the
+test program work on real hardware without crashing. Further
+testing needed.</p>
+
+<p>Finally, added a floor to the test program to make it easier
+to stay oriented moving around.</p>
+
+<img src="psximages/lighted_floor.gif"/>
+
 </div> <!-- contentDiv -->
 </div> <!-- bodyDiv -->
 

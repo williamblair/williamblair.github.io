@@ -44,3 +44,6 @@ Pages 34
   - sycall read
   - finished readChar
 
+12/05/2020: 6:00pm-7:00pm
+Pages 34
+  - finished readWord
