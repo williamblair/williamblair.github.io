@@ -45,5 +45,11 @@ Pages 34
   - finished readChar
 
 12/05/2020: 6:00pm-7:00pm
+----------
 Pages 34
   - finished readWord
+
+12/06/2020: 8:00pm-9:00pm
+----------
+Pages 34
+  - working on parseUint - having error when input number is above a certain size

@@ -113,3 +113,7 @@ syscall return value is stored in rax
 
 need to be careful to check which registers get overwritten when calling functions
 (had issue when writing readWord which internally calls readChar that was overwriting reg vals)
+
+
+1       2      3     4    5   6power \0
+100000  10000  1000  100  10  1
