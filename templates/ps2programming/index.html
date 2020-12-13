@@ -457,6 +457,98 @@ static inline void DrawCubeGroup(const Cube &amp; cube, const float y)
 
 <img src="images/glampert_03_cubes.png"/>
 
+<h3>12/13/2020</h3>
+
+<p>Added texture support. With the way the renderering is currently set up, there is usually only room
+for a single texture at a time. Meaning, each time a different texture is used, it must be re-uploaded
+to vram and take the current texture's place.</p>
+<p>Despite this, a <a href="https://en.wikipedia.org/wiki/Texture_atlas">texture atlas</a> class is
+included to determine the available areas in VRam to upload the texture/keep track of the current
+vram use, however it isn't used (at least for this example). 
+(I had to look up what a texture atlas was, but it's just a different name for a sprite
+sheet). This texture atlas in turn uses a custom/simple std::vector implementation called
+Array&lt;&gt;, which is interesting.</p>
+<p>Besides the addition of the Texture and TextureAtlas classes, the renderer changes are mostly:</p>
+
+<pre><code>void SetTexture( const Texture&amp; texture )
+{
+    // no need to change
+    if ( &amp;texture == currentTex )
+    {
+        return;
+    }
+
+    currentTex = (Texture*)&amp;texture;
+    // assert(currentTex-&gt;getPixels() != NULL);
+    // assert(currentTex-&gt;getTexBuffer().address == uint(vramUserTextureStart));
+
+    flushPipeline();
+    //texSwitches++;
+
+    // upload to GS ram
+    const u32 width = currentTex-&gt;GetWidth();
+    const u32 height = currentTex-&gt;GetHeight();
+    const u32 psm = currentTex-&gt;GetPixelFormat();
+    u8* pixels = (u8*)currentTex-&gt;GetPixels();
+
+    qword_t* q = textureUploadPacket[frameIndex].GetQwordPtr();
+    q = draw_texture_transfer( q, 
+                               pixels, 
+                               width, 
+                               height, 
+                               psm, 
+                               vramUserTextureStart, 
+                               width );
+    q = draw_texture_flush( q );
+    dma_channel_send_chain( DMA_CHANNEL_GIF, 
+                            textureUploadPacket[frameIndex].GetQwordPtr(),
+                            textureUploadPacket[frameIndex].GetDisplacement(q), 
+                            0, 
+                            0 );
+    dma_wait_fast();
+}
+
+...
+
+#define DRAW3D_PROLOGUE() \
+BEGIN_DMA_TAG(currentFrameQwPtr); \
+if (currentTex != nullptr) \
+{ \
+	setTextureBufferSampling(); \
+} \
+u64 * /*restrict*/ packetPtr = (u64 *)(draw_prim_start(currentFrameQwPtr, 0, &amp;primDesc, &amp;primColor))
+
+...
+
+void setTextureBufferSampling()
+{
+    // assert(currentTex != NULL);
+    // assert(currentFrameQwPtr != NULL)
+    // assert(currentTex-&gt;GetTexBuffer().address == u32(vramUserTextureStart));
+
+    currentFrameQwPtr = draw_texture_sampling( currentFrameQwPtr, 
+                                               0, 
+                                               &amp;currentTex-&gt;GetTexLod() );
+    currentFrameQwPtr = draw_texturebuffer( currentFrameQwPtr, 
+                                            0, 
+                                            &amp;currentTex-&gt;GetTexBuffer(), 
+                                            &amp;currentTex-&gt;GetTexClut() );
+}
+</code></pre>
+
+<p>Then in main.cpp, you add:</p>
+
+<pre><code>// TODO - move this into CPP file or something
+u32 Texture::vramUserTextureStart = 0;
+...
+renderer.SetPrimTextureMapping( true );
+...
+renderer.SetTexture( gTexture );
+...
+</code></pre>
+
+<img src="images/glampert_04_cubes_textured.png"/>
+
 <p><a href="../../index.html">&lt;-- Back to Home</a></p>
 
 </div> <!-- contentDiv -->
