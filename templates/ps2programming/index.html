@@ -549,6 +549,75 @@ renderer.SetTexture( gTexture );
 
 <img src="images/glampert_04_cubes_textured.png"/>
 
+<h3>12/20/2020</h3>
+
+<p>Added basic 2D drawing, font drawing, and the ingame console.
+Now the TextureAtlas previously is used as the texture to store the
+font in. I think the builtin fonts are actual font files, as opposed
+to just images. There initially was a bug where I had made some
+small mistakes in the TextureAtlas code. Also, the 2D drawing
+seems to cause an error if you don't have enough commands sent
+or time spent or similar. I confirmed this in the original cubes
+demo code as well. Having the renderer draw "pre" doesn't work
+but anything at or above "pres" does</p>
+
+<pre><code>renderer.Begin2D();
+{
+    // doesn't work
+	Vec2f pos = { 5.0f, 5.0f };
+	Color4b textCol = { 255, 255, 255, 255 };
+	renderer.DrawText(pos, textCol, FontManager::FONT_CONSOLAS_24, "Pre");
+
+	rect.x = 10;
+	rect.y = 50;
+	rect.width = 100;
+	rect.height = 100;
+	color.r = 255;
+	color.b = 0;
+	color.g = 0;
+	color.a = 255;
+	renderer.DrawRectFilled( rect, color );
+}
+renderer.End2D();
+</code></pre>
+
+<p>vs.</p>
+
+
+<pre><code>renderer.Begin2D();
+{
+    // works
+	Vec2f pos = { 5.0f, 5.0f };
+	Color4b textCol = { 255, 255, 255, 255 };
+	renderer.DrawText(pos, textCol, FontManager::FONT_CONSOLAS_24, "Pres");
+
+	rect.x = 10;
+	rect.y = 50;
+	rect.width = 100;
+	rect.height = 100;
+	color.r = 255;
+	color.b = 0;
+	color.g = 0;
+	color.a = 255;
+	renderer.DrawRectFilled( rect, color );
+}
+renderer.End2D();
+</code></pre>
+
+<p>There is code to decompress the font and generate a
+bitmap image from their data. I should look at glampert's website
+to see if he discusses this. The code directs you via a comment to
+<a href="https://www.silverspaceship.com/inner/imgui/grlib/gr_extra.c">https://www.silverspaceship.com/inner/imgui/grlib/gr_extra.c</a>,
+where a similar font decompression function is called grDecompressFont().
+That however also doesn't document the expected input format.
+There is, however, a different font file in the same directory
+called "font_21", when, when added to the code does indeed work
+as well.
+</p>
+
+<img src="images/glampert_05_console.png"/><br/>
+<img src="images/glampert_05_different_font.png"/>
+
 <p><a href="../../index.html">&lt;-- Back to Home</a></p>
 
 </div> <!-- contentDiv -->
