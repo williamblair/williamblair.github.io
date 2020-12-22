@@ -618,6 +618,32 @@ as well.
 <img src="images/glampert_05_console.png"/><br/>
 <img src="images/glampert_05_different_font.png"/>
 
+<h3>12/21/2020</h3>
+<p>Added the first person camera (minus the joystick integration). It's interesting
+to see the coordinate axis choices. In the current code, the camera looks
+towards positive z (the forward vector), the cubes are positioned around +20
+z (they were positioned around -20 z previously, due to not having a camera
+and using an identity matrix as the view matrix), and moving the camera
+right takes a negative x direction (e.g. x -= 10 moves the camera right by 10) 
+</p>
+
+<p>The camera uses a system time counting object - GameTime - to calculate
+the delta and how much to move, via the clock() function. I'm curious
+to find out if the PS1 has something similar. I think the clock() function
+would be kernel/OS dependant, which I don't believe the PSX has.</p>
+
+<p>Rotation is supported around the X axis (Pitch()) or the Y axis
+(Rotate()). The rotate function works by rotating each of the eye
+coordinate vectors (up, forward, right) by the input angle via basically
+2D rotation matrix calculation. Pitch() is calculated by using
+a 3D rotation matrix around a generic axis vector, with in this
+case the axis being the right coordinate vector.</p>
+
+<p>This time I ran on the actual PS2 just for fun:</p>
+
+<img src="images/glampert_06_camera_tv.jpg" width="600px"/>
+<img src="images/glampert_06_rotate.gif"/>
+
 <p><a href="../../index.html">&lt;-- Back to Home</a></p>
 
 </div> <!-- contentDiv -->
