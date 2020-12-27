@@ -708,6 +708,99 @@ static inline void drawModel()
 
 <p>Another step is to try and reproduce the result on the PS1 as well</p>
 
+<h3>12/27/2020</h3>
+<p>Model drawn with textures as well now. This required loading the image (which was stored and compiled in
+memory as an array of bytes), then setting the renderer texture to said image before drawing:</p>
+
+<pre><code>static void loadPermanentTexture(Texture&amp; texture,
+                                 const u8* data,
+                                 const u32 sizeBytes,
+                                 const u8 textureFunction)
+{
+    ImageData img;
+    if (!loadImageFromMemory(data,
+                             sizeBytes,
+                             img,
+                             true)) // true = force rgba
+    {
+        printf("Failed to load texture from location %p\n", data);
+        while (1);
+    }
+    // image should be r,g,b,a
+    if (img.comps != 4)
+    {
+        printf("Converted image should be RGBA, but comps != 4\n");
+        while (1);
+    }
+
+    // Texture isn't mipmapped
+    lod_t lod;
+    lod.calculation = LOD_USE_K;
+    lod.max_level = 0;
+    lod.mag_filter = LOD_MAG_LINEAR;
+    lod.min_filter = LOD_MIN_LINEAR;
+    lod.l = 0;
+    lod.k = 0.0f;
+    if (!texture.InitFromMemory(img.pixels,
+                                TEXTURE_COMPONENTS_RGBA,
+                                img.width, img.height,
+                                GS_PSM_32,
+                                textureFunction,
+                                &amp;lod))
+    {
+        printf("Failed to init image from memory!\n");
+        while (1);
+    }
+    printf("Successfully loaded permanent texture\n");
+}
+...
+Texture playerTexture;
+...
+static inline void initModel()
+{
+    const float scale = 0.025f;
+    if (!playerMd2Model.InitFromMemory(player_model,
+                                       size_player_model,
+                                       scale))
+    {
+        printf("Failed to init model from memory\n");
+        while (1);
+    }
+    loadPermanentTexture(playerTexture,
+                         player_model_texture,
+                         size_player_model_texture,
+                         TEXTURE_FUNCTION_MODULATE);
+
+    tempMd2Verts = (DrawVertex*)memalign(16, TEMP_MD2_VERT_COUNT*sizeof(DrawVertex));
+    memset(tempMd2Verts, 0, TEMP_MD2_VERT_COUNT*sizeof(DrawVertex));
+
+    playerAnimState.Clear();
+
+    playerModelMatrix.makeIdentity();
+}
+static inline void drawModel()
+{
+    static Color4f colorTint = { 1.0f, 1.0f, 1.0f, 1.0f };
+    Md2Model* model = &amp;playerMd2Model;
+    const u32 mdlVertCount = model-&gt;GetTriangleCount() * 3;
+    if (mdlVertCount &gt;= TEMP_MD2_VERT_COUNT)
+    {
+        printf("ERror = model vert count &gt;= temp vert count\n");
+        while (1);
+    }
+
+    model-&gt;AssembleFrame(/*playerAnimState.endFrame*/0,
+                        256, 256, // player texture size width, height
+                        colorTint,
+                        tempMd2Verts);
+    renderer.SetTexture( playerTexture );
+    renderer.SetModelMatrix( playerModelMatrix );
+    renderer.DrawUnindexedTriangles( tempMd2Verts, mdlVertCount );
+}
+</code></pre>
+
+<img src="images/glampert_07_model_textured.png"/>
+
 <p><a href="../../index.html">&lt;-- Back to Home</a></p>
 
 </div> <!-- contentDiv -->
