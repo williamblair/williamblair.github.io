@@ -1278,6 +1278,173 @@ to stay oriented moving around.</p>
 
 <img src="psximages/lighted_floor.gif"/>
 
+<h3>12/28/2020</h3>
+
+<p>Created a PSX implementation of the Vector and Matrix structs from glampert's PS2 programs.
+I did this by starting with the same internal contents the VECTOR and MATRIX structures from the PSYQ sdk
+libgte, that way you can still run PSYQ functions on the structures as if they were the default/original
+VECTOR/MATRIX, so we can still use the GTE hardware acceleration functions. What makes the PSXMatrix
+implementation difficult, however, is the weird way the PSX/PSYQ stores matrices: unlike the normal
+4x4 matrix you would expect as standard, the PSX uses a 3x3 array of shorts for rotation (int16_ts) 
+and a separate 3x1 array of long ints (int32_ts) for translation. So not only is it annoying
+to have to specify/pull data from different arrays, their types are different and not interchangeable
+as well. Currently, from outside the PSXVector struct perspective, the data is treated as a 3x4
+matrix, with the fourth column being the translation and the first three being the rotation</p>
+
+<p>To see what I mean, Below is a comparison between the PSYQ vector from libgte.h:</p>
+
+<pre><code> // LIBGTE.H; PSYQ lib implementation
+typedef struct {		/* long word type 3D vector */
+	long	vx, vy;
+	long	vz, pad;
+} VECTOR;
+...
+// PSXVector.h - my implementation
+struct PSXVector
+{
+    PSXVector() { } // Uninitialized
+    explicit PSXVector(long v); // Replicate to xyzw
+    explicit PSXVector(const long v[4]);
+...
+    // equivalent to libgte VECTOR structure
+    long x;
+    long y;
+    long z;
+    long w;
+};
+</code></pre>
+
+<p>And similar for MATRIX:</p>
+<pre><code> // LIBGTE.H, PSYQ implementation
+typedef struct  {
+	short	m[3][3];	/* 3x3 rotation matrix */
+        long    t[3];		/* transfer vector */
+} MATRIX;
+...
+// PSXMatrix.h, my implementation
+struct PSXMatrix
+{
+    PSXMatrix() { } // Uninitialized
+    explicit PSXMatrix(const long data[][4]);
+...
+    // the same as in struct MATRIX in libgte.h
+    short m[3][3];  // 3x3 rotation matrix
+    long  t[3];     // transfer vector (translation)
+};
+</code></pre>
+
+<p>Some basic testing has been done with these classes (multiply, divide, scale, rotate), but I'm still
+not 100% confident in their accuracy yet:</p>
+
+<pre><code>static inline long float2fixed(const float a)
+{
+    return (long)(a * 4096);
+}
+static inline float fixed2float(const long a)
+{
+    return ((float)a) / 4096.0f;
+}
+#define PI 3.1415926535f
+#define PI2 (PI*2.0f)
+static inline long radians2fixed(const float radians)
+{
+    return (long)(4096.0f*(radians/PI2));
+}
+#define fixedDiv(a,b) ((long)((((long long)(a))&lt;&lt;12) / ((long long)(b))))
+
+static void testRotate()
+{
+    PSXMatrix rotMat;
+    rotMat.makeRotationZ( radians2fixed(PI/2.0f) );
+    PSXVector testVec( float2fixed(1.0f), 0, 0, ONE );
+    testVec = rotMat * testVec;
+    printf2("Rotated around Z: %f, %f, %f, %f\n", fixed2float(testVec.x),
+                                                  fixed2float(testVec.y), 
+                                                  fixed2float(testVec.z), 
+                                                  fixed2float(testVec.w) );
+
+    rotMat.makeRotationX( radians2fixed(PI/2.0f) );
+    testVec = PSXVector( 0, 0, float2fixed(1.0f), ONE );
+    testVec = rotMat * testVec;
+    printf2("Rotated around X: %f, %f, %f, %f\n", fixed2float(testVec.x),
+                                                  fixed2float(testVec.y), 
+                                                  fixed2float(testVec.z), 
+                                                  fixed2float(testVec.w) );
+
+    rotMat.makeRotationY( radians2fixed(PI/2.0f) );
+    testVec = PSXVector( float2fixed(1.0f), 0, 0, ONE );
+    testVec = rotMat * testVec;
+    printf2("Rotated around Y: %f, %f, %f, %f\n", fixed2float(testVec.x),
+                                                  fixed2float(testVec.y), 
+                                                  fixed2float(testVec.z), 
+                                                  fixed2float(testVec.w) );
+}
+
+int main(void)
+{
+    PSXMatrix testMat;
+    PSXVector vecA;
+    PSXVector vecB;
+    PSXVector vecC;
+    ...
+    printf2("Float to fixed 1.0f: %f, %d\n", 1.0f, float2fixed(1.0f));
+    printf2("Fixed to float 4096: %d, %f\n", 4096, fixed2float(4096));
+    
+    testMat.makeScaling(float2fixed(2.0f),float2fixed(2.0f),float2fixed(2.0f));
+    
+    vecA = PSXVector(float2fixed(1.0f), float2fixed(2.0f), float2fixed(4.0f), float2fixed(1.0f));
+    vecB = PSXVector(float2fixed(3.0f), float2fixed(2.0f), float2fixed(4.0f), float2fixed(1.0f));
+    vecC = PSXVector(float2fixed(3.0f), float2fixed(2.0f), float2fixed(4.0f), float2fixed(1.0f));
+    
+    vecA *= float2fixed(2.0f);
+    vecB /= float2fixed(2.0f);
+    vecC.normalizeSelf();
+    
+    printf2("1.0/2.0 : %f\n", fixed2float(fixedDiv(float2fixed(1.0f), float2fixed(2.0f))));
+    printf2("2.0/4.0 : %f\n", fixed2float(fixedDiv(float2fixed(2.0f), float2fixed(4.0f))));
+    printf2("8.0/16.0: %f\n", fixed2float(fixedDiv(float2fixed(8.0f), float2fixed(16.0f))));
+    
+    printf2("a*b: %f, %f, %f, %f\n", fixed2float(vecA.x),
+                                     fixed2float(vecA.y), 
+                                     fixed2float(vecA.z), 
+                                     fixed2float(vecA.w) );
+    vecA = testMat * vecA;
+    printf2("scaled a*b 2: %f, %f, %f, %f\n", fixed2float(vecA.x),
+                                              fixed2float(vecA.y), 
+                                              fixed2float(vecA.z), 
+                                              fixed2float(vecA.w) );
+    testMat.makeScaling(float2fixed(0.25f),float2fixed(0.25f),float2fixed(0.25f));
+    vecA = testMat * vecA;
+    printf2("scaled a*b 0.25: %f, %f, %f, %f\n", fixed2float(vecA.x),
+                                                 fixed2float(vecA.y), 
+                                                 fixed2float(vecA.z), 
+                                                 fixed2float(vecA.w) );
+    
+    testMat.makeTranslation(float2fixed(1.0f), float2fixed(2.0f), float2fixed(-1.0f));
+    vecA = testMat * vecA;
+    printf2("scaled a*b 0.25 translated: %f, %f, %f, %f\n", fixed2float(vecA.x),
+                                                            fixed2float(vecA.y), 
+                                                            fixed2float(vecA.z), 
+                                                            fixed2float(vecA.w) );
+    
+    printf2("a/b: %f, %f, %f, %f\n", fixed2float(vecB.x),
+                                     fixed2float(vecB.y), 
+                                     fixed2float(vecB.z), 
+                                     fixed2float(vecB.w) );
+    printf2("c normal: %f, %f, %f, %f\n", fixed2float(vecC.x),
+                                   fixed2float(vecC.y), 
+                                   fixed2float(vecC.z), 
+                                   fixed2float(vecC.w) );
+    
+    testRotate();
+...
+}
+</code></pre>
+
+<p>Which results in the following output from no$psx:</p>
+
+<img src="psximages/vec_matrix_math_test.png"/>
+
 </div> <!-- contentDiv -->
 </div> <!-- bodyDiv -->
 
