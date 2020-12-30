@@ -1445,6 +1445,66 @@ int main(void)
 
 <img src="psximages/vec_matrix_math_test.png"/>
 
+<h3>12/29/2020</h3>
+
+<p>Untextured MD2 model loaded and rendered. The rendering part could use optimization. One possibility
+is to calculate and store the fixed point vertex values instead of converting during the render call
+(float2fixed()). Additionally, some of the internal code of GetFrameVertex() could be precalculated and
+stored as well. I'd like if
+possible to calculate FPS somehow in order to better measure performance. The main/important
+Md2 rendering code is within the PSXRenderer class:</p>
+
+<pre><code>// for each triangle
+for ( u_int t = 0; t &lt; model.md2TriangleCount; t++ )
+{
+SetPolyF3(prim);
+const Md2Model::Vertex&amp; vert0 = model.GetFrameVertex( frameIndex,
+                                                      model.md2Triangles[t].vertex[0] );
+const Md2Model::Vertex&amp; vert1 = model.GetFrameVertex( frameIndex,
+                                                      model.md2Triangles[t].vertex[1] );
+const Md2Model::Vertex&amp; vert2 = model.GetFrameVertex( frameIndex, model.md2Triangles[t].vertex[2]);   
+
+
+// TODO - tex coords
+
+xyzPos[0].vx = fixedMul((fixedMul(frameScale[0], float2fixed(vert0.v[0])) + frameTranslate[0]), md2Scale);
+xyzPos[0].vz = fixedMul((fixedMul(frameScale[1], float2fixed(vert0.v[1])) + frameTranslate[1]), md2Scale);
+xyzPos[0].vy = fixedMul((fixedMul(frameScale[2], float2fixed(vert0.v[2])) + frameTranslate[2]), md2Scale);
+xyzPos[1].vx = fixedMul((fixedMul(frameScale[0], float2fixed(vert1.v[0])) + frameTranslate[0]), md2Scale);
+xyzPos[1].vz = fixedMul((fixedMul(frameScale[1], float2fixed(vert1.v[1])) + frameTranslate[1]), md2Scale);
+xyzPos[1].vy = fixedMul((fixedMul(frameScale[2], float2fixed(vert1.v[2])) + frameTranslate[2]), md2Scale);
+xyzPos[2].vx = fixedMul((fixedMul(frameScale[0], float2fixed(vert2.v[0])) + frameTranslate[0]), md2Scale);
+xyzPos[2].vz = fixedMul((fixedMul(frameScale[1], float2fixed(vert2.v[1])) + frameTranslate[1]), md2Scale);
+xyzPos[2].vy = fixedMul((fixedMul(frameScale[2], float2fixed(vert2.v[2])) + frameTranslate[2]), md2Scale);
+
+// translate from local coordinates to screen
+// coordinates using RotAverageNclip4()
+// otz represents 1/4 value of the average of z
+// value of each vertex
+isomote = RotAverageNclip3(&amp;xyzPos[0], // SVECTOR *v0, v1, v2
+                           &amp;xyzPos[1],
+                           &amp;xyzPos[2],
+
+                          (long*)&amp;(prim-&gt;x0),
+                          (long*)&amp;(prim-&gt;x1), // long *sxy0, sxy1, sxy2
+                          (long*)&amp;(prim-&gt;x2),
+
+                          &amp;p, &amp;otz, &amp;flg);
+
+if (isomote &gt; 0) {
+    // If our depth is valid, add it to the order table
+    if (otz &gt; 0 &amp;&amp; otz &lt; OT_LEN) {
+        setRGB0(prim, 127, 127, 127);
+        addPrim( curBuffer-&gt;ot+otz, prim );
+    }
+}
+
+// increment to the next packet area
+prim++;
+</code></pre>
+
+<img src="psximages/md2_model_untextured.gif"/>
+
 </div> <!-- contentDiv -->
 </div> <!-- bodyDiv -->
 
