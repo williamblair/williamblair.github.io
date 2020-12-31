@@ -1572,7 +1572,7 @@ we then get a nicely rendered model:</p>
 <p>Also, you can see FPS is being printed. First I added number support to the font
 texture and logic. It assumes the numbers are stored starting on a row underneath the
 letters. Then, to calc FPS, I found code to calculate this here: 
-<a href=" from https://github.com/sk-io/psx-engine/blob/main/src/main.c"> from https://github.com/sk-io/psx-engine/blob/main/src/main.c</a>.
+<a href="https://github.com/sk-io/psx-engine/blob/main/src/main.c">https://github.com/sk-io/psx-engine/blob/main/src/main.c</a>.
 It works by using a frame counter value incremented in the main game loop, while a VSync callback 
 function increments a timer counter every horizontal vsync. The NO$PSX emulator shows the code running
 at 60fps, while on the PSX hardware I saw 30fps. I was able to optimize the MD2 drawing by replacing
