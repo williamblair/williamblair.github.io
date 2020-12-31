@@ -1505,6 +1505,80 @@ prim++;
 
 <img src="psximages/md2_model_untextured.gif"/>
 
+<h3>12/30/2020</h3>
+
+<p>Got the texture working for the MD2 model. There were a couple of steps frequired for this. First,
+I converted the original PNG texture to a 16-bit BMP with gimp. I also changed the size from 256x256 to
+255x255 as I've had issues with 256 width textures (supposedly the max texture size for a single triangle
+is 256). Then converted the 16-bit bmp to a C array with my bmp2array tool. Next, when rendering the
+triangles via this code:</p>
+
+<pre><code>// translate from local coordinates to screen
+// coordinates using RotAverageNclip4()
+// otz represents 1/4 value of the average of z
+// value of each vertex
+isomote = RotAverageNclip3(&amp;xyzPos[0], // SVECTOR *v0, v1, v2, v3
+                           &amp;xyzPos[1],
+                           &amp;xyzPos[2],
+
+                          (long*)&amp;(prim-&gt;x0),
+                          (long*)&amp;(prim-&gt;x1), // long *sxy0, sxy1
+                          (long*)&amp;(prim-&gt;x2), // long *sxy2, sxy3
+
+                          &amp;p, &amp;otz, &amp;flg);
+</code></pre>
+
+<p>The resulting triangles were back facing. After some fiddling, they were
+properly rendered by reversing the order of both the input and output to the
+Nclip3 function:</p>
+
+<pre><code>// translate from local coordinates to screen
+// coordinates using RotAverageNclip4()
+// otz represents 1/4 value of the average of z
+// value of each vertex
+isomote = RotAverageNclip3(&amp;xyzPos[2], // SVECTOR *v0, v1, v2, v3
+                           &amp;xyzPos[1],
+                           &amp;xyzPos[0],
+
+                          (long*)&amp;(prim-&gt;x2),
+                          (long*)&amp;(prim-&gt;x1), // long *sxy0, sxy1
+                          (long*)&amp;(prim-&gt;x0), // long *sxy2, sxy3
+
+                          &amp;p, &amp;otz, &amp;flg);
+</code></pre>
+
+<p>After that, parts of the texture were being rendered as transparent:</p>
+
+<img src="psximages/md2_model_textured_transparent.png"/>
+
+<p>This is due to the GPU interpreting completely black pixels (0x0000) as transparent.
+I tried to lazily fix this by replacing every 0x00,0x00 in the C texture
+array with 0x00,0x01, but that ended up adding green spots everywhere:</p>
+
+<img src="psximages/md2_model_textured_green.png"/><br/>
+<img src="psximages/md2_model_texturedd_vram.png"/>
+
+<p>So instead I modified the bmp2array tool to accept a third argument, a 1 or a 0
+to enable or disable transparency. If transparency is disabled, and the read pixel
+color is R=0,G=0,B=0, it instead sets the colors to R=0,G=0,B=1 so it's not 
+completely black and hence transparent. Finally,
+instead of dividing the MD2 texture UV values by the texture width/height (how the PS2/glampert's
+code works), we take the raw MD2 UV vals as this matches what the PS1 expects, which is a direct pixel
+x,y value instead of a float from 0 to 1.
+we then get a nicely rendered model:</p>
+
+<img src="psximages/md2_model_textured.png"/>
+
+<p>Also, you can see FPS is being printed. First I added number support to the font
+texture and logic. It assumes the numbers are stored starting on a row underneath the
+letters. Then, to calc FPS, I found code to calculate this here: 
+<a href=" from https://github.com/sk-io/psx-engine/blob/main/src/main.c"> from https://github.com/sk-io/psx-engine/blob/main/src/main.c</a>.
+It works by using a frame counter value incremented in the main game loop, while a VSync callback 
+function increments a timer counter every horizontal vsync. The NO$PSX emulator shows the code running
+at 60fps, while on the PSX hardware I saw 30fps. I was able to optimize the MD2 drawing by replacing
+the float2fixed() function from floatVal*4096 to floatVal&lt;&lt;12.
+</p>
+
 </div> <!-- contentDiv -->
 </div> <!-- bodyDiv -->
 
