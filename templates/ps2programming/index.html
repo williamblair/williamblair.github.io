@@ -801,6 +801,76 @@ static inline void drawModel()
 
 <img src="images/glampert_07_model_textured.png"/>
 
+<h3>01/01/2021</h3>
+
+<p>Animation with the MD2 model now working. It works by interpolating
+between the current model keyframe and the next model keyframe based
+on a floating point value between 0 and 1 (the percentage of the
+way through the anim). The current and next keyframe are updated
+based on the GameTime counter and the animation's set FPS (for the
+below image I set FPS to glampert's default MD2 fps of 7)</p>
+
+<pre><code>static void initAnimation(const StdMd2AnimId animId)
+{
+    u32 start, end, frameRate;
+
+    Md2Model::GetStdAnim( animId, start, end, frameRate );
+    playerAnimState.startFrame = start;
+    playerAnimState.endFrame = end;
+    playerAnimState.nextFrame = start + 1;
+    playerAnimState.fps = /*frameRate*/MD2ANIM_DEFAULT_FPS;
+}
+static inline void drawModel()
+{
+    ...
+    playerAnimState.Update(gTime.currentTimeSeconds, 
+                           model-&gt;GetKeyframeCount());
+    model-&gt;AssembleFrameInterpolated(playerAnimState.curFrame,
+                                     playerAnimState.nextFrame,
+                                     playerAnimState.interp,
+                                     256, 256, // texture width, height
+                                     colorTint,
+                                     tempMd2Verts );
+    renderer.SetTexture( playerTexture );
+    renderer.DrawUnindexedTriangles( tempMd2Verts, mdlVertCount );
+}
+</code></pre>
+
+<p>There are quite a few default MD2 animations available; so far I've
+only tried the first two:</p>
+
+<pre><code>// Standard MD2 animations, with predefined frame numbers and FPS.
+enum StdMd2AnimId
+{
+    MD2ANIM_STAND,
+    MD2ANIM_RUN,
+    MD2ANIM_ATTACK,
+    MD2ANIM_PAIN_A,
+    MD2ANIM_PAIN_B,
+    MD2ANIM_PAIN_C,
+    MD2ANIM_JUMP,
+    MD2ANIM_FLIP,
+    MD2ANIM_SALUTE,
+    MD2ANIM_FALL_BACK,
+    MD2ANIM_WAVE,
+    MD2ANIM_POINT,
+    MD2ANIM_CROUCH_STAND,
+    MD2ANIM_CROUCH_WALK,
+    MD2ANIM_CROUCH_ATTACK,
+    MD2ANIM_CROUCH_PAIN,
+    MD2ANIM_CROUCH_DEATH,
+    MD2ANIM_DEATH_FALL_BACK,
+    MD2ANIM_DEATH_FALL_FORWARD,
+    MD2ANIM_DEATH_FALL_BACK_SLOW,
+    MD2ANIM_BOOM,
+
+    // Number of entries in this enum. Internal use.
+    MD2ANIM_COUNT
+};
+</code></pre>
+
+<img src="images/glampert_08_animation.gif"/>
+
 <p><a href="../../index.html">&lt;-- Back to Home</a></p>
 
 </div> <!-- contentDiv -->
