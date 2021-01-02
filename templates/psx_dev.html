@@ -1579,6 +1579,25 @@ at 60fps, while on the PSX hardware I saw 30fps. I was able to optimize the MD2 
 the float2fixed() function from floatVal*4096 to floatVal&lt;&lt;12.
 </p>
 
+<h3>01/01/2021</h3>
+
+<p>Got MD2 animation working like on the PS2. I ran into an issue of needing to use VECTOR
+(with long ints) instead of SVECTOR (with shorts) for intermediate values to be interpolated
+(as opposed to previously you could do all of the calculations at once and hence use a SVECTOR):</p>
+
+<pre><code>VECTOR xyzPosA[3];
+VECTOR xyzPosB[3];
+SVECTOR xyzPos[3]; // final linearly interpolated and scaled coord
+</code></pre>
+
+<p>Above is part of the new code, whereas before for unanimated there was just xyzPos without
+the need to interpolate PosA and PosB. Additionally, twice the calculations are done in the
+beginning as we calculate for both frameA and frameB before interpolting between them.
+Now, the FPS is down to 30 on the emulator/20 on actual hardware :( I'll have to do
+some optimization</p>
+
+<img src="psximages/md2_model_animated.gif"/>
+
 </div> <!-- contentDiv -->
 </div> <!-- bodyDiv -->
 
