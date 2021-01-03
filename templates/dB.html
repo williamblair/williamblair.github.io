@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>BJ's Website</title>
+</head>
+<body>
+
+<h1 align="center">Decibel and Power Converter</h1>
+
+<div>
+<label for="powerInput">power:</label>
+<input id="powerInput" name="powerInput" type="number" value="2.0"/>
+<button onclick="runPowerToDb()">Convert to dB</button>
+<p id="dbResult">result dB:</p>
+</div>
+
+<div>
+<label for="dbInput">dB:</label>
+<input id="dbInput" name="dbInput" type="number" value="3.0102999566398116"/>
+<button onclick="runDbToPower()">Convert to Power</button>
+<p id="powerResult">result power:</p>
+</div>
+
+<script>
+var logBase = function(base, val)
+{
+    return Math.log(val) / Math.log(base);
+}
+
+var powerToDb = function(power)
+{
+    return 10.0*logBase(10.0, power);
+}
+
+var dbToPower = function(dB)
+{
+    return Math.pow(10.0, dB / 10.0);
+}
+
+var runPowerToDb = function()
+{
+    var powerVal = document.getElementById("powerInput").value;
+    var dbVal = powerToDb(powerVal);
+    document.getElementById("dbResult").innerHTML = "result dB: " + dbVal;
+}
+
+var runDbToPower = function()
+{
+    var dbVal = document.getElementById("dbInput").value;
+    var powerVal = dbToPower(dbVal);
+    document.getElementById("powerResult").innerHTML = "result power: " + powerVal;
+}
+</script>
+
+<div>
+<h3>What's a dB?</h3>
+Decibels (dB) can be described as a ratio of power between two signals. It
+is useful for comparing signals where the difference between them is too small
+to be viewed linearlly/directly. The name Bel is in reference to Alexander Graham Bell.
+Originall, the unit used was just plain old Bels, but it was found that it is more
+common to have resulting values smaller than a single Bel, e.g. one tenth Bel. Thus,
+it became standard to use decibels instead, where one decibel is one tenth of a single
+Bel. A value/power ratio is converted to Decibels by the formula dB = 10*log<sub>10</sub>(ratio),
+e.g. if power A is 2.0 and power B is 1.0, their ratio is 2.0/1.0, and the
+result decibel is 10*log<sub>10</sub>(2/1) = 10*log<sub>10</sub>(2)
+</div>
+
+</body>
+</html>
+
