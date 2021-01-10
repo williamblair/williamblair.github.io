@@ -55,5 +55,66 @@
 * ![Carrier Synchronization Diagram](carrier_synchronization_circuit.png)
 * ![Phase Error Diagram](phase_error_diagram.png)
 
-Left off on timing errors and symbol recovery
+## Timing correction
+* Goal to sample at an interval at the proper time to get the max
+  signal amplitude
+* Done using a timeing error detector (TED)
+* Two methods: oversampling and interpolation
+    * oversampling: sample at rate much higher than symbol rate, then
+      select the samples closest to the maximum effect points
+    * ![Oversampling Diagram](oversampling_diagram.png)
+    * Interpolation: oversample at small amount (e.g. 2x symbol rate)
+      and interpolate between samples
+    * ![Interpolation Diagram](interpolation_diagram.png)
+* TED produces early and late signals, then subtracts between them
+  to get a 'punctual' (on time) sample time
+    * ![Early Late timing signals](early_late_timing.png)
+* Combined timing and carrier synchronization looks like:
+    * ![Symbol timing and carrier sync](timing_carrier_sync.png)
+* Should make I and Q amplitudes converge:
+    * ![IQ Convergence](iq_convergence.png)
+
+## Coarse Frequency Syncronization
+* Calculates an initial frequency offset, for a large value (happens
+  before fine frequency sync)
+* Uses FFT on input, raised to 4th power, then selecting FFT bin
+  with highest magnitude as the desired signal
+* ![Coarse Freq Est](coarse_freq_est.png)
+
+## PSK phase ambiguity
+* Once you have a proper PSK (e.g. BPSK or QPSK) signal plot,
+  there is a chance the phase is incorrect, e.g. rotated to
+  the wrong constellation points. This means your resulting bits
+  will be incorrect since they are derived from the wrong
+  constellation point
+* ![QPSK phase rotation](qpsk_phase_rotation.png)
+* Two ways to handle this: differential encoding or unique word
+  transmission
+
+## Differential Encoding
+* Encodes input bits so that they can be recovered after incorrect
+  receive due to PSK phase offset
+* For BPSK, you use the current bit and previous encoded bit (Default 0)
+  and XNOR them:
+* To decode, you do the same thing except your previous bit to use
+  is BEFORE decoding
+    * ![BPSK differential encode](bpsk_differential_encode.png)
+* If the phase is incorrect on the received symbols, then the first
+  decoded bit will be incorrect, but the rest will be correct
+* QPSK encoding and decoding is similar, except you use the last 2 bits
+  instead of just the last bits, and the output of encoding/decoding
+  is two bits instead of 1 bit
+    * ![QPSK differential encode](qpsk_differential_encode.png)
+
+## Unique Word Synchronization
+* You transmit a fixed/known bit sequence before your actual payload.
+  On the receive end, we look for that sequence, and if it's not found,
+  check the resulting sequence if we rotate the phase/bit mapping
+  ourselves. Once we find the phase mapping that results in the
+  correct sequence, we apply said phase mappnig to the rest of the
+  input as well
+* For BSPK this looks like:
+    * ![BPSK unique word](bpsk_unique_word.png)
+* For QPSK this looks like:
+    * ![QPSK unique word](qpsk_unique_word.png)
 

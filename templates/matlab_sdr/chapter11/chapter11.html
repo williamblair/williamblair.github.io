@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>BJ's Website</title>
+</head>
+<body>
+<h2 id="digital-phase-modulation-schemes">Digital Phase Modulation Schemes</h2>
+<ul>
+<li>Binary Phase Shift Keying (BPSK): 1 bit per symbol<ul>
+<li><img src="bpsk_constellation.png" alt="BPSK Constellation"></li>
+</ul>
+</li>
+<li>Quaternary Phase Shift Keying (QPSK): 2 bits per symbol<ul>
+<li><img src="qpsk_constellation.png" alt="QPSK Constellation"></li>
+</ul>
+</li>
+<li>8-Phase Shift Keying (8PSK): 3 bits per symbol<ul>
+<li><img src="8psk_constellation.png" alt="8PSK Constellation"></li>
+</ul>
+</li>
+<li><img src="qpsk_iq_amplitudes.png" alt="QPSK Symbols Amplitudes"></li>
+</ul>
+<h2 id="digital-amplitude-modulation-schemes">Digital Amplitude Modulation Schemes</h2>
+<ul>
+<li>4-position Quadrature Amplitude Modulation (4-QAM): 2 bits per symbol</li>
+<li>16-position Quadrature Amplitude Modulation (16-QAM): 4 bits per symbol</li>
+<li>64-position Quadrature Amplitude Modulation (64-QAM): 6 bits per symbol</li>
+<li><img src="qam_constellations.png" alt="QAM Constellations"></li>
+</ul>
+<h2 id="decision-boundaries">Decision Boundaries</h2>
+<ul>
+<li><img src="decision_boundaries.png" alt="Descision Boundaries"></li>
+</ul>
+<h2 id="pulse-shaping">Pulse Shaping</h2>
+<ul>
+<li>Purpose: limit the bandwidth of the transmission</li>
+<li>Happens after bit-to symbol mapping above</li>
+<li>Have to avoid introducing inter-symbol-interference (ISI)</li>
+<li>Popular implementation: raised cosine filter (RC)<ul>
+<li>One-half implemented on transmitter end, other half implemented
+on receive end</li>
+<li>Each half is a root-raised cosine filter (RRC) filter</li>
+<li>When combined, the RRC filters provide zero-ISI</li>
+<li><img src="rrc_results.png" alt="RRC Filter Results"></li>
+</ul>
+</li>
+</ul>
+<h2 id="digital-upconversion-and-downconversion">Digital Upconversion and Downconversion</h2>
+<ul>
+<li>Modulates and Demodulates a signal</li>
+<li>Additionally moves between the symbol rate f_symbol and the DAC or ADC
+sampling rate f_system</li>
+<li>Digital Upconverter (DUC): transmitter, f_symbol -&gt; f_system through filtering<ul>
+<li><img src="duc_diagram.png" alt="DUC Diagram"></li>
+</ul>
+</li>
+<li>Digital Downconverter (DDC): receiver, f_system -&gt; f_symbol<ul>
+<li><img src="ddc_diagram.png" alt="DDC Diagram"></li>
+</ul>
+</li>
+<li>Multirate R_multirate = f_system/f_symbol</li>
+</ul>
+<h2 id="carrier-synchronization">Carrier Synchronization</h2>
+<ul>
+<li>On receive side, need to account for phase and frequency offset
+errors<ul>
+<li><img src="carrier_synchronization.png" alt="Carrier Synchronization"></li>
+</ul>
+</li>
+<li>Phase error calculation:<ul>
+<li>Decision Directed: transmitted data symbols unknown, phase error
+is generated based on symbol decision (closest symbol to received
+sample)<ul>
+<li>Generally use this method</li>
+<li>Possible that there is still phase rotation (e.g., a multiple
+of 90 degrees)</li>
+</ul>
+</li>
+<li>Data aided: receiver knows transmitted symbols, derives phase
+error based on that</li>
+</ul>
+</li>
+<li><img src="carrier_synchronization_circuit.png" alt="Carrier Synchronization Diagram"></li>
+<li><img src="phase_error_diagram.png" alt="Phase Error Diagram"></li>
+</ul>
+<h2 id="timing-correction">Timing correction</h2>
+<ul>
+<li>Goal to sample at an interval at the proper time to get the max
+signal amplitude</li>
+<li>Done using a timeing error detector (TED)</li>
+<li>Two methods: oversampling and interpolation<ul>
+<li>oversampling: sample at rate much higher than symbol rate, then
+select the samples closest to the maximum effect points</li>
+<li><img src="oversampling_diagram.png" alt="Oversampling Diagram"></li>
+<li>Interpolation: oversample at small amount (e.g. 2x symbol rate)
+and interpolate between samples</li>
+<li><img src="interpolation_diagram.png" alt="Interpolation Diagram"></li>
+</ul>
+</li>
+<li>TED produces early and late signals, then subtracts between them
+to get a &#39;punctual&#39; (on time) sample time<ul>
+<li><img src="early_late_timing.png" alt="Early Late timing signals"></li>
+</ul>
+</li>
+<li>Combined timing and carrier synchronization looks like:<ul>
+<li><img src="timing_carrier_sync.png" alt="Symbol timing and carrier sync"></li>
+</ul>
+</li>
+<li>Should make I and Q amplitudes converge:<ul>
+<li><img src="iq_convergence.png" alt="IQ Convergence"></li>
+</ul>
+</li>
+</ul>
+<h2 id="coarse-frequency-syncronization">Coarse Frequency Syncronization</h2>
+<ul>
+<li>Calculates an initial frequency offset, for a large value (happens
+before fine frequency sync)</li>
+<li>Uses FFT on input, raised to 4th power, then selecting FFT bin
+with highest magnitude as the desired signal</li>
+<li><img src="coarse_freq_est.png" alt="Coarse Freq Est"></li>
+</ul>
+<h2 id="psk-phase-ambiguity">PSK phase ambiguity</h2>
+<ul>
+<li>Once you have a proper PSK (e.g. BPSK or QPSK) signal plot,
+there is a chance the phase is incorrect, e.g. rotated to
+the wrong constellation points. This means your resulting bits
+will be incorrect since they are derived from the wrong
+constellation point</li>
+<li><img src="qpsk_phase_rotation.png" alt="QPSK phase rotation"></li>
+<li>Two ways to handle this: differential encoding or unique word
+transmission</li>
+</ul>
+<h2 id="differential-encoding">Differential Encoding</h2>
+<ul>
+<li>Encodes input bits so that they can be recovered after incorrect
+receive due to PSK phase offset</li>
+<li>For BPSK, you use the current bit and previous encoded bit (Default 0)
+and XNOR them:</li>
+<li>To decode, you do the same thing except your previous bit to use
+is BEFORE decoding<ul>
+<li><img src="bpsk_differential_encode.png" alt="BPSK differential encode"></li>
+</ul>
+</li>
+<li>If the phase is incorrect on the received symbols, then the first
+decoded bit will be incorrect, but the rest will be correct</li>
+<li>QPSK encoding and decoding is similar, except you use the last 2 bits
+instead of just the last bits, and the output of encoding/decoding
+is two bits instead of 1 bit<ul>
+<li><img src="qpsk_differential_encode.png" alt="QPSK differential encode"></li>
+</ul>
+</li>
+</ul>
+<h2 id="unique-word-synchronization">Unique Word Synchronization</h2>
+<ul>
+<li>You transmit a fixed/known bit sequence before your actual payload.
+On the receive end, we look for that sequence, and if it&#39;s not found,
+check the resulting sequence if we rotate the phase/bit mapping
+ourselves. Once we find the phase mapping that results in the
+correct sequence, we apply said phase mappnig to the rest of the
+input as well</li>
+<li>For BSPK this looks like:<ul>
+<li><img src="bpsk_unique_word.png" alt="BPSK unique word"></li>
+</ul>
+</li>
+<li>For QPSK this looks like:<ul>
+<li><img src="qpsk_unique_word.png" alt="QPSK unique word"></li>
+</ul>
+</li>
+</ul>
+</body>
+</html>
