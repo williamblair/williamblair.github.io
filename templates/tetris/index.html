@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BJ's Website</title>
+    
+  <link rel="stylesheet" type="text/css" href="../../site.css"/>
+  
+  <style>
+    #mycanvas {
+        width: 640px;
+        height: 480px;
+        overflow: hidden;
+    }
+</style>
+</head>
+<body>
+
+<div style="width:640px; height:480px; margin-left: auto; margin-right: auto;">
+    <canvas id="mycanvas" width="640" height="480"></canvas>
+</div>
+
+<script src="renderer.js"></script>
+<script src="tiles.js"></script>
+<script>
+
+var CreateTile = function( tileArray, inColor )
+{
+    var tileObj = {
+        
+        // top left position
+        x: 0,
+        y: 0,
+        
+        tiles: tileArray,
+        color: inColor
+    };
+    return tileObj;
+}
+
+var DrawTile = function( tile )
+{
+    var xIndex = 0;
+    var yIndex = 0;
+    for ( var x = tile.x; 
+          x < tile.x + TILE_WIDTH_PX*TILE_WIDTH; 
+          x += TILE_WIDTH_PX )
+    {
+        yIndex = 0;
+        for ( var y = tile.y; 
+              y < tile.y + TILE_HEIGHT_PX*TILE_HEIGHT; 
+              y += TILE_HEIGHT_PX )
+        {
+            var index = yIndex * TILE_WIDTH + xIndex;
+            if ( tile.tiles[index] !== 0 )
+            {
+                renderer.DrawSquare( x, y, TILE_WIDTH_PX, tile.color );
+            }
+            yIndex++;
+        }
+        xIndex++;
+    }
+}
+
+var NextTile = CreateTile( AllTiles[ Math.floor( Math.random() * AllTiles.length ) ],
+                           AllColors[ Math.floor( Math.random() * AllColors.length ) ] );
+var CurTile = CreateTile( AllTiles[ Math.floor( Math.random() * AllTiles.length ) ],
+                           AllColors[ Math.floor( Math.random() * AllColors.length ) ] );
+var DrawNext = function()
+{
+    renderer.DrawText( 400, 100, "30px Monospace", "#FFFFFF", "Next" );
+    NextTile.x = 400;
+    NextTile.y = 150;
+    DrawTile( NextTile );
+}
+
+var UpdateTile = function()
+{
+    CurTile.x = (CurTile.x + 1);
+    CurTile.y = (CurTile.y + 1);
+    
+    if (CurTile.y + TILE_HEIGHT_PX >= renderer.height)
+    {
+        CurTile = NextTile;
+        NextTile = CreateTile( AllTiles[Math.floor(Math.random() * AllTiles.length)],
+                               AllColors[Math.floor(Math.random() * AllColors.length)] );
+        CurTile.x = 0;
+        CurTile.y = 0;
+    }
+}
+
+renderer.Init( 640, 480 );
+console.log( "Render init: ", 
+              renderer.width, 
+              renderer.height );
+
+var MainLoop = function()
+{
+    renderer.Clear();
+    
+    UpdateTile();
+    
+    DrawNext();
+    DrawTile( CurTile );
+    
+    requestAnimationFrame( MainLoop );
+}
+
+// start the main loop
+requestAnimationFrame( MainLoop );
+
+</script>
+
+<p>
+<a href="../../index.html">&lt;-- Back to Home</a>
+</p>
+
+</body>
+</html>
+
