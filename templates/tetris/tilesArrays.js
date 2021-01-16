@@ -1,11 +1,3 @@
-// tiles size in pixels
-const TILE_WIDTH_PX = 10;
-const TILE_HEIGHT_PX = 10;
-
-// tiles array size
-const TILE_WIDTH = 4;
-const TILE_HEIGHT = 4;
-
 // tetris tiles list
 var AllTiles = 
 [

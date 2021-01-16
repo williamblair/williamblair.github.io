@@ -16,6 +16,7 @@ var renderer = {
 	
 	Clear: function()
 	{
+        this.ctx.stroke();
 		this.ctx.fillStyle = "#000000";
 		this.ctx.fillRect( 0, 0, this.width, this.height );
 	},
@@ -33,6 +34,12 @@ var renderer = {
 		this.ctx.fillStyle = color;
 		this.ctx.fillRect( x, y, size, size );
 	},
+    
+    DrawSquareOutline( x, y, size, color )
+    {
+        this.ctx.strokeStyle = color;
+        this.ctx.rect( x, y, size, size );
+    },
     
     DrawText( x, y, font, color, message )
     {
