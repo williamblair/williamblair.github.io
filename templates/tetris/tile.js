@@ -55,6 +55,13 @@ var TileShouldStop = function( tile )
                 {
                     return true;
                 }
+                
+                
+                // check if colliding with a piece on the board
+                if (BoardCollision( tile ))
+                {
+                    return true;
+                }
             }
         }
     }
@@ -77,10 +84,13 @@ var UpdateTile = function()
         gameTimeCounter = 0;
         
         //CurTile.x = (CurTile.x + 1);
+        var CurTileCopy = CurTile;
         CurTile.y = ( CurTile.y + TILE_HEIGHT_PX );
     
         if (TileShouldStop( CurTile ))
         {
+            StoreTileOnBoard( CurTileCopy );
+            
             CurTile = NextTile;
             NextTile = CreateTile( AllTiles[Math.floor(Math.random() * AllTiles.length)],
                                    AllColors[Math.floor(Math.random() * AllColors.length)] );
@@ -94,15 +104,14 @@ var UpdateTile = function()
 var MoveTileRight = function()
 {
     CurTile.x += TILE_WIDTH_PX;
-    var doneChecking = false;
     
     // prevent moving off the board
     for ( var xIndex = 0; 
-          xIndex < TILE_WIDTH && !doneChecking; 
+          xIndex < TILE_WIDTH; 
           xIndex++ )
     {
         for ( var yIndex = 0; 
-              yIndex < TILE_HEIGHT && !doneChecking; 
+              yIndex < TILE_HEIGHT;
               yIndex++ )
         {
             if ( CurTile.tiles[ yIndex * TILE_WIDTH + xIndex ] )
@@ -110,26 +119,39 @@ var MoveTileRight = function()
                 var tileX = CurTile.x + (xIndex * TILE_WIDTH_PX);
                 var tileY = CurTile.y + (yIndex * TILE_HEIGHT_PX);
                 
-                // TODO - check against existing board tiles
                 if ( tileX + TILE_WIDTH_PX >
                      BOARD_X + (BOARD_WIDTH * TILE_WIDTH_PX) )
                 {
                     // undo the move right
                     CurTile.x -= TILE_WIDTH_PX;
-                    doneChecking = true;
+                    return;
                 }
             }
         }
     }
+    
+    // check for another tile on the board
+    if (BoardCollision( CurTile ))
+    {
+        CurTile.x -= TILE_WIDTH_PX; // undo the move right
+    }
 }
+
 var MoveTileLeft = function()
 {
     CurTile.x -= TILE_WIDTH_PX;
     
-    // TODO - check against existing board tiles
+    // Check against far left side of board
     if ( CurTile.x < BOARD_X )
     {
         // undo the move left
+        CurTile.x += TILE_WIDTH_PX;
+        return;
+    }
+
+    // check for another tile on the board
+    if (BoardCollision( CurTile ))
+    {
         CurTile.x += TILE_WIDTH_PX;
     }
 }

@@ -14,3 +14,6 @@ const BOARD_HEIGHT = 40;
 const BOARD_X = 20;
 const BOARD_Y = 20;
 
+// board background color
+const BOARD_COLOR = "#ABCDEF";
+

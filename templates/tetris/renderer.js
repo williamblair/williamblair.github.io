@@ -29,6 +29,12 @@ var renderer = {
 		this.ctx.stroke();
 	},
 	
+    DrawRect( x, y, width, height, color )
+    {
+        this.ctx.fillStyle = color;
+		this.ctx.fillRect( x, y, width, height );
+    },
+    
 	DrawSquare( x, y, size, color )
 	{
 		this.ctx.fillStyle = color;
