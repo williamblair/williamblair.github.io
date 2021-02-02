@@ -1598,6 +1598,57 @@ some optimization</p>
 
 <img src="psximages/md2_model_animated.gif"/>
 
+<h3>01/30/2021</h3>
+
+<p>Decided to play around with more low-level and assembly; I'd like to practice to really
+get better at it. I've started this by following <a href="https://github.com/PeterLemon/PSX">
+Peter Lemon's PSX baremetal assembly</a>, but with
+mips gcc instead of the assembler his repo uses.</p>
+<p>I attempted to set up a gdb-to-emulator environment without success; neither Xavi92 pcsxr
+(<a href="http://www.psxdev.net/forum/viewtopic.php?t=3633">link</a>) or pcsx redux
+(<a href="https://github.com/grumpycoders/pcsx-redux">link</a>) methods seemed to work for me,
+at least when using gdb-multiarch.</p>
+<p>I got NO$PSX working in linux instead using Wine and disabling audio, that way you can
+at least follow along and use breakpoints at the assembly level</p>
+<p>Some notes about GNU Assembler syntax</p>
+<ul>
+<li>Define constants with <code>.equ NAME, VALUE</code></li>
+<li>Comments start with #</li>
+<li>Macros take the form of
+<code><pre>.macro NAME [param1, param2, ...]
+    code
+    ...
+.endm</pre></code>
+    <ul><li>Dereference parameters with a backslash (<code>\param</code>)</li></ul>
+</li>
+<li>Name registers with a $ (e.g. <code>$sp</code>)</li>
+</ul>
+
+<p>And some gcc inline assembly notes:</p>
+<ul>
+<li>Great resource here: <a href="https://www.ibiblio.org/gferg/ldp/GCC-Inline-Assembly-HOWTO.html">link</a></li>
+<li>General syntax: <code>asm("quoted assembly code" : /* optional outputs */ : /* optional inputs */ : /* optional registers list */);</code>
+    <ul><li>Inputs and outputs are derefenced as <code>%number</code></li>
+    </ul>
+<li>x86_64 assembly mixed with C++: <a href="https://www.youtube.com/watch?v=rxsBghsrvpI&list=PLKK11Ligqitg9MOX3-0tFT1Rmh3uJp7kA">Youtube playlist</a></li>
+<li>Can define functions in assembly in an external file by declaring them as <code>extern "C" functionName()</code>,
+then in the assembly file: <pre><code>global functionName
+
+functionName:
+    code
+    ...
+    ret
+</code></pre>
+    <ul><li>The function return value should be stored in rax</li></ul>
+</li>
+</ul>
+
+<p>I finally got a step further from the earlier assembly test and drew some text using a texture from
+Peter Lemon's PSX assembly, using raw C (no SDK libraries) instead (TODO - is to implement the same thing in raw ASM):</p>
+<img src="psximages/peterlemon_text.png"/>
+
+<p>The code for this can be found here: <a href="https://github.com/williamblair/PSX-Lowlevel">Link</a></p>
+
 </div> <!-- contentDiv -->
 </div> <!-- bodyDiv -->
 
