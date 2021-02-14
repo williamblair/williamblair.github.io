@@ -1649,6 +1649,26 @@ Peter Lemon's PSX assembly, using raw C (no SDK libraries) instead (TODO - is to
 
 <p>The code for this can be found here: <a href="https://github.com/williamblair/PSX-Lowlevel">Link</a></p>
 
+<h3>02/14/2021</h3>
+
+<p>Got an equivalent of the above draw text working in GNU assembler. Some notes/discoveries:</p>
+<ul>
+<li>I had to add the <code>.set noreorder</code> directive, otherwise the program wouldn't work.</li>
+<li>I included an 'array' of data for the font texture by
+    <ol>
+        <li>Converting the font*.bin to an array using bin2c</li>
+        <li>Converting the C array format to <pre><code>.data
+ArrayName:
+    .byte 0x00
+    .byte 0x01
+    ...
+.text</code></pre>
+        </li>
+        <li>Including the above asm array format in main.s via <code>.include "fontdata.s"</code></li>
+    </ol>
+</li>
+</ul>
+
 </div> <!-- contentDiv -->
 </div> <!-- bodyDiv -->
 
