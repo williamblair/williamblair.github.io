@@ -7,7 +7,7 @@
     <meta charset="utf-8"/>
     <title>44 Heads Up Display (HUD)</title>
 </head>
-<body onload="main()">
+<body onload="initMain()">
 <div width="600" height="600" style="min-width:600px; min-height:600px;">
 <canvas id="mycanvas" width="600" height="600" 
         style="position:absolute; z-index: 0;">
@@ -17,6 +17,11 @@
         style="position:absolute; z-index: 1;">
 </canvas>
 </div>
+<div>
+    <textarea cols="80" rows="40" id="codeArea" style="padding:5px;"></textarea>
+    <br/>
+    <button type="button" id="runButton">Run</button>
+</div>
 <p>Click to detect if you selected the cube!</p>
 
 <script src="../lib/webgl-utils.js"></script>
@@ -24,7 +29,7 @@
 <script src="../lib/cuon-utils.js"></script>
 <script src="../lib/cuon-matrix.js"></script>
 
-<script>
+<script id="WebGLScript">
     
 // vertex shader program
 var VertexShaderStr =`
@@ -454,7 +459,23 @@ function initVertexBuffers(gl) {
     // give back the number of vertices in the buffer
     return n;
 }
+main();
+</script>
+<script>
+function initMain() {
+    var codeArea = document.getElementById("codeArea");
+    var webGLScript = document.getElementById("WebGLScript");
 
+    codeArea.value = webGLScript.text;
+
+    var runButton = document.getElementById("runButton");
+    runButton.onclick = function() {
+        var runFunc = new Function(codeArea.value);
+        runFunc();
+    }
+    //var initialRunFunc = new Function(codeArea.value);
+    //initialRunFunc();
+}
 </script>
 </body>
 </html>

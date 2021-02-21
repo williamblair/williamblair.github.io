@@ -7,17 +7,24 @@
     <meta charset="utf-8"/>
     <title>23 textured quad</title>
 </head>
-<body onload="main()">
-<canvas id="mycanvas" width="200" height="150">
-    Your Browser doesn't support canvas :(
-</canvas>
+<body onload="initMain()">
+<div style="display:flex;">
+    <canvas id="mycanvas" width="600" height="600">
+        Your Browser doesn't support canvas :(
+    </canvas>
+    <div>
+        <textarea cols="80" rows="40" id="codeArea" style="padding:5px;"></textarea>
+        <br/>
+        <button type="button" id="runButton">Run</button>
+    </div>
+</div>
 
 <script src="../lib/webgl-utils.js"></script>
 <script src="../lib/webgl-debug.js"></script>
 <script src="../lib/cuon-utils.js"></script>
 <script src="../lib/cuon-matrix.js"></script>
 
-<script>
+<script id="WebGLScript">
     
 // vertex shader program
 var VertexShaderStr =`
@@ -101,14 +108,14 @@ function main() {
 function initVertexBuffers(gl) {
     
     // the vertices and texture coords to store in the buffer
-    //var vertices = new Float32Array([-0.5,  0.5,   0.0, 1.0, // first point
-    //                                 -0.5, -0.5,   0.0, 0.0, // second point
-    //                                  0.5,  0.5,   1.0, 1.0, // third point
-    //                                  0.5, -0.5,   1.0, 0.0]); // fourth point
-    var vertices = new Float32Array([-0.5,  0.5,   -0.3, 1.7, // first point
-                                     -0.5, -0.5,   -0.3, -0.2, // second point
-                                      0.5,  0.5,   1.7, 1.7, // third point
-                                      0.5, -0.5,   1.7, -0.2]); // fourth point
+    var vertices = new Float32Array([-0.5,  0.5,   0.0, 1.0, // first point
+                                     -0.5, -0.5,   0.0, 0.0, // second point
+                                      0.5,  0.5,   1.0, 1.0, // third point
+                                      0.5, -0.5,   1.0, 0.0]); // fourth point
+    //var vertices = new Float32Array([-0.5,  0.5,   -0.3, 1.7, // first point
+                                     //-0.5, -0.5,   -0.3, -0.2, // second point
+                                      //0.5,  0.5,   1.7, 1.7, // third point
+                                      //0.5, -0.5,   1.7, -0.2]); // fourth point
     var n = 4; // number of vertices
     
     // create the buffer object
@@ -212,7 +219,23 @@ function loadTexture(gl, n, texture, uSampler, image) {
     // tell the shader sampler uniform to use texture 0
     gl.uniform1i(uSampler, 0);
 }
+main();
+</script>
+<script>
+function initMain() {
+    var codeArea = document.getElementById("codeArea");
+    var webGLScript = document.getElementById("WebGLScript");
 
+    codeArea.value = webGLScript.text;
+
+    var runButton = document.getElementById("runButton");
+    runButton.onclick = function() {
+        var runFunc = new Function(codeArea.value);
+        runFunc();
+    }
+    //var initialRunFunc = new Function(codeArea.value);
+    //initialRunFunc();
+}
 </script>
 </body>
 </html>

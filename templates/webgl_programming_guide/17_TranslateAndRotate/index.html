@@ -7,17 +7,24 @@
     <meta charset="utf-8"/>
     <title>17 translate then rotate with library</title>
 </head>
-<body onload="main()">
-<canvas id="mycanvas" width="200" height="150">
-    Your Browser doesn't support canvas :(
-</canvas>
+<body onload="initMain()">
+<div style="display:flex;">
+    <canvas id="mycanvas" width="600" height="600">
+        Your Browser doesn't support canvas :(
+    </canvas>
+    <div>
+        <textarea cols="80" rows="40" id="codeArea" style="padding:5px;"></textarea>
+        <br/>
+        <button type="button" id="runButton">Run</button>
+    </div>
+</div>
 
 <script src="../lib/webgl-utils.js"></script>
 <script src="../lib/webgl-debug.js"></script>
 <script src="../lib/cuon-utils.js"></script>
 <script src="../lib/cuon-matrix.js"></script>
 
-<script>
+<script id="WebGLScript">
     
 // vertex shader program
 var VertexShaderStr =`
@@ -170,7 +177,23 @@ function initVertexBuffers(gl) {
     // give back the number of vertices in the buffer
     return n;
 }
+main();
+</script>
+<script>
+function initMain() {
+    var codeArea = document.getElementById("codeArea");
+    var webGLScript = document.getElementById("WebGLScript");
 
+    codeArea.value = webGLScript.text;
+
+    var runButton = document.getElementById("runButton");
+    runButton.onclick = function() {
+        var runFunc = new Function(codeArea.value);
+        runFunc();
+    }
+    //var initialRunFunc = new Function(codeArea.value);
+    //initialRunFunc();
+}
 </script>
 </body>
 </html>

@@ -4,12 +4,19 @@
     <meta charset="utf-8"/>
     <title>01 Draw Rectange</title>
 </head>
-<body onload="main()">
-<canvas id="mycanvas" width="200" height="150">
-    Your Browser doesn't support canvas :(
-</canvas>
-<script>
+<body onload="initMain()">
+<div style="display:flex;">
+    <canvas id="mycanvas" width="600" height="600">
+        Your Browser doesn't support canvas :(
+    </canvas>
+    <div>
+        <textarea cols="80" rows="40" id="codeArea" style="padding:5px;"></textarea>
+        <br/>
+        <button type="button" id="runButton">Run</button>
+    </div>
+</div>
 
+<script  id="WebGLScript">
 function main() {
     
     // retrieve the canvas element
@@ -27,7 +34,25 @@ function main() {
     ctx.fillStyle = "rgba(0, 0, 255, 1.0)";
     ctx.fillRect(120, 10, 150, 150);
 }
-
+main();
 </script>
+
+<script>
+function initMain() {
+    var codeArea = document.getElementById("codeArea");
+    var webGLScript = document.getElementById("WebGLScript");
+
+    codeArea.value = webGLScript.text;
+
+    var runButton = document.getElementById("runButton");
+    runButton.onclick = function() {
+        var runFunc = new Function(codeArea.value);
+        runFunc();
+    }
+    //var initialRunFunc = new Function(codeArea.value);
+    //initialRunFunc();
+}
+</script>
+
 </body>
 </html>

@@ -7,7 +7,7 @@
     <meta charset="utf-8"/>
     <title>45 3D Overlay</title>
 </head>
-<body onload="main()">
+<body onload="initMain()">
 <canvas id="mycanvas" width="600" height="600" style="position:absolute; z-indeX: 0">
     Your Browser doesn't support canvas :(
 </canvas>
@@ -18,13 +18,17 @@
 <h1>My Second Header</h1>
 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-
+<div>
+    <textarea cols="80" rows="40" id="codeArea" style="padding:5px;"></textarea>
+    <br/>
+    <button type="button" id="runButton">Run</button>
+</div>
 <script src="../lib/webgl-utils.js"></script>
 <script src="../lib/webgl-debug.js"></script>
 <script src="../lib/cuon-utils.js"></script>
 <script src="../lib/cuon-matrix.js"></script>
 
-<script>
+<script id="WebGLScript">
     
 // vertex shader program
 var VertexShaderStr =`
@@ -426,7 +430,23 @@ function initVertexBuffers(gl) {
     // give back the number of vertices in the buffer
     return n;
 }
+main();
+</script>
+<script>
+function initMain() {
+    var codeArea = document.getElementById("codeArea");
+    var webGLScript = document.getElementById("WebGLScript");
 
+    codeArea.value = webGLScript.text;
+
+    var runButton = document.getElementById("runButton");
+    runButton.onclick = function() {
+        var runFunc = new Function(codeArea.value);
+        runFunc();
+    }
+    //var initialRunFunc = new Function(codeArea.value);
+    //initialRunFunc();
+}
 </script>
 </body>
 </html>

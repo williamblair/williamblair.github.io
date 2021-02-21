@@ -7,16 +7,23 @@
     <meta charset="utf-8"/>
     <title>04 Draw Point v2</title>
 </head>
-<body onload="main()">
-<canvas id="mycanvas" width="200" height="150">
-    Your Browser doesn't support canvas :(
-</canvas>
+<body onload="initMain()">
+<div style="display:flex;">
+    <canvas id="mycanvas" width="600" height="600">
+        Your Browser doesn't support canvas :(
+    </canvas>
+    <div>
+        <textarea cols="80" rows="40" id="codeArea" style="padding:5px;"></textarea>
+        <br/>
+        <button type="button" id="runButton">Run</button>
+    </div>
+</div>
 
 <script src="../lib/webgl-utils.js"></script>
 <script src="../lib/webgl-debug.js"></script>
 <script src="../lib/cuon-utils.js"></script>
 
-<script>
+<script id="WebGLScript">
     
 // vertex shader program
 var VertexShaderStr =`
@@ -80,7 +87,23 @@ function main() {
                   0,         // vertex offset to draw from
                   1);        // number of MODE to draw
 }
+main();
+</script>
+<script>
+function initMain() {
+    var codeArea = document.getElementById("codeArea");
+    var webGLScript = document.getElementById("WebGLScript");
 
+    codeArea.value = webGLScript.text;
+
+    var runButton = document.getElementById("runButton");
+    runButton.onclick = function() {
+        var runFunc = new Function(codeArea.value);
+        runFunc();
+    }
+    //var initialRunFunc = new Function(codeArea.value);
+    //initialRunFunc();
+}
 </script>
 </body>
 </html>
