@@ -1,0 +1,134 @@
+<!-- code samples from the book can be found here:
+     https://sites.google.com/site/webglbook/
+-->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>06 Mouse Point</title>
+</head>
+<body onload="main()">
+<canvas id="mycanvas" width="200" height="150">
+    Your Browser doesn't support canvas :(
+</canvas>
+<p>Click Me!</p>
+
+<script src="../lib/webgl-utils.js"></script>
+<script src="../lib/webgl-debug.js"></script>
+<script src="../lib/cuon-utils.js"></script>
+
+<script>
+    
+// vertex shader program
+var VertexShaderStr =`
+    attribute vec4 aPosition; // vertex data passed into the shader
+    attribute float aPointSize; // size of each texel
+    void main() {
+        gl_Position = aPosition; // coordinates
+        gl_PointSize = aPointSize;
+    }
+`;
+
+// fragment shader program
+var FragmentShaderStr = `
+    void main() {
+        gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0); // fragment color
+    }
+`;
+
+function main() {
+
+    
+    // retrieve the canvas element
+    var canvas = document.getElementById("mycanvas");
+    
+    if (!canvas) {
+        console.log("Failed to get canvas element");
+        return false;
+    }
+    
+    var gl = getWebGLContext(canvas);
+    if (!gl) {
+        console.log("Failed to get OpenGL context");
+        return false;
+    }
+    
+    // Load and compile shader programs
+    if (!initShaders(gl, VertexShaderStr, FragmentShaderStr)) {
+        console.log("Failed to init shaders");
+        return false;
+    }
+    
+    // Get pixel size attribute
+    var aPointSize = gl.getAttribLocation(gl.program, "aPointSize");
+    if (aPointSize < 0) {
+        console.log("Failed to get point size attribute");
+        return false;
+    }
+    
+    // send pixel size to the vertex shader attribute
+    const pixelSize = 20.0;
+    gl.vertexAttrib1f(aPointSize, pixelSize);
+    
+    // Get vertex attribute
+    var aPosition = gl.getAttribLocation(gl.program, "aPosition");
+    if (aPosition < 0) {
+        console.log("Failed to get aPosition attribute");
+        return false;
+    }
+    
+    // send vertex data to the vertex shader attribute
+    var vertices = new Float32Array([0.0, 0.0, 0.0]);
+    gl.vertexAttrib3fv(aPosition, vertices);
+    //gl.vertexAttrib3f(aPosition, 0.0, 0.0, 0.0);
+    
+    // specify the color to clear the canvas with
+    gl.clearColor(1.0, 0.0, 0.0, 1.0);
+    
+    // clear the canvas
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    
+    // draw a point
+    gl.drawArrays(gl.POINTS, // mode; gl.POINTS, gl.LINES, gl.LINE_STRIP, gl.LINE_LOOP, gl.TRIANGLES, gl.TRIANGLE_STRIP, or gl.TRIANGLE_FAN
+                  0,         // vertex offset to draw from
+                  1);        // number of MODE to draw
+                  
+    // register mouse click event
+    canvas.onmousedown = function (eventObj) {
+        click(eventObj, gl, canvas, aPosition);
+    };
+}
+
+// function to draw a point based on mouse position
+var gPoints = []; // global clicked points list
+function click(eventObj, gl, canvas, aPosition) {
+    
+    // get mouse x, y
+    var x = eventObj.clientX;
+    var y = eventObj.clientY;
+    var rect = eventObj.target.getBoundingClientRect(); // object position
+    
+    // offset from canvas position then normalize between 0.0,1.0
+    x = ((x - rect.left) - canvas.width/2)/(canvas.width/2);
+    y = (canvas.height/2 - (y - rect.top))/(canvas.height/2);
+    
+    gPoints.push([x,y]);
+    
+    // clear the screen
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    
+    // draw the points array
+    const len = gPoints.length;
+    for (var i = 0; i < len; i++) {
+        
+        // send point to shader
+        gl.vertexAttrib3f(aPosition, gPoints[i][0], gPoints[i][1], 0.0);
+        
+        // draw the point
+        gl.drawArrays(gl.POINTS, 0, 1);
+    }
+}
+
+</script>
+</body>
+</html>
