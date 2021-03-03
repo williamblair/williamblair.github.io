@@ -1,0 +1,310 @@
+<!-- code samples from the book can be found here:
+     https://sites.google.com/site/webglbook/
+-->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>42 Mouse Rotation</title>
+</head>
+<body onload="main()">
+<canvas id="mycanvas" width="600" height="600">
+    Your Browser doesn't support canvas :(
+</canvas>
+<p id="statusText">Loading...</p> 
+<p>Click and drag to rotate the object</p>
+<div>
+    <p>Click a button to draw a different model</p>
+    <button id="teapotButton">Utah Teapot Model</button><br/>
+    <button id="bunnyButton">Stanford Bunny Model</button><br/>
+    <button id="armadilloButton">Stanford Armadillo Model</button><br/>
+    <button id="trexButton">Stanford Tyrannosaurus</button><br/>
+    <button id="dragonButton">Stanford Dragon</button><br/>
+    <button id="buddhaButton">Stanford Buddha</button><br/>
+</div>
+<p>In order to get larger OBJ files to work, with indices greater than the
+max of unsigned shorts (0xFFFF), we need to be able to use gl.UNSIGNED_INT
+as element index types. This type is natively available in WebGL 2. To enable
+webgl2, I added "webgl2" as a getContext argument option in 
+../lib/webgl-utils.js: </p>
+<code>var names = ["webgl2", "webgl", "experimental-webgl", "webkit-3d", "moz-webgl"];</code>
+<p>When creating the webgl index buffer, use a Uint32Array:</p>
+<code>var indexArr = new Uint32Array(this.vertexIndices);
+gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexArr, gl.STATIC_DRAW);</code>
+<p>When drawing via indices, use: (in OBJModel.js)</p>
+<code>gl.drawElements(gl.TRIANGLES, this.n, gl.UNSIGNED_INT, 0);</code>
+<p>Most OBJ models from <a href="https://www.prinmath.com/csci5229/OBJ/index.html">https://www.prinmath.com/csci5229/OBJ/index.html</a></p>
+
+<script src="../lib/webgl-utils.js"></script>
+<script src="../lib/webgl-debug.js"></script>
+<script src="../lib/cuon-utils.js"></script>
+<script src="../lib/cuon-matrix.js"></script>
+<script src="./Shader.js"></script>
+<script src="./OBJModel.js"></script>
+
+<script src="teapotObj.js"></script>
+<script src="armadilloObj.js"></script>
+<script src="bunnyObj.js"></script>
+<script src="trexObj.js"></script>
+<script src="dragonObj.js"></script>
+<script src="buddhaObj.js"></script>
+
+<script>
+    
+// vertex shader program
+var VertexShaderStr =`
+    attribute vec4 aPosition; // vertex data passed into the shader
+    //attribute vec4 aColor;
+    attribute vec4 aNormal;
+    
+    uniform mat4 uModelMatrix;
+    uniform mat4 uNormalMatrix; // inverse transpose of the model matrix
+    uniform mat4 uViewMatrix;
+    uniform mat4 uProjectionMatrix;
+    
+    //varying vec4 vColor;
+    varying vec3 vNormal;
+    varying vec3 vPosition;
+    
+    void main() {
+        gl_Position = uProjectionMatrix * uViewMatrix * uModelMatrix * aPosition; // coordinates
+        
+        vPosition = vec3(uModelMatrix * aPosition); // world space vertex coord
+        vNormal = normalize(vec3(uNormalMatrix * aNormal));
+        //vColor = aColor;
+    }
+`;
+
+// fragment shader program
+var FragmentShaderStr = `
+    precision mediump float;
+    
+    uniform vec3 uLightColor;
+    uniform vec3 uLightPosition;
+    uniform vec3 uAmbientColor;
+    
+    //varying vec4 vColor; // passed from vertex shader
+    varying vec3 vNormal;
+    varying vec3 vPosition;
+    
+    vec4 vColor = vec4(1.0, 1.0, 1.0, 1.0);
+    
+    // point light
+    vec3 calcPoint() {
+    
+        // normalize input
+        vec3 normal = normalize(vNormal);
+        
+        // normalized light direction
+        vec3 lightDir = normalize(uLightPosition - vPosition);
+        
+        // diffuse dot product
+        float nDotL = max(dot(lightDir, normal), 0.0);
+        
+        // diffuse calculation
+        vec3 diffuse = uLightColor * vec3(vColor) * nDotL;
+        
+        return diffuse;
+    }
+    
+    vec3 calcAmbient() {
+        return uAmbientColor * vec3(vColor);
+    }
+    
+    void main() {
+        //gl_FragColor = vColor;
+        gl_FragColor = vec4(calcPoint() + calcAmbient(), 1.0);
+    }
+`;
+
+var gShader = null;
+
+function main() {
+    
+    var statusPar = document.getElementById("statusText");
+    statusPar.innerHTML ="Initting WebGL Canvas";
+    
+    // retrieve the canvas element
+    var canvas = document.getElementById("mycanvas");
+    
+    if (!canvas) {
+        console.log("Failed to get canvas element");
+        return false;
+    }
+    
+    //var gl = getWebGLContext(canvas);
+    var gl = canvas.getContext("webgl2");
+    if (!gl) {
+        console.log("Failed to get OpenGL context");
+        return false;
+    }
+    
+    // Load and compile shader programs
+    gShader = new Shader(gl, VertexShaderStr, FragmentShaderStr);
+    
+    // 3D model
+    statusPar.innerHTML ="Parsing OBJ Models";
+    var teapotObj = new OBJModel(TEAPOT_OBJ_STR);
+    var armadilloObj = new OBJModel(ARMADILLO_OBJ_STR);
+    var bunnyObj = new OBJModel(BUNNY_OBJ_STR);
+    var trexObj = new OBJModel(TREX_OBJ_STR);
+    var dragonObj = new OBJModel(DRAGON_OBJ_STR, 0.25);
+    var buddhaObj = new OBJModel(BUDDHA_OBJ_STR, 0.25);
+    statusPar.innerHTML ="Initializing Model GL buffers";
+    teapotObj.InitBuffers(gl);
+    armadilloObj.InitBuffers(gl);
+    bunnyObj.InitBuffers(gl);
+    trexObj.InitBuffers(gl);
+    dragonObj.InitBuffers(gl);
+    buddhaObj.InitBuffers(gl);
+    
+    var objName = "teapot";
+    var objDrawMap = {
+        "teapot": teapotObj,
+        "armadillo": armadilloObj,
+        "bunny": bunnyObj,
+        "trex": trexObj,
+        "dragon": dragonObj,
+        "buddha": buddhaObj
+    };
+    
+    // register object changes
+    document.getElementById("teapotButton").onclick = function(obj) {
+        objName = "teapot";
+    }
+    document.getElementById("armadilloButton").onclick = function(obj) {
+        objName = "armadillo";
+    }
+    document.getElementById("bunnyButton").onclick = function(obj) {
+        objName = "bunny";
+    }
+    document.getElementById("trexButton").onclick = function(obj) {
+        objName = "trex";
+    }
+    document.getElementById("dragonButton").onclick = function(obj) {
+        objName = "dragon";
+    }
+    document.getElementById("buddhaButton").onclick = function(obj) {
+        objName = "buddha";
+    }
+    
+    // enable checking depth before drawing
+    // try commenting out to see what happens
+    gl.enable(gl.DEPTH_TEST);
+    
+    // enable offset to mitigate z fighting
+    //gl.enable(gl.POLYGON_OFFSET_FILL);
+    //gl.polygonOffset(1.0, 1.0);
+    
+    // set lighting uniforms
+    gShader.SetVec3f(gl, "uLightColor", 1.0, 1.0, 1.0);
+    gShader.SetVec3f(gl, "uLightPosition", 3.0, 3.0, 2.0);
+    gShader.SetVec3f(gl, "uAmbientColor", 0.2, 0.2, 0.2);
+    
+    // calculate projection (perspective) matrix
+    var projectionMatrix = new Matrix4();
+    var fov = 30; // field of view angle
+    var aspect = canvas.width / canvas.height; // aspect ratio
+    var near = 1; // near clip distance
+    var far = 100; // far clip distance
+    projectionMatrix.setPerspective(fov, aspect, near, far);
+    
+    // calculate the view matrix
+    var viewMatrix = new Matrix4();
+    viewMatrix.setLookAt(3,  // eye position x
+                         3,  // eye position y
+                         7,  // eye position z
+                         0,     // lookat position x
+                         0,     // lookat position y
+                         0,     // lookat position z
+                         0,     // up x
+                         1,     // up y
+                         0);    // up z
+    
+    // calcualate the model matrix
+    var modelMatrix = new Matrix4();
+    modelMatrix.setTranslate(0, -0.5, 0);
+    modelMatrix.rotate(90.0, 0, 0, 1); // 90 degree rotation around z axis
+    
+    // calculate the normal matrix
+    var normalMatrix = new Matrix4();
+    normalMatrix.setInverseOf(modelMatrix);
+    normalMatrix.transpose();
+    
+    function updateUniforms() {
+        // send matrices to the shader
+        gShader.SetMat4fv(gl, "uModelMatrix", modelMatrix.elements);
+        gShader.SetMat4fv(gl, "uViewMatrix", viewMatrix.elements);
+        gShader.SetMat4fv(gl, "uProjectionMatrix", projectionMatrix.elements);
+        gShader.SetMat4fv(gl, "uNormalMatrix", normalMatrix.elements);    
+    }
+    
+    var modelRotation = [0.0, 0.0]; // x and y axis rotation
+    var dragging = false; // whether or not click is held down
+    var lastX = -1, lastY = -1;
+    canvas.onmousedown = function(eventObj) {
+        var x = eventObj.clientX;
+        var y = eventObj.clientY;
+        
+        // canvas screen area
+        var rect = eventObj.target.getBoundingClientRect();
+        
+        // check if inside the canvas, and if so start dragging
+        if (rect.left <= x && x < rect.right && 
+            rect.top <= y && y < rect.bottom) {
+            lastX = x;
+            lastY = y;
+            dragging = true;
+        }
+    }
+    canvas.onmouseup = function(eventObj) {
+        dragging = false; // stop dragging
+    }
+    canvas.onmousemove = function(eventObj) {
+        var x = eventObj.clientX;
+        var y = eventObj.clientY;
+        if (dragging) {
+
+            var factor = 100.0/canvas.height; // rotation ratio
+            var dx = factor * (x - lastX);
+            var dy = factor * (y - lastY);
+            // limit x axis rotation between -90,90
+            modelRotation[0] = Math.max(Math.min(modelRotation[0] + dy, 90.0), -90.0);
+            modelRotation[1] = modelRotation[1] + dx;
+        }
+        lastX = x;
+        lastY = y;
+    }
+    
+    // continuously updates the screen
+    statusPar.innerHTML = "Done Loading!";
+    function mainLoop() {
+        // specify the color to clear the canvas with
+        gl.clearColor(0.3, 0.0, 0.3, 1.0);
+        
+        // clear the canvas
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    
+        // set the model matrix based on rotation
+        modelMatrix.setTranslate(0, -0.5, 0);
+        modelMatrix.rotate(modelRotation[0], 1, 0, 0); // x axis rotation
+        modelMatrix.rotate(modelRotation[1], 0, 1, 0); // y axis rotation
+        // update normal matrix based on model matrix
+        normalMatrix.setInverseOf(modelMatrix);
+        normalMatrix.transpose();
+        
+        // apply matrix changes
+        updateUniforms();
+    
+        // draw the object
+        objDrawMap[objName].Draw(gl);
+                      
+        requestAnimationFrame(mainLoop);
+    }
+    // initial loop call
+    mainLoop();
+}
+
+</script>
+</body>
+</html>
