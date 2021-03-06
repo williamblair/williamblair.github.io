@@ -21,6 +21,7 @@
     <button id="trexButton">Stanford Tyrannosaurus</button><br/>
     <button id="dragonButton">Stanford Dragon</button><br/>
     <button id="buddhaButton">Stanford Buddha</button><br/>
+    <button id="womanButton">Woman (GLTF)</button><br/>
 </div>
 <p>In order to get larger OBJ files to work, with indices greater than the
 max of unsigned shorts (0xFFFF), we need to be able to use gl.UNSIGNED_INT
@@ -34,6 +35,13 @@ gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexArr, gl.STATIC_DRAW);</code>
 <p>When drawing via indices, use: (in OBJModel.js)</p>
 <code>gl.drawElements(gl.TRIANGLES, this.n, gl.UNSIGNED_INT, 0);</code>
 <p>Most OBJ models from <a href="https://www.prinmath.com/csci5229/OBJ/index.html">https://www.prinmath.com/csci5229/OBJ/index.html</a></p>
+<p>Woman GLTF model from 
+   <a href="https://github.com/PacktPublishing/Hands-On-Game-Animation-Programming/tree/master/Chapter11/Sample03/Assets">
+   https://github.com/PacktPublishing/Hands-On-Game-Animation-Programming/tree/master/Chapter11/Sample03/Assets
+   </a>
+</p>
+<p>For GLTF parsing, the format is described <a href="https://github.com/KhronosGroup/glTF#overview">here</a>,
+while I found how to convert the base64 buffer data string to a Float32Array() <a href="https://gist.github.com/sketchpunk/f5fa58a56dcfe6168a9328e7c32a4fd4">here</a></p>
 
 <script src="../lib/webgl-utils.js"></script>
 <script src="../lib/webgl-debug.js"></script>
@@ -41,6 +49,7 @@ gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexArr, gl.STATIC_DRAW);</code>
 <script src="../lib/cuon-matrix.js"></script>
 <script src="./Shader.js"></script>
 <script src="./OBJModel.js"></script>
+<script src="./GLTFModel.js"></script>
 
 <script src="teapotObj.js"></script>
 <script src="armadilloObj.js"></script>
@@ -117,6 +126,7 @@ var FragmentShaderStr = `
     }
 `;
 
+// global shader program
 var gShader = null;
 
 function main() {
@@ -143,7 +153,8 @@ function main() {
     gShader = new Shader(gl, VertexShaderStr, FragmentShaderStr);
     
     // 3D model
-    statusPar.innerHTML ="Parsing OBJ Models";
+    statusPar.innerHTML ="Parsing Models";
+    var womanGltf = new GLTFModel("./Woman.gltf", 0.5);
     var teapotObj = new OBJModel(TEAPOT_OBJ_STR);
     var armadilloObj = new OBJModel(ARMADILLO_OBJ_STR);
     var bunnyObj = new OBJModel(BUNNY_OBJ_STR);
@@ -151,6 +162,7 @@ function main() {
     var dragonObj = new OBJModel(DRAGON_OBJ_STR, 0.25);
     var buddhaObj = new OBJModel(BUDDHA_OBJ_STR, 0.25);
     statusPar.innerHTML ="Initializing Model GL buffers";
+    womanGltf.InitBuffers(gl);
     teapotObj.InitBuffers(gl);
     armadilloObj.InitBuffers(gl);
     bunnyObj.InitBuffers(gl);
@@ -158,8 +170,10 @@ function main() {
     dragonObj.InitBuffers(gl);
     buddhaObj.InitBuffers(gl);
     
-    var objName = "teapot";
+    
+    var objName = "woman";
     var objDrawMap = {
+        "woman": womanGltf,
         "teapot": teapotObj,
         "armadillo": armadilloObj,
         "bunny": bunnyObj,
@@ -186,6 +200,9 @@ function main() {
     }
     document.getElementById("buddhaButton").onclick = function(obj) {
         objName = "buddha";
+    }
+    document.getElementById("womanButton").onclick = function(obj) {
+        objName = "woman";
     }
     
     // enable checking depth before drawing
@@ -286,7 +303,7 @@ function main() {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     
         // set the model matrix based on rotation
-        modelMatrix.setTranslate(0, -0.5, 0);
+        modelMatrix.setTranslate(0, -1.5, 0);
         modelMatrix.rotate(modelRotation[0], 1, 0, 0); // x axis rotation
         modelMatrix.rotate(modelRotation[1], 0, 1, 0); // y axis rotation
         // update normal matrix based on model matrix
