@@ -132,6 +132,35 @@ Matrix4.prototype.multiplyVector4 = function(pos) {
 };
 
 /**
+ * Multiply the matrix internally by a scalar
+ * @param x the scalar value to multiply by
+ * @return this
+ */
+Matrix4.prototype.multiplyScalar = function(x) {
+  var e = this.elements;
+  e[0] *= x;  e[4] *= x;  e[8]  *= x;   e[12] *= x;
+  e[1] *= x;  e[5] *= x;  e[9]  *= x;   e[13] *= x;
+  e[2] *= x;  e[6] *= x;  e[10] *= x;   e[14] *= x;
+  e[3] *= x;  e[7] *= x;  e[11] *= x;   e[15] *= x;
+  return this;
+};
+
+/**
+ * Internal scalar addition with the other matrix
+ * @param other the oter matrix to add
+ * @return this
+ */
+Matrix4.prototype.add = function(other) {
+  var e = this.elements;
+  var eo = other.elements;
+  e[0] += eo[0];  e[4] += eo[4];  e[8]  += eo[8];   e[12] += eo[12];
+  e[1] += eo[1];  e[5] += eo[5];  e[9]  += eo[9];   e[13] += eo[13];
+  e[2] += eo[2];  e[6] += eo[6];  e[10] += eo[10];   e[14] += eo[14];
+  e[3] += eo[3];  e[7] += eo[7];  e[11] += eo[11];   e[15] += eo[15];
+  return this;
+};
+
+/**
  * Transpose the matrix.
  * @return this
  */
@@ -728,6 +757,32 @@ Vector3.prototype.normalize = function() {
 };
 
 /**
+ * Internally add elements by another vector3
+ * @param x the vector3 to add by
+ * @return this
+ */
+Vector3.prototype.add = function(x) {
+    var v = this.elements;
+    v[0] += x.elements[0];
+    v[1] += x.elements[1];
+    v[2] += x.elements[2];
+    return this;
+}
+
+/**
+ * Internally multiply elements by scalar
+ * @param x the scalar to multiply by
+ * @return this
+ */
+Vector3.prototype.multiplyScalar = function(x) {
+    var v = this.elements;
+    v[0] *= x;
+    v[1] *= x;
+    v[2] *= x;
+    return this;
+}
+
+/**
  * Constructor of Vector4
  * If opt_src is specified, new vector is initialized by opt_src.
  * @param opt_src source vector(option)
@@ -738,4 +793,32 @@ var Vector4 = function(opt_src) {
     v[0] = opt_src[0]; v[1] = opt_src[1]; v[2] = opt_src[2]; v[3] = opt_src[3];
   } 
   this.elements = v;
+}
+
+/**
+ * Internally multiply elements by scalar
+ * @param x the scalar to multiply by
+ * @return this
+ */
+Vector4.prototype.multiplyScalar = function(x) {
+    var v = this.elements;
+    v[0] *= x;
+    v[1] *= x;
+    v[2] *= x;
+    v[3] *= x;
+    return this;
+}
+
+/**
+ * Internally add elements by scalar
+ * @param x the other vector4 to add
+ * @return this
+ */
+Vector4.prototype.add = function(x) {
+    var v = this.elements;
+    v[0] += x.elements[0];
+    v[1] += x.elements[1];
+    v[2] += x.elements[2];
+    v[2] += x.elements[3];
+    return this;
 }

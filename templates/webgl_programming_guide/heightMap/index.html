@@ -1,0 +1,208 @@
+<!-- code samples from the book can be found here:
+     https://sites.google.com/site/webglbook/
+-->
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="utf-8"/>
+    <title>.RAW image heightmap</title>
+</head>
+<body onload="main()">
+<canvas id="mycanvas" width="600" height="600">
+    Your Browser doesn't support canvas :(
+</canvas>
+<p>Height Map Generated from a .RAW image version of
+the following:</p>
+<img src="./heightmap.png"/>
+<p>Adapted from chapter 5 of 
+<a href="https://www.amazon.com/Beginning-OpenGL-Game-Programming-Second/dp/159863528X">Beginning OpenGL Game Programming</a>
+</p>
+<p>Instead of bothering with asynchronous loading, I converted the .RAW image file
+to a byte array and stored it in <a href="./heightMap.raw.js">./heightMap.raw.js</a></p>
+<p>TODO is normal generation - colors are currently set based on height value</p>
+
+<script src="../lib/webgl-utils.js"></script>
+<script src="../lib/webgl-debug.js"></script>
+<script src="../lib/cuon-utils.js"></script>
+<script src="../lib/cuon-matrix.js"></script>
+<script src="./Shader.js"></script>
+<script src="./HeightMap.js"></script>
+<script src="heightMap.raw.js"></script>
+
+<script>
+    
+// vertex shader program
+var VertexShaderStr =`
+    attribute vec4 aPosition; // vertex data passed into the shader
+    attribute vec4 aColor;
+    //attribute vec4 aNormal;
+    
+    uniform mat4 uModelMatrix;
+    //uniform mat4 uNormalMatrix; // inverse transpose of the model matrix
+    uniform mat4 uViewMatrix;
+    uniform mat4 uProjectionMatrix;
+    
+    varying vec4 vColor;
+    //varying vec3 vNormal;
+    //varying vec3 vPosition;
+    
+    void main() {
+        gl_Position = uProjectionMatrix * uViewMatrix * uModelMatrix * aPosition; // coordinates
+        
+        //vPosition = vec3(uModelMatrix * aPosition); // world space vertex coord
+        //vNormal = normalize(vec3(uNormalMatrix * aNormal));
+        vColor = aColor;
+    }
+`;
+
+// fragment shader program
+var FragmentShaderStr = `
+    precision mediump float;
+    
+    //uniform vec3 uLightColor;
+    //uniform vec3 uLightPosition;
+    //uniform vec3 uAmbientColor;
+    
+    varying vec4 vColor; // passed from vertex shader
+    //varying vec3 vNormal;
+    //varying vec3 vPosition;
+    
+    //vec4 vColor = vec4(1.0, 1.0, 1.0, 1.0);
+    
+    // point light
+    /*vec3 calcPoint() {
+    
+        // normalize input
+        vec3 normal = normalize(vNormal);
+        
+        // normalized light direction
+        vec3 lightDir = normalize(uLightPosition - vPosition);
+        
+        // diffuse dot product
+        float nDotL = max(dot(lightDir, normal), 0.0);
+        
+        // diffuse calculation
+        vec3 diffuse = uLightColor * vec3(vColor) * nDotL;
+        
+        return diffuse;
+    }
+    
+    vec3 calcAmbient() {
+        return uAmbientColor * vec3(vColor);
+    }*/
+    
+    void main() {
+        gl_FragColor = vColor;
+        //gl_FragColor = vec4(calcPoint() + calcAmbient(), 1.0);
+    }
+`;
+
+// global shader program
+var gShader = null;
+
+function main() {
+    
+    // retrieve the canvas element
+    var canvas = document.getElementById("mycanvas");
+    
+    if (!canvas) {
+        console.log("Failed to get canvas element");
+        return false;
+    }
+    
+    //var gl = getWebGLContext(canvas);
+    var gl = canvas.getContext("webgl2");
+    if (!gl) {
+        console.log("Failed to get OpenGL context");
+        return false;
+    }
+    
+    // Load and compile shader programs
+    gShader = new Shader(gl, VertexShaderStr, FragmentShaderStr);
+    
+    // 3D model
+    var heightMap = new HeightMap(heightmap_raw);
+    heightMap.InitBuffers(gl);
+    
+    
+    var objName = "heightMap";
+    var objDrawMap = {
+        "heightMap": heightMap
+    };
+    
+    // enable checking depth before drawing
+    // try commenting out to see what happens
+    gl.enable(gl.DEPTH_TEST);
+    
+    // enable offset to mitigate z fighting
+    //gl.enable(gl.POLYGON_OFFSET_FILL);
+    //gl.polygonOffset(1.0, 1.0);
+    
+    // set lighting uniforms
+    //gShader.SetVec3f(gl, "uLightColor", 1.0, 1.0, 1.0);
+    //gShader.SetVec3f(gl, "uLightPosition", 3.0, 3.0, 2.0);
+    //gShader.SetVec3f(gl, "uAmbientColor", 0.2, 0.2, 0.2);
+    
+    // calculate projection (perspective) matrix
+    var projectionMatrix = new Matrix4();
+    var fov = 52.0; // field of view angle
+    var aspect = canvas.width / canvas.height; // aspect ratio
+    var near = 1; // near clip distance
+    var far = 100; // far clip distance
+    projectionMatrix.setPerspective(fov, aspect, near, far);
+    
+    // calculate the view matrix
+    var viewMatrix = new Matrix4();
+    viewMatrix.setIdentity();
+    /*viewMatrix.setLookAt(3,  // eye position x
+                         200,  // eye position y
+                         100,  // eye position z
+                         0,     // lookat position x
+                         0,     // lookat position y
+                         0,     // lookat position z
+                         0,     // up x
+                         1,     // up y
+                         0);    // up z*/
+    
+    // calcualate the model matrix
+    var modelMatrix = new Matrix4();
+    modelMatrix.setTranslate(0, -20.0, 0);
+    modelMatrix.rotate(25.0, 1.0, 0, 0); // 25 degree rotation around x axis
+    modelMatrix.translate(0.0, 0.0, -50.0);
+    
+    // calculate the normal matrix
+    var normalMatrix = new Matrix4();
+    normalMatrix.setInverseOf(modelMatrix);
+    normalMatrix.transpose();
+    
+    function updateUniforms() {
+        // send matrices to the shader
+        gShader.SetMat4fv(gl, "uModelMatrix", modelMatrix.elements);
+        gShader.SetMat4fv(gl, "uViewMatrix", viewMatrix.elements);
+        gShader.SetMat4fv(gl, "uProjectionMatrix", projectionMatrix.elements);
+        //gShader.SetMat4fv(gl, "uNormalMatrix", normalMatrix.elements);    
+    }
+    
+    // continuously updates the screen
+    function mainLoop() {
+        // specify the color to clear the canvas with
+        gl.clearColor(0.0, 0.5, 0.9, 1.0);
+        
+        // clear the canvas
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        
+        // apply matrix changes
+        updateUniforms();
+    
+        // draw the object
+        objDrawMap[objName].Draw(gl);
+                      
+        requestAnimationFrame(mainLoop);
+    }
+    // initial loop call
+    mainLoop();
+}
+
+</script>
+</body>
+</html>
