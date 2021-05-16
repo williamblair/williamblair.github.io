@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BJ's Website</title>
+  <link rel="stylesheet" type="text/css" href="../../site.css"/>
+  
+</head>
+<body>
+
+<div id="bodyDiv">
+
+<div id="contentDiv">
+
+<h1>PS3 Programming Log</h1>
+<img alt="PS2 Logo" style="float:right; margin:5px;" src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Flogonoid.com%2Fimages%2Fplaystation-3-logo.png&f=1&nofb=1" width="400px"/>
+
+<p>My working log for learning programming for the Playstation 3. Inspired
+by <a href="https://research.ncl.ac.uk/game/mastersdegree/">Newcastle University's
+Computer Game Engineering Content</a> where they have a few sections on PS3 programming.
+Unfortunately, they seem to use the official SONY PS3 Devkit, which of course we don't
+have access too. There is however an open source ps3sdk we can use:
+<a href="https://github.com/ps3dev">https://github.com/ps3dev</a>. I've followed so far
+the first introduction section from the Newcastle content and it seems like a good resource;
+the only drawback is it's Windows and Visual Studio oriented. (Another future project TODO -
+convert their example code to SDL/GLEW for Linux support!)</p>
+
+<p>For PS3 my current goal is
+to get MD5 skeletal animation working
+<a href="https://research.ncl.ac.uk/game/mastersdegree/graphicsforgames/skeletalanimation/">
+from the NewCastle tutorial</a>, and possibly 
+the GLTF skeletal animation from <a href="https://www.amazon.com/Hands-Game-Animation-Programming-implementation/dp/1800208081">
+Hands-On C++ Game Animation Programming</a>. Also, it'd be cool to get
+<a href="https://github.com/gzorin/RSXGL">RSXGL</a> working, which is an OpenGL 3.1
+implementation, but I haven't had any luck so far.</p>
+
+<p>The source code is currently here: <a href="https://bitbucket.org/williamblair/ps3devprogs">https://bitbucket.org/williamblair/ps3devprogs</a></p>
+
+<h3>05/15/2021</h3>
+
+<p>Looking through the
+<a href="https://github.com/ps3dev/PSL1GHT/tree/master/samples/graphics/rsxtest">
+psl1ght graphics example</a>. Seems actually pretty similar to OpenGL: we have shaders,
+buffer attributes, texture formats, etc...
+</p>
+<p>The shaders are NOT compiled and loaded at runtime like in OpenGL; instead they are
+pre-compiled at the same time as the main program and stored as byte arrays and included
+as C headers.</p>
+<p>The shader language seems pretty similar to GLSL except programs take in
+a bunch of function arguments intead of global vars:</p>
+<pre><code>void main
+(
+    float3 vertexPosition : POSITION,
+    float3 vertexNormal : NORMAL,
+    float2 vertexTexcoord : TEXCOORD0,
+    
+    uniform float4x4 projMatrix,
+    uniform float4x4 modelViewMatrix,
+    
+    out float4 ePosition : POSITION,
+    out float4 oPosition : TEXCOORD0,
+    out float3 oNormal : TEXCOORD1,
+    out float2 oTexcoord : TEXCOORD2
+)
+{
+    ePosition = mul(mul(projMatrix,modelViewMatrix),float4(vertexPosition,1.0f));
+    
+    oPosition = float4(vertexPosition,1.0f);
+    oNormal = vertexNormal;
+    oTexcoord = vertexTexcoord;
+}
+</code></pre>
+
+<p>Vertex buffer data seems to be stored on GPU memory but accessible from the CPU.
+The memory is allocated via rsxMemalign() and then vertex data is copied into it.
+There is an 'offset' associated with this allocation used as arguments to other functions;
+I'm assuming this is like the address of the memory block within GPU memory.</p>
+<pre><code>m_meshBuffer->vertices = (S3DVertex*)rsxMemalign(128,m_meshBuffer->cnt_vertices*sizeof(S3DVertex));
+...
+m_meshBuffer->vertices[i] = S3DVertex(pos.getX(),pos.getY(),pos.getZ(),normal.getX(),normal.getY(),normal.getZ(),tu,static_cast<f32>(ay*RECIPROCAL_PI));
+u32 offset = 0;    
+rsxAddressToOffset( &m_meshBuffer->vertices[0].pos, &offset );
+</code></pre>
+<p>The S3DVertex and SBuffer classes are included with the psl1ght sample as custom objects (mesh.h), so we
+don't have to use those if we don't want to.</p>
+<p>As a side note, the main CPU is the PowerPC Processor Unit (PPU) and then there are 
+eight SPUs to execute separate programs to run in parallel if desired (see 
+<a href="https://mirrors.edge.kernel.org/pub/linux/kernel/people/geoff/cell/ps3-linux-docs/CellProgrammingTutorial/BasicsOfCellArchitecture.html">here</a>).
+RSX stands for reality synthesizer and is the PS3 GPU (see <a href="https://www.psdevwiki.com/ps3/RSX">here</a>.)
+</p>
+<p>The compiled program results in a .elf file (similar to the PS2), but for the PS3 this
+needs to be converted into a .self file which I think is an encrypted version of the .elf.
+Using ps3load with the elf file didn't seem to work but using the .self file did. Conversion
+to a .self is done automatically with the ps1light sample makefile.</p>
+
+<p>I remorked the sample code to remove the lighting (to simplify things), then made the
+following C++ classes:</p>
+<ul>
+<li>Shader</li>
+<li>Texture</li>
+<li>Entity
+    <ul>
+     <li>Sphere</li>
+     <li>Torus</li>
+     <li>Cube</li>
+    </ul>
+</li>
+</ul>
+
+<p>Rendering an entity then works the same as opengl, where you set shader
+and vertex buffer attributes, then draw indexed arrays:</p>
+<pre><code>g_Shader.Use();
+g_Shader.SetVertexProgParam( "projMatrix", (float*)&P );
+g_Shader.SetVertexProgParam( "modelViewMatrix", (float*)&modelViewMatrix );
+...
+g_Sphere.Render();
+</code></pre>
+
+<p>TODO is to make a rendering class, also have a single shader SetAttribute
+function for both vertex shader and fragment shader attribs.
+I also made a Logging namespace and macro which logs to both
+TTY/stdout and the debug font sample to the screen:</p>
+<pre><code>#define DBG_LOG(format, ...)                                            \
+    sprintf( Log::dbgPrintStr, "%s:%d: ", __FILE__, __LINE__ );         \
+    Log::len = strlen( Log::dbgPrintStr );                              \
+    sprintf( &Log::dbgPrintStr[ Log::len ], format, ##__VA_ARGS__ );    \
+                                                                        \
+    printf( Log::dbgPrintStr );                                         \
+                                                                        \
+    Log::dbgLogHistory.push_back( Log::dbgPrintStr );                   \
+    if ( Log::dbgLogHistory.size() > LOG_HISTORY_LEN ) {                \
+        Log::dbgLogHistory.pop_front();                                 \
+    }
+</code></pre>
+
+<p>I originally tried an inline function but that resulted in the function
+not actually being able to be inlined, and thus the __FILE__ and __LINE__
+preprocessor vars were not showing the desired call location, and instead were
+all showing the same line and function for inside the log call. So I used a
+macro instead.
+For the DBG_LOG macro, an important note is you need the two ## in front
+of __VA_ARGS__ in order to prevent errors when no extra args were provided to
+the macro. This might be gcc specific.</p>
+<p>The result of this rework can be seen running in the rpcs3 emulator, though
+I've confirmed it runs on hardware too:</p>
+
+<img src="images/basic_entity_5_15_2021.png" width="600px"/>
+
+<p>
+<a href="../../index.html">&lt;-- Back to Home</a>
+</p>
+
+</div> <!-- contentDiv -->
+</div> <!-- bodyDiv -->
+
+</body>
+</html>
