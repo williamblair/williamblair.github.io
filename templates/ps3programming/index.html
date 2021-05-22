@@ -147,6 +147,256 @@ I've confirmed it runs on hardware too:</p>
 
 <img src="images/basic_entity_5_15_2021.png" width="600px"/>
 
+<h3>05/22/2021</h3>
+<p>Added pad class for the controller. Basic psl1ght API usage for the pad
+is as follows:</p>
+<pre><code>ioPadInit(7); // Idk what 7 means, TODO - look this up
+...
+padInfo info;
+padData data;
+int padnumber = 0;
+while (true)
+{
+    ioPadGetInfo( &info );
+    if ( info.status[ padnumber ] )
+    {
+        ioPadGetData( padnumber, &data );
+        bool crossPressed = (bool)data.BTN_CROSS;
+    }
+}
+</code></pre>
+
+The list of available info from padData, based on the generated doxygen
+from the ps3toolchain build is below (I could probably upload the generated
+doxygen here, it'd be easier than opening the html locally...):
+<pre><code>typedef struct _pad_data
+ {
+     s32 len;                                
+     union{
+         u16 button[MAX_PAD_CODES];          
+         struct {
+             u16 zeroes;                     
+             unsigned int : 8;               
+             unsigned int seven : 4;         
+             unsigned int halflen : 4;       
+             unsigned int : 8;               
+             /* Button information */
+             /* 0: UP, 1: DOWN */
+             unsigned int BTN_LEFT : 1;      
+             unsigned int BTN_DOWN : 1;      
+             unsigned int BTN_RIGHT : 1;     
+             unsigned int BTN_UP : 1;        
+             unsigned int BTN_START : 1;     
+             unsigned int BTN_R3 : 1;        
+             unsigned int BTN_L3 : 1;        
+             unsigned int BTN_SELECT : 1;    
+             unsigned int : 8;               
+             unsigned int BTN_SQUARE : 1;    
+             unsigned int BTN_CROSS : 1;     
+             unsigned int BTN_CIRCLE : 1;    
+             unsigned int BTN_TRIANGLE : 1;  
+             unsigned int BTN_R1 : 1;        
+             unsigned int BTN_L1 : 1;        
+             unsigned int BTN_R2 : 1;        
+             unsigned int BTN_L2 : 1;        
+             /* Analog nub information */
+             /* 0x0000 - 0x00FF */
+             unsigned int ANA_R_H : 16;
+             unsigned int ANA_R_V : 16;
+             unsigned int ANA_L_H : 16;
+             unsigned int ANA_L_V : 16;
+ 
+             /* Pressure-sensitive information */
+             /* 0x0000 - 0x00FF */
+             unsigned int PRE_RIGHT : 16;
+             unsigned int PRE_LEFT : 16;
+             unsigned int PRE_UP : 16;
+             unsigned int PRE_DOWN : 16;
+             unsigned int PRE_TRIANGLE : 16;
+             unsigned int PRE_CIRCLE : 16;
+             unsigned int PRE_CROSS : 16;
+             unsigned int PRE_SQUARE : 16;
+             unsigned int PRE_L1 : 16;
+             unsigned int PRE_R1 : 16;
+             unsigned int PRE_L2 : 16;
+             unsigned int PRE_R2 : 16;
+ 
+             /* Sensor information */
+             /* 0x0000 - 0x03FF */
+             unsigned int SENSOR_X : 16;
+             unsigned int SENSOR_Y : 16;
+             unsigned int SENSOR_Z : 16;
+             unsigned int SENSOR_G : 16;
+ 
+             /* BD remote information */
+             unsigned int BTN_BDLEN : 16;    
+             unsigned int BTN_BDCODE : 16;   
+             u8 reserved[76];
+         };
+     };
+ } padData;
+</code></pre>
+
+Then for my pad class, I made the following test to check button click/press/
+vibration (called "actuators")/analog sticks:
+
+<pre><code>Pad pad;
+...
+pad.Init( 0 ); // controller 0
+..
+while (true)
+{
+    pad.Update();
+    if ( pad.IsHeld( Pad::CROSS ) ) {
+        goto done;
+    }
+    
+    // large actuator
+    static unsigned short algVal;
+    algVal = pad.GetLeftAnalogY();
+    static unsigned short prevAlgVal = algVal;
+    if ( algVal != prevAlgVal )
+    {
+        if ( algVal > prevAlgVal && algVal - prevAlgVal > 5 )
+        {
+            pad.SetLargeActuator( algVal );
+        }
+        else if ( algVal < prevAlgVal && prevAlgVal - algVal > 5 )
+        { 
+            pad.SetLargeActuator( algVal );
+        }
+        DBG_LOG( "Alg X: %u", algVal );
+    }
+    prevAlgVal = algVal;
+
+    // small actuator
+    if ( pad.IsClicked( Pad::SQUARE ) )
+    {
+        static bool actVal = false;
+        actVal = !actVal;
+        pad.SetSmallActuator( actVal );
+    }
+    
+    ...
+}
+</code></pre>
+
+<p>Also created renderer class. Currently relies too heavily on rsxutil.h/cpp,
+so a TODO is inspect those internals. Basic usage is as follows:</p>
+
+<pre><code>Renderer renderer;
+Entity entity;
+renderer.Init();
+while (1)
+{
+    renderer.BeginFrame();
+    renderer.RenderEntity( entity );
+    renderer.EndFrame();
+}
+</code></pre>
+
+<p>RenderEntity() actually forwards the important drawing to the Entity
+class; it sets render clip settings then just calls Entity::Render()</p>
+
+<pre><code>void Renderer::RenderEntity( Entity& entity )
+{
+    rsxSetUserClipPlaneControl(context,GCM_USER_CLIP_PLANE_DISABLE,
+                                       GCM_USER_CLIP_PLANE_DISABLE,
+                                       GCM_USER_CLIP_PLANE_DISABLE,
+                                       GCM_USER_CLIP_PLANE_DISABLE,
+                                       GCM_USER_CLIP_PLANE_DISABLE,
+                                       GCM_USER_CLIP_PLANE_DISABLE);
+    entity.Render();
+}
+</code></pre>
+
+<p>To actually draw triangles, the process is quite OpenGL like:
+you set vertex pointer attribs and then (in this case) draw indexed
+triangles (code from Entity.cpp):</p>
+<pre><code>rsxAddressToOffset( &m_meshBuffer->vertices[0].pos, &offset );
+rsxBindVertexArrayAttrib( m_context,
+                          GCM_VERTEX_ATTRIB_POS,
+                          0,
+                          offset,
+                          sizeof( S3DVertex ),
+                          3,
+                          GCM_VERTEX_DATA_TYPE_F32,
+                          GCM_LOCATION_RSX );
+
+rsxAddressToOffset( &m_meshBuffer->vertices[0].nrm, &offset );
+rsxBindVertexArrayAttrib( m_context,
+                          GCM_VERTEX_ATTRIB_NORMAL,
+                          0,
+                          offset,
+                          sizeof( S3DVertex ),
+                          3,
+                          GCM_VERTEX_DATA_TYPE_F32,
+                          GCM_LOCATION_RSX );
+
+rsxAddressToOffset( &m_meshBuffer->vertices[0].u, &offset );
+rsxBindVertexArrayAttrib( m_context,
+                          GCM_VERTEX_ATTRIB_TEX0,
+                          0,
+                          offset,
+                          sizeof( S3DVertex ),
+                          2,
+                          GCM_VERTEX_DATA_TYPE_F32,
+                          GCM_LOCATION_RSX );
+
+rsxAddressToOffset( &m_meshBuffer->indices[0], &offset );
+rsxDrawIndexArray( m_context,
+                   GCM_TYPE_TRIANGLES,
+                   offset,
+                   m_meshBuffer->cnt_indices,
+                   GCM_INDEX_TYPE_16B,
+                   GCM_LOCATION_RSX );
+
+</code></pre>
+
+<p>Next, I tested file I/O. This is a luxury compared to PS2 and PS1 - there
+is a PS3 OS which provides filesystem access for us! At first, I tried to
+program a test file location relative to the SELF executable directory, but
+the test.txt file failed to open. I added a DEFINE for the assets directory
+instead so the absolute path was used:</p>
+
+<pre><code>Makefile:
+  ASSETS_DIR  :=  /dev_hdd0/rsxtest/game/assets
+  TARGET      :=  game/rsxtest
+  ...
+  CFLAGS      =   -Wall -mcpu=cell $(MACHDEP) $(INCLUDE) -DASSETS_DIR=\"$(ASSETS_DIR)\"
+
+Code:
+ static void fileTest()
+  {
+      std::string line;
+      std::ifstream testFile( ASSETS_DIR"/test.txt" );
+      if ( !testFile.is_open() ) {
+          DBG_LOG( "Failed to open assets/test.txt" );
+          return;
+      }
+  
+      for (; std::getline( testFile, line ); )
+      {
+          DBG_LOG( line.c_str() );
+      }
+  }
+</code></pre>
+
+<p>To access the PS3 filesystem remotely, we can use the FTP server built into
+the PS3 CFW. I can access the ftp server from my computer by mounting it in
+a local directory using curlftpfs; then it's just a matter of copying the
+files over:
+
+<pre><code>curlftpfs ftp://192.168.0.14 ~/ps3_ftp/ # mount the ftp server
+cp -r game ~/ps3_ftp/dev_hdd0/rsxtest/
+</code></pre>
+
+<p>On the ps3 side, to launch the game, we can find the self executable
+in the multiman explorer and launch it from there (although ps3load should
+still work, I think...)</p>
+
+<img src="images/ps3_filesystem_5_22_2021.jpg" width="500px"/>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
