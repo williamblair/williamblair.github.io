@@ -76,11 +76,11 @@ a bunch of function arguments intead of global vars:</p>
 The memory is allocated via rsxMemalign() and then vertex data is copied into it.
 There is an 'offset' associated with this allocation used as arguments to other functions;
 I'm assuming this is like the address of the memory block within GPU memory.</p>
-<pre><code>m_meshBuffer->vertices = (S3DVertex*)rsxMemalign(128,m_meshBuffer->cnt_vertices*sizeof(S3DVertex));
+<pre><code>m_meshBuffer-&gt;vertices = (S3DVertex*)rsxMemalign(128,m_meshBuffer-&gt;cnt_vertices*sizeof(S3DVertex));
 ...
-m_meshBuffer->vertices[i] = S3DVertex(pos.getX(),pos.getY(),pos.getZ(),normal.getX(),normal.getY(),normal.getZ(),tu,static_cast<f32>(ay*RECIPROCAL_PI));
+m_meshBuffer-&gt;vertices[i] = S3DVertex(pos.getX(),pos.getY(),pos.getZ(),normal.getX(),normal.getY(),normal.getZ(),tu,static_cast<f32>(ay*RECIPROCAL_PI));
 u32 offset = 0;    
-rsxAddressToOffset( &m_meshBuffer->vertices[0].pos, &offset );
+rsxAddressToOffset( &amp;m_meshBuffer-&gt;vertices[0].pos, &amp;offset );
 </code></pre>
 <p>The S3DVertex and SBuffer classes are included with the psl1ght sample as custom objects (mesh.h), so we
 don't have to use those if we don't want to.</p>
@@ -111,8 +111,8 @@ following C++ classes:</p>
 <p>Rendering an entity then works the same as opengl, where you set shader
 and vertex buffer attributes, then draw indexed arrays:</p>
 <pre><code>g_Shader.Use();
-g_Shader.SetVertexProgParam( "projMatrix", (float*)&P );
-g_Shader.SetVertexProgParam( "modelViewMatrix", (float*)&modelViewMatrix );
+g_Shader.SetVertexProgParam( "projMatrix", (float*)&amp;P );
+g_Shader.SetVertexProgParam( "modelViewMatrix", (float*)&amp;modelViewMatrix );
 ...
 g_Sphere.Render();
 </code></pre>
@@ -124,12 +124,12 @@ TTY/stdout and the debug font sample to the screen:</p>
 <pre><code>#define DBG_LOG(format, ...)                                            \
     sprintf( Log::dbgPrintStr, "%s:%d: ", __FILE__, __LINE__ );         \
     Log::len = strlen( Log::dbgPrintStr );                              \
-    sprintf( &Log::dbgPrintStr[ Log::len ], format, ##__VA_ARGS__ );    \
+    sprintf( &amp;Log::dbgPrintStr[ Log::len ], format, ##__VA_ARGS__ );    \
                                                                         \
     printf( Log::dbgPrintStr );                                         \
                                                                         \
     Log::dbgLogHistory.push_back( Log::dbgPrintStr );                   \
-    if ( Log::dbgLogHistory.size() > LOG_HISTORY_LEN ) {                \
+    if ( Log::dbgLogHistory.size() &gt; LOG_HISTORY_LEN ) {                \
         Log::dbgLogHistory.pop_front();                                 \
     }
 </code></pre>
@@ -157,10 +157,10 @@ padData data;
 int padnumber = 0;
 while (true)
 {
-    ioPadGetInfo( &info );
+    ioPadGetInfo( &amp;info );
     if ( info.status[ padnumber ] )
     {
-        ioPadGetData( padnumber, &data );
+        ioPadGetData( padnumber, &amp;data );
         bool crossPressed = (bool)data.BTN_CROSS;
     }
 }
@@ -257,7 +257,7 @@ while (true)
     static unsigned short prevAlgVal = algVal;
     if ( algVal != prevAlgVal )
     {
-        if ( algVal > prevAlgVal && algVal - prevAlgVal > 5 )
+        if ( algVal &gt; prevAlgVal &amp;&amp; algVal - prevAlgVal &gt; 5 )
         {
             pad.SetLargeActuator( algVal );
         }
@@ -298,7 +298,7 @@ while (1)
 <p>RenderEntity() actually forwards the important drawing to the Entity
 class; it sets render clip settings then just calls Entity::Render()</p>
 
-<pre><code>void Renderer::RenderEntity( Entity& entity )
+<pre><code>void Renderer::RenderEntity( Entity&amp; entity )
 {
     rsxSetUserClipPlaneControl(context,GCM_USER_CLIP_PLANE_DISABLE,
                                        GCM_USER_CLIP_PLANE_DISABLE,
@@ -313,7 +313,7 @@ class; it sets render clip settings then just calls Entity::Render()</p>
 <p>To actually draw triangles, the process is quite OpenGL like:
 you set vertex pointer attribs and then (in this case) draw indexed
 triangles (code from Entity.cpp):</p>
-<pre><code>rsxAddressToOffset( &m_meshBuffer->vertices[0].pos, &offset );
+<pre><code>rsxAddressToOffset( &amp;m_meshBuffer-&gt;vertices[0].pos, &amp;offset );
 rsxBindVertexArrayAttrib( m_context,
                           GCM_VERTEX_ATTRIB_POS,
                           0,
@@ -323,7 +323,7 @@ rsxBindVertexArrayAttrib( m_context,
                           GCM_VERTEX_DATA_TYPE_F32,
                           GCM_LOCATION_RSX );
 
-rsxAddressToOffset( &m_meshBuffer->vertices[0].nrm, &offset );
+rsxAddressToOffset( &amp;m_meshBuffer-&gt;vertices[0].nrm, &amp;offset );
 rsxBindVertexArrayAttrib( m_context,
                           GCM_VERTEX_ATTRIB_NORMAL,
                           0,
@@ -333,7 +333,7 @@ rsxBindVertexArrayAttrib( m_context,
                           GCM_VERTEX_DATA_TYPE_F32,
                           GCM_LOCATION_RSX );
 
-rsxAddressToOffset( &m_meshBuffer->vertices[0].u, &offset );
+rsxAddressToOffset( &amp;m_meshBuffer-&gt;vertices[0].u, &amp;offset );
 rsxBindVertexArrayAttrib( m_context,
                           GCM_VERTEX_ATTRIB_TEX0,
                           0,
@@ -343,11 +343,11 @@ rsxBindVertexArrayAttrib( m_context,
                           GCM_VERTEX_DATA_TYPE_F32,
                           GCM_LOCATION_RSX );
 
-rsxAddressToOffset( &m_meshBuffer->indices[0], &offset );
+rsxAddressToOffset( &amp;m_meshBuffer-&gt;indices[0], &amp;offset );
 rsxDrawIndexArray( m_context,
                    GCM_TYPE_TRIANGLES,
                    offset,
-                   m_meshBuffer->cnt_indices,
+                   m_meshBuffer-&gt;cnt_indices,
                    GCM_INDEX_TYPE_16B,
                    GCM_LOCATION_RSX );
 
@@ -415,9 +415,9 @@ read in file fields from little to big endian during load:</p>
 inline int32_t lend2bend32( int32_t lend )
 {
     char* ptr = (char*)&lend;
-    return (ptr[3] << 24) |
-           (ptr[2] << 16) |
-           (ptr[1] << 8)  |
+    return (ptr[3] &lt;&lt; 24) |
+           (ptr[2] &lt;&lt; 16) |
+           (ptr[1] &lt;&lt; 8)  |
            (ptr[0]);
 }
 inline float lend2bend32f( float lend )
@@ -434,7 +434,7 @@ inline float lend2bend32f( float lend )
 inline int16_t lend2bend16( int16_t lend )
 {
     char* ptr = (char*)&lend;
-    return (ptr[1] << 8) |
+    return (ptr[1] &lt;&lt; 8) |
            (ptr[0]);
 }
 
@@ -444,12 +444,12 @@ READ_DATA( lend2bend32( header.skinOffset ), skins, lend2bend32( header.numSkins
 READ_DATA( lend2bend32( header.texCoordOffset ), md2TexCoords, lend2bend32( header.numTexCoords )
 READ_DATA( lend2bend32( header.triangleOffset ), triangles, lend2bend32( header.numTriangles ), T
 
-for ( TexCoord& tc : md2TexCoords )
+for ( TexCoord&amp; tc : md2TexCoords )
 {
     tc.s = lend2bend16( tc.s );
     tc.t = lend2bend16( tc.t );
 }   
-for ( Triangle& tr : triangles )
+for ( Triangle&amp; tr : triangles )
 {
     tr.vertIndex[0] = lend2bend16( tr.vertIndex[0] );
     tr.vertIndex[1] = lend2bend16( tr.vertIndex[1] );
@@ -485,15 +485,15 @@ in the torus/sphere classes:</p>
 <pre><code>
 genBuffers:
 
-m_meshBuffer->cnt_vertices = interpolatedFrame.vertices.size();
-m_meshBuffer->vertices =
+m_meshBuffer-&gt;cnt_vertices = interpolatedFrame.vertices.size();
+m_meshBuffer-&gt;vertices =
     (S3DVertex*)rsxMemalign( 128, 
-                             m_meshBuffer->cnt_vertices * sizeof(S3DVertex) );
-if ( !m_meshBuffer->vertices ) {
+                             m_meshBuffer-&gt;cnt_vertices * sizeof(S3DVertex) );
+if ( !m_meshBuffer-&gt;vertices ) {
     DBG_LOG( "Failed to alloc vertices\n" );
     return false; 
 }   
-m_meshBuffer->indices = nullptr;
+m_meshBuffer-&gt;indices = nullptr;
 if ( texCoords.size() != interpolatedFrame.vertices.size() ) {
     DBG_LOG( "Tex coords size != vertices size (%lu, %lu)\n",
             texCoords.size(), interpolatedFrame.vertices.size() );
@@ -501,8 +501,8 @@ if ( texCoords.size() != interpolatedFrame.vertices.size() ) {
 }
 for ( u32 i = 0; i < m_meshBuffer->cnt_vertices; ++i )
 {
-    Vector3& pos = interpolatedFrame.vertices[i];
-    m_meshBuffer->vertices[i] = S3DVertex( pos.getX(), pos.getY(), pos.getZ(),
+    Vector3&amp; pos = interpolatedFrame.vertices[i];
+    m_meshBuffer-&gt;vertices[i] = S3DVertex( pos.getX(), pos.getY(), pos.getZ(),
                                            0.0f, 1.0f, 0.0f, // TODO - normals
                                            texCoords[i].u, texCoords[i].v );
 }
@@ -514,8 +514,8 @@ Update:
 // Update RSX memory
 for ( u32 i = 0; i < m_meshBuffer->cnt_vertices; ++i )
 {
-    Vector3& pos = interpolatedFrame.vertices[i];
-    m_meshBuffer->vertices[i] = S3DVertex( pos.getX(), pos.getY(), pos.getZ(),
+    Vector3&amp; pos = interpolatedFrame.vertices[i];
+    m_meshBuffer-&gt;vertices[i] = S3DVertex( pos.getX(), pos.getY(), pos.getZ(),
                                            0.0f, 1.0f, 0.0f, // TODO - normals
                                            texCoords[i].u, texCoords[i].v );
 }
@@ -529,13 +529,13 @@ rsxDrawIndexArray() used previously, on the commands.h file reference:</p>
 <p>Then a slight modification to Entity::Render() to check wether to draw
 with indices or arrays:</p>
 <pre><code>...
-if ( m_meshBuffer->indices != nullptr )
+if ( m_meshBuffer-&amp;gt;indices != nullptr )
 {
-    rsxAddressToOffset( &m_meshBuffer->indices[0], &offset );
+    rsxAddressToOffset( &amp;m_meshBuffer-&amp;gt;indices[0], &amp;offset );
     rsxDrawIndexArray( m_context,
                        GCM_TYPE_TRIANGLES,        // u32 type
                        offset,                    // u32 offset
-                       m_meshBuffer->cnt_indices, // u32 count
+                       m_meshBuffer-&amp;gt;cnt_indices, // u32 count
                        GCM_INDEX_TYPE_16B,        // u32 data_type
                        GCM_LOCATION_RSX );        // u32 location
 }
@@ -544,7 +544,7 @@ else
     rsxDrawVertexArray( m_context,
                         GCM_TYPE_TRIANGLES,
                         0,
-                        m_meshBuffer->cnt_vertices );
+                        m_meshBuffer-&gt;cnt_vertices );
 }
 </code></pre>
 
@@ -555,7 +555,7 @@ class in main.cpp, based off ppu/include/sys/systime.h sysGetCurrentTime()</p>
 public:
     GameTimer()
     {   
-        GetCurSecNsec( &m_lastSec, &m_lastNsec );
+        GetCurSecNsec( &amp;m_lastSec, &amp;m_lastNsec );
         m_FPS = 0.0f;
     }   
     ~GameTimer()
@@ -564,10 +564,10 @@ public:
     {   
         u64 curSec;
         u64 curNsec;
-        GetCurSecNsec( &curSec, &curNsec );
+        GetCurSecNsec( &amp;curSec, &amp;curNsec );
 
         u64 secDiff = curSec - m_lastSec;
-        u64 nsecDiff = (curNsec < m_lastNsec) ? m_lastNsec - curNsec : curNsec - m_lastNsec;
+        u64 nsecDiff = (curNsec &lt; m_lastNsec) ? m_lastNsec - curNsec : curNsec - m_lastNsec;
 
         m_deltaMs = (float( secDiff ) * 1000.0f) +
                     (float( nsecDiff ) / 1000000.0f);
@@ -576,7 +576,7 @@ public:
 
         ++m_framesCount;
         m_fpsTimeCount += m_deltaMs;
-        if ( m_fpsTimeCount / 1000.0f >= m_fpsDuration )
+        if ( m_fpsTimeCount / 1000.0f &gt;= m_fpsDuration )
         {
             m_FPS = ( m_fpsTimeCount / 1000.0f ) * m_framesCount;
             m_framesCount = 0;
@@ -628,8 +628,8 @@ modelViewMatrix = transpose(viewMatrix*modelMatrix);
 objEyePos = modelMatrixIT*eye_pos;
 
 g_Shader.Use();
-g_Shader.SetVertexProgParam( "projMatrix", (float*)&g_ProjMatrix );
-g_Shader.SetVertexProgParam( "modelViewMatrix", (float*)&modelViewMatrix );
+g_Shader.SetVertexProgParam( "projMatrix", (float*)&amp;g_ProjMatrix );
+g_Shader.SetVertexProgParam( "modelViewMatrix", (float*)&amp;modelViewMatrix );
 
 g_Renderer.RenderEntity( g_Ogro );
 </code></pre>
