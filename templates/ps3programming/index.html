@@ -644,7 +644,81 @@ as the emulator executable:</p>
 
 <img src="images/rpcs3_folder_layout_5_23_2021.png"/>
 
-<p>Next TODO is to get the proper texture loaded and used</p>
+<p>Next was texture loading. Like the Md2Model class, I copied and modified the Targa Image 
+loading implementation from beginning opengl game programming. Like the .md2 model file,
+the .tga texture needs to be converted from little to big endian. Luckily, there are only
+4 fields in the file header that are larger than 1 byte and hence need to be flipped
+(xOrigin, yOrigin, width, and height):</p>
+<pre><code>struct Header
+{
+    uint8_t idLength;
+    uint8_t colorMapType;
+    uint8_t imageTypeCode;
+    uint8_t colorMapSpec[5];
+    uint16_t xOrigin;
+    uint16_t yOrigin;
+    uint16_t width;
+    uint16_t height;
+    uint8_t bpp;        // bits per pixel
+    uint8_t imageDesc;
+};
+</code></pre>
+
+<p>Other than that I didn't really need to modify the Targa code at all, just remove
+the OpenGL buffer function. To load the texture data for the PS3 GPU, I made the
+Targa::Image class a child of the Texture class, and added the Texture::Init function
+to Targa::Image::Load:</p>
+
+<pre><code>
+namespace Targa
+{
+...
+class Image : public Texture
+{
+// internally calls Texture::Init()
+bool Load( gcmContextData* context, const std::string&amp; fileName );
+...
+bool Image::Load( gcmContextData* context, const std::string&amp; fileName )
+{
+...
+    return Texture::Init( context,
+                          imageData.data(),
+                          width,
+                          height,
+                          bytesPerPixel );
+}
+</code></pre>
+
+<p>Within the Texture class, I had to modify the init function to account
+for textures with 3 bytes per pixel (no alpha), which defaults to an alpha
+value of 255 instead:</p>
+<pre><code>
+bool Texture::Init( gcmContextData* context, u8* pixelData, u32 width, u32 height, u32 bytesPerPixel )
+{
+...
+    m_buffer = (u32*)rsxMemalign( 128, width * height * 4 ); // force 4 bytes per pixel
+...
+    DBG_ASSERT( bytesPerPixel == 4 || bytesPerPixel == 3 );
+    u8* buffer = (u8*)m_buffer;
+    for ( u32 i = 0; i < width * height * 4; i += 4 )
+    {
+        buffer[ i + 1 ] = *pixelData++; // r
+        buffer[ i + 2 ] = *pixelData++; // g
+        buffer[ i + 3 ] = *pixelData++; // b
+        if ( bytesPerPixel == 4 ) {
+            buffer[ i + 0 ] = *pixelData++; // a
+        } else {
+            buffer[ i + 0 ] = 255;
+        }
+    }
+...
+</code></pre>
+
+<p>Initially the texture wasn't displaying right on the model; it turned out to be a bug
+where I was converting the Md2 texture coordinates from little to big endian twice; so I was
+ending up at little endian again. Fixing that we now see a glorious Ogro model:</p>
+
+<img src="images/textured_md2_5_23_2021.gif"/>
 
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
