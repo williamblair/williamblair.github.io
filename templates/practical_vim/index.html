@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Practical Vim Notes</title>
+</head>
+<body>
+<pre>
+Vim Cheetsheet Commands
+.       repeat the last change/command
+&gt;&gt;      increases indent of current line 
+&lt;&lt;      decrease indent of current line
+&gt;G      increases indent of current line until end of the file
+=G      auto indent current line until end of file
+f{char} moves character to first occurance of {char} on the current line. can also
+        use a number n to go to the nth occurance
+;       repeat last f/t/F/ or T. can also use a number count for n times
+,       repeat the last f/t/F or T in reverse direction
+&amp;       repeat the last substitute (:s/target/replacement)
+*       search for the word under the current cursor location
+n       repeat the last search
+s       erase current character then enter insert mode
+cw      delete word and enter insert mode ("change word")
+c3w     delete current 3 words and enter insert mode
+daw     delete "a word"; the entire word including leading/trailing whitespace
+n&lt;C-x&gt;  subtract n from the first found number on the current line (e.g. 10&lt;C-x&gt;)
+n&lt;C-a&gt;  add n to the first found number on the current line (e.g. 10&lt;C-a&gt;)
+&lt;C-w&gt;   (insert mode) delete back one word
+&lt;C-u&gt;   (insert mode) delete back to start of line
+&lt;C-o&gt;   (insert mode) enters normal/command mode for a single command then back into insert
+yt{char}    yank till {char}; copy from cursor until {char}
+&lt;C-r&gt;0    (insert mode) paste yanked contents (from register 0) then go back into insert
+&lt;C-r&gt;=    (insert mode) enter a math expression and vim inserts the result
+</pre>
+</body>
+</html>

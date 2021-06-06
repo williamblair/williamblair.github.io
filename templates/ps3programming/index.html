@@ -700,7 +700,7 @@ bool Texture::Init( gcmContextData* context, u8* pixelData, u32 width, u32 heigh
 ...
     DBG_ASSERT( bytesPerPixel == 4 || bytesPerPixel == 3 );
     u8* buffer = (u8*)m_buffer;
-    for ( u32 i = 0; i < width * height * 4; i += 4 )
+    for ( u32 i = 0; i &lt; width * height * 4; i += 4 )
     {
         buffer[ i + 1 ] = *pixelData++; // r
         buffer[ i + 2 ] = *pixelData++; // g
@@ -719,6 +719,160 @@ where I was converting the Md2 texture coordinates from little to big endian twi
 ending up at little endian again. Fixing that we now see a glorious Ogro model:</p>
 
 <img src="images/textured_md2_5_23_2021.gif"/>
+
+<h3>06/05/2021</h3>
+
+<p>Working on getting MD5 Skeletal Animation from Newcastle tutorials on PS3.
+To start, I replaced the Newcastle Vector3, Vector4, Matrix3, and Matrix4 classes
+with the PS3 SDK SIMD optimized classes. Additionally, the OpenGL code had to be
+replaced with the PS3 RSX memory/vertex code. This included adding support
+for 32-bit indices instead of 16-bit indices, due to the number of vertices
+required.</p>
+
+<pre><code>DBG_LOG( "Generating RSX buffers\n" );
+
+if ( vertices == nullptr ) {
+    DBG_LOG( "vertices null!\n" );
+    return false;
+}
+m_meshBuffer-&gt;cnt_vertices = numVertices;
+m_meshBuffer-&gt;vertices =
+    (S3DVertex*)rsxMemalign( 128,
+                             m_meshBuffer-&gt;cnt_vertices * sizeof(S3DVertex) );
+if ( !m_meshBuffer-&gt;vertices ) {
+    DBG_LOG( "Failed to alloc vertices\n" );
+    return false;
+}
+
+if ( indices )
+{
+    m_meshBuffer-&gt;cnt_indices = numIndices;
+    m_meshBuffer-&gt;indices = nullptr;
+    m_meshBuffer-&gt;indices32 =
+        (u32*)rsxMemalign( 128, m_meshBuffer-&gt;cnt_indices * sizeof(u32) );
+    if ( !m_meshBuffer-&gt;indices32 ) {
+        DBG_LOG( "Failed to alloc indices32\n" );
+        free( m_meshBuffer-&gt;vertices );
+        return false;
+    }
+}
+
+for ( u32 i = 0; i &lt; m_meshBuffer-&gt;cnt_vertices; ++i )
+{
+    Vectormath::Aos::Vector3&amp; pos = vertices[i];
+    Vector2&amp; texCoord = textureCoords[i];
+    m_meshBuffer-&gt;vertices[i] = S3DVertex( pos.getX(), pos.getY(), pos.getZ(),
+                                           0.0f, 1.0f, 0.0f, // TODO - normals
+                                           texCoord.u, 1.0f - texCoord.v );
+}
+
+DBG_LOG( "mesh buffer num indices: %u\n", m_meshBuffer-&gt;cnt_indices );
+for ( u32 i = 0; i &lt; m_meshBuffer-&gt;cnt_indices; ++i )
+{
+    m_meshBuffer-&gt;indices32[i] = indices[i];
+}
+...
+if ( m_meshBuffer-&gt;indices != nullptr )
+{
+    rsxAddressToOffset( &amp;m_meshBuffer-&gt;indices[0], &amp;offset );
+    rsxDrawIndexArray( m_context,
+                       GCM_TYPE_TRIANGLES,        // u32 type
+                       offset,                    // u32 offset
+                       m_meshBuffer-&amp;gt;cnt_indices, // u32 count
+                       GCM_INDEX_TYPE_16B,        // u32 data_type
+                       GCM_LOCATION_RSX );        // u32 location
+}
+else if ( m_meshBuffer-&gt;indices32 != nullptr )
+{
+    rsxAddressToOffset( &amp;m_meshBuffer-&gt;indices32[0], &amp;offset );
+    rsxDrawIndexArray( m_context,
+                       GCM_TYPE_TRIANGLES,        // u32 type
+                       offset,                    // u32 offset
+                       m_meshBuffer-&gt;cnt_indices, // u32 count
+                       GCM_INDEX_TYPE_32B,        // u32 data_type
+                       GCM_LOCATION_RSX );        // u32 location
+}
+
+</code></pre>
+
+<p>After those changes, I ended up with an initial bug:</p>
+
+<img src="images/md5model_vecbug.png"/>
+
+<p>Which, after debugging by logging values to text files and comparing between PC
+version, narrowed down to this code:</p>
+
+<pre><code>Vectormath::Aos::Vector4 res = ((joint.transform * weight.position) * weight.weightValue);
+target-&gt;vertices[j] += Vectormath::Aos::Vector3( res.getX(), res.getY(), res.getZ() );
+</code></pre>
+
+<p>weight.position was a Vector3. Because of this, the multiply operator was handling the Matrix4/Vec3
+length differently than the newcastle matrix code. Making weight.position a Vector4 instead fixed the
+issue:</p>
+
+<pre><code>Vectormath::Aos::Vector4 res = (( joint.transform *
+                                  Vectormath::Aos::Vector4( weight.position, 1.0f ))
+                                  * weight.weightValue );
+target-&gt;vertices[j] += res.getXYZ();
+</code></pre>
+
+<img src="images/md5model_vecbug_fixed.png"/>
+
+<p>Another bug:</p>
+
+<pre><code>float oriX, oriY, oriZ;
+from &gt;&gt; oriX &gt;&gt; oriY &gt;&gt; oriZ;
+baseFrame.orientations[current].setX( oriX ); // bug! should be oriX,oriY,oriZ
+baseFrame.orientations[current].setY( oriX );
+baseFrame.orientations[current].setZ( oriX );
+</code></pre>
+
+<p>Better, but the animation is still weird/jerky, and the texture coordinates are still off...</p>
+<img src="images/jerky_md5_anim_6_5_2021.gif"/>
+
+<p>Turned out to be an issue with my game timer class</p>
+
+<pre><code>//g_MD5Node-&gt;Update( g_Timer.GetDeltaMS() );
+g_MD5Node-&gt;Update( 16.0f );
+</code></pre>
+
+<p>Hard coding the passed milliseconds made the animation nice and
+smooth as expected</p>
+
+<img src="images/md5_anim_non_jerky_6_5_2021.gif"/>
+
+<p>Modified the game timer code to combine both seconds and nanoseconds
+into just nanoseconds:</p>
+
+<pre><code>//u64 secDiff = curSec - m_lastSec;                                                          
+//u64 nsecDiff = (curNsec &lt; m_lastNsec) ? m_lastNsec - curNsec : curNsec - m_lastNsec;
+u64 curNano = (curSec * 1e9) + curNsec;
+u64 lastNano = (m_lastSec * 1e9) + m_lastNsec;
+
+//m_deltaMs = (float( secDiff ) * 1000.0f) +
+//            (float( nsecDiff ) / 1000000.0f);
+m_deltaMs = float((curNano - lastNano) / 1000000);
+</code></pre>
+
+<p>Next, to fix the texture, I had to flip the v coordinate, like is done
+in the Md2 model class:</p>
+
+<pre><code>for ( u32 i = 0; i &lt; m_meshBuffer-&gt;cnt_vertices; ++i )                                           
+{                                                                                                
+    Vectormath::Aos::Vector3&amp; pos = vertices[i];                                                 
+    Vector2&amp; texCoord = textureCoords[i];
+    m_meshBuffer-&gt;vertices[i] = S3DVertex( pos.getX(), pos.getY(), pos.getZ(),                   
+                                              0.0f, 1.0f, 0.0f, // TODO - normals                   
+                                              texCoord.u, 1.0f - texCoord.v ); // flipped v to 1.0f - v
+}
+</code></pre>
+
+<p>And wallah! Fully textured and animated working on the console:</p>
+
+<img src="images/md5_animated_working_fully_6_5_2021.gif"/>
+
+<p>I loaded the proper texture outside of the MD5 class; TODO would be to auto
+load the texture based on the file name within the MD5.</p>
 
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>

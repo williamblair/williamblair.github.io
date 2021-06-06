@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Game Code Complete</title>
+</head>
+<body>
+
+<a href="https://www.amazon.com/Game-Coding-Complete-Fourth-McShaffry/dp/1133776574">
+<img src="https://images-na.ssl-images-amazon.com/images/I/51OEEXgistL._SX402_BO1,204,203,200_.jpg" width="400px"/>
+</a>
+
+<p>Game Coding Complete notes</p>
+<p>Code here: <a href="https://github.com/williamblair/game_code_complete">https://github.com/williamblair/game_code_complete</a></p>
+
+<h2>Chapter 3</h2>
+
+<h3>Memory Pool</h3>
+<p>Each entry in the memory pool in this chapter has a header which is a
+pointer to the next entry in the memory pool. Each entry is the same size,
+so it is a pool of fixed size chunks, which is why we don't need to store the
+size in the header as well.</p>
+<p>I added a test main program which uses chunks of 8 bytes (64 bits)
+then prints and shows the pool contents and the corresponding header pointers:</p>
+
+<pre><code>static const size_t CHUNK_SIZE = sizeof(uint64_t); // each allocated entry will be 8 bytes
+static const size_t NUM_CHUNKS = 10; // there will be memory available for 10 chunks at a time
+...
+if ( !memPool.Init( CHUNK_SIZE, NUM_CHUNKS ) ) {
+    printf("Failed to init mem pool\n");
+    return 1;
+}
+...
+// free from pool
+while ( allocMap.size() > 0 )
+{
+    auto pairIter = allocMap.begin();
+    uint8_t** ppChunkHeader = (uint8_t**)( (uint8_t*)pairIter->first - 
+            sizeof(uint8_t*) );
+    uint8_t* pNextListEntry = ppChunkHeader[0];
+    printf("Freeing 0x%08X (chunk header = 0x%08X)\n", 
+            pairIter->first, (void*)ppChunkHeader );
+    printf("  Points to: 0x%08X\n", (void*)pNextListEntry );
+    memPool.Free( pairIter->first );
+    allocMap.erase( pairIter );
+}</code></pre>
+
+<p>Which, as an example run, shows the addresses linked to each other:</p>
+
+<pre><code>Freeing 0x000003A8 (chunk header = 0x000003A0)
+  Points to: 0x000003B0
+Freeing 0x000003B8 (chunk header = 0x000003B0)
+  Points to: 0x000003C0
+Freeing 0x000003C8 (chunk header = 0x000003C0)
+  Points to: 0x000003D0
+Freeing 0x000003D8 (chunk header = 0x000003D0)
+  Points to: 0x000003E0
+Freeing 0x000003E8 (chunk header = 0x000003E0)
+  Points to: 0x000003F0
+Freeing 0x000003F8 (chunk header = 0x000003F0)
+  Points to: 0x00000400
+Freeing 0x00000408 (chunk header = 0x00000400)
+  Points to: 0x00000410
+Freeing 0x00000418 (chunk header = 0x00000410)
+  Points to: 0x00000420
+Freeing 0x00000428 (chunk header = 0x00000420)
+  Points to: 0x00000430
+Freeing 0x00000438 (chunk header = 0x00000430)
+  Points to: 0x00000000</code></pre>
+
+<h2>Chapter 6</h2>
+
+<h3>Actors/Components</h3>
+
+<p>Used timyxml2 instead of tinyxml like the book uses. The basic tinyxml2 objects
+representing XML nodes are XMLElement and the top level loaded XML is XMLDocument.
+Basic usage is:</p>
+
+<pre><code>#include &lt;tinyxml2.h&gt;
+using namespace tinyxml2;
+XMLDocument* pDoc = new XMLDocument;
+pDoc-&gt;LoadFile( filename );
+XMLElement* pRoot = pDoc-&gt;RootElement();
+// loop through each child XML element
+for ( XMLElement* pNode = pRoot-&gt;FirstChildElement();
+      pNode;
+      pNode = pNode-&gt;NextSiblingElement() )
+{
+    std::string val( pNode-&gt;Value() );
+    ...
+}
+</code></pre>
+
+<h2>Chapter 7</h2>
+<h3>Process Manager/Cooperative Multitasker</h3>
+
+<p>Made example usage/test program. It creates a process manager
+and two processes (a parent and child process), where the child
+process runs after the parent process finishes. Each 'process' is updated once
+per frame; and it is trusted that the process will only run as long as necessary for
+a single 'tick' of update; hence the name 'cooperative multitasker.' Seems like
+an organized/alternative to <a href="https://www.youtube.com/watch?v=MuCpdoIEpgA&t=1s">coroutines</a>,
+for example.</p>
+
+<pre><code>ProcessManager processManager;
+StrongProcessPtr pDelayProcess( new DelayProcess( 5000 ) ); // 5 second delay
+StrongProcessPtr pKaboomProcess( new KaboomProcess() ); // gets called after delay
+
+processManager.AttachProcess( pDelayProcess );
+pDelayProcess-&gt;AttachChild( pKaboomProcess );
+
+auto timeStart = std::chrono::steady_clock::now();
+auto lastTime = std::chrono::steady_clock::now();
+auto timeStop = std::chrono::steady_clock::now();
+while ( std::chrono::duration_cast&lt;std::chrono::seconds&gt;
+        ( timeStop - timeStart).count() &lt; 10 )
+{
+    timeStop = std::chrono::steady_clock::now();
+    uint64_t deltaMs = std::chrono::duration_cast&lt;std::chrono::milliseconds&gt;
+        ( timeStop - lastTime ).count();
+
+    processManager.UpdateProcesses( deltaMs );
+
+    // go easy on the CPU a little
+    lastTime = timeStop;
+    std::this_thread::sleep_for( 
+        std::chrono::milliseconds( uint64_t( 1000.0f/30.0f ) ) );
+}
+</code></pre>
+
+<h2>Chapter 11</h2>
+<h3>Event Manager/Event System</h3>
+
+<p>In the book they use a third party library, FastDelegate, to make function
+objects passed around as event handlers. I instead used c++11 function objects.
+Originally I used plain old std::function&lt;&gt;s, but found you cannot test
+instances of them for equality. So I made them function object smart pointers:</p>
+
+<pre><code>#include &lt;functional&gt;
+typedef std::shared_ptr&lt;IEventData&gt; IEventDataPtr;
+typedef std::shared_ptr&lt;std::function&lt;void(IEventDataPtr)&gt;&gt; EventListenerDelegate;
+
+// for declaring a delegate via a class member function
+#define DECL_MBR_DELEGATE( func )               \
+    new std::function&lt;void(IEventDataPtr)&gt;(     \
+            std::bind( func,                    \
+                       this,                    \
+                       std::placeholders::_1    \
+                )                               \
+            )
+...
+class RoleSystem
+{
+public:
+    
+    RoleSystem() :
+        destroyDelegate(
+            DECL_MBR_DELEGATE( &amp;RoleSystem::DestroyActorDelegate ) )
+    {
+        ActorId actorId = ActorId(ACTOR_ID);
+        m_roleMap[actorId] = "Actor1";
+
+        IEventManager* evtMgr = IEventManager::GetInstance();
+        assert( evtMgr != nullptr );
+        evtMgr-&gt;VAddListener( destroyDelegate, EvtDataDestroyActor::sk_EventType );
+    } 
+
+    void DestroyActorDelegate( IEventDataPtr pEventData )
+    {
+        // cast pointer to the actual event data
+        // important to properly cast so the shared_ptr&lt;&gt; isn't
+        // deleted prematurely before we're done using it
+        std::shared_ptr&lt;EvtDataDestroyActor&gt; pCastEventData(
+            std::static_pointer_cast&lt;EvtDataDestroyActor&gt;(pEventData) );
+
+        std::cout &lt;&lt; "RoleSystem attempting to remove actor" &lt;&lt; std::endl;
+        auto it = m_roleMap.find( pCastEventData-&gt;GetId() );
+        if ( it != m_roleMap.end() )
+        {
+            std::cout &lt;&lt; "  found actor: " &lt;&lt; it-&gt;second &lt;&lt; std::endl;
+            m_roleMap.erase( it );
+        }
+        else
+        {
+            std::cout &lt;&lt; "  failed to find actor" &lt;&lt; std::endl;
+        }
+    }
+...
+</code></pre>
+
+<h2>Chapter 12</h2>
+<h3>Lua Scripting</h3>
+
+<p>Installed LuaPlus 5.3 instead of 5.1 from
+<a href="https://github.com/jjensen/luaplus51-all">
+https://github.com/jjensen/luaplus51-all</a>. The build process
+results in a static library file
+luaplus/.build/bin.lua53-luaplus.gcc.linux64/lua53-luaplus-static.a. I made
+a copy of it to be named liblua53-luaplus-static.a (added the lib prefix)
+so it can be found by gcc with the -llua53-luaplus-static flag. I then added
+its path to the Makefile and also had to add the -ldl flag.</p>
+
+<pre><code>CC = g++ 
+CFLAGS = -std=c++17 -g
+LUAPLUS_DIR = /home/bj/luaplus
+LUAPLUS_BUILD_DIR = $(LUAPLUS_DIR)/.build/bin.lua53-luaplus.gcc.linux64
+INCDIRS = -I./ \
+          -I$(LUAPLUS_DIR)/Src \
+          -I$(LUAPLUS_DIR)/Src/LuaPlus/lua53-luaplus/src \
+          -I../09_resource_cache \
+          -I../08_zip \
+          -I../07_coop_multitasker \
+          -I../11_event_manager
+LIBDIRS = -L$(LUAPLUS_BUILD_DIR)
+LIBS = -llua53-luaplus-static -ldl -lz 
+...
+</code></pre>
+
+Because of the version difference, I had to change the the LuaPlus function
+object from LuaFunction<void> to LuaFunctionVoid, based on reading the LuaPlus 5.3
+documentation (luaplus/Docs/LuaPlus.html):
+
+<pre><code>LuaPlus::LuaObject m_scriptInitFunc;
+...
+// original
+LuaPlus::LuaFunction<void> func( m_scriptInitFunc );
+func( self );
+
+// new
+LuaPlus::LuaFunctionVoid func( m_scriptInitFunc );
+func( self );
+</code></pre>
+
+<p>Added test Lua event triggers and handlers based on book suggestion/example:</p>
+
+<pre><code>class EvtDataScriptEventFromLua : public ScriptEvent
+{
+public:
+
+    static const EventType sk_EventType;
+    ...
+    virtual const EventType&amp; VGetEventType() const { return sk_EventType; }
+
+    EXPORT_FOR_SCRIPT_EVENT( EvtDataScriptEventFromLua );
+
+protected:
+
+    virtual bool VBuildEventFromScript(); // extract value from Lua
+    int m_num; // dummy test value
+};
+
+class EvtDataScriptEventToLua : public ScriptEvent
+{
+public:
+
+    static const EventType sk_EventType;
+    ...
+    virtual const EventType&amp; VGetEventType() const { return sk_EventType; }
+    EXPORT_FOR_SCRIPT_EVENT( EvtDataScriptEventToLua );
+
+protected:
+
+    virtual void VBuildEventData(); // fill data with value before sending to Lua
+    int m_num;
+};
+</code></pre>
+
+<p>Had a bug initially where the Lua Event handler data was not being set
+properly within C++ because I had the name of the virtual function overrides
+for filling the data wrong:</p>
+
+<pre><code>...
+protected:
+    virtual void BuildEventData(); // should have been 'VBuildEventData()'
+...
+protected:
+    virtual bool BuildEventFromScript(); // should have been 'VBuildEventFromScript()'
+...
+</code></pre>
+
+<p>So instead, the default base class functions were being called instead, which
+set the Lua object to NIL instead of filling/extracting from it the desired
+data.</p>
+
+</body>
+</html>
+
