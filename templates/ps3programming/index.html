@@ -874,6 +874,158 @@ in the Md2 model class:</p>
 <p>I loaded the proper texture outside of the MD5 class; TODO would be to auto
 load the texture based on the file name within the MD5.</p>
 
+<h3>06/06/2021</h3>
+
+<p>Working on the heightmap terrain from Begginning Opengl Game Programming.
+Similar to the MD5 model, I replaced Vector/Matrix classes with the
+ps3 Vectormath::Aos::Vector3 versions. I also moved the texturing outside
+of the class (into main for now).</p>
+
+<p>The scale of the terrain compared to the MD5 model is quite different;
+I'll have to either scale down the MD5 model or scale up the terrain.</p>
+
+<p>I initially had a texturing issue:</p>
+
+<img src="images/terrain_badtexture_6_6_2021.png" width="600px"/>
+
+<p>Which viewing the zoomed out version, showed the texture was
+not repeating over each terrain section. Looking at the texture
+class code properties, I saw the texture was configured to clamp
+instead of wrap, which matches viewing the zoomed out terrain.</p>
+
+<p>Looking at the PSL1GHT doxygen, we can see the different
+texture options:</p>
+
+<img src="images/terrain_texture_doxygen_6_6_2021.png"/>
+
+<p>I chose GCM_TEXTURE_REPEAT to use instead of GCM_TEXTURE_CLAMP:</p>
+
+<pre><code>//rsxTextureWrapMode(m_context,shaderTexUnit,GCM_TEXTURE_CLAMP_TO_EDGE,GCM_TEXTURE_CLAMP_TO_EDGE,GCM_TEXTURE_CLAMP_TO_EDGE,0,GCM_TEXTURE_ZFUNC_LESS,0);
+rsxTextureWrapMode(m_context,shaderTexUnit,GCM_TEXTURE_REPEAT,GCM_TEXTURE_REPEAT,GCM_TEXTURE_REPEAT,0,GCM_TEXTURE_ZFUNC_LESS,0);
+</code></pre>
+
+<img src="images/terrain_texture_repeat_6_6_2021.png" width="600px"/>
+
+<p>Scaling the terrain by a factor of 20 we can now see the ground
+in relation to the MD5 model:</p>
+
+<img src="images/terrain_scaled_6_6_2021.png" width="600px"/>
+
+<p>However, when I tried running it on my PS3 it didn't turn out so well:</p>
+
+<img src="images/terrain_ps3_error_6_6_2021.jpg" width="600px"/>
+
+<p>I guessed it had to do with the massive scaling and size difference between the terrain and MD5
+model. After adding a scale option to the MD5 loading code and scaling it down to 1/20th its original
+size, and then adjusting the camera, running on PS3 hardware worked again:</p>
+
+<img src="images/terrain_ps3_working_6_6_2021.gif"/>
+
+<h3>06/07/2021</h3>
+
+<p>Got transparent texture for the tree object from beg. opengl game prog. working. I made a
+static S3DVertex class member pointer, that way all Tree instances can share the same vertex
+memory. I also changed the vertex/texture coordinate buffers to use triangles instead of
+triangle strips, just because I was lazy and didn't want to figure out how to do that on the
+ps3 (I think an additional 2 triangles won't kill us!).</p>
+
+<pre><code>// static buffer instance
+S3DVertex* Tree::s_vertices = nullptr;
+...
+static const size_t numVertices = 12;
+m_meshBuffer-&gt;cnt_vertices = numVertices;
+if ( s_vertices == nullptr )
+{
+    float vertices[numVertices*3] = 
+    {
+        // first square
+        -1.0f, 0.0f, 0.0f, // bottom left
+        1.0f,  0.0f, 0.0f, // bottom right
+        -1.0f, 2.0f, 0.0f, // top left
+        1.0f,  0.0f, 0.0f, // bottom right
+        1.0f,  2.0f, 0.0f, // top right
+        -1.0f, 2.0f, 0.0f, // top left
+
+        // second square
+        0.0f, 0.0f,  1.0f, // bottom left
+        0.0f, 0.0f, -1.0f, // bottom right
+        0.0f, 2.0f,  1.0f, // top left
+        0.0f, 0.0f, -1.0f, // bottom right
+        0.0f, 2.0f, -1.0f, // top right
+        0.0f, 2.0f,  1.0f // top left
+        
+    };
+
+    float texCoords[numVertices*2] =
+    {
+        // first square
+        0.0f, 0.0f, // bottom left
+        1.0f, 0.0f, // bottom right
+        0.0f, 1.0f, // top left
+        1.0f, 0.0f, // bottom right
+        1.0f, 1.0f, // top right
+        0.0f, 1.0f, // top left
+
+        // second square
+        0.0f, 0.0f, // bottom left
+        1.0f, 0.0f, // bottom right
+        0.0f, 1.0f, // top left
+        1.0f, 0.0f, // bottom right
+        1.0f, 1.0f, // top right
+        0.0f, 1.0f, // top left
+    };
+
+    s_vertices = (S3DVertex*)rsxMemalign( 128,
+                                          m_meshBuffer-&gt;cnt_vertices * sizeof(S3DVertex) );
+    for ( size_t i = 0; i &lt; numVertices; ++i )
+    {
+        float* vertex = &amp;vertices[i*3];
+        float* texCoord = &amp;texCoords[i*2];
+        s_vertices[i] = S3DVertex( vertex[0], vertex[1], vertex[2],
+                                    0.0f, 1.0f, 0.0f, // TODO - normals
+                                    texCoord[0], texCoord[1] );
+    }
+}
+m_meshBuffer-&gt;vertices = s_vertices;
+m_meshBuffer-&gt;cnt_indices = 0;
+m_meshBuffer-&gt;indices = nullptr;
+m_meshBuffer-&gt;indices32 = nullptr;
+</code></pre>
+
+<p>Next, I updated fragment shader to allow alpha values:</p>
+<pre><code>//float3 color = tex2D(texture, texcoord).xyz; // old
+float4 color = tex2D(texture, texcoord); // new
+    
+//oColor = float4(color,1.0f); // old
+oColor = color; // new
+</code></pre>
+
+<p>Yet the tree texture was showing black where it should be transparent:</p>
+
+<img src="images/nontransparent_tree_6_7_2021.png"/>
+
+<p>Hard coding red and green values in the shader showed that indeed worked:</p>
+
+<img src="images/nontransparent_color_test_6_7_2021.png"/>
+
+<p>After some poking around in the psl1ght doxygen, I found shader blending was
+disabled by default. I added the following calls to Renderer::SetDrawEnv().
+I was surprised rsxSetBlendFunc() needed to be called explicitly as well, I assumed
+some default would have worked instead.</p>
+
+<pre><code>rsxSetBlendEnable( context, GCM_TRUE ); // enable blending
+rsxSetBlendEquation( context, GCM_FUNC_ADD, GCM_FUNC_ADD ); // default blend equation...
+rsxSetBlendFunc( context, GCM_SRC_ALPHA, // sfcolor (source)
+                          GCM_ONE_MINUS_SRC_ALPHA, // dfcolor (destination)
+                          GCM_SRC_ALPHA, // sfalpha
+                          GCM_ONE_MINUS_SRC_ALPHA ); // dfalpha
+</code></pre>
+
+<p>Which is called every Renderer::BeginFrame(). Now we have a transparent texture
+for the tree as expected:</p>
+
+<img src="images/transparent_tree_working_6_7_2021.png"/>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
