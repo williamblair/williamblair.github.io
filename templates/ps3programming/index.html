@@ -1026,6 +1026,68 @@ for the tree as expected:</p>
 
 <img src="images/transparent_tree_working_6_7_2021.png"/>
 
+
+<h3>06/21/2021</h3>
+
+<p>Added an orbit camera class based on "Game Programming in C++"
+by Sanjay Madhav, chapter 9</p>
+
+<p>Surprisingly, it worked basically on the first try, after replacing
+Madhav's Vector/Quaternion code with the PSL1GHT library code:</p>
+
+<pre><code>void OrbitCamera::Update( const float dt )
+{
+    // yaw quaternion about world up
+    Vectormath::Aos::Quat yaw = Vectormath::Aos::Quat::rotationY(
+        m_yawSpeed * dt );
+ 
+    // transform offset and up by yaw
+    m_offset = Vectormath::Aos::rotate( yaw, m_offset );
+    m_up = Vectormath::Aos::rotate( yaw, m_up );
+    
+    // Compute camera forward and right
+    // forward owner.position - (owner.position + offset)
+    // = -offset
+    Vectormath::Aos::Vector3 forward = -1.0f * m_offset;
+    forward = normalize( forward );
+    Vectormath::Aos::Vector3 right = Vectormath::Aos::cross( m_up, forward );
+    right = Vectormath::Aos::normalize( right );
+    
+    // Create quaternion for pitch about camera right
+    Vectormath::Aos::Quat pitch = Vectormath::Aos::Quat::rotation(
+        m_pitchSpeed * dt, right );
+    // transform offset and up by pitch
+    m_offset = Vectormath::Aos::rotate( pitch, m_offset );
+    m_up = Vectormath::Aos::rotate( pitch, m_up );
+    
+    // Create the lookat matrix
+    m_viewMat = Vectormath::Aos::Matrix4::lookAt(
+        Vectormath::Aos::Point3( m_target + m_offset ), // camera position
+        Vectormath::Aos::Point3( m_target ), // camera target/look at
+        m_up ); // up vector
+}
+</code></pre>
+
+<p>Then, in main, I replaced the viewMatrix with the Camera 
+GetViewMatrix() function. TODO is also to move the entity positions
+within the entity class (for the model matrix):</p>
+
+<pre><code>static OrbitCamera g_Camera;
+...
+modelViewMatrix = transpose(g_Camera.GetViewMatrix()*modelMatrix);
+...
+g_Camera.SetTarget( g_MD5Position );
+g_Camera.Update( g_Timer.GetDeltaMS() );
+//g_Camera.SetPitchSpeed( 0.0005f ); // rotate the camera
+g_Camera.SetYawSpeed( 0.0005f );
+</code></pre>
+
+<p>TODO is to move the camera with the controller, but testing shows
+valid rotation around our MD5 model target:</p>
+
+<img src="images/orbit_camera_1_6_21_2021.gif"/><br/>
+<img src="images/orbit_camera_2_6_21_2021.gif"/>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
