@@ -1,17 +1,25 @@
 body {
   /*background-image: url("images/sandlite.jpeg");*/
-  background-image: url("images/ffvi3_16x16.png");
+  /*background-image: url("images/ffvi3_16x16.png");*/
+  /*background-image: url("images/greycloth.jpg");*/
+  /*background-image: url("images/grey_from_chris.gif");*/
+  /*background-image: url("images/grey_seamless.jpg");*/
+  /*background-image: url("images/leather_texture.jpeg");*/
+  /*background-image: url("images/sandlite.jpeg");*/
+  background-image: url("images/space_texture.jpeg");
   background-repeat: repeat;
   height: 100%;
   color: white;
+  /*color: black;*/
 }
 
 a:link {
-  color: #AAFFAA;
+  color: #FFAAFF;
+  /*color: blue;*/
 }
 
 a:visited {
-  color: #FFFFFF;
+  color: #AAAAAA;
 }
 
 table, tr, th, td {

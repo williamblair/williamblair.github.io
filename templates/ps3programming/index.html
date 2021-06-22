@@ -261,7 +261,7 @@ while (true)
         {
             pad.SetLargeActuator( algVal );
         }
-        else if ( algVal < prevAlgVal && prevAlgVal - algVal > 5 )
+        else if ( algVal &lt; prevAlgVal &amp;&amp; prevAlgVal - algVal &gt; 5 )
         { 
             pad.SetLargeActuator( algVal );
         }
@@ -469,8 +469,8 @@ and define a basic Vector2 struct:</p>
     f32 scale[3];     // use to multiply and add Vertex::v
     f32 translate[3];
     char name[16];
-    std::vector<Vertex> md2Vertices;
-    std::vector<Vector3> vertices; // converted result vertices
+    std::vector&lt;Vertex&gt; md2Vertices;
+    std::vector&lt;Vector3&gt; vertices; // converted result vertices
 };
 ...
 struct Vector2
@@ -499,7 +499,7 @@ if ( texCoords.size() != interpolatedFrame.vertices.size() ) {
             texCoords.size(), interpolatedFrame.vertices.size() );
     return false;
 }
-for ( u32 i = 0; i < m_meshBuffer->cnt_vertices; ++i )
+for ( u32 i = 0; i &lt; m_meshBuffer-&gt;cnt_vertices; ++i )
 {
     Vector3&amp; pos = interpolatedFrame.vertices[i];
     m_meshBuffer-&gt;vertices[i] = S3DVertex( pos.getX(), pos.getY(), pos.getZ(),
@@ -512,7 +512,7 @@ Update:
 
 ...
 // Update RSX memory
-for ( u32 i = 0; i < m_meshBuffer->cnt_vertices; ++i )
+for ( u32 i = 0; i &lt; m_meshBuffer-&gt;cnt_vertices; ++i )
 {
     Vector3&amp; pos = interpolatedFrame.vertices[i];
     m_meshBuffer-&gt;vertices[i] = S3DVertex( pos.getX(), pos.getY(), pos.getZ(),
