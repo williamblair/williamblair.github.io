@@ -1088,6 +1088,202 @@ valid rotation around our MD5 model target:</p>
 <img src="images/orbit_camera_1_6_21_2021.gif"/><br/>
 <img src="images/orbit_camera_2_6_21_2021.gif"/>
 
+<h3>06/22/2021</h3>
+
+<p>
+Got model rotation/forward direction working. Added yaw, pitch, position,
+forward speed, and a model matrix to the Entity class:
+</p>
+
+<pre><code>Vectormath::Aos::Matrix4 m_modelMat;
+Vectormath::Aos::Vector3 m_position;
+float m_yawSpeed; // yaw speed in radians/sec
+float m_yaw; // yaw in radians
+float m_yawRenderOffset; // additional yaw to add before rendering
+
+float m_pitchSpeed; // pitch speed in radians/sec
+float m_pitch; // pitch in radians
+
+float m_forwardSpeed; // added to m_position based on calculated forward vec
+</code></pre>
+
+<p>Then Update() recalculates the model matrix (based on 
+Madhav mentioned yesterday). It's currently limited to yaw rotation about
+the Y axis.</p>
+
+<pre><code>void Entity::Update( float dt )
+{
+    m_yaw += m_yawSpeed * dt;
+
+    // TODO - account for pitch in forward as well
+    // default forward points right; along x axis
+    Vectormath::Aos::Vector3 forward( 1.0f, 0.0f, 0.0f );
+    // rotate the right-pointing forward about Y axis based on yaw
+    Vectormath::Aos::Quat yaw = Vectormath::Aos::Quat::rotationY( m_yaw );
+    forward = Vectormath::Aos::rotate( yaw, forward );
+
+    // move forward
+    m_position = m_position + (forward * m_forwardSpeed * dt);
+
+    // TODO - 
+    // This doesn't allow for pitch or roll rotation...
+    m_modelMat = Vectormath::Aos::Matrix4(
+        Vectormath::Aos::Transform3(
+            Vectormath::Aos::Quat::rotationY( m_yaw ),
+            m_position ));
+}
+</code></pre>
+
+<p>Next, added controller input to move/rotate the entity (Filter2D again
+based on Madhav, except scaled controller values from -128 to 127 instead of 
+-32768 32767:</p>
+
+<pre><code>// input range 0-255, middle = 127
+Vector2 Filter2D( int inputX, int inputY )
+{
+    const float deadZone = (8000.0f/32768.0f) * 127.0f;
+    const float maxValue = (30000.0f/32768.0f) * 127.0f;
+
+    Vector2 dir;
+    dir.x = (float)(inputX) - 127.0f;
+    dir.y = (float)(inputY) - 127.0f;
+
+    float length = dir.Length();
+
+    if ( length &lt; deadZone )
+    {
+        dir.x = 0.0f;
+        dir.y = 0.0f;
+    }
+    else
+    {
+        // calculate fractional between dead zone and max value circles
+        float f = ( length - deadZone ) / ( maxValue - deadZone );
+
+        // clamp between 0 and 1
+        if ( f &lt; 0.0f ) { f = 0.0f; }
+        if ( f &gt; 1.0f ) { f = 1.0f; }
+
+        // normalize vector and scale it to the fractional value
+        dir.x *= f / length;
+        dir.y *= f / length;
+    }
+
+    return dir;
+}
+...
+// main loop
+Vector2 analogDir = Filter2D( g_Pad.GetLeftAnalogX(),
+                               g_Pad.GetLeftAnalogY() );
+float dirLen = analogDir.Length();
+g_MD5Node-&gt;SetForwardSpeed( -dirLen * 0.005f );
+static bool isIdle = false;
+if ( dirLen &gt; 0.000001f ) {
+    float angle = atan2( -analogDir.y, analogDir.x );
+    g_MD5Node-&gt;SetYaw( angle );
+}
+
+g_MD5Node-&gt;Update( g_Timer.GetDeltaMS() );
+g_Camera.SetTarget( g_MD5Node-&gt;GetPosition() );
+g_Camera.Update( g_Timer.GetDeltaMS() );
+
+</code></pre>
+
+<p>Then confirmed that we can rotate the entity and move it around:</p>
+
+<img src="images/rotating_working_6_22_2021.gif"/>
+
+<h3>06/23/2021</h3>
+
+<p>Added the walking animation to the controlled MD5 Model, which turned out to
+be way harder than I thought it would.</p>
+
+<p>The first step was simple; load and play a different .md5anim file instead of
+the idle anim:</p>
+
+<pre><code>EXIT_ON_FAIL( g_MD5Data.AddAnim( ASSETS_DIR"/models/hellknight/idle2.md5anim" ),
+              "Failed to load md5 anim\n",
+              "Sucess loading md5 anim\n" );
+EXIT_ON_FAIL( g_MD5Data.AddAnim( ASSETS_DIR"/models/hellknight/walk7.md5anim" ),
+              "Failed to load md5 anim\n",
+              "Sucess loading md5 anim\n" );
+//g_MD5Node-&gt;PlayAnim( ASSETS_DIR"/models/hellknight/idle2.md5anim" );
+g_MD5Node-&gt;PlayAnim( ASSETS_DIR"/models/hellknight/walk7.md5anim" );
+</code></pre>
+
+<p>But that causes the model to move forward during its anim sequence:</p>
+
+<img src="images/walking_notworking_6_23_2021.gif"/>
+
+<p>Based on <a href="https://www.gamedev.net/forums/topic/539631-md5---how-to-make-a-character-walk-according-to-animation/">
+this post</a>, to try and keep the model from moving forward during its walk cycle,
+I tried subtracting the interpolated current and next root joint's anim
+transform from the model position, but the result was very jerky/not smooth:</p>
+
+<pre><code>// MD5Anim.cpp
+skelJoint.transform = MD5FileData::conversionMatrix * skelJoint.localTransform;
+curRootTransform = skelJoint.transform;
+Vectormath::Aos::Matrix4 nextLocalTransform;
+Vectormath::Aos::Transform3 nextT3( animQuat, nextAnimPos ); // don't care about rotation, only using position
+nextLocalTransform = Vectormath::Aos::Matrix4( nextT3 );
+nextRootTransform = MD5FileData::conversionMatrix * nextLocalTransform;
+...
+// MD5Node.cpp
+Vectormath::Aos::Matrix4&amp; rootMat = currentAnim-&gt;GetCurRootTransform();
+Vectormath::Aos::Matrix4&amp; nextRootMat = currentAnim-&gt;GetNextRootTransform();
+Vectormath::Aos::Vector3 offset = rootMat.getTranslation();
+Vectormath::Aos::Vector3 nextOffset = nextRootMat.getTranslation();
+
+// LERP between the offsets
+if ( currentAnim-&gt;GetFrameRate() &lt; 0.000001f ) {
+    //DBG_LOG( "WARN: current anim frame rate 0.0f\n" );
+    return Vectormath::Aos::Vector3( 0.0f, 0.0f, 0.0f );
+}
+// frameTime is in milliseconds not seconds, so frame rate scaled by 1000
+float t = frameTime / ( 1000.0f / currentAnim-&gt;GetFrameRate() );
+if ( t &lt; 0.0f || t &gt; 1.0f ) {
+    t = 0.0f;
+    DBG_LOG( "ERROR - bad t (frameTime, frameRate: %f, %f )\n", frameTime, currentAnim-&gt;GetFrameRate() );
+}
+offset = Vectormath::Aos::lerp( 1.0f - t, offset, nextOffset );
+return offset;
+...
+// Entity.cpp
+// TODO - account for pitch in forward as well
+// default forward points right; along x axis
+Vectormath::Aos::Vector3 forward( 1.0f, 0.0f, 0.0f );
+Vectormath::Aos::Vector3 moveOffset( GetMovingAnimOffset() );
+// rotate the right-pointing forward about Y axis based on yaw
+Vectormath::Aos::Quat yaw = Vectormath::Aos::Quat::rotationY( m_yaw );
+forward = Vectormath::Aos::rotate( yaw, forward );
+moveOffset = Vectormath::Aos::rotate( yaw, moveOffset );
+
+// move forward
+m_position = m_position + (forward * m_forwardSpeed * dt);
+
+// TODO
+// This doesn't allow for pitch or roll rotation...
+m_modelMat = Vectormath::Aos::Matrix4(
+    Vectormath::Aos::Transform3(
+        Vectormath::Aos::Quat::rotationY( m_yaw ),
+        m_position - moveOffset )); // offset position by animation offset
+</code></pre>
+
+<p>Again, this didn't work well. I next tried setting the root joint
+animation matrix translation component directly to zero, which worked like a charm!
+As well as being much simpler and less expensive</p>
+
+<pre><code>// MD5Anim.cpp
+...
+skelJoint.transform = MD5FileData::conversionMatrix * skelJoint.localTransform;
+Vectormath::Aos::Vector3 transVec( 0.0f, 0.0f, 0.0f ); // don't move the model's position at all please
+skelJoint.transform.setTranslation( transVec );
+</code></pre>
+
+<p>So now we can move our model directly with the controller and trigger the walking animation:</p>
+
+<img src="images/walking_working_6_23_2021.gif"/>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
