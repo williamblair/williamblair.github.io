@@ -1669,6 +1669,106 @@ ArrayName:
 </li>
 </ul>
 
+<h3>07/05/2021</h3>
+
+<p>Working on file loading from CD. I was able to get a simple .txt file loaded after looking at
+the following resources:</p>
+<ul>
+    <li><a href="http://onorisoft.free.fr/retro.htm">Orion's PSX library</a></li>
+    <li><a href="http://psx.arthus.net/sdk/Psy-Q/DOCS/TRAINING/FALL96/cdrom.pdf">PSYQ CD intro powerpoint</a></li>
+    <li><a href="https://github.com/Lameguy64/PSn00bSDK/blob/master/examples/cdrom/cdbrowse/main.c">PSN00bSDK cd browser example</a></li>
+    <li>PSYQ reference manual</li>
+</ul>
+
+<p>I use psxsdk to create the CD .bin/.cue file, as psxsdk includes mkpskiso and mkisofs.
+First, CdSearchFile() was failing due to the file name needing to be upper case:</p>
+<pre>CdSearchFile( &amp;fileStruct, "myfile.txt" ); // wrong!
+CdSearchFile( &amp;fileStruct, "\\MYFILE.TXT;1" ); // correct!
+</pre>
+
+<p>Next, I was having an error where the system was crashing after reading the file.
+It turned out you need to read in multiples of 2048 bytes, which is the size of a CD sector:</p>
+
+<pre><code>CdReadFile( fileName, (u_long*)buf, 12 ); // incorrect!
+
+// correct!
+unsigned long bufSize = fileStruct.size + (2048 - (fileStruct.size % 2048));
+buf = new char[bufSize];
+CdReadFile( fileName, (u_long*)buf, 0 ); // 0 defaults to reading the entire file
+</code>
+</pre>
+
+<p>Once that worked, I read the contents of the file to be displayed by the renderer:</p>
+
+<pre><code>bool ReadFile( char* fileName, char* inBuf )
+{
+    char* buf = nullptr; // store the read file
+    CdlFILE fileStruct;
+    int i;
+    int cnt;
+    memset( &amp;fileStruct, 0, sizeof(fileStruct) );
+
+    // check disk status
+    u_char result[8];
+    CdControl( CdlNop, 0, result );
+    if ( result[0] &amp; CdlStatShellOpen )
+    {
+        if ( CdDiskReady(1) != CdlComplete )
+        {
+            printf("Shell open waiting\n");
+            while ( CdDiskReady(0) != CdlComplete );
+        }
+    }
+
+    // name MUST be uppsercase in the form "\\THE\\FILE\\PATH.EXT;1"
+    unsigned long bufSize = 0;
+    if ( CdSearchFile( &amp;fileStruct, fileName ) == 0 )
+    {
+        printf( "CD search file failed (pos: 0x%X)\n", fileStruct.pos );
+        return false;
+    }
+    else
+    {
+        printf( "Found file: pos,size,name: 0x%08X, %lu, %s\n",
+                *((u_int*)&amp;fileStruct.pos),
+                fileStruct.size,
+                fileStruct.name );
+        const unsigned long sectorSize = 2048;
+        unsigned long bufSize = fileStruct.size + (sectorSize - (fileStruct.size % sectorSize));
+        buf = new char[bufSize];
+    }
+
+
+    // start the read operation
+    // num bytes (size) must be a multiple of 2048
+    //      reads entire file if num bytes is 0
+    CdReadFile( fileName, (u_long*)buf, 0 );
+
+    // wait for read operation to finish
+    while (( cnt = CdReadSync(1, 0) ) &gt; 0 );
+    if ( cnt == -1 ) {
+        printf( "CdReadSync error\n" );
+        delete[] buf;
+        return false;
+    }
+    memcpy( inBuf, buf, fileStruct.size );
+    delete[] buf;
+    buf = nullptr;
+
+    return true;
+}
+...
+if ( ReadFile( "\\TEST.TXT;1", textBuf ) )
+{
+    printf( "Read test.txt: %s\n", textBuf );
+}
+...
+renderer.DrawString( font, 10, 50, textBuf );
+</code></pre>
+
+<p>Which looks like:</p>
+<img src="psximages/text_file_loading_7_5_2021.png"/>
+
 </div> <!-- contentDiv -->
 </div> <!-- bodyDiv -->
 
