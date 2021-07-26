@@ -1284,6 +1284,102 @@ skelJoint.transform.setTranslation( transVec );
 
 <img src="images/walking_working_6_23_2021.gif"/>
 
+<h3>07/25/2021</h3>
+
+<p>Working on porting <a href="https://www.amazon.com/Game-Programming-Creating-Games-Design/dp/0134597206">Sanjay Madhav's Game Programming book</a>
+to PS3, starting with Chapter 8 (Input system and asteroids game)</p>
+
+<p>PSL1GHT comes with a port SDL 1.2, not 2.0, so the first thing was converting the relevant code.
+It's mostly using SDL_Surfaces for everything instead of SDL_Renderer and SDL_Window. Additionally,
+the chapter uses OpenGL to draw everything in 2D. I'm hoping just for this chapter's code to just use SDL
+and worry about PS3 RSX programming later. However, one problem I need to fix currently is that SDL 1.2
+doesn't include the ability to rotate surfaces/sprites, so I'll either have to do that manually to the 
+surface pixels or suck it up and program with the rsx/shaders so I can do rotation that way.</p>
+
+<p>So far I have the ship sprite drawn (using SDL_image) and input working. I had an issue at first
+running on PS3 hardware that RPCS3 emulator didn't catch, related to SDL initialization:</p>
+
+<pre><code>
+// This code freezes on PS3 hardware
+if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_JOYSTICK|SDL_INIT_TIMER) != 0)
+{
+    SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
+    return false;
+}
+mWindow = SDL_SetVideoMode(1024, 768, 32, SDL_HWSURFACE);
+if (!mWindow) {
+    SDL_Log("Failed to set video mode: %s\n", SDL_GetError());
+    return false;
+}
+
+// This code works/doesn't freeze
+if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK) != 0)
+{
+    SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
+    return false;
+}
+
+mWindow = SDL_SetVideoMode(1024, 768, 0, SDL_FULLSCREEN);
+if (!mWindow) {
+    SDL_Log("Failed to set video mode: %s\n", SDL_GetError());
+    return false;
+}
+</code></pre>
+
+<p>This was based on looking at <a href="https://github.com/kernow5000/shoot">kernow5000s</a>
+, which looking at it again now I noticed doesn't actually target the PS3. On github at least
+through searching, I don't find many results for "sdl ps3."</p>
+
+<p>Currently, after creating a few lazer objects the PS3 freezes as well. This happens on
+both the rpcs3 emulator and hardware:</p>
+
+<pre><code>if (input.GetMappedButtonState("Fire") == EHeld
+    &amp;&amp; mLaserCooldown &lt;= 0.0f)
+{
+    // this commented out code causes freeze after a few calls...
+    // Create a laser and set its position/rotation to mine
+    //Laser* laser = new Laser(GetGame());
+    //laser-&gt;SetPosition(GetPosition());
+    //laser-&gt;SetRotation(GetRotation());
+    //SDL_Log("Ship fire");
+
+    // Reset laser cooldown (quarter second)
+    mLaserCooldown = 0.25f;
+}
+</code></pre>
+
+<p>Which I'm assuming is related to dynamic memory allocation. That's a TODO for later.
+Next, SDL 1.2 doesn't have direct button mappings for the PS3 controller, you just specify which
+button via an integer, so I added some defines after testing which integer matches
+what button:</p>
+
+<pre><code>// How ps3 controller buttons are mapped to SDL buttons
+#define PS3_BUTTON_LEFT     0
+#define PS3_BUTTON_DOWN     1
+#define PS3_BUTTON_RIGHT    2
+#define PS3_BUTTON_UP       3
+#define PS3_BUTTON_START    4
+#define PS3_BUTTON_RANALOG  5
+#define PS3_BUTTON_LANALOG  6
+#define PS3_BUTTON_SELECT   7
+#define PS3_BUTTON_SQUARE   8
+#define PS3_BUTTON_CROSS    9
+#define PS3_BUTTON_CIRCLE   10
+#define PS3_BUTTON_TRIANGLE 11
+#define PS3_BUTTON_R1       12
+#define PS3_BUTTON_L1       13
+#define PS3_BUTTON_R2       14
+#define PS3_BUTTON_L2       15
+</code></pre>
+
+<p>Finally, just a note it seems I can't get variable L2/R2 trigger
+values, they are just mapped as buttons. It may be worth ditching SDL
+for input and just using PSL1GHT directly in this case...</p>
+
+<p>The current progress of the chapter8 code looks like this:</p>
+
+<img src="images/chapter8_7_25_2021.png"/>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
