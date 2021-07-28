@@ -1380,6 +1380,84 @@ for input and just using PSL1GHT directly in this case...</p>
 
 <img src="images/chapter8_7_25_2021.png"/>
 
+<h3>07/27/2021</h3>
+
+<p>Basically finished chapter 8, the only thing missing is sprite rotation, which I'm not sure I'll bother with,
+sense I wanted to focus on 3d next anyways.</p>
+
+<p>The issue I had with Lasers crashing the code turned out to be a bug I had when re-introducing the Actors
+back into the game class:</p>
+
+<pre><code>// Bugged code I wrote - deleting an entry from mActors instead of mPendingActors,
+// causing invalid memory access!
+void Game::RemoveActor(Actor* actor)
+{
+    // Is it in pending actors?
+    auto iter = std::find(mPendingActors.begin(), mPendingActors.end(), actor);
+    if (iter != mPendingActors.end())
+    {
+        // Swap to end of vector and pop off (avoid rease copies)
+        std::iter_swap(iter, mActors.end() - 1);
+        mActors.pop_back();
+    }
+}
+
+// Proper version, fixed the bug:
+void Game::RemoveActor(Actor* actor)
+{
+    // Is it in pending actors?
+    auto iter = std::find(mPendingActors.begin(), mPendingActors.end(), actor);
+    if (iter != mPendingActors.end())
+    {
+        // Swap to end of vector and pop off (avoid erase copies)
+        std::iter_swap(iter, mPendingActors.end() - 1);
+        mPendingActors.pop_back();
+    }
+
+    // Is it in actors?
+    iter = std::find(mActors.begin(), mActors.end(), actor);
+    if (iter != mActors.end())
+    {
+        // Swap to end of vector and pop off (avoid erase copies)
+        std::iter_swap(iter, mActors.end() - 1);
+        mActors.pop_back();
+    }
+}
+</code></pre>
+
+<p>After that, I had to modify the MoveComponent class screen position
+calculation from OpenGL coordinates where the center of the screen is 0,0
+to SDL coordinates where the top left of the screen is 0,0:</p>
+
+<pre><code>// Old OpenGL coordinates code:
+// Screen wrapping (for asteroids)
+if (pos.x &lt; -512.0f) { pos.x = 510.0f; }
+else if (pos.x &gt; 512.0f) { pos.x = -510.0f; }
+if (pos.y &lt; -384.0f) { pos.y = 382.0f; }
+else if (pos.y &gt; 384.0f) { pos.y = -382.0f; }
+mOwner-&gt;SetPosition(pos);
+
+// New SDL coordinates version:
+float sWidth = (float)mOwner-&gt;GetGame()-&gt;GetScreenWidth();
+float sHeight = (float)mOwner-&gt;GetGame()-&gt;GetScreenHeight();
+
+// Screen wrapping (for asteroids)
+if (pos.x &lt; 0.0f) { pos.x = sWidth-1; }
+else if (pos.x &gt; sWidth) { pos.x = 1.0f; }
+if (pos.y &lt; 0.0f) { pos.y = sHeight-1; }
+else if (pos.y &gt; sHeight) { pos.y = 1.0f; }
+mOwner-&gt;SetPosition(pos);
+</code></pre>
+
+<p>Now, the code acts like the original book version except a) the sprites don't rotate
+and b) only a square in the center of the screen is used; assuming that's because
+I hard-coded the window resolution to 1024x768:</p>
+
+<img src="images/chapter_08_working_7_27_2021.gif"/>
+
+<p>I now have a git repo for the code 
+<a href="https://bitbucket.org/williamblair/game_programming_cpp_ps3/src/master/">here</a></p>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
