@@ -1458,6 +1458,71 @@ I hard-coded the window resolution to 1024x768:</p>
 <p>I now have a git repo for the code 
 <a href="https://bitbucket.org/williamblair/game_programming_cpp_ps3/src/master/">here</a></p>
 
+<h3>07/28/2021</h3>
+
+<p>Working on changing SDL rendering to rsx 3D rendering so we can a) use the full screen
+and b) rotate sprites. It'll also be needed for the further chapters anyways to render
+3D.</p>
+
+<p>Currently have the Renderer class, Shader class seemingly working (techincally shader hasn't been
+tested yet). Renderer is initialized in Game class and clears the screen white.</p>
+
+<p>Started texture class, not finished. Planning to use SDL_image to load the texture data
+to upload to the rsx as a texture, in place of SOIL in the book code.</p>
+
+<p>Also todo, implement the VertexArray class to have a PS3 version of that, as opposed to storing
+the vertex data in an object in the game class.</p>
+
+<h3>07/30/2021</h3>
+
+<p>Got the 3D/shader version of chapter 08 fully working now.</p>
+
+<p>I had the most issue with matrices and shader transformations. The book uses (I think)
+a left-handed coordinate system and stores the matrices in row-major order which is
+different than the OpenGL centric manner I'm used to seeing (right-handed coordinates
+and column major order). The book tells OpenGL to transpose the matrices as they are sent
+to the shader (GL_TRUE):</p>
+<pre><code>// book code
+void Shader::SetMatrixUniform(const char* name, const Matrix4&amp; matrix)
+{
+	// Find the uniform by this name
+	GLuint loc = glGetUniformLocation(mShaderProgram, name);
+	// Send the matrix data to the uniform
+	// GL_TRUE - "For the matrix commands, specifies whether to transpose the matrix as the values are loaded into the uniform variable."
+	glUniformMatrix4fv(loc, 1, GL_TRUE, matrix.GetAsFloatPtr());
+}
+</code></pre>
+<p>Then in the vertex shader, the multiplcation order is backwards compared to what I've
+seen previously:</p>
+<pre><code>// Transform position to world space, then clip space
+gl_Position = pos * uWorldTransform * uViewProj;
+</code></pre>
+<p>The question then is how does this translate to the PSX/rsx? After some experimentation,
+the following works for me; however, I hard-coded the z value to zero otherwise it
+was freaking out:</p>
+<pre><code>ePosition = mul(mul(transpose(uViewProj),transpose(uWorldTransform)),pos);
+ePosition.z = 0.0;
+</code></pre>
+<p>With this however, the sprite rotations were backwards and the y-coordinate was
+backwards also. To work around this, I negated the actor rotation and y-position
+when calculating the world matrix:</p>
+<pre><code>// Scale, then rotate, then translate
+mWorldTransform = Matrix4::CreateScale(mScale);
+mWorldTransform *= Matrix4::CreateRotationZ(-mRotation); // negated rotation and y position below
+mWorldTransform *= Matrix4::CreateTranslation(Vector3(mPosition.x, -mPosition.y, 0.0f));
+</code></pre>
+
+<p>I'll probably end up replacing the book's matrix/vector classes with the psl1ght
+provided versions to use hardware accelerated computations anyways for the next
+chapters. We now have a version that uses the entire available screen space and hardware
+accelerated drawing (Also my first time converting a video to webm below; it's only
+178KB! Seems to be a good alternative to gifs...)</p>
+
+<p>Recorded from rpcs3: (I confirmed it works on hardware too)</p>
+<video controls width="600">
+    <source src="images/chapter8_7_30_2021_working.webm" type="video/webm"/>
+</video>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
