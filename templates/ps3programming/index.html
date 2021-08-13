@@ -1523,6 +1523,171 @@ accelerated drawing (Also my first time converting a video to webm below; it's o
     <source src="images/chapter8_7_30_2021_working.webm" type="video/webm"/>
 </video>
 
+<h3>08/07/2021</h3>
+<p>Testing out what I have implemented to far from Chapter 9. First test is .gpmesh and 
+VertexArray to verify those can be rendered correctly. I'm doing this by adding them to my previous
+rsxtest program sense I know that works.</p>
+<p>First bug was in the vertex array class - I wasn't allocating enough memory for the indices because the
+rsxMemalign call was allocating for 16bit indices instead of 32:</p>
+<pre><code>// Oops! should be below instead
+mMeshBuffer.indices32 = (u32*)rsxMemalign( 128, mMeshBuffer.cnt_indices * sizeof(u16) );
+
+// That's better
+mMeshBuffer.indices32 = (u32*)rsxMemalign( 128, mMeshBuffer.cnt_indices * sizeof(u32) );
+</code></pre>
+
+<p>After that, I was accessing VertexArray mMeshBuffer indices out of bounds due to an
+index calculation mix-match:</p>
+
+<pre><code>// vertices[i] results in invalid vertices indexes
+for (unsigned int i=0; i &lt; mMeshBuffer.cnt_vertices*8; i += 8) {
+    mMeshBuffer.vertices[i] = S3DVertex( verts[i+0], verts[i+1], verts[i+2], // pos
+                                         verts[i+3], verts[i+4], verts[i+5], // normal
+                                         verts[i+6], verts[i+7] ); // tex coord
+}
+
+// should have been this
+for (unsigned int i=0,j=0; i &lt; mMeshBuffer.cnt_vertices*8; i += 8,++j) {
+    mMeshBuffer.vertices[j] = S3DVertex( verts[i+0], verts[i+1], verts[i+2], // pos
+                                         verts[i+3], verts[i+4], verts[i+5], // normal
+                                         verts[i+6], verts[i+7] ); // tex coord
+}
+</code></pre>
+
+<p>Once that was fixed the gpmesh file (a sphere) was rendered successfully, although it
+is still missing its proper texture (it's using the tree's texture in this image):</p>
+
+<img src="images/gpmesh_test_working_08_07_2021.png" width="800"/>
+
+<h3>08/12/2021</h3>
+
+<p>Got the chapter 9 sprite component code working (at least in the rsx test sandbox I've been using).
+My first step was to recreate the 'CreateSimpleViewProj' function to use the Vectormath matrix class.
+I got the source code for the psl1ght perspective Matrix4 function 
+(<a href="https://github.com/ps3dev/PSL1GHT/blob/master/common/vectormath/ppu/cpp/mat_aos.h">here</a>)
+and then modified it to match Madhav's code:</p>
+
+<pre><code>inline Vectormath::Aos::Matrix4 CreateSimpleViewProj(float width, float height)
+{
+    float f, rangeInv;
+    vec_float4 zero, col0, col1, col2, col3;
+    union { vec_float4 v; float s[4]; } tmp;
+    zero = ((vec_float4){0.0f,0.0f,0.0f,0.0f});
+    tmp.v = zero;
+    tmp.s[0] =  2.0f / width;
+    col0 = tmp.v;
+    tmp.v = zero;
+    tmp.s[1] = 2.0f / height;
+    col1 = tmp.v;
+    tmp.v = zero;
+    tmp.s[2] = 1.0f;
+    col2 = tmp.v;
+    tmp.v = zero;
+    tmp.s[2] = 1.0f;
+    tmp.s[3] = 1.0f;
+    col3 = tmp.v;
+    return Vectormath::Aos::Matrix4(
+        Vectormath::Aos::Vector4( col0 ),
+        Vectormath::Aos::Vector4( col1 ),
+        Vectormath::Aos::Vector4( col2 ),
+        Vectormath::Aos::Vector4( col3 )
+    );
+}
+</code></pre>
+
+<p>Next, I made a psl1ght version of the sprite vertex/fragment shaders:</p>
+
+<pre><code>// Sprite.vcg
+void main
+(
+    float3 inPosition : POSITION,
+    float3 inNormal : NORMAL,
+    float2 inTexCoord : TEXCOORD0,
+    
+    uniform float4x4 uWorldTransform,
+    uniform float4x4 uViewProj,
+    
+    out float4 ePosition : POSITION,
+    out float4 oPosition : TEXCOORD0,
+    out float3 oNormal : TEXCOORD1,
+    out float2 oTexcoord : TEXCOORD2
+)
+{
+    float4 pos = float4(inPosition,1.0f);
+    ePosition = mul(mul(uViewProj,uWorldTransform),pos);
+    
+    oPosition = pos;
+    oNormal = inNormal;
+    oTexcoord = inTexCoord;
+}
+
+// Sprite.fcg
+void main
+(
+    float4 position : TEXCOORD0,
+    float3 normal : TEXCOORD1,
+    float2 fragTexCoord : TEXCOORD2,
+    
+    uniform sampler2D uTexture,
+    
+    out float4 oColor
+)
+{
+    oColor = tex2D(uTexture, fragTexCoord);
+}
+</code></pre>
+
+<p>Note you have to invert the Vectormath matrices before sending them to the shader;
+Madhav's code does this automatically by specifying GL_TRUE as the transpose argument to
+glUniformMatrix4fv. The final world matrix code for the sprite drawing looks like:</p>
+
+<pre><code>Vectormath::Aos::Matrix4 parentWorld = Vectormath::Aos::Matrix4::translation( mPosition );
+Vectormath::Aos::Matrix4 world = parentWorld * scaleMat;
+world = Vectormath::Aos::transpose(world);
+shader-&gt;SetVertexProgParam( "uWorldTransform", (float*)&amp;world );
+</code></pre>
+
+<p>During debugging I added a quick helper function to print out the contents of
+a matrix, which works the same for both the original Chapter 9 code and the ps3
+version, where you just print the matrix object as an array of floats:</p>
+
+<pre><code>inline void PrintMat4( Vectormath::Aos::Matrix4&amp; mat )
+{
+    float* ptr = (float*)&mat;
+    for (int i=0; i&lt;4; ++i)
+    {
+        for (int j=0; j&lt;4; ++j)
+        {
+            printf("%08.08f ", *ptr++);                               
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
+</code></pre>
+
+<p>That way I could compare the matrix contents of both programs side
+by side:</p>
+
+<img src="images/matrix_compare_08_12_2021.png"/>
+
+<p>A final note is that disabling depth test is required for drawing
+the sprites so they are always drawn on top:</p>
+
+<pre><code>//Renderer.h
+void SetDepthTest(const bool isEnabled) {
+    rsxSetDepthTestEnable(m_context, isEnabled ? GCM_TRUE : GCM_FALSE);
+}
+//SpriteComponent.cpp
+renderer-&gt;SetDepthTest(false);
+renderer-&gt;RenderSpriteVertexArray();
+renderer-&gt;SetDepthTest(true);
+</code></pre>
+
+<p>The result is that we can see the healthbar image from Chapter9:</p>
+
+<img src="images/chapter9_healthbar_08_12_2021.png" width="600px"/>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
