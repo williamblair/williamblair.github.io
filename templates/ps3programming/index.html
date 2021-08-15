@@ -1688,6 +1688,91 @@ renderer-&gt;SetDepthTest(true);
 
 <img src="images/chapter9_healthbar_08_12_2021.png" width="600px"/>
 
+<h3>08/13/2021</h3>
+
+<p>Made more progress on Chapter9 drawing; things I think are mostly
+being drawn propely now, but mirrored or something.</p>
+
+<p>Notes:</p>
+<ul>
+<li>Matrices do indeed need to be transposed before they are sent to the shader</li>
+<li>Matrix and Quaternion multiplication needs to happen from right-to-left like
+you would see in OpenGL shaders</li>
+<li>Quaternion initialization with a rotation and vector needs to be initialized
+with the function Vectormath::Aos::Quat::rotation(), as opposed to a quat constructor
+(the quat constructor just sets the x,y,z,w values)</li>
+</ul>
+
+<p>Running on actual hardware however causes the rendering to freak out
+like the rsxsample test above when objects are too close to the camera
+(i.e. the rifle). Removing the rifle is better (everything is rendered
+properly) but the FPS still tanks. Not sure why that's happening... potentially
+related to culling/clipping perhaps?</p>
+
+<img src="images/chapter9_sprites_drawing_08_13_2021.png" width="600px"/>
+<img src="images/chapter9_default_view_08_13_2021.png" width="600px"/>
+<img src="images/chapter9_walls_drawing_08_14_2021.png" width="600px"/>
+<img src="images/chapter9_walls_fps_gun_08_14_2021.png" width="600px"/>
+
+<h3>08/14/2021</h3>
+
+<p>Got RSXGL working with my current toolchain version (gcc 7!). Found
+a thread on psx-place:
+<a href="https://www.psx-place.com/threads/rsxgl-status.34031/page-2">link</a>
+where user Crystal had tested a version pre-compiled with gcc 4 against
+a newer version of the ps3dev toolchain (gcc 7). I got it mostly
+working with the following steps and changes, and pushed the changes to my
+forked repo: <a href="https://github.com/williamblair/RSXGL">https://github.com/williamblair/RSXGL</a></p>
+
+<pre>
+git clone https://github.com/crystalct/RSXGL.git
+cd RSXGL
+./autogen.sh
+./configure
+make -f mk.inst
+cd rsxgl_gear_sample
+
+Edit makefile eigen include dirs to:
+export INCLUDE  :=  $(foreach dir,$(INCLUDES), -I$(CURDIR)/$(dir)) \
+                    $(foreach dir,$(LIBDIRS),-I$(dir)/include) \
+                    $(LIBPSL1GHT_INC) -I$(CURDIR)/$(BUILD) \
+                    -I$(PORTLIBS)/include -I$(CURDIR)/../extsrc/eigen/Eigen \
+                    -I$(CURDIR)/../extsrc/eigen
+
+Remove eigen 2 support cflag:
+#CFLAGS      =   -O2 -Wall -mcpu=cell $(MACHDEP) $(INCLUDE) -D__RSX__ -DEIGEN2_SUPPORT
+CFLAGS      =   -O2 -Wall -mcpu=cell $(MACHDEP) $(INCLUDE) -D__RSX__
+
+Add -std=c++11 to CXX flags to get rid of std::round and std::log1p error:
+CXXFLAGS    =   $(CFLAGS) -std=c++11
+
+make
+
+rsx_gl_gear_sample.self should how exist and work
+
+cd ../src/samples/rsxglgears
+make
+fself.py rsxglgears.elf rsxglgears.self
+rsxglgears.self should now exist and work
+
+cd ../rsxgltest
+make
+fself.py rsxgltest.elf rsxgltest.self
+</pre>
+
+<p>The result .self for glgears and rsxgltest worked! strangely the
+top level rsx_gl_cube_test didn't work though, I think it's related
+to the shader compilation as I had to modify the Makefile because cgc
+didn't exist in the location the Makefile thought it should</p>
+
+<video controls width="600">
+    <source src="images/rsx_glgears_08_14_2021.webm" type="video/webm"/>
+</video>
+
+<video controls width="600">
+    <source src="images/rsxgl_test_08_14_2021.webm" type="video/webm"/>
+</video>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
