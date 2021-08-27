@@ -1864,6 +1864,139 @@ do some parallel processing if necessary.</p>
     <source src="images/chapter9_fps_nowalls_08_18_2021.webm"/>
 </video>
 
+<h3>08/22/2021</h3>
+
+<pre>
+Building assimp for psl1ght:
+referenced https://github.com/gzorin/RSXGL/commit/96feeea6e58ad50c6479eb4b813bd4d06babee8f
+
+git clone git://github.com/assimp/assimp.git assimp
+cd assimp
+    assimp commit is d2b7e9c38c4f33b9ac96a863c94475c03cdf056d (Aug 20 2021, merge pull request from #4040 from assimp/build_fixes)
+git apply ../bjpsl1ghtassimp.patch
+    gives warning:
+    ../bjpsl1ghtassimp.patch:259: new blank line at EOF.
+    +
+    warning: 1 line adds whitespace errors.
+mkdir build
+cd build
+../../bjassimpcmake.sh
+../../bjremoveusrinclude.sh
+../../bjassimpmake.sh
+make install
+    installs to /usr/local/ps3dev/portlibs/ppu
+</pre>
+
+<p>Contents of bjpsl1ghtassimp.patch can be found in the
+<a href="https://bitbucket.org/williamblair/ps3devprogs/src/master/glassview/">
+bitbucket repo</a></p>
+
+
+<p>Contents of bjassimpcmake.sh:</p>
+<pre>
+# -DCMAKE_CXX_EXTENSIONS=OFF
+AS=ppu-as \
+CC=ppu-gcc \
+CXX=ppu-g++ \
+AR=ppu-ar \
+LD=ppu-gcc \
+STRIP=ppu-strip \
+OBJCOPY=ppu-objcopy \
+PATH=$PS3DEV/bin:$PS3DEV/ppu/bin:$PATH \
+PORTLIBS=$PS3DEV/portlibs/ppu \
+LIBPSL1GHT_INC="-I$PSL1GHT/ppu/include -I$PSL1GHT/ppu/include/simdmath" \
+LIBPSL1GHT_LIB="-L$PSL1GHT/ppu/lib" \
+CFLAGS_INIT="" \
+CXXFLAGS_INIT="-D_GLIBCX11_USE_C99_STDIO" \
+CMAKE_INCLUDE_DIRECTORIES=$PSL1GHT/ppu/include:$PSL1GHT/ppu/include/simdmath \
+CMAKE_LIBRARY_DIRECTORIES=$PSL1GHT/ppu/lib \
+CMAKE_PREFIX_PATH=$PSL1GHT/ppu \
+cmake ../ \
+-DCMAKE_CXX_COMPILER=ppu-g++ \
+-DCMAKE_C_COMPILER=ppu-gcc \
+-DCMAKE_INSTALL_PREFIX=/usr/local/ps3dev/portlibs/ppu \
+-DCMAKE_CXX_FLAGS="-MMD -MP -MF \
+-D_GLIBCXX11_USE_C99_STDIO -mcpu=cell -mhard-float \
+-fmodulo-sched -ffunction-sections -fdata-sections \
+-D__RSX__ \
+-D_XOPEN_SOURCE=500 \
+-I$PSL1GHT/ppu/include -I$PSL1GHT/ppu/include/simdmath \
+-I$PS3DEV/portlibs/ppu/include \
+-L$PSL1GHT/ppu/lib -L$PSL1GHT/portlibs/ppu/lib" \
+-DCMAKE_C_FLAGS="-MMD -MP -MF \
+-D_GLIBCXX11_USE_C99_STDIO -mcpu=cell -mhard-float \
+-fmodulo-sched -ffunction-sections -fdata-sections \
+-D__RSX__ \
+-D_XOPEN_SOURCE \
+-I$PSL1GHT/ppu/include -I$PSL1GHT/ppu/include/simdmath \
+-I$PS3DEV/portlibs/ppu/include \
+-L$PSL1GHT/ppu/lib -L$PSL1GHT/portlibs/ppu/lib" \
+-DBUILD_SHARED_LIBS=0 \
+-DASSIMP_BUILD_TESTS=0
+</pre>
+
+<p>Contents of bjremoveusrinclude.sh:</p>
+
+<pre>
+sed -i 's/\-I\/usr\/include//' ./code/CMakeFiles/assimp.dir/flags.make 
+#sed -i 's/\-I\/usr\/include//' ./test/CMakeFiles/unit.dir/flags.make 
+sed -i 's/\-I\/usr\/include//' ./tools/assimp_cmd/CMakeFiles/assimp_cmd.dir/flags.make 
+</pre>
+
+<p>Contents of bjassimpmake.sh:</p>
+
+<pre>
+AS=ppu-as \
+CC=ppu-gcc \
+CXX=ppu-g++ \
+AR=ppu-ar \
+LD=ppu-gcc \
+STRIP=ppu-strip \
+OBJCOPY=ppu-objcopy \
+PATH=$PS3DEV/bin:$PS3DEV/ppu/bin:$PATH \
+PORTLIBS=$PS3DEV/portlibs/ppu \
+LIBPSL1GHT_INC="-I$PSL1GHT/ppu/include -I$PSL1GHT/ppu/include/simdmath" \
+LIBPSL1GHT_LIB="-L$PSL1GHT/ppu/lib" \
+CFLAGS_INIT="" \
+CXXFLAGS_INIT="-D_GLIBCX11_USE_C99_STDIO" \
+CMAKE_INCLUDE_DIRECTORIES=$PSL1GHT/ppu/include:$PSL1GHT/ppu/include/simdmath \
+CMAKE_LIBRARY_DIRECTORIES=$PSL1GHT/ppu/lib \
+CMAKE_PREFIX_PATH=$PSL1GHT/ppu \
+C_INCLUDE_PATH=$CMAKE_INCLUDE_DIRECTORIES \
+CPLUS_INCLUDE_PATH=$CMAKE_INCLUDE_DIRECTORIES \
+LIBRARY_PATH=$CMAKE_LIBRARY_DIRECTORIES \
+make -j4 VERBOSE=ON
+</pre>
+
+<h3>08/27/2021</h3>
+<p>Got my version of the
+<a href="https://github.com/gzorin/rsxgl-samples/tree/master/src/glassview">glassview sample</a> working.
+The two hard parts were installing assimp (above),
+and an issue that turned out to be related to the shader attributes. I had to bind the attribute
+locations specifically instead of getting their locations:</p>
+
+<pre><code>// This part seems to be necessary; getting the attrib location seemed to
+    // cause the program to not work...
+    glBindAttribLocation(program, 0, "vertex");
+    glBindAttribLocation(program, 1, "normal");
+    glBindAttribLocation(program, 2, "uv");
+    vertex_location = 0;
+    normal_location = 1;
+    uv_location = 2;
+
+    // Link the program for real:
+    glLinkProgram(program);
+    glValidateProgram(program);
+</code></pre>
+
+<p>I also ended up not using the original author's glassimp library; mainly because I removed
+it while debugging before I figured out the above attrib location issue and never put it
+back in to see if it still worked...</p>
+
+<video controls width="600">
+    <source src="images/glassview_08_27_2021.webm"/>
+</video>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
