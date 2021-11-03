@@ -877,6 +877,19 @@ enum StdMd2AnimId
 
 <img src="images/glampert_09_thirdpers_camera.gif"/>
 
+<h3>10/31/2021</h3>
+<p>Starting a cross-platform implementation of the game <a href="https://2048game.com/">2048</a>.
+Planning on using SDL 1.2 to support PS2 and PS3 with relative ease (knock on wood!).
+For the base/PC version so far, I just have an image/atlas based font loaded and
+working, which compiles and runs for PS2 as well (except for the background color
+on the PS2 for some reason...).</p>
+<p>In order to get the PS2 version working, I have the font image being loaded
+via the romfs PS2SDK port, which embeds a file system into the ROM/ELF itself for
+the PS2. I've found the current romfs library/genromfs tool built with my version
+of the PS2SDK requires changing the generated romdisk.c array name from 'romdisk' to
+'romdisk_start' based on current version of genromfs I guess.</p>
+<p>The font used is proportional_16x16 from opengameart.com</p>
+
 <p><a href="../../index.html">&lt;-- Back to Home</a></p>
 
 </div> <!-- contentDiv -->
