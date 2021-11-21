@@ -890,6 +890,37 @@ of the PS2SDK requires changing the generated romdisk.c array name from 'romdisk
 'romdisk_start' based on current version of genromfs I guess.</p>
 <p>The font used is proportional_16x16 from opengameart.com</p>
 
+<h3>11/20/2021</h3>
+<p>Joystick initialization using SDL on the PS2 was freezing the system. Fixed by re-compling
+the PS2 SDL port (<a href="https://github.com/ps2dev/ps2sdk-ports">link</a>) 
+with the following change to use a different subsystem module:</p>
+<pre><code>diff --git a/sdl/src/Makefile b/sdl/src/Makefile
+index ad1dbd2..8de569b 100755
+--- a/sdl/src/Makefile
++++ b/sdl/src/Makefile
+@@ -10,7 +10,8 @@ SDL_USE_HW_SURFACE=1
+ HAVE_INPUT_DEVICES=0
+ 
+ # Enable Multitap Support (Uses X* IOP modules)
+-ENABLE_MTAP=1
++#ENABLE_MTAP=1
++ENABLE_MTAP=0
+ 
+ # Enable FREESD instead of LIBSD
+ USE_FREESD=1
+</code></pre>
+
+<p>Also, I needed to initialize the SDL timing subsystem (which wasn't needed
+on PC) (SDL_INIT_TIMER):</p>
+<pre><code>if ( SDL_Init( SDL_INIT_VIDEO|SDL_INIT_JOYSTICK|SDL_INIT_TIMER ) &lt; 0 ) { 
+    //LOG_ERROR( "Failed to int SDL" );
+    printf( "Failed to init SDL\n" );
+    return false;
+}
+</code></pre>
+
+<p>After that, it's working the same as the PC version so far :)</p>
+
 <p><a href="../../index.html">&lt;-- Back to Home</a></p>
 
 </div> <!-- contentDiv -->
