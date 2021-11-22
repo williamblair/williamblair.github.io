@@ -921,6 +921,19 @@ on PC) (SDL_INIT_TIMER):</p>
 
 <p>After that, it's working the same as the PC version so far :)</p>
 
+<h3>11/21/2021</h3>
+
+<p>Got sound working, although it has a dependency on loading
+audsrv.irx from the host over ps2link currently. I tried the SDL mixer
+port but it wasn't working at all in pcsx2, and while the sample program
+worked on real hardware, In my code the audio got stuck stuttering
+on startup. The current ps2 audio implementation uses adpcm (.adp)
+audio following the audsrv example in samples/rpc/audsrv. TODO is
+possibly look at the .wav loading sample instead.</p>
+<p>Also added more to the start menu screen, game over screen,
+and user score. Next TODO is to save/load high scores.</p>
+<img src="images/twentyfortyeight_11_21_2021.png"/>
+
 <p><a href="../../index.html">&lt;-- Back to Home</a></p>
 
 </div> <!-- contentDiv -->
