@@ -934,6 +934,48 @@ possibly look at the .wav loading sample instead.</p>
 and user score. Next TODO is to save/load high scores.</p>
 <img src="images/twentyfortyeight_11_21_2021.png"/>
 
+<h3>11/22/2021</h3>
+
+<p>Setup the project to create a .iso image and got a simple text file read from CD-ROM working,
+as well as loading the audio srv .irx module from a buffer in EE ram. Loading the audsrv.irx
+from EE RAM wasn't working before because there was a function call I was missing to patch
+the IOP allowing this. Figured that out thanks to
+<a href="https://www.psx-place.com/threads/trying-to-read-file-from-usd-pendrive.29432/">this link</a>.</p>
+<p>To read from CD-ROM, the cdfs.irx IOP module needed to be loaded:</p>
+<pre><code>int irxRet = 0;
+int ret = SifExecModuleBuffer(
+    cdfs_irx,
+    size_cdfs_irx,
+    0,
+    nullptr,
+    &amp;irxRet
+);  
+</code></pre>
+<p>Where cdfs_irx and size_cdfs_irx are the contents and size of the cdfs.irx file converted into a byte
+array via bin2c. Loading this in the same place as the audsrv.irx however was causing the audio
+to not work, so for now it's placed in main under a test function. Loading a file is then
+done via</p>
+<pre><code>FILE* fp = fopen("cdfs:test.txt", "r");
+...
+</code></pre>
+<p>With the 'cdfs:' prefix.</p>
+
+<p>Creating a .iso image for the ps2 is pretty similar to how it's done for ps1. Create SYSTEM.CNF,
+which looks like</p>
+
+<pre>BOOT2 = cdrom0:\MAIN.ELF;1
+VER = 1.0
+VMODE = NTSC
+</pre>
+
+<p>and place it in a folder along with MAIN.ELF (or whatever executable), then you can run mkisofs:</p>
+
+<pre>mkisofs -o mygame.iso cdrom
+</pre>
+
+<p>Where cdrom is the folder containing the .elf and SYSTEM.CNF. Got the system.cnf info from
+<a href="https://github.com/AxionDrak/PSX2CNFCreator">here</a>.</p>
+
 <p><a href="../../index.html">&lt;-- Back to Home</a></p>
 
 </div> <!-- contentDiv -->
