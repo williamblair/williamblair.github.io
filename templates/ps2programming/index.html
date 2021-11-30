@@ -976,6 +976,74 @@ VMODE = NTSC
 <p>Where cdrom is the folder containing the .elf and SYSTEM.CNF. Got the system.cnf info from
 <a href="https://github.com/AxionDrak/PSX2CNFCreator">here</a>.</p>
 
+<h3>11/29/2021</h3>
+<p>PS2 Save Data to memory card working</p>
+<img src="images/savedata_11_29_2021.png"/>
+<p>Saved the high score unsigned integer in the unknown3 field in the mcIcon struct:
+<a href="https://ps2dev.github.io/ps2sdk/libmc_8h.html#structmc_icon">https://ps2dev.github.io/ps2sdk/libmc_8h.html#structmc_icon</a>,
+altough it looks like I could create a separate file no problemo. The files are stored in mc0:TW48, so it
+assumes use of memory card 0. TODO I could add option to format the memory card if it's unformatted, and give error
+messages to user graphically.
+</p>
+<p>Made the following changes to the memory card sample in ps2sdk/samples/rpc/memorycard</p>
+<pre><code>diff --git a/ee/rpc/memorycard/samples/mc_example.c b/ee/rpc/memorycard/samples/mc_example.c
+index 7450cd13..7f9e7d3d 100644
+--- a/ee/rpc/memorycard/samples/mc_example.c
++++ b/ee/rpc/memorycard/samples/mc_example.c
+@@ -14,7 +14,10 @@
+ #include &lt;kernel.h&gt;
+ #include &lt;sifrpc.h&gt;
+ #include &lt;loadfile.h&gt;
+-#include &lt;fileio.h&gt;
++//#include &lt;fileio.h&gt;
++#include &lt;fcntl.h&gt;
++#include &lt;unistd.h&gt;
++#include &lt;sjis.h&gt;
+ #include &lt;malloc.h&gt;
+ #include &lt;libmc.h&gt;
+ #include &lt;stdio.h&gt;
+@@ -33,7 +36,8 @@ void LoadModules(void);
+ int CreateSave(void);
+ 
+ #define ARRAY_ENTRIES  64
+-static mcTable mcDir[ARRAY_ENTRIES] __attribute__((aligned(64)));
++//static mcTable mcDir[ARRAY_ENTRIES] __attribute__((aligned(64)));
++static sceMcTblGetDir mcDir[ARRAY_ENTRIES] __attribute__((aligned(64)));
+ static int mc_Type, mc_Free, mc_Format;
+ 
+ int main() {
+@@ -105,10 +109,10 @@ int main() {
+ 
+        for(i=0; i &lt; ret; i++)
+        {
+-               if(mcDir[i].attrFile &amp; MC_ATTR_SUBDIR)
+-                       printf("[DIR] %s\n", mcDir[i].name);
++               if(mcDir[i].AttrFile &amp; MC_ATTR_SUBDIR)
++                       printf("[DIR] %s\n", mcDir[i].EntryName);
+                else
+-                       printf("%s - %d bytes\n", mcDir[i].name, mcDir[i].fileSizeByte);
++                       printf("%s - %d bytes\n", mcDir[i].EntryName, mcDir[i].FileSizeByte);
+        }
+ 
+        // Check if existing save is present
+@@ -132,10 +136,10 @@ int main() {
+ 
+                for(i=0; i &lt; ret; i++)
+                {
+-                       if(mcDir[i].attrFile &amp; MC_ATTR_SUBDIR)
+-                               printf("[DIR] %s\n", mcDir[i].name);
++                       if(mcDir[i].AttrFile &amp; MC_ATTR_SUBDIR)
++                               printf("[DIR] %s\n", mcDir[i].EntryName);
+                        else
+-                               printf("%s - %d bytes\n", mcDir[i].name, mcDir[i].fileSizeByte);
++                               printf("%s - %d bytes\n", mcDir[i].EntryName, mcDir[i].FileSizeByte);
+                }
+        }
+</code></pre>
+
+<p>Also, I used modules SIO2MAN, MCMAN, and MCSERV instead of XSIO2MAN, XMCMAN, and XMCSERV like
+in the sample. I tried the X... versions and they seemed to not initialize properly.</p>
+
 <p><a href="../../index.html">&lt;-- Back to Home</a></p>
 
 </div> <!-- contentDiv -->
