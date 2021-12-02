@@ -1997,6 +1997,24 @@ back in to see if it still worked...</p>
     <source src="images/glassview_08_27_2021.webm"/>
 </video>
 
+<h3>12/1/2021</h3>
+
+<p>Started porting my 2048 game implementation to the PS3.
+One TODO is to change the window size from 640x480 to fill the PS3
+screen instead, and resize tiles/font accordingly.</p>
+<p>Currently the game is hard coded to load assets from /dev_hdd0/twentyfortyeight/data.
+This directory is configured in Makefile.ps3.</p>
+<p>For some reason the ps3 controller directional hats are mapped to
+buttons instead of JOYHAT events. And of course, the button numbers don't have
+the same mapping as the PS2 port and PC controllers.</p>
+<p>I spent a fair amount of time messing with audio. The SDL_mixer port
+kind of works with Mix_Music, except the audio is really fuzzy/distorted/bad quality.
+After tring different Mix_OpenAudio settings I tried Mix_Chunk instead and that
+works fine with audio quality as expected. I had to re-save the .wav file exported from
+audacity as 16bit wav though in order for it to load successfully.</p>
+<p>The only other big TODO left is save data. That'll be interesting
+to see if I can get the ps3's save menu system working.</p>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
