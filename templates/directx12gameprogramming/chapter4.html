@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>BJ's Website</title>
+    
+    <style>
+        table, tr, td {
+            border: 3px ridge;
+            border-collapse: collapse;
+        }
+        tr, td {
+            margin: 5px;
+            padding: 5px;
+        }
+    </style>
+    
+</head>
+<body>
+<h1>Chapter 4 - Direct3D Initialization</h1>
+<h3>Definitions</h3>
+<table>
+<tr>
+    <td><b>Render Target</b></td>
+    <td>The screen/window</td>
+</tr>
+<tr>
+    <td><b>Component Object Model (COM)</b></td>
+    <td>Language-independant interface; Reference counting reference/pointer to a resource/class type.</td>
+</tr>
+<tr>
+    <td><b>Swap Chain</b></td>
+    <td>The combination of the front and back buffer for double buffering
+        (although more buffers can be used)</td>
+</tr>
+<tr>
+    <td><b>Depth Buffer</b></td>
+    <td>Buffer representing the depth of each pixel; 0.0 means closest to viewer and 1.0 means farthest</td>
+</tr>
+<tr>
+    <td><b>Bind</b></td>
+    <td>Telling the rendering pipeline that we're going to use a certain resource</td>
+</tr>
+<tr>
+    <td><b>Descriptor</b></td>
+    <td>Contains information about a resource and references/points to said resource; is used for binding</td>
+</tr>
+<tr>
+    <td><b>View</b></td>
+    <td>A synonym for Descriptor</td>
+</tr>
+<tr>
+    <td><b>DirectX Graphics Infrastructure (DXGI)</b></td>
+    <td>Helper API used with  DirectX</td>
+</tr>
+<tr>
+    <td><b>Residency</b></td>
+    <td>Whether or not a resource is on the GPU memory</td>
+</tr>
+<tr>
+    <td><b>Command Queue</b></td>
+    <td>queue of GPU commands; commands sit on the queue until the GPU gets to them for processing.</td>
+</tr>
+<tr>
+    <td><b>Command List</b></td>
+    <td>Group of commands which are added to the command queue in order to be executed.</td>
+</tr>
+<tr>
+    <td><b>Fence</b></td>
+    <td>A point/event in time used to synchronize the GPU and CPU. An integer incremented
+        by the GPU once it executes a Signal command. After adding the signal command
+        to the GPU command queue, the CPU waits until the integer
+        reaches the expected value, which implies the GPU executed the Signal command
+        and all other commands before the Signal have finished.
+    </td>
+</tr>
+<tr>
+    <td><b>Flush</b></td>
+    <td>Wait (using a fence) until all commands in the command queue have been completed by the GPU.</td>
+</tr>
+<tr>
+    <td><b>Resource Transition</b></td>
+    <td>Changing the state of a resource, for example from read-only to write-only. Done by
+        adding transition resource barriers to the command list.
+    </td>
+</tr>
+</table>
+
+<h3>Microsoft::WRL::ComPtr class</h3>
+<pre>Smart pointer to manage COM objects.
+ComPtr::Get() -> returns the raw pointer to the underlying object.
+ComPtr::GetAddressOf() -> returns the address of the raw pointer (e.g. void**)
+ComPtr::Reset() -> sets the ComPtr to nullptr and decrements the reference count.
+    You can also set the ComPtr = nullptr.
+COM interface names begin with captial I, e.g. ID3D12GraphicsCommandList
+</pre>
+
+<h3>Swap Chain</h3>
+<pre>Swapping the front and back buffer is called 'presenting'.
+Uses the IDXGISwapChain interface.
+Functions include IDXGISwapChain::Resize and IDXGISwapChain::Present
+</pre>
+
+<h3>Depth Buffer</h3>
+<pre>Possible texture formats of the depth buffer:
+DXGI_FORMAT_D32_FLOAT_S8X24_UINT - 32bit float, 8bits reserved for spencil buffer and 24bits unused (for padding)
+DXGI_FORMAT_D32_FLOAT - 32bit float
+DXGI_FORMAT_D24_UNORM_S8_UINT - 24bit mapped to 0...1, 8bits for stencil buffer mapped to 0...255
+DXGI_FORMAT_D16_UNORM - 16bit mapped to 0...1
+
+Stencil buffer is optional and always attached to the depth buffer if used.
+</pre>
+
+<h3>Descriptors</h3>
+<pre>CBV/SRV/UAV descriptor - constant buffer view, shader resource view, and unordered access view
+Sample descriptor - sampler resources used for texturing
+RTV descriptor - render target resources
+DSV descriptor - depth/stencil resources
+
+Descriptor heap - array of descriptors; memory for all descriptors of a certain type.
+Separate heaps for each descriptor type.
+Multiple descriptors can reference the same resource.
+</pre>
+
+<h3>Important Classes</h3>
+<pre>IDXGIFactory - used to create swap chain and display adapter interfaces
+IDXGISwapChain - swap chain interface
+IDXGIAdapter - display adapter interface (e.g. the graphics card)
+IDXGIOutput - computer monitor/screen/display interface
+ID3D12Device - virtual adapter interface used to create command alloctors/command lists/etc.
+ID3D12CommandQueue - GPU command queue interface
+ID3D12CommandList - Command list interface
+ID3D12GraphicsCommandList - GPU command list; child of ID3D12CommandList
+ID3D12CommandAllocator - memory created and used to store commands in the command list
+ID3D12Fence - fence interface
+</pre>
+
+<h3>Resource Transitions</h3>
+<pre>ID3D12CommandList::ResourceBarrier adds a resource transition command.
+D3D12_RESOURCE_STATE_PRESENT - when the resource is being displayed/showed/read
+D3D12_RESOURCE_STATE_RENDER_TARGET - when the resource is being written/drawn to
+</pre>
+
+<h3>General steps for Direct3D initialization</h3>
+<pre>Create the ID3D12Device (D3D12CreateDevice())
+Create an ID3D12Fence
+Check 4X MSAA quality level support
+Create the command queue, command list allocator, and main command list
+Describe and create the swap chain
+Create the descriptor heaps
+Resize the back buffer and create a render target view to the back buffer
+Create the depth/stencil buffer and its associated depth/stencil view
+Set the viewport and scissor rectangles
+</pre>
+
+<h3>Example Direct3D 12 initialization code</h3>
+<p>
+Note d3dx12.h is available from Microsoft at
+<a href="https://github.com/microsoft/DirectX-Headers/blob/main/include/directx/d3dx12.h">this link</a>
+</p>
+
+<pre><code>#include &lt;windows.h&gt;
+#include &lt;wrl.h&gt;
+#include &lt;dxgi1_4.h&gt;
+#include &lt;d3d12.h&gt;
+#include &lt;D3Dcompiler.h&gt;
+#include &lt;DirectXMath.h&gt;
+#include &lt;DirectXPackedVector.h&gt;
+#include &lt;DirectXColors.h&gt;
+#include &lt;DirectXCollision.h&gt;
+#include &lt;string&gt;
+#include &lt;memory&gt;
+#include &lt;algorithm&gt;
+#include &lt;vector&gt;
+#include &lt;array&gt;
+#include &lt;unordered_map&gt;
+#include &lt;cstdint&gt;
+#include &lt;fstream&gt;
+#include &lt;sstream&gt;
+#include &lt;cassert&gt;
+#include "d3dx12.h"
+
+using Microsoft::WRL::ComPtr;
+using namespace DirectX;
+using namespace DirectX::PackedVector;
+
+LRESULT CALLBACK
+ExampleMainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+    // TODO!!!
+
+    return DefWindowProc(hwnd, msg, wParam, lParam);
+}
+
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)
+{
+    WNDCLASS wc;
+    wc.style         = CS_HREDRAW | CS_VREDRAW;
+    wc.lpfnWndProc   = ExampleMainWndProc; 
+    wc.cbClsExtra    = 0;
+    wc.cbWndExtra    = 0;
+    wc.hInstance     = hInstance;
+    wc.hIcon         = LoadIcon(0, IDI_APPLICATION);
+    wc.hCursor       = LoadCursor(0, IDC_ARROW);
+    wc.hbrBackground = (HBRUSH)GetStockObject(NULL_BRUSH);
+    wc.lpszMenuName  = 0;
+    wc.lpszClassName = L"MainWnd";
+
+    if (!RegisterClass(&amp;wc))
+    {
+        MessageBox(0, L"RegisterClass Failed.", 0, 0);
+        return false;
+    }
+
+    // Compute window rectangle dimensions based on requested client area dimensions.
+    RECT R = { 0, 0, 800, 600 };
+    AdjustWindowRect(&amp;R, WS_OVERLAPPEDWINDOW, false);
+    int width  = R.right - R.left;
+    int height = R.bottom - R.top;
+
+    HWND hMainWnd = CreateWindow(L"MainWnd", L"Window Caption", 
+        WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, width, height, 0, 0, hInstance, 0); 
+    if (!hMainWnd)
+    {
+        MessageBox(0, L"CreateWindow Failed.", 0, 0);
+        return false;
+    }
+
+    ShowWindow(hMainWnd, SW_SHOW);
+    UpdateWindow(hMainWnd);
+
+    // Create the ID3D12Device (D3D12CreateDevice())
+    Microsoft::WRL::ComPtr&lt;IDXGIFactory4&gt; dxgiFactory;
+    CreateDXGIFactory1(IID_PPV_ARGS(&dxgiFactory));
+    Microsoft::WRL::ComPtr&lt;ID3D12Device&gt; d3dDevice;
+    HRESULT hardwareResult = D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&amp;d3dDevice));
+    if (FAILED(hardwareResult)) { /* TODO */ }
+
+    // Create an ID3D12Fence and descriptor sizes
+    Microsoft::WRL::ComPtr&lt;ID3D12Fence&gt; fence;
+    d3dDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&amp;fence));
+    UINT rtvDescriptorSize = 0; // render target view descriptor size
+    UINT dsvDescriptorSize = 0; // depth/stencil view descriptor size
+    UINT cbvSrvUavDescriptorSize = 0; // constant buffer/shader resource/unordered access views descriptor size
+    rtvDescriptorSize = d3dDevice-&gt;GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+    dsvDescriptorSize = d3dDevice-&gt;GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+    cbvSrvUavDescriptorSize = d3dDevice-&gt;GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+    // Check 4X MSAA quality level support
+    DXGI_FORMAT backBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+    D3D12_FEATURE_DATA_MULTISAMPLE_QUALITY_LEVELS msQualityLevels;
+    msQualityLevels.Format = backBufferFormat;
+    msQualityLevels.SampleCount = 4;
+    msQualityLevels.Flags = D3D12_MULTISAMPLE_QUALITY_LEVELS_FLAG_NONE;
+    msQualityLevels.NumQualityLevels = 0;
+    d3dDevice-&gt;CheckFeatureSupport(D3D12_FEATURE_MULTISAMPLE_QUALITY_LEVELS,
+        &amp;msQualityLevels, sizeof(msQualityLevels));
+    UINT msaaQuality = msQualityLevels.NumQualityLevels;
+
+    // Create the command queue, command list allocator, and main command list
+    Microsoft::WRL::ComPtr&lt;ID3D12CommandQueue&gt; commandQueue;
+    Microsoft::WRL::ComPtr&lt;ID3D12CommandAllocator&gt; commandAllocator;
+    Microsoft::WRL::ComPtr&lt;ID3D12GraphicsCommandList&gt; commandList;
+    {
+        D3D12_COMMAND_QUEUE_DESC queueDesc = {};
+        queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+        queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+        d3dDevice->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&commandQueue));
+        d3dDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT,
+            IID_PPV_ARGS(commandAllocator.GetAddressOf()));
+        d3dDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT,
+            commandAllocator.Get(), nullptr, IID_PPV_ARGS(commandList.GetAddressOf()));
+        // start the list in a closed state
+        commandList->Close();
+    }
+
+    // Describe and create the swap chain
+    Microsoft::WRL::ComPtr&lt;IDXGISwapChain&gt; swapChain;
+    const int swapChainBufferCount = 2;
+    swapChain.Reset();
+    DXGI_SWAP_CHAIN_DESC sd;
+    sd.BufferDesc.Width = 800; // window width
+    sd.BufferDesc.Height = 600; // window height
+    sd.BufferDesc.RefreshRate.Numerator = 60;
+    sd.BufferDesc.RefreshRate.Denominator = 1;
+    sd.BufferDesc.Format = backBufferFormat;
+    sd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+    sd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+    sd.SampleDesc.Count = msaaQuality &gt; 0 ? 4 : 1;
+    sd.SampleDesc.Quality = msaaQuality &gt; 0 ? msaaQuality - 1 : 0;
+    sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+    sd.BufferCount = swapChainBufferCount;
+    sd.OutputWindow = hMainWnd;
+    sd.Windowed = true;
+    sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+    sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+    dxgiFactory-&gt;CreateSwapChain(commandQueue.Get(), &amp;sd, swapChain.GetAddressOf());
+
+    // Create the descriptor heaps
+    Microsoft::WRL::ComPtr&lt;ID3D12DescriptorHeap&gt; rtvHeap; // render target view descriptors
+    Microsoft::WRL::ComPtr&lt;ID3D12DescriptorHeap&gt; dsvHeap; // depth/stencil view descriptors
+    {
+        D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc;
+        rtvHeapDesc.NumDescriptors = swapChainBufferCount;
+        rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+        rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+        rtvHeapDesc.NodeMask = 0;
+        d3dDevice->CreateDescriptorHeap(&amp;rtvHeapDesc, IID_PPV_ARGS(rtvHeap.GetAddressOf()));
+
+        D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc;
+        dsvHeapDesc.NumDescriptors = 1;
+        dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+        dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+        dsvHeapDesc.NodeMask = 0;
+        d3dDevice->CreateDescriptorHeap(&amp;dsvHeapDesc, IID_PPV_ARGS(dsvHeap.GetAddressOf()));
+    }
+
+    int currBackBuffer = 0;
+#define DepthStencilView() \
+    dsvHeap->GetCPUDescriptorHandleForHeapStart()
+#define CurrentBackBufferView() \
+    CD3DX12_CPU_DESCRIPTOR_HANDLE(rtvHeap->GetCPUDescriptorHandleForHeapStart(), currBackBuffer, rtvDescriptorSize)
+
+    // Resize the back buffer and create a render target view to the back buffer
+    Microsoft::WRL::ComPtr&lt;ID3D12Resource&gt; swapChainBuffer[swapChainBufferCount];
+    CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHeapHandle(rtvHeap-&gt;GetCPUDescriptorHandleForHeapStart());
+    for (UINT i = 0; i &lt; swapChainBufferCount; ++i)
+    {
+        // get the ith buffer in the swap chain
+        swapChain-&gt;GetBuffer(i, IID_PPV_ARGS(&amp;swapChainBuffer[i]));
+
+        // create a Render Target View to it
+        d3dDevice-&gt;CreateRenderTargetView(swapChainBuffer[i].Get(), nullptr, rtvHeapHandle);
+
+        // Next entry in the heap
+        rtvHeapHandle.Offset(1, rtvDescriptorSize);
+    }
+
+    // Create the depth/stencil buffer and its associated depth/stencil view
+    DXGI_FORMAT depthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    Microsoft::WRL::ComPtr&lt;ID3D12Resource&gt; depthStencilBuffer;
+    {
+        D3D12_RESOURCE_DESC dsDesc;
+        dsDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+        dsDesc.Alignment = 0;
+        dsDesc.Width = 800; // window width
+        dsDesc.Height = 600; // window height
+        dsDesc.DepthOrArraySize = 1;
+        dsDesc.MipLevels = 1;
+        dsDesc.Format = depthStencilFormat;
+        dsDesc.SampleDesc.Count = msaaQuality &gt; 0 ? 4 : 1;
+        dsDesc.SampleDesc.Quality = msaaQuality &gt; 0 ? msaaQuality - 1 : 0;
+        dsDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+        dsDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+
+        D3D12_CLEAR_VALUE optClear;
+        optClear.Format = depthStencilFormat;
+        optClear.DepthStencil.Depth = 1.0f;
+        optClear.DepthStencil.Stencil = 0;
+        d3dDevice-&gt;CreateCommittedResource(&amp;CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+            D3D12_HEAP_FLAG_NONE, &amp;dsDesc, D3D12_RESOURCE_STATE_COMMON, 
+            &amp;optClear, IID_PPV_ARGS(depthStencilBuffer.GetAddressOf()));
+
+        // create descriptor to mip level 0 of entire resource using the format of the resource
+        d3dDevice-&gt;CreateDepthStencilView(depthStencilBuffer.Get(), nullptr, DepthStencilView());
+
+        // transition the resource from its initial state to be used as a depth buffer
+        commandList-&gt;ResourceBarrier(1,
+            &amp;CD3DX12_RESOURCE_BARRIER::Transition(depthStencilBuffer.Get(),
+                D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
+    }
+
+    // Set the viewport and scissor rectangles
+    // The viewport needs to be reset whenever the command list is reset
+    D3D12_VIEWPORT vp;
+    vp.TopLeftX = 0.0f;
+    vp.TopLeftY = 0.0f;
+    vp.Width = 800.0f;
+    vp.Height = 600.0f;
+    vp.MinDepth = 0.0f;
+    vp.MaxDepth = 1.0f;
+    commandList-&gt;RSSetViewports(1, &amp;vp);
+
+    // example scissor rect covers the upper-left quadrant of the back buffer
+    tagRECT scissorRect = { 0, 0, 800/2, 600/2 };
+    commandList-&gt;RSSetScissorRects(1, &amp;scissorRect);
+
+    return 0;
+}
+</code></pre>
+
+</body>
+</html>
+
+
