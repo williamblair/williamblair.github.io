@@ -1044,6 +1044,200 @@ index 7450cd13..7f9e7d3d 100644
 <p>Also, I used modules SIO2MAN, MCMAN, and MCSERV instead of XSIO2MAN, XMCMAN, and XMCSERV like
 in the sample. I tried the X... versions and they seemed to not initialize properly.</p>
 
+<h3>01/29/2022</h3>
+<p>Thinking about trying to port the code from
+<a href="https://github.com/williamblair/BeginningOpenGLGameProgs">Beginning OpenGL Programming</a>.
+I got the Md2 model working (previously the Md2 model code was from G. Lampert's repository). I
+replaced the C++ STL code with C code as the ps2sdk doesn't support STL.</p>
+
+<p>I also wrote a bunch of Math helpers similar to Sanjay Madhav's
+<a href="https://github.com/williamblair/code">Game Programming in C++</a>. I wrote custom
+Mat4 and Vec4 classes which essentially wrap the ps2sdk VECTOR and MATRIX classes:</p>
+<pre><code>// Compatible with VECTOR via *((VECTOR*)Vec4::v)
+struct Vec4
+{
+    union
+    {
+        struct
+        {
+            float x;
+            float y;
+            float z;
+            float w;
+        };
+        float v[4];
+    };
+
+    Vec4() :
+        x(0.0f),
+        y(0.0f),
+        z(0.0f),
+        w(1.0f)
+    {}
+    
+    Vec4(float x, float y, float z, float w) :
+        x(x),
+        y(y),
+        z(z),
+        w(w)
+    {}
+
+    Vec4(const Vec4& other) {
+        vector_copy(VECTORCAST(*this), VECTORCAST(other));
+    }
+
+    Vec4& operator=(const Vec4& other) {
+        vector_copy(VECTORCAST(*this), VECTORCAST(other));
+        return *this;
+    }
+    
+    Vec4& operator+=(const Vec4& other) {
+        x += other.x;
+        y += other.y;
+        z += other.z;
+        w += other.w;
+        return *this;
+    }
+    Vec4& operator-=(const Vec4& other) {
+        x -= other.x;
+        y -= other.y;
+        z -= other.z;
+        w -= other.w;
+        return *this;
+    }
+} __attribute__((aligned(16)));
+
+inline Vec4 operator*(const Vec4& lhs, const Vec4& rhs) {
+    Vec4 result;
+    vector_multiply(VECTORCAST(result), VECTORCAST(lhs), VECTORCAST(rhs));
+    return result;
+}
+...
+// Compatible with MATRIX via Mat4::v1d
+struct Mat4
+{
+    union
+    {
+        struct
+        {
+            float row0[4];
+            float row1[4];
+            float row2[4];
+            float row3[4];
+        };
+        float v1d[16];
+        float v2d[4][4];
+    };
+
+    Mat4() { matrix_unit(MATRIXCAST(*this)); }
+    Mat4(const Mat4& other) {
+        matrix_copy(MATRIXCAST(*this), MATRIXCAST(other));
+    }
+    Mat4& operator=(const Mat4& other) {
+        matrix_copy(MATRIXCAST(*this), MATRIXCAST(other));
+        return *this;
+    }
+} __attribute__((aligned(16)));
+
+inline Mat4 operator*(const Mat4& lhs, const Mat4& rhs) {
+    Mat4 result;
+    matrix_multiply(
+        MATRIXCAST(result), MATRIXCAST(lhs), MATRIXCAST(rhs));
+    return result;
+}</code></pre>
+
+<p>Although noting that the Mat4 struct names (row0...) should be changed to col0... as
+the values are stored column-major not row-major.</p>
+
+<p>I improved the book's Md2 model code as well by generating the list of animations
+from the file contents, instead of hard coding which frames go with which animation:</p>
+
+<pre><code>void Md2Model::genAnimations()
+{
+    animationsSize = countNumAnims();
+    animations = (Animation*)malloc(animationsSize*sizeof(Animation));
+    char curAnimName[16];
+    memset((void*)curAnimName, 0, sizeof(curAnimName));
+    size_t animIndex = 0;
+    size_t c = 0;
+    animations[0].startFrame = 0;
+    animations[0].endFrame = 0;
+    while (!(keyFrames[0].name[c] >= '0' && keyFrames[0].name[c] <= '9'))
+    {
+        animations[0].name[c] = keyFrames[0].name[c];
+        curAnimName[c] = keyFrames[0].name[c];
+        ++c;
+    }
+    animations[0].name[c] = '\0';
+    curAnimName[c] = '\0';
+    animations[0].loop = true;
+    c = 0;
+    for (size_t i = 1; i < keyFramesSize; ++i)
+    {
+        char frameAnimName[16];
+        while (!(keyFrames[i].name[c] >= '0' && keyFrames[i].name[c] <= '9'))
+        {
+            frameAnimName[c] = keyFrames[i].name[c];
+            ++c;
+        }
+        frameAnimName[c] = '\0';
+        c = 0;
+        if (strcmp(curAnimName, frameAnimName) != 0) {
+            strcpy(curAnimName, frameAnimName);
+            animations[animIndex].endFrame = i - 1;
+            animIndex++;
+            animations[animIndex].startFrame = i;
+            animations[animIndex].loop = true;
+            strcpy(animations[animIndex].name, curAnimName);
+        }
+    }
+    animations[animationsSize-1].endFrame = keyFramesSize - 1;
+
+    for (size_t i = 0; i < animationsSize; ++i)
+    {
+        printf("Anim name, start, stop: %s, %ld, %ld\n",
+            animations[i].name, 
+            animations[i].startFrame, animations[i].endFrame
+        );
+    }
+}</code></pre>
+
+<p>Which assumes the keyframes names are ordered such as "walk1, walk2, walk3, idle001, idle002, ...".
+I tested out a different Md2 model than what the book provides, which I got from
+<a href="https://www.md2.sitters-electronics.nl/models.htm">https://www.md2.sitters-electronics.nl/models.htm</a>.
+</p>
+
+<p>Porting the TARGA image parsing was pretty straightforward, just again converting the C++ STL
+functions/variables with C. The tricky part was figuring out how to use the texture data with PS2SDK.
+I started with the textured cube example included with PS2SDK, but that only uses a single texture.
+There seem's to be only enough room left in VRAM for a single texture to be loaded at a time,
+so switching between textures during drawing requires re-uploading it to VRAM, which I figured out
+based on looking at G. Lampert's repository. It might be possible to store more textures using 8-bit
+CLUT indexed instead of RGB24. To re-upload a texture during the draw loop, you need to end and upload
+the current DMA chain and wait for the texture to be uploaded before continuing. Also, textures are
+currently limited to 256x256px.
+</p>
+
+<p>For file IO, instead of compiling everything into the executable,
+I used the cdfs IRX plugin. This worked in PCSX2, but I tried installing the ISO on
+my actual PS2 harddrive via HDLGAmeInstaller and it didn't seem to work - I just got
+a white screen during boot. So for
+testing on the real system, I used ps2link and loaded everything via the TCP
+connection (via filename "host:path/to/file." Also, I was getting weird triangle
+clipping and freakout to the center of the screen when testing on PCSX2, which
+doesn't happen on the actual hardware. During attempt to debug this on PCSX2 I
+don't draw the floor tiles which they are above a certain radius away from the model,
+which is why in below you see floor tiles popping in and out.</p>
+
+<p>The final current result looks like so:</p>
+
+<video width="320" controls>
+    <source src="./images/md2_01_29_2022.webm" type="video/webm">
+</video>
+
+<p>And the code can be found at: 
+<a href="https://bitbucket.org/williamblair/gskittest/src/master/">https://bitbucket.org/williamblair/gskittest/src/master/</a></p>
+
 <p><a href="../../index.html">&lt;-- Back to Home</a></p>
 
 </div> <!-- contentDiv -->
