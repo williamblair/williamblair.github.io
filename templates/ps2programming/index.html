@@ -1238,6 +1238,112 @@ which is why in below you see floor tiles popping in and out.</p>
 <p>And the code can be found at: 
 <a href="https://bitbucket.org/williamblair/gskittest/src/master/">https://bitbucket.org/williamblair/gskittest/src/master/</a></p>
 
+<h3>01/31/2022</h3>
+<p>Redid the above gskittest code to use VU1 instead of VU0/EE in attempt to fix the triangle
+clipping issue from above. Based the code off of the ps2sdk VU1 sample:
+<a href="https://github.com/ps2dev/ps2sdk/tree/master/ee/draw/samples/vu1">
+https://github.com/ps2dev/ps2sdk/tree/master/ee/draw/samples/vu1
+</a>.
+</p>
+
+<p>The main issue I ran into was rendering the Md2 model due to its much higher
+triangle count compared to a cube. One of the vu1 packet functions turns out to
+have a maximum face count of 256: (<a href="https://github.com/ps2dev/ps2sdk/blob/master/ee/packet2/include/packet2_vif.h">packet2_vif.h</a>)</p>
+<pre><code>/** 
+ * Close UNPACK manually. 
+ * In reality, get back to pointer "vif_code_opened_at" and 
+ * fix num value with qwords counted from last packet2_vif_open_unpack().
+ * @param packet2 Pointer to packet.
+ * @param unpack_num Amount of data written to the VU Mem (qwords) or MicroMem (dwords). 
+ * 256 is max value! 
+ */
+static inline void packet2_vif_close_unpack_manual(packet2_t *packet2, u32 unpack_num)
+{
+    assert(packet2->vif_code_opened_at != NULL);               // There is open UNPACK/DIRECT.
+    assert(((u32)packet2->next & 0x3) == 0);                   // Make sure we're u32 aligned
+    assert((packet2->vif_code_opened_at->cmd & 0x60) == 0x60); // It was UNPACK
+    assert(unpack_num <= 256);
+    packet2->vif_code_opened_at->num = (unpack_num == 256) ? 0 : unpack_num;
+    packet2->vif_code_opened_at = (vif_code_t *)NULL;
+}
+</code></pre>
+
+<p>So I ended up looping through the faces in chunks of 255 or less (since 255 is divisible by 3,
+so triangles are kept together):</p>
+
+<pre><code>void Renderer::DrawVertexBuffer(Mat4& modelMat, Mat4& viewMat, PS2::VertexBuffer& vb)
+{
+    texbuffer_t* t_texbuff = &texbuff;
+
+    if (vb.mIndicesCount > MAX_FACES_COUNT ||
+        vb.mVertexCount > MAX_FACES_COUNT)
+    {
+        printf("Invalid vertex buffer num indices or vertices %d, %d\n",
+            vb.mIndicesCount, vb.mVertexCount);
+    }
+
+    VECTOR* vertices = (VECTOR*)vb.mVertices;
+    VECTOR* sts = (VECTOR*)vb.mTexCoords;
+    int faces_count = 0;
+    if (vb.mIndicesCount > 0)
+    {
+        int* faces = vb.mIndices;
+        faces_count = vb.mIndicesCount;
+        int cur_face = 0;
+        int faces_remain = faces_count;
+        while (faces_remain > 0)
+        {
+            int num_faces = (faces_remain > 255 ? 255 : faces_remain);
+            if (num_faces % 3 != 0) {
+                printf("ERROR - num faces not mult of 3\n");
+                return;
+            }
+            for (int i = 0; i < num_faces; ++i)
+            {
+                c_verts[i][0] = vertices[faces[cur_face]][0];
+                c_verts[i][1] = -vertices[faces[cur_face]][1]; // negative because everything's upside down currently...
+                c_verts[i][2] = vertices[faces[cur_face]][2];
+                c_verts[i][3] = vertices[faces[cur_face]][3];
+
+                c_sts[i][0] = sts[faces[cur_face]][0];
+                c_sts[i][1] = sts[faces[cur_face]][1];
+                c_sts[i][2] = sts[faces[cur_face]][2];
+                c_sts[i][3] = sts[faces[cur_face]][3];
+
+                ++cur_face;
+            }
+            // see ps2sdk/ee/include/packet2.h
+            // 0 = do NOT clear memory
+            packet2_reset(zbyszek_packet, 0);
+            calculate_cube(t_texbuff, num_faces);
+            draw_cube(
+                MATRIXCAST(viewMat),
+                MATRIXCAST(modelMat),
+                t_texbuff,
+                num_faces
+            );
+            
+            faces_remain -= num_faces;
+        }
+    }
+</code></pre>
+
+<p>The calculate_cube and draw_cube functions don't actually do anything
+cube related; they're names leftover from the original sample code. TODO - rename them</p>
+
+<p>Now we can draw the model and full floor tiles without clipping issues. And, the code
+seems to run faster/get higher FPS! Tested on both PCSX2 and hardware. On PCSX2, a couple
+of the model triangles aren't quite right, but seems to be fine on hardware.</p>
+
+<video width="400" controls>
+    <source src="images/md2_camera_floorworking_01_31_2022.webm" type="video/webm"/>
+</video>
+<br/>
+<video width="400" controls>
+    <source src="images/md2_camera_ps2hardware_01_31_2022.webm" type="video/webm"/>
+</video>
+<br/>
+
 <p><a href="../../index.html">&lt;-- Back to Home</a></p>
 
 </div> <!-- contentDiv -->
