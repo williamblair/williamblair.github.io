@@ -1344,6 +1344,28 @@ of the model triangles aren't quite right, but seems to be fine on hardware.</p>
 </video>
 <br/>
 
+<h3>02/01/2022</h3>
+<p>Got audio working in the above example. Was a bit more of a hassle than I thought.
+Basically did the same thing as for 2048 (using audsrv), but ran into a few snags:</p>
+
+<ol>
+<li>Needed to recompile the audsrv.irx file (using bin2c), using the one in /usr/local/ps2dev/ps2sdk/iop/irx.
+    I originally copy and pasted the one from 2048 but it wasn't working (I was using a slightly different
+    ps2sdk version)
+</li>
+<li>The audsrv.irx module load doesn't seem to work from cdfs; it needs to be loaded from host: or EE memory</li>
+<li>I had to lower the WAV file project rate to 8000Hz in Audacity before converting to adp. I saved the WAV
+    file as 16 bit
+    <ol><li>Convert via `adpenc &lt;wav file&gt; &lt;adp result file&gt;`</li></ol>
+</li>
+<li>I had to decrease the sound file length. Although the original file was less than 2MB (the size of SPU ram).
+The original length file worked in PCSX2 but not on real hardware.</li>
+</ol>
+
+<p>Also, I didn't post the code for above yesterday:
+<a href="https://bitbucket.org/williamblair/ps2vu1test/src/master/">https://bitbucket.org/williamblair/ps2vu1test/src/master/</a>
+</p>
+
 <p><a href="../../index.html">&lt;-- Back to Home</a></p>
 
 </div> <!-- contentDiv -->
