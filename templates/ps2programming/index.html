@@ -1387,6 +1387,84 @@ mTexCoords[i].w = 0.0f;
     <source src="images/heightmap_02_02_2022.webm" type="video/webm"/>
 </video>
 
+<h3>02/23/2022</h3>
+<p>Got a 2d texture drawing on the screen. Don't seem to need to disable the z-buffer (although
+I haven't tried drawing textures on top of each other).
+I estimated normalizing the draw location from 0..640/512 to NDC by trying values until
+they seemed to work fine. Although I'm sure there's a way to properly calculate it
+instead. The drawing uses the same 3D pipeline but with the mode/view/projection matrices
+all set to identity, with the vertex coordinates set manually based on the NDC calculation:</p>
+
+<pre><code>void DrawTexture(Texture& tex, int x, int y, int w, int h)
+{
+    MATRIX modelMat; // identity matrices
+    MATRIX viewMat;
+    MATRIX projMat;
+
+    matrix_unit(modelMat);
+    matrix_unit(viewMat);
+    matrix_unit(projMat);
+    
+    SetTexture(tex);
+    
+    // disable z-buffering
+    // TODO - not create packet each time
+    /*packet2_t* zbufPacket = packet2_create(35, P2_TYPE_NORMAL, P2_MODE_NORMAL, 0);
+    packet2_update(zbufPacket, draw_disable_tests(zbufPacket->next, 0, &z));
+    packet2_update(zbufPacket, draw_finish(zbufPacket->next));
+    dma_wait_fast();
+    dma_channel_send_packet2(zbufPacket, DMA_CHANNEL_GIF, 1);
+    draw_wait_finish();*/
+
+    float xNorm = (float)x / 640.0f;
+    float yNorm = ((float)y / 512.0f);
+    float wNorm = (float)w / 640.0f;
+    float hNorm = (float)h / 512.0f;
+    float leftX = -0.156f + ((float)xNorm)*(0.156f*2.0f); // estimated numbers...
+    float bottomY = -0.125f + ((float)yNorm)*(0.125f*2.0f);
+    float rightX = leftX + (((float)wNorm)*(0.156f*2.0f));
+    float topY = bottomY + (((float)hNorm)*(0.125f*2.0f));
+    
+    // put vertex data in zbyszek_packet
+    // TODO - not create/set vectors each time
+    int num_faces = 6;
+    *((Vec4*)c_verts[0]) = Vec4( leftX, bottomY, 0.0f, 1.0f ); // bottom left
+    *((Vec4*)c_verts[1]) = Vec4(  rightX, bottomY, 0.0f, 1.0f ); // bottom right
+    *((Vec4*)c_verts[2]) = Vec4(  rightX,  topY, 0.0f, 1.0f ); // top right
+    *((Vec4*)c_verts[3]) = Vec4( leftX, bottomY, 0.0f, 1.0f ); // bottom left
+    *((Vec4*)c_verts[4]) = Vec4(  rightX,  topY, 0.0f, 1.0f ); // top right
+    *((Vec4*)c_verts[5]) = Vec4( leftX,  topY, 0.0f, 1.0f ); // top left
+    
+    *((Vec4*)c_sts[0]) = Vec4( 0.0f, 0.0f, 1.0f, 0.0f ); // bottom left
+    *((Vec4*)c_sts[1]) = Vec4( 1.0f, 0.0f, 1.0f, 0.0f ); // bottom right
+    *((Vec4*)c_sts[2]) = Vec4( 1.0f, 1.0f, 1.0f, 0.0f ); // top right
+    *((Vec4*)c_sts[3]) = Vec4( 0.0f, 0.0f, 1.0f, 0.0f ); // bottom left
+    *((Vec4*)c_sts[4]) = Vec4( 1.0f, 1.0f, 1.0f, 0.0f ); // top right
+    *((Vec4*)c_sts[5]) = Vec4( 0.0f, 1.0f, 1.0f, 0.0f ); // top left
+    packet2_reset(zbyszek_packet, 0);
+    calculate_cube(&texbuff, num_faces);
+    
+    // draw via VIF packet
+    draw_cube(projMat, viewMat, modelMat, &texbuff, num_faces);
+    
+    // reenable zbuffering
+    /*packet2_reset(zbufPacket, 0);
+    packet2_update(zbufPacket, draw_enable_tests(zbufPacket->next, 0, &z));
+    packet2_update(zbufPacket, draw_finish(zbufPacket->next));
+    dma_wait_fast();
+    dma_channel_send_packet2(zbufPacket, DMA_CHANNEL_GIF, 1);
+    draw_wait_finish();
+    packet2_free(zbufPacket);*/
+}
+</code></pre>
+
+<p>Also, for some reason had to render the texture before the terrain,
+otherwise the texture would be clipped along with the terrain:</p>
+<img src="images/tex_clipping_02_03_2022.jpg" width="400px"/>
+
+<p>Final result drawing with x,y,w,h=50,50,100,100:</p>
+<img src="images/tex_working_02_03_2022.jpg" width="400px"/>
+
 <p><a href="../../index.html">&lt;-- Back to Home</a></p>
 
 </div> <!-- contentDiv -->
