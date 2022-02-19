@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="utf-8"/>
+    <title>BJ's Website</title>
+    <link rel="stylesheet" type="text/css" href="../../site.css"/>
+</head>
+<body>
+<h1>Wii Programming Log</h1>
+
+<div style="display:flex;">
+<div>
+    <p>Now that I have a homebrew-enabled wii, let's write some code for it :)</p>
+</div>
+<div>
+    <img width="400" src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcalgaryvideogames.com%2Fwp-content%2Fuploads%2F2015%2F10%2Fwii_console.jpg&f=1&nofb=1"/>
+</div>
+</div>
+
+<h3>02/19/2022</h3>
+
+<p>The wiibrew website has basically all of the information necessary
+to get started:
+<a href="https://wiibrew.org/wiki/Main_Page">https://wiibrew.org/wiki/Main_Page</a>.
+The SDK is called devkitPro, and it also provides libraries for the GBA, Nintendo DS,
+GameCube, and a couple of other platforms.
+</p>
+
+<p>A binary installation of the sdk is done via a custom pacman package
+manager:
+<a href="https://devkitpro.org/wiki/Getting_Started">https://devkitpro.org/wiki/Getting_Started</a>.
+After the custom pacman is installed, simply run:</p>
+<pre><code>sudo dkp-pacman -S wii-dev
+</code></pre>
+
+<p>To test the code on PC, the dolphin emulator seems to be the most popular:
+<a href="https://www.linux.org/threads/dolphin-%E2%80%93-wii-emulator-even-the-newest-versions-of-ubuntu.37798/">
+https://www.linux.org/threads/dolphin-%E2%80%93-wii-emulator-even-the-newest-versions-of-ubuntu.37798/
+</a>
+</p>
+
+<pre><code>sudo apt-add-repository ppa:dolphin-emu/ppa
+sudo apt install dolphin-emu
+</code></pre>
+
+<p>Looking at the included examples in /opt/devkitpro/examples/wii/graphics/gx/neheGX
+(which are Wii versions of the famous now legacy NeHe OpenGL tutorials),
+the programs are very OpenGL 1-2 like, with the fixed-function pipeline (no shaders).
+Some example code for drawing a triangle:</p>
+<pre><code>GX_Begin(GX_TRIANGLES, GX_VTXFMT0, 3);
+    GX_Position3f32( 0.0f, 1.0f, 0.0f);		// Top
+    GX_Color3f32(1.0f,0.0f,0.0f);			// Set The Color To Red
+    GX_Position3f32(-1.0f,-1.0f, 0.0f);	// Bottom Left
+    GX_Color3f32(0.0f,1.0f,0.0f);			// Set The Color To Green
+    GX_Position3f32( 1.0f,-1.0f, 0.0f);	// Bottom Right
+    GX_Color3f32(0.0f,0.0f,1.0f);			// Set The Color To Blue
+GX_End();
+</code></pre>
+
+<p>I've been working on getting an IQM animated model working.This is since I've
+been working with raylib recently, which uses the IQM format. I ported the
+<a href="https://github.com/lsalzman/iqm">iqm github example</a> which
+shows animates a single simple IQM model.</p>
+
+<p>I was having trouble using the devktPro libogc math library to properly
+animate the IQM. Using the github IQM example geom math library, the animation
+worked no problem. I ended up starting my own math library, initially in C++,
+to debug the issue. Once that worked, I added back in the optimized libogc
+math functions within the math library.</p>
+<p>The two important notes are
+that the libogc matrices are row-major (as opposed to column major in OpenGL),
+and most of the math functions work with 3x4 matrices instead of 4x4. Luckily,
+you can simply cast the 4x4 matrices as 3x4 and they still work properly.
+The math library is <a href="https://bitbucket.org/williamblair/gamemath/src/master/">here</a>,
+and I figure I can add implementations for other consoles since I already have alot of
+math code (for example for the ps2, ps3).</p>
+
+<p>Said math library is added as a submodule to the main code, which can be found
+<a href="https://bitbucket.org/williamblair/wiiprogtest/src/master/">here</a></p>
+
+<p>And, surprisingly, it works on hardware the first try!</p>
+<div>
+<video controls width="400">
+    <source src="./images/iqm_model_02_19_2022.webm" type="video/webm"/>
+</video>
+</div>
+
+<a href="../../index.html">&lt;-- Back to Home</a>
+
+</body>
+</html>
+
