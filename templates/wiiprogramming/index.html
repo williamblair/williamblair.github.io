@@ -85,6 +85,31 @@ math code (for example for the ps2, ps3).</p>
 </video>
 </div>
 
+<h3>02/23/2022</h3>
+
+<p>Added third person camera controller and custom IQM model, as well as a textured tile floor.
+TODO is to add more animations to the character (e.g. an idle anim).</p>
+
+<p>Iqm format models can be exported from blender via the plugin
+from the github IQM link (see my
+<a href="../raylib/log.html">raylib experiments page</a>).
+For getting an animated model, I found
+<a href="https://youtu.be/su8KURZ6vRc">this video</a> and
+<a href="https://youtu.be/wYqJ7AyEuhc">this video</a> introducing
+me to mixamo, owned by adobe. It contains a good amount of 3d models
+and a ton of animations that you can apply to any character model! You just upload
+the model and select the location of each of the joints. I singled out a character
+from <a href="https://www.turbosquid.com/3d-models/17-walking-people-3d-model/165559">this model pack</a>,
+uploaded it to mixamo to give it a walking animation (the source file was a .max, so I
+opened it in 3ds max and exported it but had trouble exporting the animations properly),
+then loaded it and exported it from blender as an IQM model.</p>
+
+<div style="margin-bottom:20px">
+<video controls width="400">
+    <source src="./images/iqmwalkworking_02_23_2022.webm" type="video/webm"/>
+</video>
+</div>
+
 <a href="../../index.html">&lt;-- Back to Home</a>
 
 </body>
