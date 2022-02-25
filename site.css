@@ -6,20 +6,21 @@ body {
   /*background-image: url("images/grey_seamless.jpg");*/
   /*background-image: url("images/leather_texture.jpeg");*/
   /*background-image: url("images/sandlite.jpeg");*/
-  background-image: url("images/space_texture.jpeg");
-  background-repeat: repeat;
+  /*background-image: url("images/space_texture.jpeg");*/
+  /*background-image: url("images/Stitches.bmp");*/
+  background-image: linear-gradient(to bottom right, #000000, #444444);
   height: 100%;
   color: white;
   /*color: black;*/
 }
 
 a:link {
-  color: #FFAAFF;
+  color: #FF0000;
   /*color: blue;*/
 }
 
 a:visited {
-  color: #AAAAAA;
+  color: #EEEEEE;
 }
 
 table, tr, th, td {

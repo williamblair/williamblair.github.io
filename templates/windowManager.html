@@ -1,7 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-US">
   <head>
-    <title>williamblair.github.io</title>
+    <meta charset="utf-8"/>
+    <title>BJ's Website</title>
+    <link rel="stylesheet" type="text/css" href="../site.css"/>
   </head>
   <body>
     <div class="content">
@@ -16,13 +18,13 @@
               
                 <div id="imageDiv">
                             <a href="../images/window_manager_screenshot.png">
-                                <img src="../images/window_manager_screenshot.png" width="100%"/>
+                                <img src="../images/window_manager_screenshot.png" width="400"/>
                             </a>
                         </div>
                         <h2>How it Works</h2>
                         <div id="imageDiv">
                             <a href="../images/window_manager_explained.png">
-                                <img src="../images/window_manager_explained.png" width="100%"/>
+                                <img src="../images/window_manager_explained.png" width="800"/>
                             </a>
                         </div>
                         <h3>1. The X Server / Root Window</h3>
@@ -39,7 +41,7 @@
                         In our program the frame windows and their children are stored in a linked list
                         of structs called <b>WMClient</b>s:
                         </p>
-                        <div hljs hljs-no-escape>
+                        <pre><code>
 // groups frame windows and the actual app windows
 typedef struct WMClient
 {   
@@ -63,7 +65,7 @@ typedef struct WMClient
     
     struct WMClient *next;
 } WMClient;
-                        </div>
+                        </code></pre>
 
                         <h3>3. Title Bar</h3>
                         <p>
@@ -77,7 +79,7 @@ typedef struct WMClient
                         These are (shocker) also just windows, whose mouse press (called button presses in Xlib)
                         are mapped to the minimize, maximize, and close functions for the window:
                         </p>
-                        <div hljs hljs-no-escape>
+                        <pre><code>
 /* test if any special windows were pressed */
 if(e.window == temp->minWin)
 {
@@ -94,9 +96,9 @@ else if(e.window == temp->closeWin)
     hClose(e, temp);
     return True;
 }
-                        </div>
+                        </code></pre>
                         ...
-                        <div hljs hljs-no-escape>
+                        <pre><code>
 Bool hMinimize(const XButtonEvent e, WMClient *c)
 {
     printf("Minimize area!\n");
@@ -117,7 +119,7 @@ Bool hClose(const XButtonEvent e, WMClient *c)
 
     ...
 }
-                        </div>
+                        </code></pre>
 
                         <h3>5. Application Window</h3>
                         <p>
@@ -126,7 +128,7 @@ Bool hClose(const XButtonEvent e, WMClient *c)
                         This is when we reparent the window into a frame and give it a titlebar/
                         buttons:
                         </p>
-                        <div hljs hljs-no-escape>
+                        <pre><code>
 Bool hMapRequest(const XMapRequestEvent e)
 {
     printf("Map Request Event!\n");
@@ -137,9 +139,9 @@ Bool hMapRequest(const XMapRequestEvent e)
     
     return True;
 }
-                        </div>
+                        </code></pre>
                         ...
-                        <div hljs hljs-no-escape>
+                        <pre><code>
 Bool reparentWindow(Window child, Bool before_wm)
 {
     ...
@@ -153,7 +155,7 @@ Bool reparentWindow(Window child, Bool before_wm)
 
     ...
 }
-                        </div>
+                        </code></pre>
                         
                         <p>
                         Source: <a href="https://github.com/williamblair/capstone-wm-github">https://github.com/williamblair/capstone-wm-github</a>
