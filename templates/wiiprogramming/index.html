@@ -110,6 +110,54 @@ then loaded it and exported it from blender as an IQM model.</p>
 </video>
 </div>
 
+<h3>02/24/2022</h3>
+<p>Added the idle animation and code to switch between idle/walk.
+The IQM exporter combines the animations into a single one by appending their frames
+to the first anim. So, in this model's case, frames 0-180 are for idle, and 181-211
+are the walk cycle. The code to handle this looks like:</p>
+<pre><code>IqmMesh::Anim idleAnim = { 0, 180, "idle" };
+IqmMesh::Anim walkAnim = { 181, 181+30-1, "walk" };
+...
+void Update(const float dt)
+{
+    animCounter += dt;
+    while ((int)animCounter > mEndFrame) { animCounter -= (mEndFrame - mStartFrame); }
+    
+    animateiqm(animCounter);
+}
+
+void AddAnim(const Anim& anim) {
+    mAnims.push_back(anim);
+}
+void SetAnim(const std::string& name)
+{
+    for (Anim& anim : mAnims)
+    {
+        if (anim.name == name) {
+            // only reset anim if not already set
+            if (mStartFrame != anim.startFrame ||
+                mEndFrame != anim.endFrame)
+            {
+                mStartFrame = anim.startFrame;
+                mEndFrame = anim.endFrame;
+                animCounter = mStartFrame;
+            }
+            break;
+        }
+    }
+}</code></pre>
+
+<p>While in blender, each animation is stored in an "action":
+</p>
+<img width="400" src="./images/iqm_walkanim_blender_02_24_2022.png"/><br/>
+
+<p>And now the character switches between idle/walk:</p>
+<div style="margin-bottom:20px">
+<video controls width="400">
+    <source src="./images/iqm_walkandidle_02_24_2022.webm" type="video/webm"/>
+</video>
+</div>
+
 <a href="../../index.html">&lt;-- Back to Home</a>
 
 </body>
