@@ -158,6 +158,50 @@ void SetAnim(const std::string& name)
 </video>
 </div>
 
+<h3>03/01/2022</h3>
+<p>Added world coordinates to screen coordinates calculation. The idea is I'll be able
+to point and click/shoot 3d objects in the scene with the 2d wiimote coords. The
+calculation was adapted from the <a href="https://github.com/raysan5/raylib/blob/master/src/rcore.c">raylib source code</a>
+GetWorldToScreen function. It wasn't working for me at first until
+I remembered the matrix multiply overload I added only computes the
+3x4 portion of the matrix, not the 4x4. So the fourth row needed to be
+calculated manually in order to get a correct w component for perspective division.
+The resulting function is:</p>
+
+<pre><code>inline Vec2 WorldToScreenCoords(Vec3& pos, Mat4& viewMat, Mat4& projMat, int scrWidth, int scrHeight) {
+    Mat4 viewProj = projMat * viewMat;
+    // the 4th row is not calculated by projMat*viewMat (only does 3x4)
+    viewProj.r3c0 = projMat(3,0)*viewMat(0,0) + projMat(3,1)*viewMat(1,0) + projMat(3,2)*viewMat(2,0) + projMat(3,3)*viewMat(3,0);
+    viewProj.r3c1 = projMat(3,0)*viewMat(0,1) + projMat(3,1)*viewMat(1,1) + projMat(3,2)*viewMat(2,1) + projMat(3,3)*viewMat(3,1);
+    viewProj.r3c2 = projMat(3,0)*viewMat(0,2) + projMat(3,1)*viewMat(1,2) + projMat(3,2)*viewMat(2,2) + projMat(3,3)*viewMat(3,2);
+    viewProj.r3c3 = projMat(3,0)*viewMat(0,3) + projMat(3,1)*viewMat(1,3) + projMat(3,2)*viewMat(2,3) + projMat(3,3)*viewMat(3,3);
+    // we want to calculate and include the w coord
+    Vec4 worldPos = viewProj * Vec4(pos, 1.0f);
+    float w = worldPos.w;
+    if (fabsf(w) > 0.00001f) {
+        w = 1.0f / w;
+    }
+    // normalized device coordinates (inverted y)
+    Vec3 ndcPos(worldPos.x * w, -worldPos.y * w, worldPos.z * w);
+    // 2d screen pos
+    return Vec2(
+        (ndcPos.x + 1.0f) / 2.0f * ((float)scrWidth),
+        (ndcPos.y + 1.0f) / 2.0f * ((float)scrHeight)
+    );
+}
+</code></pre>
+
+<img src="./images/screenpos_calc_03_01_2022.png" width="400"/><br/>
+<p>I tested the calculation on the player position, which is the bottom
+of the model's feet. So, 320,433 seems like a reasonable screen position
+(the screen resolution is about 640x480) and thus I think it's working.</p>
+
+<p>Also added OGG music and got printf working (needed to add a call to console_init()).
+It only draws to one of the framebuffers so it constanly flickers; I tried setting it to
+a different framebuffer each frame but that resulted in a black screen.
+The Music class just wraps the OGG streaming example; currently the OGG file needs to be
+completely stored in memory.</p>
+
 <a href="../../index.html">&lt;-- Back to Home</a>
 
 </body>
