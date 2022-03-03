@@ -202,6 +202,89 @@ a different framebuffer each frame but that resulted in a black screen.
 The Music class just wraps the OGG streaming example; currently the OGG file needs to be
 completely stored in memory.</p>
 
+<h3>03/03/2022</h3>
+
+<p>Added 2D sprite drawing and transparency. First, to draw the sprite,
+I had the renderer use an ortho projection matrix that was an identity matrix,
+so I can directly set NDC coordinates of the sprite (-1,+1) , converting from screen
+pixel coordinates. Orthographic was required because using perspective mode,
+having the sprite quad vertex buffer have a z coordinate of 0 wasn't showing up:</p>
+<pre><code>// for drawing from the top left
+float vertices[6*5] = {
+    // position         texcoord
+    0.0f, -1.0f, 0.0f,  0.0f, 0.0f, // bottom left
+    1.0f, -1.0f, 0.0f,  1.0f, 0.0f, // bottom right
+    0.0f, 0.0f, 0.0f,   0.0f, 1.0f, // top left
+    
+    1.0f, -1.0f, 0.0f,  1.0f, 0.0f, // bottom right
+    1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
+    0.0f, 0.0f, 0.0f,   0.0f, 1.0f // top left
+};
+sVertBuf.Init(
+    vertices,
+    6*5,
+    nullptr,
+    0,
+    5 // floats per vertex
+);
+...
+GX_LoadProjectionMtx((f32(*)[4])projMat->v, GX_ORTHOGRAPHIC);
+</code></pre>
+
+<p>To draw the sprite, the converted NDC coordinates and sprite size
+are put into a model matrix. Additionally, depth testing is disabled
+because otherwise, the sprite shows up behind all of the 3d objects:</p>
+<pre><code>void Sprite::Draw(Renderer& render)
+{
+    GameMath::Mat4 modelMat = mTransMat * mScaleMat;
+    render.SetTexture(*mTexture);
+    render.DisableDepthTest();
+    // viewmat == projmat == identity
+    render.DrawVertexBuffer(modelMat, sViewProjMat, sVertBuf, &sViewProjMat);
+    render.EnableDepthTest();
+}
+void Sprite::SetDrawSize(int width, int height)
+{
+    float scaleX = pixWidthToNDCCoord(width);
+    float scaleY = pixHeightToNDCCoord(height);
+    mScaleMat = GameMath::Scale(scaleX, scaleY, 1.0f);
+}
+void Sprite::SetPosition(int x, int y)
+{
+    mX = x;
+    mY = y;
+    float posX = xPixelToNDCCoord(mX);
+    float posY = yPixelToNDCCoord(mY);
+    mTransMat = GameMath::Translate(posX, posY, 0.0f);
+}
+</code></pre>
+
+<p>Additionally, to get transparency working, blending needed to be enabled:</p>
+<pre><code>GX_SetTevOp(GX_TEVSTAGE0, GX_BLEND);
+GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+...
+// flip framebuffer
+mFbIndex ^= 1;
+GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+GX_SetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+GX_SetColorUpdate(GX_TRUE);
+GX_SetAlphaUpdate(GX_TRUE);
+GX_CopyDisp(mFrameBuffer[mFbIndex], GX_TRUE);
+</code></pre>
+
+<p>Below shows before/after disabling the depth test:</p>
+<div>
+<video width="400" controls>
+    <source src="./images/spritedraw_depthfailing_03_03_2022.webm" type="video/webm"/>
+</video>
+</div>
+
+<div>
+<video width="400" controls>
+    <source src="./images/spritedraw_03_03_2022.webm" type="video/webm"/>
+</video>
+</div>
+
 <a href="../../index.html">&lt;-- Back to Home</a>
 
 </body>
