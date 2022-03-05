@@ -285,6 +285,71 @@ GX_CopyDisp(mFrameBuffer[mFbIndex], GX_TRUE);
 </video>
 </div>
 
+<h3>03/04/2022</h3>
+<p>Got axis-aligned-bounding-boxes working, including debug drawing. I'm not sure if setting the box
+line color is working properly; On the wii it does seem a bit red (as intended) but mostly white.
+To draw the lines and give them a color, untextured, a new set of vertex format/attributes needed
+to be configured. In libogc it looks like there are 8 possible vertex format configurations to use at
+once. However, when drawing with a different vertex format, the GX vertex description needs to be
+updated to match the current format:</p>
+<pre><code>// here we are providing only position and color for each vertex
+GX_ClearVtxDesc();
+GX_SetVtxDesc(GX_VA_POS, GX_DIRECT);
+GX_SetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+</code></pre>
+
+<p>Then to draw lines instead of triangles we simply use GX_LINES instead of GX_TRIANGLES in GX_Begin</p>
+<pre><code>GX_Begin(GX_LINES, GX_VTXFMT1, vertexCount);
+</code></pre>
+<p>Also noting we are using GX_VTXFMT1 instead of 0, where format 1 was configured during initialization:</p>
+<pre><code>// for drawing lines for bounding box drawing
+GX_SetVtxAttrFmt(GX_VTXFMT1, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+GX_SetVtxAttrFmt(GX_VTXFMT1, GX_VA_CLR0, GX_CLR_RGB, GX_RGB8, 0);
+</code></pre>
+
+<p>Next, to be able to test our 2d sprite position against the 3d bounding box, the min and max positions
+of the AABB are converted to 2d screen space, then we check if the sprite position is in between the 
+2d min/max:</p>
+
+<pre><code>AABB& plyrAabb = gPlayer.GetAabb();
+GameMath::Vec3 minWorld = plyrAabb.pos + plyrAabb.min;
+GameMath::Vec3 maxWorld = plyrAabb.pos + plyrAabb.max;
+
+// test world to screen pos
+GameMath::Vec2 plyrScreenMin = GameMath::WorldToScreenCoords(
+    minWorld,
+    gPlayer.GetViewMat(),
+    gRender.GetProjMat(),
+    gRender.GetScreenWidth(),
+    gRender.GetScreenHeight()
+);
+GameMath::Vec2 plyrScreenMax = GameMath::WorldToScreenCoords(
+    maxWorld,
+    gPlayer.GetViewMat(),
+    gRender.GetProjMat(),
+    gRender.GetScreenWidth(),
+    gRender.GetScreenHeight()
+);
+// sprX is left side of sprite
+if (sprX + (256/2) > plyrScreenMin.x &&
+    sprX + (256/2) < plyrScreenMax.x &&
+    sprY + (256/2) > plyrScreenMax.y && // y is flipped
+    sprY + (256/2) < plyrScreenMin.y)
+{
+    gPointerSpr.SetTexture(&gPointerTexRed);
+}
+else
+{
+    gPointerSpr.SetTexture(&gPointerTex);
+}
+</code></pre>
+
+<div>
+<video width="400" controls>
+    <source src="./images/aabb_intersect_03_04_2022.webm" type="video/webm"/>
+</video>
+</div>
+
 <a href="../../index.html">&lt;-- Back to Home</a>
 
 </body>
