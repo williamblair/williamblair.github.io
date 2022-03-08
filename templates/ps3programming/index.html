@@ -2015,6 +2015,49 @@ audacity as 16bit wav though in order for it to load successfully.</p>
 <p>The only other big TODO left is save data. That'll be interesting
 to see if I can get the ps3's save menu system working.</p>
 
+<h3>03/07/2022</h3>
+<p>Started PS3/PSL1GHT implementation of the
+<a href="https://bitbucket.org/williamblair/gamemath/src/master/">GameMath library</a>.
+Referencing the PSL1GHT
+<a href="https://github.com/ps3dev/PSL1GHT/tree/master/common/vectormath/ppu/cpp">vectormath library</a>,
+the core vector functions come from the <i>altivec</i> and <i>simdmath</i>
+headers. I'm not sure yet if these instructions are specific to the PS3 Cell CPU or
+more general to the powerpc architecture. Searching one of the function names
+I found
+<a href="https://arcb.csc.ncsu.edu/~mueller/cluster/ps3/SDK3.0/docs/accessibility/sdkpt/cbet_2cplus_vectintr.html">this reference here</a>
+of available vector instructions, which operate on vec4's. As a side note I
+also found an interesting reference, "Universal SIMD-Mathlibrary" on
+<a href="https://webuser.hs-furtwangen.de/~dersch/">https://webuser.hs-furtwangen.de/~dersch/</a>,
+which has description "single precision floating point vector datatypes are provided for the SIMD-platforms x86 (SSE2), PowerPC and Cell."
+I haven't looked at it yet.</p>
+<p>I've started with the cpp implementation and have replaced most of the vec3 instructions
+using these, just ignoring the 4th component. So far, all of the tests in the test program pass.
+I should also add timestamps/performance counting for a speedup comparison, but that's a TODO
+for now</p>
+<pre>Test testVec3Add passed
+Test testVec3Sub passed
+Test testVec3PlusEquals passed
+Test testVec3MinusEquals passed
+Test testVec3TimesScale passed
+Test testVec3Dot passed
+Test testVec3Cross passed
+Test testVec3Normalize passed
+Test testMat4DefaultConstructor passed
+Test testMat4CopyConstructor passed
+Test testMat4Translate passed
+Test testMat4TranslateVec3 passed
+Test testMat4RotateVec3 passed
+Test testMat4ScaleVec3 passed
+Test testMat4SRTMat passed
+Test testMat4Inverse passed
+Test testMat4Transpose passed
+Test testQuatMul passed
+Test testQuatRot passed
+Test testQuatNormalize passed
+20/20 tests passed
+</pre>
+
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
