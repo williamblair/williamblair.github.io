@@ -2057,6 +2057,19 @@ Test testQuatNormalize passed
 20/20 tests passed
 </pre>
 
+<h3>03/17/2022</h3>
+
+<p>Refactored some of the classes including Renderer, Texture, VertexBuffer in a
+new iqmtest folder in the ps3devprogs repo, which uses the GameMath library ps3 impl.
+Initially tested a simple quad. Didn't work initially, found a bug in the perspective
+matrix function. Next, started adding IQM model support. The base mesh works,
+and I was kind of expecting the animation to work right off the bat but no such luck.
+I've started debugging outputs against the PC demo version and the base frame matrices
+don't seem to quite match, so there's probably a bug in the GameMath impl somewhere.</p>
+
+<img src="images/vertex_buffer_refactored_03_17_2022.png" width="600"/><br/>
+<img src="images/iqm_base_mesh_working_03_17_2022.png" width="600"/><br/>
+<img src="images/iqm_anim_not_working_03_17_2022.png" width="600"/><br/>
 
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
