@@ -2082,6 +2082,45 @@ the PS3 version and replaced the PSL1GHT vec4 with the cpp Vec4.</p>
     <source src="images/iqm_anim_cppmath_working_03_21_2022.webm" type="video/webm"/>
 </video>
 
+<h3>03/30/2022</h3>
+<p>Figured out the differnce - the issue was I had added a 4th component (w) to the
+ps3 Vec3 impl in order to support SIMD operations. In the IqmMesh class, the
+size of a Vec3 was assumed to be 3*sizeof(float), so casting a pointer to floats
+to a Vec3 was of the incorrect size, and incrementing the Vec3 pointer skipped
+a float, resulting in incorrect values. To fix this, the float pointers were
+left as floats and the pointers were increased by 3 instead for each vertex
+calculation:</p>
+<pre><code>     // The actual vertex generation based on the matrixes follows...
+-    const GameMath::Vec3* srcpos = (const GameMath::Vec3*)inposition;
+-    const GameMath::Vec3* srcnorm = (const GameMath::Vec3*)innormal;
+-    const GameMath::Vec4* srctan = (const GameMath::Vec4*)intangent;
+-    GameMath::Vec3* dstpos = (GameMath::Vec3*)outposition;
+-    GameMath::Vec3* dstnorm = (GameMath::Vec3*)outnormal;
+-    GameMath::Vec3* dsttan = (GameMath::Vec3*)outtangent;
+-    GameMath::Vec3* dstbitan = (GameMath::Vec3*)outbitangent;
++    const float* srcpos = (const float*)inposition;
++    const float* srcnorm = (const float*)innormal;
++    const float* srctan = (const float*)intangent;
++    float* dstpos = (float*)outposition;
++    float* dstnorm = (float*)outnormal;
++    float* dsttan = (float*)outtangent;
++    float* dstbitan = (float*)outbitangent;
+...
+-        srcpos++;
+-        srcnorm++;
+-        srctan++;
+-        dstpos++;
+-        dstnorm++;
+-        dsttan++;
+-        dstbitan++;
++        srcpos += 3;
++        srcnorm += 3;
++        srctan += 3;
++        dstpos += 3;
++        dstnorm += 3;
++        dsttan += 3;
++        dstbitan += 3;
+</code></pre>
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
