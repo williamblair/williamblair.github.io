@@ -2121,6 +2121,21 @@ calculation:</p>
 +        dsttan += 3;
 +        dstbitan += 3;
 </code></pre>
+
+<h3>04/01/2022</h3>
+<p>Added FPS camera and TileFloor, both essentially copied from the wii dev program. Had to add normals
+into the tile floor vertices. Also for some reason one of the repeating tiles is always screwed up. It was cool
+to see that FPS camera required no modification at all, aside from changing the include from Wii to PS3
+for GameMath (#include &lt;GameMath/wii/GameMath.h&gt; to #include &lt;GameMath/ps3/GameMath.h&gt;)</p>
+
+<video width="600" controls>
+    <source src="./images/fps_camera_working_04_01_2022.webm" type="video/webm"/>
+</video>
+<br/>
+<video width="600" controls>
+    <source src="./images/tile_floor_error_04_01_2022.webm" type="video/webm"/>
+</video>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
