@@ -2121,6 +2121,36 @@ calculation:</p>
 +        dsttan += 3;
 +        dstbitan += 3;
 </code></pre>
+
+<h3>04/05/2022</h3>
+
+<p>I was too cocky - the iqmtest isn't working on actual hardware :(.
+Should have tested it sooner...</p>
+<img src="./images/iqmtest_notworking_onconsole_04052022.jpg" width="600"/>
+<p>I started looking for other code references to help debug. Found
+a tiny3D implementation:
+<a href="https://github.com/wargio/tiny3D">https://github.com/wargio/tiny3D</a>,
+which also uses
+<a href="https://github.com/wargio/ps3soundlib">https://github.com/wargio/ps3soundlib</a>.
+To build:
+</p>
+
+<pre>git clone https://github.com/wargio/ps3soundlib.git
+cd ps3soundlib
+# auto installs to /usr/local/ps3dev, make sure you don't need sudo to access
+make
+cd ..
+git clone https://github.com/wargio/tiny3D.git
+cd tiny3D
+make</pre>
+
+<p>I tested the spheres3D example, which didn't work with ps3load remotely
+but did work when copying the .self to the ps3 and launching via multiman.
+Next step is to start looking at the tiny3D source code and maybe experiementing
+with it some</p>
+
+<img src="./images/tiny3d_working_onconsole_04052022.jpg" width="600"/>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
