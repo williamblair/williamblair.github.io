@@ -2165,6 +2165,105 @@ with it some</p>
 
 <img src="./images/tiny3d_working_onconsole_04052022.jpg" width="600"/>
 
+<h3>04/09/2022</h3>
+<p>Got IQM animation basically working on console using tiny3d if I use the cpp gamemath impl
+instead of simd version. Not sure what the simd version bug is yet. Also the textures are
+sort of weird if you move and I think my FPS camera isn't working right. I'll know for
+sure once I add the tiled floor.</p>
+<p>Using tiny3d is basically like the older fixed-function OpenGL pipeline. It might be
+nice to try and modify the code a bit to be able to directly copy the vertices to the 
+rsx buffer instead of copying vertices individually. A basic tiny3d example I confirmed
+works to draw a triangle is:</p>
+<pre><code>#include &lt;stdio.h&gt;
+
+#include &lt;tiny3d.h&gt;
+#include &lt;matrix.h&gt;
+
+int main()
+{
+    MATRIX projMat; // projection matrix
+    MATRIX mvMat; // model-view matrix
+
+    // 4MB vertex data
+    if (tiny3d_Init(TINY3D_Z16 | 4*1024*1024) &lt; 0) {
+        printf("Error init tiny3D\n");
+        return 1;
+    }
+
+    projMat = MatrixProjPerspective(
+        60.0f, // fov degrees
+        640.0f/480.0f, // aspect
+        0.00125f, // near
+        300.0f // far
+    );
+    mvMat = MatrixTranslation(0.0f, 0.0f, 5.0f);
+
+    for (;;)
+    {
+        // alpha is first in color (argb)
+        tiny3d_Clear(0xFF000000, TINY3D_CLEAR_ALL);
+
+        // enable alpha test and alpha blending
+        blend_src_func srcFun = (blend_src_func)(TINY3D_BLEND_FUNC_SRC_RGB_SRC_ALPHA | TINY3D_BLEND_FUNC_SRC_ALPHA_SRC_ALPHA);
+        blend_dst_func dstFun = (blend_dst_func)(TINY3D_BLEND_FUNC_DST_RGB_ONE_MINUS_SRC_ALPHA | TINY3D_BLEND_FUNC_DST_ALPHA_ZERO);
+        blend_func blndFun = (blend_func)(TINY3D_BLEND_RGB_FUNC_ADD | TINY3D_BLEND_ALPHA_FUNC_ADD);
+        tiny3d_AlphaTest(1, 0x10, TINY3D_ALPHA_FUNC_GEQUAL);
+        tiny3d_BlendFunc(1, srcFun, dstFun, blndFun);
+
+        // Set 3d mode
+        tiny3d_Project3D();
+
+        // Set model,view,projection matrix
+        tiny3d_SetProjectionMatrix(&projMat);
+        tiny3d_SetMatrixModelView(&mvMat);
+
+        // set polygon type
+        tiny3d_SetPolygon(TINY3D_TRIANGLES);
+        
+        // Draw vertices (position must be first)
+        tiny3d_VertexPos(-0.5f, -0.5f, 0.0f);
+        tiny3d_VertexFcolor(1.0f, 0.0, 0.0, 1.0f);
+        tiny3d_VertexPos(0.5f, -0.5f, 0.0f);
+        tiny3d_VertexFcolor(1.0f, 0.0f, 0.0f, 1.0f);
+        tiny3d_VertexPos(0.0f, 0.5f, 0.0f);
+        tiny3d_VertexFcolor(1.0f, 0.0f, 0.0f, 1.0f);
+
+        // end of vertex list
+        tiny3d_End();
+
+        // here projection, modelview, texture can be changed and tiny3d_setpolygon can
+        // be called again to start drawing more vertices
+
+        // end of frame
+        tiny3d_Flip();
+    }
+
+    return 0;
+}
+</code></pre>
+
+<p>Tiny3D uses I think left-handed coordinates (+x=right, +y=up, +z=forward).
+To use my GameMath library I added the following conversion functions:</p>
+<pre><code>inline GameMath::Mat4 gameMath2TinyProjMat(GameMath::Mat4& mat) {
+    GameMath::Mat4 result = Transpose(mat);
+    result.v[1][1] = -result.v[1][1];
+    result.v[2][2] = -result.v[2][2];
+    result.v[3][2] = -result.v[3][2];
+    result.v[2][3] = -result.v[2][3] * 0.5f;
+    return result;
+}
+inline GameMath::Mat4 gameMath2TinyModelViewMat(GameMath::Mat4& mat) {
+    GameMath::Mat4 result = mat;
+    result.v[3][2] = -result.v[3][2];
+    return result;
+}
+</code></pre>
+
+<p>The full current iqm code is at
+<a href="https://bitbucket.org/williamblair/ps3devprogs/src/master/tiny3diqm/">
+https://bitbucket.org/williamblair/ps3devprogs/src/master/tiny3diqm/</a>
+</p>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
