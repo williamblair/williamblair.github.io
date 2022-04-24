@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>BJ's Website</title>
+    <link rel="stylesheet" type="text/css" href="../../site.css"/>
+</head>
+<body style="min-height:1000px;">
+<h1>GameLib</h1>
+
+<p>
+Starting to combine my code for different platforms into a single library.
+For now simply called <i>GameLib</i>. TBD a cooler, better sounding name :).
+Originally this repo had PS2 and PSX code, now I'm redoing it as I have more
+experience and worked with other platforms. Plus, multiplatform support including
+PSX is hard because of the PSX needing to do everything in fixed-point.
+</p>
+
+<p>
+The code is here:
+<a href="https://bitbucket.org/williamblair/workspace/projects/GAM">https://bitbucket.org/williamblair/workspace/projects/GAM</a>,
+where the GameLib repo contains the library code, and iqmanimpc for now is the test applicaton.
+Also uses my GameMath library as a submodule for GameLib:
+<a href="https://bitbucket.org/williamblair/gamemath/src/master/">https://bitbucket.org/williamblair/gamemath/src/master/</a>
+</p>
+
+<h3>04/23/2022</h3>
+<p>Base PC and Wii implementations working together. Includes a third-person controlled
+animated IQM model and tiled floor:</p>
+
+<img src="images/iqmanim_04_23_2022.png" width="400px"/>
+
+<p>The PC implementation uses Visual Studio 2019 for Windows.
+The libraries used are SDL2 and GLEW, so it *should* work
+on Linux as well. Still need to make a Makefile for linux. For
+windows, compile.bat is used with the VS developer command prompt
+to call cl.exe with the required args. A preprocessor define
+PC_BUILD is used by GameMath and some initialization/file loading.</p>
+
+<p>The wii implementation uses Makefile.wii with devkitpro. The main
+difference between the Wii and PC implemenations currently is texture
+loading on the wii uses textures baked into the code, so the loading
+functions are different. TODO is figure out how to load textures for
+wii from a file. The preprocessor define WII_BUILD is used in this
+case. The differences between main.cpp for the PC and Wii are:</p>
+
+<pre><code>#ifdef PC_BUILD
+using namespace GameLib::PC;
+#undef main
+#endif
+
+#ifdef WII_BUILD
+// IQM texture
+#include "Gina.h"
+#include "Gina_tpl.h"
+// Ground texture
+#include "grass.h"
+#include "grass_tpl.h"
+using namespace GameLib::Wii;
+#endif
+
+...
+
+#ifdef PC_BUILD
+    if (!gRender.Init(800, 600, "Hello World")) { return 1; }
+    if (!gInput.Init()) { return 1; }
+    if (!gGrassTex.LoadFromTGA("assets/grass.tga")) { return 1; }
+    if (!gIqm.Init("assets/gina.iqm")) { return 1; }
+    if (!gIqmTex.LoadFromTGA("assets/gina.tga")) { return 1; }
+#endif
+#ifdef WII_BUILD
+    if (!gRender.Init(640, 480, "Hello World")) { return 1; }
+    if (!gInput.Init()) { return 1; }
+    if (!gGrassTex.Init(grass_tpl, grass_tpl_size, grass)) { return 1; }
+    if (!gIqm.Init("sd:/gina.iqm")) { return 1; }
+    if (!gIqmTex.Init(Gina_tpl, Gina_tpl_size, gina)) { return 1; }
+#endif
+</code></pre>
+
+<p>TODO is to retest on Wii hardware to make sure it still works. Up next is the
+PS3 base implementation. Hopefully after that PS2 support as well (maybe...)</p>
+
+<p>
+<a href="../../index.html">&lt;-- Back to Home</a>
+</p>
+
+</body>
+</html>
