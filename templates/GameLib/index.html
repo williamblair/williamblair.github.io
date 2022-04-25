@@ -81,9 +81,45 @@ using namespace GameLib::Wii;
 <p>TODO is to retest on Wii hardware to make sure it still works. Up next is the
 PS3 base implementation. Hopefully after that PS2 support as well (maybe...)</p>
 
+<h3>04/24/2022</h3>
+
+<p>Started PS3 implementation. Confirmed a simple triangle drawing works.
+Basically all there, except there's still a camera
+issue between tiny3d using +z=forwards 0..65535 and GameMath using +z=backwards.
+I think the main issue currently is the tiny3d vertex shader:</p>
+<pre><code>v = mul(inputvertex.vertex, WorldMatrix);
+outputvertex.vertex    = mul(v,ProjMatrix);
+outputvertex.vertex.z *= outputvertex.vertex.w;
+</code></pre>
+
+<p>This last line (z*w) I believe is causing the GameMath matrix implementations
+to be incompatible. I've been trying to figure out if I can remove that line and
+recompile ther vertex shader for tiny3d. It seems to be baked into the code via
+the vpcomp utility, which is no longer used by PSL1GHT and has been replaced by cgcomp.
+Cgcomp seems to output a different format than vpcomp. I was able to compile vpcomp from
+an older commit of PSL1GHT, but it gives errors when trying to compile the vertex shader.
+The first error was "pow" being an unsupported function</p>
+
+<img src="images/vpcomp_error1_04_24_2022.png" width="600px"/>
+
+<p>After commenting out the line that uses pow, a error related to a register
+is given:</p>
+
+<img src="images/vpcomp_error2_04_24_2022.png" width="600px"/>
+
+<p>I'm guessing maybe the version of nvidia-cg-toolkit (libCg)
+is newer now compared to ~2011 and is causing the issue? However
+older versions from the nvidia website are unavailable (only 3.31
+is available). The only other thing I can try maybe is modifying
+the tiny3d source code to account for the z*w vertex shader line
+when sending vertices/matrices to the shader. Otherwise I might
+try just using PSL1GHT again without tiny3d and make the code more similar to how
+tiny3d works (allocating a single block of RSX memory for vertices)</p>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
 
 </body>
 </html>
+
