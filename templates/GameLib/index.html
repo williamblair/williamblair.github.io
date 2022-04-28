@@ -116,6 +116,96 @@ when sending vertices/matrices to the shader. Otherwise I might
 try just using PSL1GHT again without tiny3d and make the code more similar to how
 tiny3d works (allocating a single block of RSX memory for vertices)</p>
 
+<h3>04/28/2022</h3>
+
+<p>Switched from tiny3d to plain PSL1GHT ps3 impl. Had two issues:
+one, there seems to be a bug somewhere in the ps3 implementation of GameMath, as switching
+from the ps3 impl to the plain c++ impl fixed incorrect rendering initially. I haven't
+looked into the issue yet. I thought I had ran into this and already fixed it earlier,
+but maybe not.</p>
+
+<p>The second was that some vertices would freak out and render incorrectly on my actual
+PS3 hardware but not on rpcs3. I've seen this happen before on my previous PS3/PSL1GHT programs
+so I wasn't super surprised that it happened. After playing around with different options related
+to vertex clipping in the renderer code, the following seem to have fixed the issue/render correctly
+without freakouts:</p>
+<pre><code>// don't call this function:
+//rsxSetZMinMaxControl(context, 0, 1, 1);
+
+// do call this function:
+for (i=0; i&lt;8; i++) {
+    rsxSetViewportClip(context, i, display_width, display_height);
+}
+
+// don't call this function:
+//rsxSetUserClipPlaneControl(context,GCM_USER_CLIP_PLANE_DISABLE,GCM_USER_CLIP_PLANE_DISABLE,...)
+</code></pre>
+<p>Which were functions I saw used in different examples code. Also, as a side note, I was able
+to use OpenGL-style glsl shaders following this post by user Crystal:
+<a href="https://www.psx-place.com/threads/how-to-use-glsl-shaders-inside-psl1ght-rsx-projects.34239/">link</a>.
+The glsl and regular PSL1GHT equivalent versions of the shader I'm using so far are:
+</p>
+
+<pre><code>//glsl vertex/fragment shader
+#version 130
+in vec3 aPos;
+in vec3 aColor;
+out vec4 fragColor;
+uniform mat4 uMvpMatrix;
+void main(void)
+{
+    gl_Position = uMvpMatrix * vec4(aPos, 1.0);
+    fragColor = vec4(aColor, 1.0);
+}
+---
+#version 130
+out vec4 FragColor;
+in vec4 fragColor;
+void main(void)
+{
+    FragColor = fragColor;
+}
+
+// PSL1GHT version (hlsl/directX? not sure)
+void main
+(
+    float3 aPos : POSITION,
+    float3 aColor : COLOR,
+    uniform float4x4 uMvpMatrix,
+    out float4 ePosition : POSITION,
+    out float3 oColor : COLOR
+)
+{
+    float4 v;
+    v = mul(float4(aPos, 1.0f), uMvpMatrix);
+    ePosition = v;
+    oColor = aColor;
+}
+---
+void main
+(
+    float3 color : COLOR,
+    out float4 oColor
+)
+{
+    float4 testColor = float4(color, 1.0);
+    oColor = testColor;
+}
+</code></pre>
+
+<p>Currently the PSL1GHT version is used and is what I tested on my actual PS3. Below
+shows before fixing the vertex freakout issue and after. Next TODO for PS3 is to add back in
+textures and IQM model support.</p>
+
+<video controls width="500px">
+    <source src="./images/vertex_clip_issue_04_28_2022.webm" type="video/webm"/>
+</video>
+<br/>
+<video controls width="500px">
+    <source src="./images/vertex_clip_fixed_04_28_2022.webm" type="video/webm"/>
+</video>
+
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
