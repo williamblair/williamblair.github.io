@@ -205,6 +205,56 @@ textures and IQM model support.</p>
     <source src="./images/vertex_clip_fixed_04_28_2022.webm" type="video/webm"/>
 </video>
 
+<h3>04/29/2022</h3>
+<p>Got PS3 iqm anim working and re-verified Wii working on hardware. Also made some
+changes on the Wii implementation to get the hello world simple triangle drawing
+working. The issue for Wii was the Renderer::Clear() call was setting up to use
+a texture, which the simple triangle drawing wasn't using.</p>
+<p>For the rest of the ps3 impl for iqm animation, I found again there's an issue
+with the PS3 GameMath impl. When using the PS3 impl, the IQM model wasn't shown
+onscreen, but the tile floor rendered fine/as expected. That makes me think there's
+something wrong with the Quaternion ps3 impl, as the tile floor doesn't use them.
+For now though, switching it to use the plain cpp implementation of GameMath works
+fine.</p>
+<p>The shader I added for textured rendering on ps3 looks like:</p>
+<pre><code>void main
+(
+    float3 aPos : POSITION,
+    float2 aTexCoord : TEXCOORD0,
+
+    uniform float4x4 uMvpMatrix,
+
+    out float4 ePosition : POSITION,
+    out float2 oTexCoord : TEXCOORD0
+)
+{
+    float4 v;
+
+    v = mul(float4(aPos, 1.0f), uMvpMatrix);
+    ePosition = v;
+
+    oTexCoord = aTexCoord;
+}
+---
+void main
+(
+    float2 texCoord : TEXCOORD0,
+
+    uniform sampler2D uTexture,
+
+    out float4 oColor
+)
+{
+    float4 testColor = tex2D(uTexture, texCoord);
+    oColor = testColor;
+}</code></pre>
+
+<p>Yesterday I got the pspdev environment set up, so I can try and create a PSP
+implementation as well. There seems to be a larger/more active PSP community
+based on my brief searching and the toolchain seems to be very modern/actively
+maintained. The example I tried yesterday uses CMake and the compiler for pspdev
+is gcc 11.2, which is the latest I think. Because of this I'm (knock on wood)
+guessing the PSP implementation should be fairly straightforward.</p>
 
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
