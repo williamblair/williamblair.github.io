@@ -256,6 +256,72 @@ maintained. The example I tried yesterday uses CMake and the compiler for pspdev
 is gcc 11.2, which is the latest I think. Because of this I'm (knock on wood)
 guessing the PSP implementation should be fairly straightforward.</p>
 
+<h3>04/30/2022</h3>
+
+<p>Started the psp implementation; added enough to get the gamelibhellworld triangle
+drawing and camera movement working. Most of the information/psp code came from
+<a href="https://web.archive.org/web/20090124081552/http://ghoti.nl/PSPtutorials.php">
+https://web.archive.org/web/20090124081552/http://ghoti.nl/PSPtutorials.php
+</a> and the corresponding code at
+<a href="https://github.com/PSP-Archive/3D-PSP-Tutorials">
+https://github.com/PSP-Archive/3D-PSP-Tutorials
+</a>. Graphics using pspsdk kind of seems to be a hybrid between old/fixed function
+and modern OpenGL. There aren't shaders (that I've seen), but you don't call a function
+to specify each vertex point; all vertices are drawn in a single call. The matrix system
+is like older OpenGL though with an internal matrix stack. Luckily, the matrix format
+directly matches the GameMath cpp implementation. We can directly feed psp sdk our
+GameMath matrices via:</p>
+<pre><code>// set projection matrix
+sceGumMatrixMode(GU_PROJECTION);
+sceGumLoadIdentity();
+sceGumLoadMatrix((const ScePspFMatrix4*)&amp;mProjMat.r0c0);
+// set view matrix
+sceGumMatrixMode(GU_VIEW);
+sceGumLoadMatrix((const ScePspFMatrix4*)&amp;viewMat.r0c0);
+// set model matrix
+sceGumMatrixMode(GU_MODEL);
+sceGumLoadMatrix((const ScePspFMatrix4*)&amp;modelMat.r0c0);
+</code></pre>
+
+<p>The direct cast works as both structures are 16 floats in column major order.
+One difference I noticed is the Sce matrices are 16byte aligned.</p>
+
+<p>Another interesting difference for the psp implementation is the required
+format and order of vertex attributes. In modern OpenGL you specify each attribute
+of the vertex buffer/array. For pspsdk, there is a fixed combinations of formats and
+order of attributesyou can use. From the pspsdk doxygen documenation
+<a href="https://pspdev.github.io/pspsdk/group__GU.html#ga7ee605d6909a72f989cae1cc4bf6264f">here</a>,
+the required order (if included) is:
+</p>
+<pre>[vertices(1-8)] [weights (0-8)] [texture uv] [color] [normal] [vertex]</pre>
+<p>So each attribute isn't required in the vertices, if an attribute is included, it
+must be in this order in the data you send it.
+You specify which attributes are included as an argument to <i>sceGuDrawArray()</i>.
+For just having color and position attributes, the draw call looks like:</p>
+<pre><code>sceGumDrawArray(
+    GU_TRIANGLES,
+    GU_COLOR_8888 | GU_VERTEX_32BITF | GU_TRANSFORM_3D,
+    vb.mNumVertices,
+    0,
+    vb.mPosColorVertices
+);
+</code></pre>
+
+<p>Where vb.mPosColorVertices is an array internally stored in my VertexBuffer class
+where each element has the following format:</p>
+<pre><code>struct PosColorVertex {
+    unsigned char r, g, b, a;
+    float x, y, z;
+};
+</code></pre>
+<p>Upon VertexBuffer initialization, the input vertices are stored in mPosColorVertices
+in this format, as the input vertices are x,y,z, r,g,b and need to be converted.</p>
+
+<p>I haven't tried running the code on hardware yet - just on PPSSPP. I dusted off my PSP yesterday and
+confirmed it turns on, but the battery seems to be shot and it's not recognizing the memory
+stick. I ordered a new battery and memory stick which should get here sometime next week probably.
+Then I'll have to go through the "jailbreaking" process again, which I don't remember how to do...</p>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
