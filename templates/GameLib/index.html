@@ -338,9 +338,9 @@ vertices update to convert from indexed to non-indexed vertices.</p>
 <p>I ran into an issue where it seems the constructor for the
 ThirdPersonPlayer class wasn't being ran properly; I had to manually
 set the default settings in main() instead:</p>
-<pre><code>gPlayer.SetModel(&gIqm);
+<pre><code>gPlayer.SetModel(&amp;gIqm);
 gPlayer.SetModelScale(GameMath::Vec3(0.1f, 0.1f, 0.1f));
-gPlayer.SetTexture(&gIqmTex);
+gPlayer.SetTexture(&amp;gIqmTex);
 gPlayer.GetCamera().SetDistance(15.0f);
 gPlayer.SetDrawYawOffset(180.0f);
 gPlayer.SetDrawPitchOffset(-90.0f);
@@ -352,6 +352,21 @@ Ghoti tutorials to addressed later on.</p>
 <video controls style="width:400px">
     <source src="./images/psp_floorclipping_05_04_2022.webm" type="video/webm"/>
 </video>
+
+<h3>05/05/2022</h3>
+<p>The sd card and adapater I ordered came in today, so I was able to test the
+psp impl on actual hardware! To get custom firmware on the PSP, followed this
+video: <a href="https://www.youtube.com/watch?v=h-pZeWV5Q8E">link</a>. And
+it works :)</p>
+
+<video controls width="500px">
+    <source src="images/psp_iqm_working_05_05_2022.webm" type="video/webm"/>
+</video>
+
+<p>Also added a Sprite class for 2D sprite support (see the rectangle in the
+psp video above). Tested working on all systems (pc/ps3/wii/psp).
+Planning on working on texture-based fonts next then music and
+sound effects.</p>
 
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
