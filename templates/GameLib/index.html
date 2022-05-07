@@ -368,6 +368,102 @@ psp video above). Tested working on all systems (pc/ps3/wii/psp).
 Planning on working on texture-based fonts next then music and
 sound effects.</p>
 
+<h3>05/06/2022</h3>
+<p>Started texture-based font support; added PC and psp implementations.
+Uses a sprite with different UV coordinates for each character.
+Currently only uppercase letters are supported (although getting
+lowercase to work should be really easy). Had an interesting bug
+with the PSP and PS3 implementations at first. For the PC version, which I based
+the psp version off of, the renderer has a single vertex buffer to
+draw sprites with, composed of two triangles. Each sprite shares this
+vertex buffer. For the PSP implementation, this caused previously
+drawn sprites within the same frame to be overwritten/drawn over by
+the latest drawn one. It seems that calls to sceGumDrawArray do not
+copy the vertex data, and instead store the pointer you give it.
+Thus multiple calls pointing to the same data, if that data is updated
+before the actual drawing occurs, will conflict with each other. To
+get around this, instead of having a single vertex buffer for sprite
+drawing, there is an array of vertices, and a different index is used
+for each drawn sprite. Currently I set the max to 512 sprites, which
+means for texture-based font drawing, a max of 512 characters can be
+drawn per frame. I did basically the same thing for PS3 as well.</p>
+
+<pre><code>VertexBuffer::PosTexVertex* Renderer::sSpriteVertBufs = nullptr;
+// InitSpriteVertBufs()
+sSpriteVertBufs = (VertexBuffer::PosTexVertex*)memalign(
+    16,
+    SPRITE_NVERTICES*sizeof(VertexBuffer::PosTexVertex)
+);
+float vertices[5*6] = {
+    // position         texcoord
+    0.0f, -1.0f, 0.0f,   0.0f, 0.0f, // bottom left
+    1.0f, -1.0f, 0.0f,   1.0f, 0.0f, // bottom right
+    1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
+
+    0.0f, -1.0f, 0.0f,   0.0f, 0.0f, // bottom left
+    1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
+    0.0f, 0.0f, 0.0f,   0.0f, 1.0f // top left
+};
+
+int i = 0;
+while (i&lt;SPRITE_NVERTICES) {
+    for (int j=0; j&lt;6; ++j, ++i) {
+        VertexBuffer::PosTexVertex* ptv = &amp;sSpriteVertBufs[i];
+        float* v = &amp;vertices[j*5]; // 5 floats per input vertex
+        ptv-&gt;u = v[3];
+        ptv-&gt;v = v[4];
+        ptv-&gt;r = 255;
+        ptv-&gt;g = 255;
+        ptv-&gt;b = 255;
+        ptv-&gt;a = 255;
+        ptv-&gt;x = v[0];
+        ptv-&gt;y = v[1];
+        ptv-&gt;z = v[2];
+    }
+}
+
+//DrawSprite()
+// Get the current vertices buffer for 2d sprite drawing
+VertexBuffer::PosTexVertex* ptv = &amp;sSpriteVertBufs[mCurSpriteVertBuf];
+mCurSpriteVertBuf += 6; // 2 triangles
+if (mCurSpriteVertBuf &gt;= SPRITE_NVERTICES) {
+    dbgprint("ERROR - mCurSpriteVertBuf exceeded max for frame\n");
+    return;
+}
+// updated tex coords
+float leftU = sprite.mU;
+float rightU = leftU + sprite.mW;
+float topV = 1.0f - sprite.mV;
+float bottomV = 1.0f - (sprite.mV + sprite.mH);
+
+ptv[0].u = leftU; ptv[0].v = bottomV; // bottom left
+ptv[1].u = rightU; ptv[1].v = bottomV; // bottom right
+ptv[2].u = rightU; ptv[2].v = topV; // top right
+
+ptv[3].u = leftU; ptv[3].v = bottomV; // bottom left
+ptv[4].u = rightU; ptv[4].v = topV; // top right
+ptv[5].u = leftU; ptv[5].v = topV; // top left
+
+sceGumDrawArray(
+    GU_TRIANGLES,
+    GU_TEXTURE_32BITF | GU_COLOR_8888 | GU_VERTEX_32BITF | GU_TRANSFORM_3D,
+    6, // 2 triangles
+    0,
+    ptv
+);
+</code></pre>
+
+<p>Before having individual dedicated sprite-drawing vertices on psp,ps3:</p>
+<video controls width="500px">
+    <source src="images/psp_font_issue_05_06_2022.webm" type="video/webm"/>
+</video>
+<video controls width="500px">
+    <source src="images/ps3_font_issue_05_06_2022.webm" type="video/webm"/>
+</video>
+
+<p>After dedicated vertices:</p>
+<img src="images/psp_font_working_05_06_2022.jpg" width="500px"/>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
