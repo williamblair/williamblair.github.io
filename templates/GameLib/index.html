@@ -464,6 +464,129 @@ sceGumDrawArray(
 <p>After dedicated vertices:</p>
 <img src="images/psp_font_working_05_06_2022.jpg" width="500px"/>
 
+<h3>05/07/2022</h3>
+
+<p>Working on background music support (Music class). PC version
+working no problemo via SDL_mixer. Started PSP version and it's
+been more tricky. First I tried SDL_mixer for the PSP as well,
+but was getting linker related errors. Googling only really
+gave one result in Japanese:
+<a href="https://ameblo.jp/pspdevblog/entry-10051848541.html"/>link</a>
+</p>
+<pre><code>psp-fixup-imports ./IqmAnimPsp
+Error, could not fixup imports, stubs out of order.
+Ensure the SDK libraries are linked in last to correct this error
+make: *** [Makefile:27: all] Error 1
+</code></pre>
+
+<p>So then I was looking into the psp sdk included mp3 example,
+but that wasn't working for me even in PPSSPP; specifically
+the function sceMp3Init was failing. Searching online
+seems to show others get this error as well:
+<a href="https://wololo.net/talk/viewtopic.php?t=12021">link</a>
+and <a href="https://github.com/pspdev/pspsdk/issues/17">another link</a>.
+</p>
+
+<p>So far what I have working instead is a modified version of one of
+the audio wave-generation samples to stream a WAV format file instead.
+I got info on the WAV file format from
+<a href="https://docs.fileformat.com/audio/wav/">here.</a>
+The .WAV file needs to have a sample rate of 44100Hz, and be 16bit
+stereo. The nice part is it streams off of the memory stick so file
+size isn't as much of an issue. Basically I have a 2048 sample buffer
+that gets filled into from the .WAV file off of the memory stick every
+time the audio callback needs more samples:</p>
+
+<pre><code>typedef struct WAVStreamData {
+    int wavFd;
+    int fileSizeBytes; // size of the data portion of the WAV file
+    int fileBytesRemain; // remaining bytes of the file data portion
+    unsigned char* bufPtr; // pointer into below buffer
+    unsigned int bufSizeRemain; // end of buffer - bufPtr
+    unsigned char buffer[2048*4]; // save 2048 samples at once
+} WAVStreamData;
+WAVStreamData wavStream;
+
+/* This function gets called by pspaudiolib every time the
+   audio buffer needs to be filled. The sample format is
+   16-bit, stereo. */
+void audioCallback(void* buf, unsigned int length, void* userdata) {
+    char writeBuf[256];
+
+    if (!wavInitSuccess) {
+        return;
+    }   
+ 
+    // length = number of samples = 32bits/4bytes (left, right channel)
+    int outBufBytes = length*4;
+    int numBytesRemain = outBufBytes;
+    unsigned char* outBuf = (unsigned char*)buf;
+    while (numBytesRemain &gt; 0) {
+        
+        // copy buffered samples into output
+        int amountBytesCopy =
+            (wavStream.bufSizeRemain &gt;= numBytesRemain) ? 
+            numBytesRemain :
+            wavStream.bufSizeRemain;
+        // assumes WAV file data is expected format, 16bit stereo, with
+        // matching sample rate
+        memcpy(outBuf, wavStream.bufPtr, amountBytesCopy);
+
+        outBuf += amountBytesCopy;
+        numBytesRemain -= amountBytesCopy;
+        wavStream.bufPtr += amountBytesCopy;
+        wavStream.bufSizeRemain -= amountBytesCopy;
+        
+        // get more WAV file samples if buffer is empty
+        if (wavStream.bufSizeRemain == 0) {
+            
+            wavStream.bufPtr = wavStream.buffer;
+            wavStream.bufSizeRemain = sizeof(wavStream.buffer);
+            
+            int numFileReadRemain = sizeof(wavStream.buffer);
+            unsigned char* fileReadPtr = wavStream.buffer;
+            
+            while (numFileReadRemain &gt; 0) {
+                
+                int numToRead =
+                    (wavStream.fileBytesRemain &gt;= numFileReadRemain) ?
+                    numFileReadRemain :
+                    wavStream.fileBytesRemain;
+                int numRead = sceIoRead(wavStream.wavFd, fileReadPtr, numToRead);
+                if (numRead &lt;= 0) {
+                    sprintf(writeBuf, "resetting wav file to data past header\n");
+                    sceIoWrite(dbgFd, writeBuf, strlen(writeBuf));
+                    
+                    // go back to beginning of WAV file past header
+                    sceIoLseek32(wavStream.wavFd, sizeof(WAVHeader), PSP_SEEK_SET);
+                    wavStream.fileBytesRemain = wavStream.fileSizeBytes;
+                    
+                    // re-read
+                    numRead = sceIoRead(wavStream.wavFd, fileReadPtr, numToRead);
+                }
+                
+                fileReadPtr += numRead;
+                numFileReadRemain -= numRead;
+                wavStream.fileBytesRemain -= numRead;
+
+                // If we reached the end of the file...
+                if (wavStream.fileBytesRemain == 0) {
+                    sprintf(writeBuf, "resetting wav file to data past header\n");
+                    sceIoWrite(dbgFd, writeBuf, strlen(writeBuf));
+                    // go back to beginning of WAV file past header
+                    sceIoLseek32(wavStream.wavFd, sizeof(WAVHeader), PSP_SEEK_SET);
+                    wavStream.fileBytesRemain = wavStream.fileSizeBytes;
+                }
+            }
+        }
+    }
+}
+</code></pre>
+
+<p>The full code is
+<a href="https://bitbucket.org/williamblair/pspdevprogs/src/master/wavAudioStream/">here</a>,
+so now I just need to adapt this code into a Music class for GameLib.</p>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
