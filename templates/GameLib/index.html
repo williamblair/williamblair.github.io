@@ -587,6 +587,40 @@ void audioCallback(void* buf, unsigned int length, void* userdata) {
 <a href="https://bitbucket.org/williamblair/pspdevprogs/src/master/wavAudioStream/">here</a>,
 so now I just need to adapt this code into a Music class for GameLib.</p>
 
+<h3>05/08/2022</h3>
+<p>Finished PSP music implementation and Wii music implementation. The PSP version was
+just slightly reworked from the above code to work with a Music class, with audioCallback
+being a static function within Music, and then adding "this" as a user data parameter when
+you set the callback. TODO is support multiple channels, which will be necessary for sound
+effects.</p>
+
+<pre><code>void Music::Play(const bool loop)
+{
+    mWavStream.looping = loop;
+
+    // TODO - different channels
+    pspAudioSetChannelCallback(
+        0, // channel
+        audioCallback,
+        (void*)this
+    );
+}
+void Music::audioCallback(void* buf, unsigned int length, void* userdata)
+{
+    Music* mus = (Music*)userdata;
+    WAVHeader&amp; wavHdr = mus-&gt;mWavHdr;
+    WAVStreamData&amp; wavStream = mus-&gt;mWavStream;
+
+    if (mus-&gt;mPaused || (wavStream.ended &amp;&amp; !wavStream.looping)) {
+        return;
+    }
+...
+</code></pre>
+
+<p>The Wii implementation requires an OGG file which I already had working previously,
+just added the ability to load the file off of the sd card first instead of reading
+it from a buffer.</p>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
