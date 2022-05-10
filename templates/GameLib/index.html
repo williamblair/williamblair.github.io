@@ -621,6 +621,85 @@ void Music::audioCallback(void* buf, unsigned int length, void* userdata)
 just added the ability to load the file off of the sd card first instead of reading
 it from a buffer.</p>
 
+<h3>05/09/2022</h3>
+<p>Added basic PS3 Music impl for WAV files. Based off of the PSP impl
+except the sample rate seems to be 48000 (based off of
+<a href="https://github.com/cebash/SDL_PSL1GHT/blob/stable/src/audio/psl1ght/SDL_psl1ghtaudio.c">SDL PSL1GHT port</a>),
+the sample format is 32bit floats with range -1..1, and there is no given callback function.
+Instead, I figured out how to do PPU threads using PSL1GHT, and have a Music thread
+which updates the PS3 sound sample buffer in the background, again streaming from a file
+like the PSP implementation. According to
+<a href="https://www.psdevwiki.com/ps3/CELL_BE">here</a> the PPU has 2 cores/threads.
+I made a simple Thread wrapper class based off of the PSL1GHT sample, whose basic
+usage looks like:
+</p>
+<pre><code>void myThreadFcn(void* arg)
+{
+    u64 myArg = (u64)arg;
+    u64 myThreadId = Thread::GetThreadId();
+    while (notDone)
+    {
+        doStuff();
+        if (notDoingAnything) {
+            Thread::Yield();
+        }
+    }
+    u64 retVal = 0;
+    Thread::Exit(retVal);
+}
+
+u64 myArg = 42;
+GameLib::PS3::Thread myThread;
+myThread.Start(myThreadFcn, (void*)myArg, "My Thread Name");
+doStuff();
+u64 threadRetVal;
+myThread.Join(&amp;threadRetVal);
+</code></pre>
+
+<p>GetThreadId, Yield, and Exit are static Thread class functions
+to be used internally by thread functions. For the ps3 Music class,
+the thread function reads raw samples from the WAV file, converts
+them to big endian, and then converts them from 16bit to floating point
+-1..1, and copies them into the PS3 sound buffer:
+<pre><code>void Music::sThreadFcn(void* arg)
+{
+    Music* mus = (Music*)arg;
+    WAVStreamData&amp; wavStream = mus-&gt;mWavStream;
+    ...
+    while (runThread)
+    {
+        if (wavStream.ended &amp;&amp; !wavStream.looping) {
+            break;
+        }
+        if (mus-&gt;mPaused) {
+            Thread::Yield();
+            continue;
+        }
+        ...
+        // get position of the block to write
+        // 2 = 2 channels (left, right)
+        float* buf = audioDataStart + (2*AUDIO_BLOCK_SAMPLES*audioBlockIndex);
+        
+        // fill buffer
+        // samples are floating point with range -1..1
+        const float sampScale = 1.0f/32768.0f;
+        for (unsigned int i = 0; (i &lt; AUDIO_BLOCK_SAMPLES) &amp;&amp; runThread; ++i) {
+            const int16_t leftSamp = ((int16_t*)wavStream.bufPtr)[0];
+            const int16_t rightSamp = ((int16_t*)wavStream.bufPtr)[1];
+            buf[i*2 + 0] = ((float)lend2bend16(leftSamp)) * sampScale;
+            buf[i*2 + 1] = ((float)lend2bend16(rightSamp)) * sampScale;
+        ...
+    Thread::Exit(0);
+}
+void Music::Play(bool loop)
+{
+    ...
+    mThread.Start(sThreadFcn, (void*)this, "Music Thread");
+    ...
+}
+</code></pre>
+</p>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
