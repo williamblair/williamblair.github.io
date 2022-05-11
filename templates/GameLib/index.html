@@ -700,6 +700,15 @@ void Music::Play(bool loop)
 </code></pre>
 </p>
 
+<h3>05/11/2022</h3>
+<p>Added sound effect class implementation for PC and Psp. Also added linux Makefile to the
+iqmanimpc and gamelibhello world repositories. For the PC sound effect impl, the SDL2 mixer
+Mix_Chunk object is used. For the PSP impl, it works the same as the Music class except channel 1
+is used instead of channel 0. When Play() is called, the file fd is reset back to the beginning
+of the wav data so each Play() call starts from the beginning. Also added a boolean value to
+attempt to act as a poor man's mutex between the Sound Effect class and the audio callback function so they
+don't interfere with each other. Seems to be working fine on hardware, so good enough for now.</p>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
