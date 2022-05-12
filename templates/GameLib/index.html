@@ -709,6 +709,15 @@ of the wav data so each Play() call starts from the beginning. Also added a bool
 attempt to act as a poor man's mutex between the Sound Effect class and the audio callback function so they
 don't interfere with each other. Seems to be working fine on hardware, so good enough for now.</p>
 
+<h3>05/12/2022</h3>
+<p>Added sound effect impl for PS3. Like the music class, it creates a thread to stream the .wav file,
+and the thread exits when the file is out of data. What makes it different from the Music class is that
+you can call Play() again and the sound effect will tell the thread to terminate if it's already
+playing (by setting mRunning = false). The downside is that this means a new thread is created every
+time you call Play on a sound effect. Certainly not the most efficient (it'd be better to have a
+dedicated background thread), but I tested it on hardware and it works, so good enough for now. Just the Wii
+sound effect implementation remaining.</p>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
