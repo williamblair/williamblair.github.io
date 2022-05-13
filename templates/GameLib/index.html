@@ -700,7 +700,7 @@ void Music::Play(bool loop)
 </code></pre>
 </p>
 
-<h3>05/11/2022</h3>
+<h3>05/10/2022</h3>
 <p>Added sound effect class implementation for PC and Psp. Also added linux Makefile to the
 iqmanimpc and gamelibhello world repositories. For the PC sound effect impl, the SDL2 mixer
 Mix_Chunk object is used. For the PSP impl, it works the same as the Music class except channel 1
@@ -709,7 +709,7 @@ of the wav data so each Play() call starts from the beginning. Also added a bool
 attempt to act as a poor man's mutex between the Sound Effect class and the audio callback function so they
 don't interfere with each other. Seems to be working fine on hardware, so good enough for now.</p>
 
-<h3>05/12/2022</h3>
+<h3>05/11/2022</h3>
 <p>Added sound effect impl for PS3. Like the music class, it creates a thread to stream the .wav file,
 and the thread exits when the file is out of data. What makes it different from the Music class is that
 you can call Play() again and the sound effect will tell the thread to terminate if it's already
@@ -717,6 +717,35 @@ playing (by setting mRunning = false). The downside is that this means a new thr
 time you call Play on a sound effect. Certainly not the most efficient (it'd be better to have a
 dedicated background thread), but I tested it on hardware and it works, so good enough for now. Just the Wii
 sound effect implementation remaining.</p>
+
+<h3>05/12/2022</h3>
+<p>Added sound effect implementation and Thread class implementation for Wii. For sound effects, I modified
+the OGG player example to work with different Wii voice channels. In this case, only two channels are used -
+one for the Music class and one for the sound effect class. For threads, looking at lwp.h, which is the
+libogc thread interface, and the ogg player example were enough for me to figure out generally how to implement
+it. The lwp interface requires thread functions to return a void pointer, as opposed to void like the PS3
+implementation. To get around this, I made a static wrapper function in the Thread class which returns void-star
+and simply calls the actual desired thread function, then returns null:</p>
+
+<pre><code>void* Thread::sThreadFcnWrapper(void* arg)
+{
+    Thread* thr = (Thread*)arg;
+    thr-&gt;mFcn(thr-&gt;mArg);
+    return (void*)0;
+}
+</code></pre>
+
+<p>During its development, I was (and still am) having an issue creating and writing a text file to the SD
+card for some reason. I could have sworn this worked in the past. For std::ofstream I don't seem to be getting
+an error, in that is_open() returns true after supposedly opening the file. TODO is to look into that. In order
+to test if my test thread was actually running, I made the thread play the test sound effect once every two seconds,
+and then play the sound effect again after the thread exits if the return code is what I was expecting. That
+seemed to work so I'm going to call it a success.</p>
+
+<p>I think the next step is to start making more elaborate/complex demos using the library. I'm going
+to start with a 3D jrpg demo, like what I had done for Raylib. Some other TODOs now include documentation
+and adding OGG support to the PS3/PSP which only support WAV currently, and then add support for other
+image formats also.</p>
 
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
