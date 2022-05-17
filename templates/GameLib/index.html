@@ -747,6 +747,50 @@ to start with a 3D jrpg demo, like what I had done for Raylib. Some other TODOs 
 and adding OGG support to the PS3/PSP which only support WAV currently, and then add support for other
 image formats also.</p>
 
+<h3>05/16/2022</h3>
+<p>Finished PSP thread impl and added BMP image support to PSP. Thread::Yield for psp doesn't do
+anything as I haven't found a yield equivalent based on my cursory scanning of the
+<a href="https://pspdev.github.io/pspsdk/group__ThreadMan.html">pspsdk doxygen</a>. Also
+Thread::Exit doesn't save your return value because for some reason accessing the static
+map where I would save the return value results in a invalid memory access error.</p>
+
+<p>BMP image support for PSP I was able to get working based on the 
+<a href="https://en.wikipedia.org/wiki/BMP_file_format">Wikipedia entry</a> for
+the file format, plus what I remember working on SDL 1.2 for the PS1. The only
+issue I had was I needed to make sure the header structs were packed; as this was
+causing the data to not be read in properly due to structure padding:</p>
+<pre><code>struct Header
+{
+    uint16_t header; // the header field
+    uint32_t filesize; // size of the file in bytes
+    uint32_t reserved; // 4 bytes of reserved data (depending on the image that creates it)
+    uint32_t pixOffset; // 4 bytes  offset (i.e. starting address) of where the pixmap can be found
+} __attribute__((packed));
+
+// Win32 struct (40 bytes)
+struct BITMAPINFOHEADER
+{
+    uint32_t size;
+    int32_t width;
+    int32_t height;
+    uint16_t planes;
+    uint16_t bitCount;
+    uint32_t compression;
+    uint32_t sizeImage;
+    int32_t xPelsPerMeter;
+    int32_t yPelsPerMeter;
+    uint32_t clrUsed;
+    uint32_t clrImportant;
+} __attribute__((packed));
+</code></pre>
+
+<p>With a test image for a sprite and tile floor:</p>
+<img src="./images/psp_bmp_working_05_16_2022.jpg" width="500px"/>
+
+<p>I've also started a RPG demo with GameLib but I haven't pushed it anywhere yet.
+So far it just uses a different IQM model, but at least that means different IQM
+models work :)</p>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
