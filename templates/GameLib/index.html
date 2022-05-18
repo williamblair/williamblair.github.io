@@ -791,6 +791,52 @@ struct BITMAPINFOHEADER
 So far it just uses a different IQM model, but at least that means different IQM
 models work :)</p>
 
+<h3>05/17/2022</h3>
+<p>Added PC BMP image impl and SetBGColor. Had to distinguish between Visual Studio and GCC
+to indicate struct packing:
+</p>
+<pre><code>#ifdef _WIN32
+#define PACKED
+#pragma pack(push,1)
+#else
+#define PACKED __attribute__((packed))
+#endif
+struct Header
+{
+    uint16_t header; // the header field
+    uint32_t filesize; // size of the file in bytes
+    uint32_t reserved; // 4 bytes of reserved data (depending on the image that creates it)
+    uint32_t pixOffset; // 4 bytes  offset (i.e. starting address) of where the pixmap can be found
+} PACKED;
+
+// Win32 struct (40 bytes)
+struct BITMAPINFOHEADER
+{
+    uint32_t size;
+    int32_t width;
+    int32_t height;
+    uint16_t planes;
+    uint16_t bitCount;
+    uint32_t compression;
+    uint32_t sizeImage;
+    int32_t xPelsPerMeter;
+    int32_t yPelsPerMeter;
+    uint32_t clrUsed;
+    uint32_t clrImportant;
+} PACKED;
+
+#ifdef _WIN32
+#pragma pack(pop)
+#else
+#undef PACKED
+#endif
+</code></pre>
+
+<p>Also uploaded the current rpg test to bitbucket; it looks like so for now:</p>
+<video controls width="500px">
+    <source src="./images/zombie_bricks_05_17_2022.webm" type="video/webm"/>
+</video>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
