@@ -845,6 +845,20 @@ use GameMath but that was about the only issue I had. Md2 model from
 
 <img src="./images/md2_pc_05_19_2022.png" width="400px"/>
 
+<h3>05/22/2022</h3>
+<p>Added Md2 psp impl. Encountered an issue with file loading off of a memory
+stick. When using PPSSP, this didn't cause an issue but on actual hardware it
+failed to load files. The issue was having an extra forward slash in file
+paths:</p>
+
+<pre>ms0://somefile.txt # doesn't work; fails to load
+ms0:/somefile.txt # works; loads properly
+</pre>
+
+<p>Also, the performance is starting to decrease noticeably on hardware.
+Probably should try and optimize the GameMath library impl. soon to use
+the PSP's vector math support.</p>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
