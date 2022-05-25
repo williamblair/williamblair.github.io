@@ -859,6 +859,48 @@ ms0:/somefile.txt # works; loads properly
 Probably should try and optimize the GameMath library impl. soon to use
 the PSP's vector math support.</p>
 
+<h3>05/24/2022</h3>
+<p>I've began optimizing the psp GameMath impl. I'm able to use VFPU
+instructions in conjunction with the pspsdk gum library by using the same
+vfpu context, linked in libpspgum.a and libpspgum_vfpu.a:
+<a href="https://github.com/pspdev/pspsdk/tree/master/src/gum">
+https://github.com/pspdev/pspsdk/tree/master/src/gum</a>, then in
+GameMath/psp/GameMath.h:</p>
+<pre><code>// https://github.com/pspdev/pspsdk/blob/master/src/gum/pspgum_vfpu.c
+extern struct pspvfpu_context* gum_vfpucontext;
+
+namespace GameMath
+{
+...
+inline Vec3 Normalize(const Vec3&amp; v) {
+    ...
+    pspvfpu_use_matrices(gum_vfpucontext, 0, VMAT0);
+    ...
+</code></pre>
+
+<p>You also need to call gumInit() and call pspvfpu_use_matrices()
+before using any of the VFPU instructions, otherwise the PSP hardware crashes
+(although PPSSPP does not).</p>
+
+<p>I've been using <a href="http://hitmen.c02.at/files/yapspd/psp_doc/frames.html">
+http://hitmen.c02.at/files/yapspd/psp_doc/frames.html</a> as an instruction reference,
+however after looking at other code and
+<a href="https://forums.ps2dev.org/viewtopic.php?f=14&t=6929">
+https://forums.ps2dev.org/viewtopic.php?f=14&t=6929
+</a>, it seems to be incomplete/missing instructions; for example mtv. It does however
+nicely explain how the matrix/vector registers are used.</p>
+
+<p>I've been testing for correctness in GameMath/test/psp/pspTest.cpp, but I
+haven't done any performance tests yet. But, so far so good; although I'll
+need to go back and improve some of the changes now that I know there are more
+instructions I can use.</p>
+
+<img src="./images/pspmathtest_05_24_2022.jpg" width="400px"/>
+
+<p>Also, I found in PPSSPP you can get stdio to print to the console for
+printf if you enable logging to verbatim under settings, tools,
+developer tools, logging channels, enable all/log level.</p>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
