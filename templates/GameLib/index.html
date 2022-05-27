@@ -901,6 +901,36 @@ instructions I can use.</p>
 printf if you enable logging to verbatim under settings, tools,
 developer tools, logging channels, enable all/log level.</p>
 
+<h3>05/25/2022</h3>
+
+<p>Currently optimizing the PSP impl, including both GameLib and GameMath.
+The biggest difference was made by improving the normal matrix calculation
+in IqmMesh::Update to not calculate a full inverse/transpose for each joint.
+Also, the initial psp GameMath impl was slower than the plain cpp impl; the
+overhead of moving data in/out of vector registers was too high I suppose.
+I reduced the number of GameMath functions that actually use the vector registers
+down to a minimum of the obvious ones, like matrix-matrix multiplication.</p>
+
+<p>In most cases I wrote inline assembly to use the vector/matrix registers,
+so I've gotten alot more comfortable with that in the process, so that was fun.
+For the renderer I changed it so that textures and the projection matrix are
+only updated once/when necessary as opposed for every sprite or vertex buffer
+draw. Also reenabled back face culling.</p>
+
+<p>In order to calculate FPS and frame time (both are averages over 1 second periods)
+I updated the GameTimer class to include a GetAvgFps and GetAvgFrameTime function.</p>
+
+<table>
+<tr><td>Initial GameMath psp opt</td><td>8 fps, Frame time 0.13 seconds</td></tr>
+<tr><td>orig cpp GameMath impl</td><td>9.4fps, Frame time ~0.11 seconds</td></tr>
+<tr><td>TileFloor reduce and renderer optimizations, some psp GameMath vector ops</td><td> 11.45fps, Frame time 0.09 seconds</td></tr>
+<tr><td>MoveComponent::Update opt</td><td>11.89fps, Frame time 0.08 seconds</td></tr>
+<tr><td>IqmMesh anim opt</td><td>19.33fps, Frame time 0.05 seconds</td></tr>
+</table>
+
+<p>It's hard to make out in the picture but is says "FPS: 19.57" and "Frame Time: 0.05"</p>
+<img src="./images/psp_fps_05_27_2022.jpg"/>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
