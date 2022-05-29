@@ -931,6 +931,23 @@ I updated the GameTimer class to include a GetAvgFps and GetAvgFrameTime functio
 <p>It's hard to make out in the picture but is says "FPS: 19.57" and "Frame Time: 0.05"</p>
 <img src="./images/psp_fps_05_27_2022.jpg"/>
 
+<h3>05/28/2022</h3>
+
+<p>Added the game timer avg FPS and frame time to PC, PS3, and Wii impls. This was quite
+easy as all except the PC version use the same gettimeofday() function, so it was mostly
+copy-paste. The PC one uses SDL2 GetTicks() which is straightforward also.</p>
+
+<p>Added PS3 Md2Mesh impl. I had gotten MD2 models working on PS3 previously so I remembered
+I needed to endian swap all of the file format fields since PS3 is big endian. Other than that
+it was a copy-paste from the PC impl.</p>
+
+<p>I haven't tested on PS3 and Wii hardware yet, but in emulators it's showing 60FPS and ~0.02
+seconds frame time. I (knock on wood!) don't think performance will be an issue for these
+platforms yet.</p>
+
+<p>My next plan is to add indexed drawing support for PSP to try and speed up its performance
+some more.</p>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
