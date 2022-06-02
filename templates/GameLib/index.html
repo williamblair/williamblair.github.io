@@ -948,6 +948,15 @@ platforms yet.</p>
 <p>My next plan is to add indexed drawing support for PSP to try and speed up its performance
 some more.</p>
 
+<h3>06/01/2022</h3>
+<p>Working on adding indexed drawing for PSP impl. It works on PPSSPP but is crashing
+on real hardware. The only reference I've found that uses indexed drawing is the
+<a href="https://github.com/pspdev/pspsdk/blob/master/src/samples/gu/shadowprojection/shadowprojection.c">shadow projection example</a>.
+The only thing I can see that I'm doing differently is calling sceGumDrawArray instead of sceGuDrawArray, but I doubt that would
+make a difference. Also my indices are created with memalign(16,...) as opposed to a static array.
+I'm planning on getting psplink set up on my Linux host to attempt to see where it's crashing, as I'm having trouble
+getting it to print to a .txt file on the memory stick.</p>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
