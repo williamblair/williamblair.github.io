@@ -957,6 +957,22 @@ make a difference. Also my indices are created with memalign(16,...) as opposed 
 I'm planning on getting psplink set up on my Linux host to attempt to see where it's crashing, as I'm having trouble
 getting it to print to a .txt file on the memory stick.</p>
 
+<h3>06/02/2022</h3>
+<p>Fixed the psp crashing bug. The issue was VFPU usage, after getting psplink working and
+seeing where it was crashing:</p>
+<img src="./images/pspterminal_06022022.png" width="800px"/>
+<p>After looking at
+<a href="https://wololo.net/talk/viewtopic.php?p=73325">here</a> and
+<a href="https://web.archive.org/web/20090126215037/http://ghoti.nl/PSPtutorialOp4.php">here</a>
+I needed to add "PSP_MAIN_THREAD_ATTR(PSP_THREAD_ATTR_USER | THREAD_ATTR_VFPU);" next to
+the psp module info in main.cpp.</p>
+
+<p>After that, the indexed array drawing worked as expected. With that working, I could change
+the IqmMesh update to directly set the vertex buffer vertices, which resulted in an improved
+performance: Frame time: 0.03s, FPS: 29.22. Basically 30 FPS! I think the next big thing
+that's slowing us down is the tile floor drawing; I'm guessing something to do with mipmapping
+the texture?</p>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
