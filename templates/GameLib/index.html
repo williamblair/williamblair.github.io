@@ -984,6 +984,30 @@ Tested on Wii hardware as well and confirmed Md2 model is working also:</p>
     <source src="./images/objworking_06_04_2022.webm" type="video/webm"/>
 </video>
 
+<h3>06/06/2022</h3>
+<p>Added psp obj mesh impl. The test obj I was using previously wasn't rendering correctly
+in terms of the texture. I'm guessing it had something to do with the model's texture
+coordinates being unnormalized/out of bounds:</p>
+<pre>...
+vt 2.000000 0.000000
+vt 2.000000 1.000000
+vt -1.000000 0.000000
+vt -1.000000 1.000000
+...
+</pre>
+
+<p>I tried to enable texture coordinate wrapping but it didn't make a difference
+(at least by setting it in Renderer::Init). Instead I downloaded a different
+model from <a href="https://poly.pizza/m/kD8hdFa32e">here</a>. Then I had
+to import it into blender and export it again, with the setting to triangulate
+the model as some of the vertices were quads instead of triangles. Now a colorful
+orangutan is being drawn :D</p>
+
+<img src="./images/orangutan_06_06_2022.jpg" width="500px"/>
+
+<p></p>
+
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
