@@ -1005,8 +1005,56 @@ orangutan is being drawn :D</p>
 
 <img src="./images/orangutan_06_06_2022.jpg" width="500px"/>
 
-<p></p>
+<h3>06/14/2022</h3>
 
+<p>Got Gltf model animation working in the PC version. Based off of
+<a href="https://github.com/williamblair/OpenGLAnimationBook/tree/master/10_meshSkinning">
+here</a>. I modified it so that all of the classes are within a Gltf namespace,
+and switched the math parts to use GameMath instead of the included math classes. I had
+one bug where the GameMath quaternion multiplication impl wasn't working with the
+gltf implementation (although it's certainly entertaining to look at):</p>
+
+<video controls width="500">
+    <source src="./images/gltfnotworking_06_14_2022.webm" type="video/webm"/>
+</video>
+
+<p>Changing the GameMath function to be the same as the reference made it
+work:</p>
+
+<pre><code>inline Quat operator*(const Quat&amp; a, const Quat&amp; b) {
+    // not working
+    /*Vec3 av(a.x, a.y, a.z);
+    Vec3 bv(b.x, b.y, b.z);
+    Vec3 v = Cross(av, bv) + (bv*a.w) + (av*b.w);
+    float w = a.w*b.w - Dot(av, bv);
+    return Quat(
+        v.x,
+        v.y,
+        v.z,
+        w
+    );*/
+    // working
+    return Quat(
+        b.x*a.w + b.y*a.z - b.z*a.y + b.w*a.x,
+        -b.x*a.z + b.y*a.w + b.z*a.x + b.w*a.y,
+        b.x*a.y - b.y*a.x + b.z*a.w + b.w*a.z,
+        -b.x*a.x - b.y*a.y - b.z*a.z + b.w*a.w
+    );  
+}
+</code></pre>
+
+<p>I haven't looked into the differences between the two yet. I also
+think some of the Gltf classes such as Skeleton, Clip, and Transform would
+be useful in general to have in GameLib, so I might refactor those at some
+point. But for now, there it is:</p>
+
+<video controls width="500">
+    <source src="./images/gltfworking_06_14_2022.webm" type="video/webm"/>
+</video>
+
+<p>I also need to update the linux Makefile to compile object files
+instead of directly compiling the entire source code each build, since
+there are enough files now that it's becoming slow to build.</p>
 
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
