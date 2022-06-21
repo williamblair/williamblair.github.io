@@ -1068,6 +1068,39 @@ PC impl. TODO - update the other impls to match the new PC additions</p>
     <source src="./images/thirdpersoncamera_shoulder_06_15_2022.webm" type="video/webm"/>
 </video>
 
+<h3>06/20/2022</h3>
+<p>Added font support for
+<a href="https://angelcode.com/products/bmfont/">https://angelcode.com/products/bmfont/</a>.
+It's a tool that converts a regular PC ttf font to a texture and a metadata file with info
+about each character in the texture. Below's the texture and .fnt info file it generated for
+the font Georgia:</p>
+
+<img src="./images/BjTestGeorgia_0.png"/>
+<pre>info face="Georgia" size=32 bold=0 italic=0 charset="" unicode=1 stretchH=100 smooth=1 aa=1 padding=0,0,0,0 spacing=1,1 outline=0
+common lineHeight=32 base=26 scaleW=256 scaleH=256 pages=1 packed=0 alphaChnl=1 redChnl=0 greenChnl=0 blueChnl=0
+page id=0 file="BjTestGeorgia_0.tga"
+chars count=95
+char id=32   x=42    y=26    width=3     height=1     xoffset=-1    yoffset=31    xadvance=7     page=0  chnl=15
+char id=33   x=247   y=64    width=5     height=20    xoffset=2     yoffset=6     xadvance=9     page=0  chnl=15
+char id=34   x=134   y=104   width=10    height=8     xoffset=1     yoffset=5     xadvance=12    page=0  chnl=15
+char id=35   x=29    y=92    width=16    height=17    xoffset=1     yoffset=9     xadvance=18    page=0  chnl=15
+...
+</pre>
+
+<p>This way non-monospace fonts can be used with variable width/height per character.
+When drawing, an X/Y offset is also necessary (the xoffset, yoffset fields above) for
+correct spacing relative to the other characters:</p>
+
+<img src="./images/FntFont_pc_notworking_06_20_2022.png" width="600"/>
+<img src="./images/FntFont_pc_working_06_20_2022.png" width="600"/>
+
+<p>Also started menu system for the gamelibrpg using the above font support.
+Through this found a bug in the Sprite class setting the default texture UVs and
+size, then also added a scale factor to the font drawing to change the displayed
+font size.</p>
+
+<img src="./images/initbattlemenu_06_20_2022.png" width="600"/>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
