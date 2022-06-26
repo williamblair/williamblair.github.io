@@ -1112,6 +1112,18 @@ of a sprite over time via sin/cos waves.</p>
     <source src="./images/gamelibrpg_initialbattlescene_06_24_2022.webm" type="video/webm"/>
 </video>
 
+<h3>06/25/2022</h3>
+<p>Added FntFont implementation for PSP. This took way longer than I thought due to two bugs.
+First, since I was unable to use std::getline for reading the .fnt file, I wrote one using the
+pspsdk sceIo* functions. It had a bug where I forgot to clear the file buffer and index status,
+causing the second font load to not read anything, resulting in a character info array length
+of 0. Second, for some reason storing the character info structs in a std::map was resulting
+in a memory access error and crash in both PPSSPP and real hardware. I replaced std::map
+with a std::vector, now with the assumption that the character info structs are stored and
+loaded in ascending order from least to greatest ascii value.</p>
+
+<p>Next TODO is either a Wii Fnt font impl or PS3 gltf impl.</p>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
