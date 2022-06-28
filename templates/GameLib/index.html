@@ -1124,6 +1124,74 @@ loaded in ascending order from least to greatest ascii value.</p>
 
 <p>Next TODO is either a Wii Fnt font impl or PS3 gltf impl.</p>
 
+<h3>06/27/2022</h3>
+<p>Working towards adding FntFont implementation for Wii. As a first step, image files need to be
+able to be loaded from the sd card, so we can modify the image data before it gets uploaded as a
+texture. Up until now TPL files from the libogc examples were being used. So far I have bmp images
+working. I hit an issue where the resulting texture was off/incorrect, using the below BMP file
+for testing:</p>
+
+<img src="./images/Woman.bmp"/><br/>
+<img src="./images/wiibmp_notworking_06_27_2022.png"/>
+
+<p>After some digging, found that the image data you upload via GX_InitTexObj must be in a
+<a href="https://wiki.tockdom.com/wiki/Image_Formats">special format/order</a>:</p>
+
+<img src="./images/wii_image_formats_06_27_2022.png"/>
+<img src="./images/wii_image_blocks_06_27_2022.png"/>
+
+<p>In order to rearrange the pixel data, I used the following code:</p>
+
+<pre><code>// below values are specific to RGB565
+const size_t blkW = 4; // 4 px wide blocks
+const size_t blkH = 4; // 4 px tall blocks
+const size_t numBlocksX = (width / blkW) + ((width % blkW) > 0);
+const size_t numBlocksY = (height / blkH) + ((height % blkH) > 0);
+const size_t outBytesPerPixel = 2; // RGB565
+mTexData = (uint8_t*)memalign(32, numBlocksX*blkW * numBlocksY*blkH * outBytesPerPixel);
+if (!mTexData) {
+    dbgprint("Failed to alloc mTexData\n");
+    return false;
+}
+uint16_t* outPx = (uint16_t*)mTexData;
+for (size_t blkY = 0; blkY < numBlocksY; ++blkY)
+{
+for (size_t blkX = 0; blkX < numBlocksX; ++blkX)
+{
+    size_t blkImgWidth = (width - blkX*blkW);
+    size_t blkImgHeight = (height - blkY*blkH);
+    
+    if (blkImgWidth > blkW) { blkImgWidth = blkW; }
+    if (blkImgHeight > blkH) { blkImgHeight = blkH; }        
+
+    size_t numPxPadRows = blkH - blkImgHeight;
+    size_t numPxPadCols = blkW - blkImgWidth;
+
+    for (size_t row = 0; row < blkImgHeight; ++row)
+    {
+        const size_t outPxX = blkX*blkW;
+        const size_t outPxY = (blkY*blkH)+row;
+        uint16_t* inPxData = (uint16_t*)data;
+        uint16_t* inPx = &inPxData[outPxY*width + outPxX];
+        for (size_t col = 0; col < blkImgWidth; ++col) {
+            *outPx++ = *inPx++;
+        }
+        for (size_t col = 0; col < numPxPadCols; ++col) {
+            *outPx++ = 0;
+        }
+    }
+    for (size_t row = 0; row < numPxPadRows; ++row) {
+        for (size_t col = 0; col < blkW; ++col) {
+            *outPx++ = 0;
+        }
+    }
+}
+}
+</code></pre>
+
+<p>Not the prettiest, but the resulting textured triangle now looks as expected!</p>
+<img src="./images/wiibmp_working_06_27_2022.png"/>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
