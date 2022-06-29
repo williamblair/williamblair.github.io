@@ -1192,6 +1192,93 @@ for (size_t blkX = 0; blkX < numBlocksX; ++blkX)
 <p>Not the prettiest, but the resulting textured triangle now looks as expected!</p>
 <img src="./images/wiibmp_working_06_27_2022.png"/>
 
+<h3>06/28/2022</h3>
+
+<p>Added tga image support for Wii and changed the result format
+to 32bit (r8g8b8a8) instead of 16bit. For 32bit textures the storage
+format is even weirder; each 4x4 block of pixels has the interleaved
+format below:</p>
+
+<img src="./images/wii_rgba32_format_06_28_2022.png"/>
+
+<p>Which, shuffling the pixels in code looks like:</p>
+
+<pre><code>const size_t blkW = 4; // 4 px wide blocks
+const size_t blkH = 4; // 4 px tall blocks
+const size_t numBlocksX = (width / blkW) + ((width % blkW) > 0);
+const size_t numBlocksY = (height / blkH) + ((height % blkH) > 0);
+const size_t outBytesPerPixel = 4; // RGBA32
+mTexData = (uint8_t*)memalign(32, numBlocksX*blkW * numBlocksY*blkH * outBytesPerPixel);
+if (!mTexData) {
+    dbgprint("Failed to alloc mTexData\n");
+    return false;
+}
+uint8_t* outPx = (uint8_t*)mTexData;
+std::vector<uint8_t> tmpOutPxIn(blkW*blkH*outBytesPerPixel); // non-reordered
+std::vector<uint8_t> tmpOutPxOut(blkW*blkH*outBytesPerPixel); // reordered
+for (size_t blkY = 0; blkY < numBlocksY; ++blkY)
+{
+for (size_t blkX = 0; blkX < numBlocksX; ++blkX)
+{
+    size_t blkImgWidth = (width - blkX*blkW);
+    size_t blkImgHeight = (height - blkY*blkH);
+    
+    if (blkImgWidth > blkW) { blkImgWidth = blkW; }
+    if (blkImgHeight > blkH) { blkImgHeight = blkH; }        
+
+    memset(tmpOutPxIn.data(), 0, tmpOutPxIn.size()*sizeof(uint8_t));
+
+    // store pixels in output block in normal RGBA order
+    for (size_t row = 0; row < blkImgHeight; ++row)
+    {
+        const size_t outPxX = blkX*blkW;
+        const size_t outPxY = (blkY*blkH)+row;
+        uint8_t* inPxData = (uint8_t*)data;
+        uint8_t* inPx = &inPxData[outPxY*width*bytesPerPixel + outPxX*bytesPerPixel];
+        uint8_t* outTmp = &tmpOutPxIn[row*blkW*outBytesPerPixel];
+        for (size_t col = 0; col < blkImgWidth; ++col) {
+            uint8_t r = *inPx++;
+            uint8_t g = *inPx++;
+            uint8_t b = *inPx++;
+            uint8_t a = (bytesPerPixel == 4) ? *inPx++ : 255;
+
+            *outTmp++ = r;
+            *outTmp++ = g;
+            *outTmp++ = b;
+            *outTmp++ = a;
+        }
+    }
+
+
+    // rearrange into ARARAR...GBGBGB... order
+    uint8_t* aPtr = &tmpOutPxOut[0];
+    uint8_t* rPtr = &tmpOutPxOut[1];
+    uint8_t* gPtr = &tmpOutPxOut[32];
+    uint8_t* bPtr = &tmpOutPxOut[33];
+    uint8_t* tmpPtr = tmpOutPxIn.data();
+    for (size_t px = 0; px < 16; ++px) {
+        uint8_t r = *tmpPtr++;
+        uint8_t g = *tmpPtr++;
+        uint8_t b = *tmpPtr++;
+        uint8_t a = *tmpPtr++;
+        *aPtr = a;
+        *rPtr = r;
+        *gPtr = g;
+        *bPtr = b;
+        aPtr += 2;
+        rPtr += 2;
+        gPtr += 2;
+        bPtr += 2;
+    }
+
+    // store the reordered pixels in the output texture
+    for (size_t px = 0; px < 64; ++px) {
+        *outPx++ = tmpOutPxOut[px];
+    }
+}
+}
+</code></pre>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
