@@ -1279,6 +1279,30 @@ for (size_t blkX = 0; blkX < numBlocksX; ++blkX)
 }
 </code></pre>
 
+<h3>07/02/2022</h3>
+<p>Fixed the PS3 GameMath impl bug that I'd been putting off for a while.
+I figured in preparation for adding GLTF support, it'd be good to make
+sure the math functions were nice and performant. The issue I think
+was in Mat4-Mat4 and Mat4-Vec4 multiplication, where the vec_float4
+types didn't like being casted as Vec4's. Doing everything directly
+with vec_float4s instead seems to have fixed the issue. I also added
+some optimizations to the Quat implementation as well which weren't
+there before, as well as adding the new functions from the cpp impl
+necessary for the GLFT implementation.</p>
+
+<p>During this, I found the PS3 Cell CPU doesn't support the vec_mul()
+function for component-wise vector multiplication. On the other hand,
+it does support vec_madd(), which is a fused multiply-add. To get around
+it, psl1ght uses vec_madd() with the add argument set to 0. I found this
+funny because for x86_64, AVX intrinsics, I've found some CPUs where
+it's the other way arround, where vector component-wise multiplication
+is supported but fused multiply add is not. Fused multiply-add in AVX
+is under it's own set of instructions and requires the "-mfma" flag
+separately from "-mavx" or "-mavx2." The ps3sdk successfully compiles
+vec_mul() instructions if you add the "-mvsx" flag, but an illegal
+instruction is encountered if you run the resulting program.</p>
+
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
