@@ -1302,6 +1302,179 @@ separately from "-mavx" or "-mavx2." The ps3sdk successfully compiles
 vec_mul() instructions if you add the "-mvsx" flag, but an illegal
 instruction is encountered if you run the resulting program.</p>
 
+<h3>07/05/2022</h3>
+<p>Added cgltf support for PS3. I had to modify the cgltf library
+(cgltf.h) to swap endianness, which luckily was only in a few locations
+- in diff form:</p>
+
+<pre><code>878a879,930
+> static int16_t lend2bend(int16_t val)
+> {
+>     int16_t res;
+>     uint8_t* in = (uint8_t*)&val;
+>     uint8_t* out = (uint8_t*)&res;
+>     out[0] = in[1];
+>     out[1] = in[0];
+>     return res;
+> }
+> static uint16_t lend2bend(uint16_t val)
+> {
+>     uint16_t res;
+>     uint8_t* in = (uint8_t*)&val;
+>     uint8_t* out = (uint8_t*)&res;
+>     out[0] = in[1];
+>     out[1] = in[0];
+>     return res;
+> }
+> /*static int32_t lend2bend(int32_t val)
+> {
+>     int32_t res;
+>     uint8_t* in = (uint8_t*)&val;
+>     uint8_t* out = (uint8_t*)&res;
+>     out[0] = in[3];
+>     out[1] = in[2];
+>     out[2] = in[1];
+>     out[3] = in[0];
+>     return res;
+> }*/
+> static uint32_t lend2bend(uint32_t val)
+> {
+>     uint32_t res;
+>     uint8_t* in = (uint8_t*)&val;
+>     uint8_t* out = (uint8_t*)&res;
+>     out[0] = in[3];
+>     out[1] = in[2];
+>     out[2] = in[1];
+>     out[3] = in[0];
+>     return res;
+> }
+> static float lend2bend(float val)
+> {
+>     float res;
+>     uint8_t* in = (uint8_t*)&val;
+>     uint8_t* out = (uint8_t*)&res;
+>     out[0] = in[3];
+>     out[1] = in[2];
+>     out[2] = in[1];
+>     out[3] = in[0];
+>     return res;
+> }
+> 
+1054a1107
+>         printf("cgltf_parse size < GlbHeaderSize\n");
+1059a1113
+>         printf("cgltf_parse invalid options\n");
+1075a1130
+>     tmp = lend2bend(tmp);
+1083a1139
+>             printf("cgltf_parse tmp GlbMagic error\n");
+1092a1149
+>             printf("cgltf_parse fixed_options type cgltf_parse_json error\n");
+1104c1161
+< 	uint32_t version = tmp;
+---
+> 	uint32_t version = lend2bend(tmp);
+1106a1164
+>         printf("cgltf_parse version != GlbVersion error\n");
+1111a1170
+>     tmp = lend2bend(tmp);
+1113a1173
+>         printf("cgltf_parse tmp > size error\n");
+1120a1181
+>         printf("cgltf_parse GlbHeaderSize + GlbChunkHeaderSize > size\n");
+1126a1188
+>     json_length = lend2bend(json_length);
+1128a1191
+>         printf("cgltf_parse GlbHeaderSize + GlbChunkHeaderSize + json_length > size\n");
+1133a1197
+>     tmp = lend2bend(tmp);
+1135a1200
+>         printf("cgltf_parse tmp != GlbMagicJsonChunk\n");
+1151a1217
+>         bin_length = lend2bend(bin_length);
+1153a1220
+>             printf("cgltf_parse GlbHeaderSize + GlbChunkHeaderSize + json_length + GlbChunkHeaderSize + bin_length > size\n");
+1158a1226
+>         tmp = lend2bend(tmp);
+1160a1229
+>             printf("cgltf_parse tmp != GlbMagicBinChunk\n");
+1172a1242
+>         printf("cgltf_parse cgltf_parse_json error\n");
+1186a1257
+>         printf("clgtf parse file invalid options\n");
+1197a1269
+>         printf("cgltf parse file file read error\n");
+1204a1277
+>         printf("cgltf parse file cgltf_parse error\n");
+1508c1581
+< 			cgltf_size v = ((unsigned short*)data)[i];
+---
+> 			cgltf_size v = lend2bend(((unsigned short*)data)[i]);
+1516c1589
+< 			cgltf_size v = ((unsigned int*)data)[i];
+---
+> 			cgltf_size v = lend2bend(((unsigned int*)data)[i]);
+2129c2202
+< 			return *((const int16_t*) in);
+---
+> 			return lend2bend(*((const int16_t*) in));
+2131c2204
+< 			return *((const uint16_t*) in);
+---
+> 			return lend2bend(*((const uint16_t*) in));
+2133c2206
+< 			return *((const uint32_t*) in);
+---
+> 			return lend2bend(*((const uint32_t*) in));
+2135c2208
+< 			return (cgltf_size)*((const float*) in);
+---
+> 			return (cgltf_size)lend2bend(*((const float*) in));
+2149c2222
+< 		return *((const float*) in);
+---
+> 		return lend2bend(*((const float*) in));
+2158c2231
+< 				return *((const int16_t*) in) / (cgltf_float)32767;
+---
+> 				return lend2bend(*((const int16_t*) in)) / (cgltf_float)32767;
+2160c2233
+< 				return *((const uint16_t*) in) / (cgltf_float)65535;
+---
+> 				return lend2bend(*((const uint16_t*) in)) / (cgltf_float)65535;
+2324c2397
+< 	switch (component_type)
+---
+> 	/*switch (component_type)
+2339a2413,2432
+> 
+> 		default:
+> 			return 0;
+> 	}*/
+> 	switch (component_type)
+> 	{
+> 		case cgltf_component_type_r_8:
+> 			return *((const int8_t*) in);
+> 
+> 		case cgltf_component_type_r_8u:
+> 			return *((const uint8_t*) in);
+> 
+> 		case cgltf_component_type_r_16:
+> 			return lend2bend(*((const int16_t*) in));
+> 
+> 		case cgltf_component_type_r_16u:
+> 			return lend2bend(*((const uint16_t*) in));
+> 
+> 		case cgltf_component_type_r_32u:
+> 			return lend2bend(*((const uint32_t*) in));
+</code></pre>
+
+<p>I'm curious to see if performance will be an issue once I add
+more than one model. Single model running on PS3 below with the updated ThirdPersonPlayer:</p>
+
+<video controls width="600">
+    <source src="./images/gltf_ps3_07_05_2022.webm" type="video/webm"/>
+</video>
 
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
