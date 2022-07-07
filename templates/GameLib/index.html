@@ -1476,6 +1476,28 @@ more than one model. Single model running on PS3 below with the updated ThirdPer
     <source src="./images/gltf_ps3_07_05_2022.webm" type="video/webm"/>
 </video>
 
+<h3>07/06/2022</h3>
+<p>Added sprite rotation support, as well as getlineheight to FntFont.
+In order for rotation to work properly, I needed to translate the sprite
+over by half of its width/height first, that way we are rotating around
+the center of the image instead of the top left:</p>
+<pre><code>GameMath::Mat4 mvpMat =
+    GameMath::Translate(sprite.mX, sprite.mY, 0.0f) *
+    
+    GameMath::Translate(normW/2,-normH/2,0.0f) *
+    GameMath::Rotate(GameMath::Deg2Rad(sprite.mRotDegrees),
+        GameMath::Vec3(0.0f, 0.0f, 1.0f)) *
+    GameMath::Translate(-normW/2,normH/2,0.0f) *
+    
+    GameMath::Scale(normW, normH, 1.0f);
+</code></pre>
+
+<p>Tested with the gamelibrpg title screen:</p>
+
+<video controls width="600">
+    <source src="./images/gamelibrpg_basic_title_screen_07_06_2022.webm" type="video/webm"/>
+</video>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
