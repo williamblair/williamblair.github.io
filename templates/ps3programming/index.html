@@ -2264,6 +2264,36 @@ inline GameMath::Mat4 gameMath2TinyModelViewMat(GameMath::Mat4& mat) {
 https://bitbucket.org/williamblair/ps3devprogs/src/master/tiny3diqm/</a>
 </p>
 
+<h3>07/24/2022</h3>
+<p>Implemented Julia set calculation in order to learn SPU parallel programming.
+I struggled alot with getting DMA transfers between the PPU/SPUs to work properly.
+Eventually found this reference and took alot from it:
+<a href="https://github.com/zerkman/fractal">https://github.com/zerkman/fractal</a>.
+I started with a serial PPU implementation and added parallelism in stepped increments,
+recording the average FPS at each step (this was with a texture width of 512; the current
+version has a width of 1024 so it's about half as fast.)</p>
+
+<table>
+<tr><th>Impl</th><th>Avg FPS</th></tr>
+<tr><td>Serial PPU impl</td><td>1.6</td></tr>
+<tr><td>Initial SPU impl</td><td>15-16</td></tr>
+<tr><td>Remove Texture Data Copy</td><td>26-27</td></tr>
+<tr><td>Initial SPU Intrinsics</td><td>43-44</td></tr>
+<tr><td>SPU Hsv2Rgb lookup</td><td>51-52</td></tr>
+<tr><td>-O3, -funroll-loops flags</td><td>56-57</td></tr>
+</table>
+
+<p>I also added inputs to zoom in, move around, and change the complex
+calculation constant. The result is very fun to play around with:</p>
+
+<video controls width="640">
+    <source src="./images/juliaset_07_24_2022.webm" type="video/webm"/>
+</video>
+
+<p>The source can be found at:
+<a href="https://bitbucket.org/williamblair/ps3spufractal/src/master/">
+https://bitbucket.org/williamblair/ps3spufractal/src/master/</a></p>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
