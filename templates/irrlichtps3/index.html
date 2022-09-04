@@ -22,6 +22,21 @@
 <h3>08/31/2022</h3>
 <p>Project files set up, CPS3Driver, CIrrDevicePS3, CPS3Texture stubs compiled.</p>
 
+<h3>09/03/2022</h3>
+<p>Added ps3 driver initialization to PS3 device, added psl1ght variables and basic
+clear/begin/end scene so the first tutorial example main loop runs and sets the
+background color. Md2 mesh loading also seems to be working without needing to change
+anything; Irrlicht seems to already handle big-endianness. Just needed to change the
+model file path explicitly to /dev_hdd0:</p>
+<pre><code>// tutorial 1 main.cpp
+AnimatedMesh* mesh = smgr->getMesh("/dev_hdd0/Irrlicht01/sydney.md2");
+// CMD2MeshFileLoader.cpp
+file->read(&header, sizeof(SMD2Header));
+#ifdef __BIG_ENDIAN__                                                                                
+header.magic = os::Byteswap::byteswap(header.magic);
+...
+</code></pre>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
