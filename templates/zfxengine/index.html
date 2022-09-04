@@ -82,6 +82,17 @@ vert cache manager render naked working.</p>
 <p>Render lines, points primitives working:</p>
 <img src="./images/drawprimitives_08_31_2022.png"/>
 
+<h3>09/03/2022</h3>
+<p>Added ZFXModel class for s3d models, and fixed the uu/VERTEX struct shader.
+The vector-matrix multiplication order needed to be switched because of the
+ZFXMatrix implementation:</p>
+<pre><code>//gl_Position = uWvpMatrix * vec4(aPos,1.0);
+gl_Position = vec4(aPos,1.0) * uWvpMatrix;
+</code></pre>
+<p>Most of the chapter 6 demo now works; not implemented are multiple windows/viewports
+and font drawing, also lighting:</p>
+<img src="./images/chp06_demo_09_03_2022.png"/>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
