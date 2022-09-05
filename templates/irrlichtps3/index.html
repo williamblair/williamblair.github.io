@@ -37,6 +37,29 @@ header.magic = os::Byteswap::byteswap(header.magic);
 ...
 </code></pre>
 
+<h3>09/04/2022</h3>
+<p>Untextured md2 model from first tutorial working.
+The pairing configuration of irrlicht and ps3 matrices was:</p>
+
+<pre><code>// CPS3Driver::setTransform()
+MvpMatrix = Matrices[ETS_PROJECTION] * Matrices[ETS_VIEW] * Matrices[ETS_WORLD];
+// CPS3Driver::drawHardwareBuffer()
+core::matrix4 trans = MvpMatrix.getTransposed();
+rsxSetVertexProgramParameter(
+    mContext,
+    shader->mVpo,
+    S3DShader::mvpMatUniform,
+    trans.pointer()
+);
+// s3d_shader.vert
+gl_Position = vec4(aPos,1.0) * uMvpMatrix;
+</code></pre>
+
+<p>Also needed to force hardware buffers into being used. Not sure how (if at all)
+to handle drawing vertices directly yet. Textures TODO next.</p>
+
+<img src="./images/tut1_untextured_09_04_2022.png" width="600px"/>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
