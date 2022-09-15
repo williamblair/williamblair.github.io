@@ -93,6 +93,17 @@ gl_Position = vec4(aPos,1.0) * uWvpMatrix;
 and font drawing, also lighting:</p>
 <img src="./images/chp06_demo_09_03_2022.png"/>
 
+<h3>09/14/2022</h3>
+<p>Initial Render Device CreateFont and DrawText working. Using fnt format font from
+<a href="https://angelcode.com/products/bmfont/">https://angelcode.com/products/bmfont/</a>,
+as the book implementation uses a built-in direct X library for loading Windows fonts.</p>
+<p>stb image was not properly loading the tga format generated for some reason, and I had
+to convert the image to a bmp instead:</p>
+<img src="./images/fntfonttexturenotworking_09_14_2022.png"/><br/>
+<img src="./images/fntfonttextureworking_09_14_2022.png"/><br/>
+<p>After that, we can successfully call DrawText():</p>
+<img src="./images/fntfonttextworking_09_14_2022.png"/>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
