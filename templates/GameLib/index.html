@@ -1559,6 +1559,48 @@ the home button. Changing the Makefile optimization flag for -O3 to -O2 fixed it
     <source src="./images/dirlight_pc_09_21_2022.webm" type="video/webm"/>
 </video>
 
+<h3>09/22/2022</h3>
+<p>Implemented basic positional/directional lighting on PS3 and PSP. For PS3 it was
+mainly just a matter of copying the PC shaders and adding the uniform sets in the
+Renderer class. PSP was more interesting as its API is more similar to older fixed pipeline
+OpenGL, which I hadn't done lighting in before.
+I looked at <a href="http://www.csc.villanova.edu/~mdamian/Past/graphicssp13/notes/lightlab.pdf">
+http://www.csc.villanova.edu/~mdamian/Past/graphicssp13/notes/lightlab.pdf</a> to get the basic
+idea then looked for similar function names in the psp sdk. I also found the lighting sample
+included with pspsdk: <a href="https://github.com/pspdev/pspsdk/tree/master/src/samples/gu/lights">
+https://github.com/pspdev/pspsdk/tree/master/src/samples/gu/lights</a>. I ended up needing to
+negate the position/direction of the input lights in order for the results to match the PS3 and PC
+versions:</p>
+
+<pre><code>
+// positional light
+sceGuEnable(GU_LIGHT0+index);
+HopsMath::Vec3 negPos = -1.0f*mPosLights[index].position;
+sceGuLight(
+    index,
+    GU_POINTLIGHT,
+    GU_AMBIENT_AND_DIFFUSE,
+    (const ScePspFVector3*)&negPos
+);
+// directional light
+sceGuEnable(GU_LIGHT0+2+index);
+HopsMath::Vec3 negDir = -1.0f*mDirLights[index].direction;
+sceGuLight(
+    index+2,
+    GU_DIRECTIONAL,
+    GU_AMBIENT_AND_DIFFUSE,
+    (const ScePspFVector3*)&negDir
+);
+</code></pre>
+
+<p>Finally, I also had to make a lower-poly version of the bunny model
+using a decimate modifier in blender, reducing the face count from 69451 to 12,038.
+</p>
+
+<video controls>
+    <source src="./images/psplight_09_22_2022.webm" type="video/webm"/>
+</video>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
