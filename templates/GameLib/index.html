@@ -1601,6 +1601,24 @@ using a decimate modifier in blender, reducing the face count from 69451 to 12,0
     <source src="./images/psplight_09_22_2022.webm" type="video/webm"/>
 </video>
 
+<h3>09/25/2022</h3>
+<p>Got lighting working on the Wii. It was similar to PSP/fixed-pipeline OpenGL.
+Followed this libogc lighting example:
+<a href="https://github.com/devkitPro/wii-examples/blob/master/graphics/gx/neheGX/lesson08/source/lesson8.c">
+https://github.com/devkitPro/wii-examples/blob/master/graphics/gx/neheGX/lesson08/source/lesson8.c
+</a>. Interestingly, according to the libogc documentation:</p>
+<p>"Although the hardware doesn't support parallel directional diffuse lights, it is possible to get "almost parallel" lights by setting
+sufficient large values to position parameters (x, y and z) which makes the light position very far away from objects to be lit and all rays
+considered almost parallel"</p>
+<p>And for GX_InitLightDir():</p>
+<p>"This function does not set the direction of parallel directional diffuse lights.
+If you want parallel diffuse lights, you may put the light position very far from every
+objects to be lit. (See GX_InitLightPos() and GX_SetChanCtrl())"
+</p>
+
+<p>I ended up basically treating the directional light the same as a positional light,
+and for this scene the result looks basically the same.</p>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
