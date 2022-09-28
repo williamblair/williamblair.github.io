@@ -1619,6 +1619,62 @@ objects to be lit. (See GX_InitLightPos() and GX_SetChanCtrl())"
 <p>I ended up basically treating the directional light the same as a positional light,
 and for this scene the result looks basically the same.</p>
 
+<h3>09/27/2022</h3>
+<p>A couple of things today:</p>
+<ul>
+    <li>Worked on unifying Input class for pc,ps3,psp</li>
+    <li>Got Md2 mesh working with updated VertexBuffer (w/ nomals) on pc,ps3 (started psp)</li>
+    <li>Updated pc,ps3,psp renderer to get turning lighting on/off during runtime</li>
+    <li>Added FileSystem namespace for setting file loading location prefix for pc,ps3,psp</li>
+</ul>
+
+<p>Encountered two bugs during the PSP updates:</p>
+<p>For the FileSystem namespace, using a string for storing the file location prefix resulted
+in PPSSPP crashing with a null memory access violation; storing it as a c-style string char
+array fixed this:</p>
+
+<pre><code>//static std::string filePrefixPath = "";
+static char filePrefixPath[256];
+void SetFilePrefix(const char* prefix)
+{
+    printf("FileSystem set file prefix: %s\n", prefix);
+    if (prefix && strlen(prefix) >= 1) {
+        //filePrefixPath = std::string(prefix);
+        strcpy(filePrefixPath, prefix);
+    }
+}
+</code></pre>
+
+<p>Second, for the updated input class, using an unordered map for storing button values
+also resulted in memory access errors. Changed to an array of booleans instead:</p>
+
+<pre><code>class Input
+{
+public:
+    
+    enum Button
+    {
+        BTN_LEFT = 0,
+        BTN_DOWN,
+        BTN_RIGHT,
+        BTN_UP,
+        BTN_SQUARE,
+        BTN_CROSS,
+        BTN_CIRCLE,
+        BTN_TRIANGLE,
+        BTN_L1,
+        BTN_R1,
+        BTN_NUMBUTTONS
+    };
+...
+//std::unordered_map&lt;Button,bool&gt; mLastButtons;
+//std::unordered_map&lt;Button,bool&gt; mCurButtons;
+bool mLastButtons[BTN_NUMBUTTONS];
+bool mCurButtons[BTN_NUMBUTTONS];
+</code></pre>
+
+<p>Next TODOs are finish MD2 mesh psp update and all the above updates for Wii.</p>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
