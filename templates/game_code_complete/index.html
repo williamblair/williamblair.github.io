@@ -288,6 +288,40 @@ protected:
 set the Lua object to NIL instead of filling/extracting from it the desired
 data.</p>
 
+<h2>Chapter 14</h2>
+<h3>3D Graphics Basics</h3>
+
+<p>I haven't done anything with actual graphics yet; focusing on the math first.
+I'm replacing all of the DirectX stuff with a custom math implementation and OpenGL
+implementation. The math is mixed from different sources.
+Have replaced D3DXPlaneDotCoord with:</p>
+
+<pre><code>// https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dxplanedotcoord
+inline float PlaneDotCoord(const Vec3&amp; point) const {
+    return a*point.x + b*point.y + c*point.z + d;
+}
+</code></pre>
+
+a,b,c, and d are the plane member variables. Replaced D3DXPlaneFromPoints with:
+
+<pre><code>// normal faces away from you if you send verts in counterclockwise order
+// https://keisan.casio.com/exec/system/1223596129
+//inline void Init(const Vec3& p0, const Vec3& p1, const Vec3& p2) {
+inline void Init(const Vec3& p2, const Vec3& p1, const Vec3& p0) {
+    Vec3 ab = p1-p0;
+    Vec3 ac = p2-p0;
+    Vec3 abc = Cross(ab,ac);
+    a = abc.x; b = abc.y; c = abc.z;
+    d = -(a*p0.x + b*p0.y + c*p0.z);
+    Normalize();
+}
+</code></pre>
+
+Not quite confident about the proper clockwise/counterclockwise vertex order,
+but it's good enough for now. We'll see if it works properly later. The comment
+shows a link to a nice visualization of the plane calculation given three points:
+<img src="./images/planecalculation_10_02_2022.png"/>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
