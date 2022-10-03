@@ -1681,6 +1681,18 @@ works. Still need to update the Md2 mesh for PSP/Wii but I'll save it for the ne
 03, which will be animated models. Debating whether to add GLTF mesh support for PSP/Wii as I'm
 concerned about performance.</p>
 
+<h3>10/02/2022</h3>
+<p>Attempting to get IQM models to work when exported from
+<a href="https://richwhitehouse.com/index.php?content=inc_projects.php&showproject=91">Noesis</a>,
+which would make life alot easier than having to open Blender and fiddle with
+stuff to get the IQM export from that.</p>
+
+<p>So far have had to add support for int weight indices instead of unsigned char, and float vertex
+weights instead of unsigned char weights. However, there's another issue as my test model is
+freaking out:</p>
+
+<img src="./images/iqm_error_10_02_2022.png"/>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
