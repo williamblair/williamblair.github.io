@@ -1693,6 +1693,21 @@ freaking out:</p>
 
 <img src="./images/iqm_error_10_02_2022.png"/>
 
+<h3>10/03/2022</h3>
+<p>Reverted trying to get Noesis IQM export working; I tried loading an exported model using the
+<a href="https://www.raylib.com/examples.html">Raylib</a> iqm mesh example and it didn't work
+in that either, so I decided it wasn't worth it. Got Squall and Edea meshes in IQM format instead,
+exported using Blender. If you look closely you can see some of the edges that should be transparent
+are the background color instead; this is due to the triangles in those cases being backwards (if
+you look at them from the other side they are as transparent as expected.) Not sure how I'd go about
+fixing that, I think its just more of an issue with the models themselves.
+Looking at the IQM code, I should really clean up and optimize the
+animation as it's terribly inefficient (at least for PC) currently.</p>
+
+<video controls>
+    <source src="./images/squalliqm_working_10_03_2022.webm" type="video/webm"/>
+</video>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
