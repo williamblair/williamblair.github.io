@@ -1708,6 +1708,52 @@ animation as it's terribly inefficient (at least for PC) currently.</p>
     <source src="./images/squalliqm_working_10_03_2022.webm" type="video/webm"/>
 </video>
 
+<h3>10/21/2022</h3>
+<p>I've spent the past two weeks working on my submission, "Mine, Robot!" for the
+RE:Start! PSP 2022 game jam. During development I encountered a few bugs in HopsLib
+for the PSP:</p>
+
+<ul>
+    <li>
+        Targa image loading not freeing/releasing the opened Targa file, resulting
+        in the PSP crashing after a certain number of images were loaded
+    </li>
+    <li>
+        Needed to add <i>sceKernelDcacheWritebackInvalidateAll();</i> after
+        vertex drawing to get rid of some graphical glitches. Thanks to
+        Iridescence for this suggestion.
+    </li>
+    <li>
+        Added texture swizzling to heavily improve/fix performance when running
+        on a real PSP; found this out again thanks to Iridescence's PSP programming
+        tutorials: <a href="https://youtu.be/QdfqWZU-CYY">link</a>
+    </li>
+    <li>
+        Needed to initialize the "locked" member variable in the sound effect and
+        music classes to false to prevent infinite loop on sound initialization
+    </li>
+    <li>
+        Found out lighting currently effects 2d sprite drawing also; this has not
+        been fixed yet.
+    </li>
+</ul>
+
+<p>Also made the following changes for PSP:</p>
+<ul>
+    <li>Added <i>SetTexture</i> to the sprite class, so the texture can be changed
+        after initialization
+    </li>
+    <li>
+        Update OBJ mesh class with normals and Add AABB
+    </li>
+    <li>
+        Add mag, magSqr for Vec3 class
+    </li>
+    <li>Add <i>GetProjMat</i> to renderer class</li>
+</ul>
+
+<p>I still need to do some code cleanup and then merge these changes back into develop/master.</p>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
