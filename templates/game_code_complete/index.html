@@ -322,6 +322,31 @@ but it's good enough for now. We'll see if it works properly later. The comment
 shows a link to a nice visualization of the plane calculation given three points:
 <img src="./images/planecalculation_10_02_2022.png"/>
 
+<h3>10/25/2022</h3>
+<p>Added OGLTextureResource, OGLTextureResourceView, OGLTextureResourceExtraData
+for loading and initializing OpenGL textures. Using stb_image from:
+<a href="https://github.com/nothings/stb/blob/master/stb_image.h">
+https://github.com/nothings/stb/blob/master/stb_image.h</a>.
+</p>
+
+<h3>10/26/2022</h3>
+<p>Started OGLRenderer to implement IRenderer class. Using SDL2/Glew. Hasn't been
+tested yet; along with OGLTextureResource. I'm getting a weird build error on Windows
+with cl/vs command prompt that I haven't seen before:</p>
+
+<pre>C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.26.28801\include\cstdlib(23): error C2733: 'abs': you cannot overload a function with 'extern "C"' linkage
+C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\corecrt_math.h(466): note: see declaration of 'abs'
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.26.28801\include\cstdlib(27): error C2733: 'abs': you cannot overload a function with 'extern "C"' linkage
+C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\corecrt_math.h(466): note: see declaration of 'abs'
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.26.28801\include\cstdlib(31): error C2733: 'abs': you cannot overload a function with 'extern "C"' linkage
+C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt\corecrt_math.h(466): note: see declaration of 'abs'
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.26.28801\include\xtr1common(21): error C2894: templates cannot be declared to have 'C' linkage
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.26.28801\include\xtr1common(38): error C2894: templates cannot be declared to have 'C' linkage
+...
+</pre>
+
+<p>Which only started after I added the SDL2/SDL.h include.</p>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
