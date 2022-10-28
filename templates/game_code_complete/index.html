@@ -347,6 +347,15 @@ C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.2
 
 <p>Which only started after I added the SDL2/SDL.h include.</p>
 
+<h3>10/27/2022</h3>
+<p>I got rid of the above error on Windows by replacing the pre-built SDL visual studio library with the latest on GitHub (2.24.1).
+I also setup a Visual Studio project as opposed to the single batch script, as part of trying to figure out the SDL2 error. The
+visual studio project compiles the sources in lib into a static library named GCC4Lib.lib.</p>
+<p>I started an OGLShader class and OGLVertexBuffer class, so now I can draw a basic triangle and confirmed the current math library
+works, in 16_3dScenes:</p>
+
+<img src="./images/basic_triangle_10_27_2022.png"/>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
