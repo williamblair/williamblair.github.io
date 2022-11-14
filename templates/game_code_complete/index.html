@@ -356,6 +356,24 @@ works, in 16_3dScenes:</p>
 
 <img src="./images/basic_triangle_10_27_2022.png"/>
 
+<h3>11/12/2022</h3>
+<p>Initial sky box and mesh nodes working. Untextured OBJ meshes
+(with diffuse color hard-coded to red) are loaded with the Assimp library. Textures
+can be loaded with stb_image. I used the skybox images from the book's
+resources, but got the teapot from elsewhere. The book uses .sdkmesh format
+meshes which Assimp doesn't support. I initially tried to load the sdkmesh
+format model using some code I found on GitHub, but it didn't seem to work.</p>
+
+<img src="./images/skybox_teapot_11_12_2022.png"/>
+
+<h3>11/13/2022</h3>
+<p>Added lighting shader and texturing to assimp mesh node. Followed the book's
+HLSL shader at first, but it uses per-vertex flat shading, so I changed it to
+per-pixel so it looks nicer:</p>
+
+<img src="./images/skybox_teapot_vert_shading_11_13_2022.png"/><br/>
+<img src="./images/skybox_teapot_frag_shading_11_13_2022.png"/><br/>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
