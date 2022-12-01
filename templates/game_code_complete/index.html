@@ -374,6 +374,22 @@ per-pixel so it looks nicer:</p>
 <img src="./images/skybox_teapot_vert_shading_11_13_2022.png"/><br/>
 <img src="./images/skybox_teapot_frag_shading_11_13_2022.png"/><br/>
 
+<h2>Chapter 17</h2>
+<h3>Collision and Simple Physics</h3>
+
+<h3>11/30/2022</h3>
+<p>This chapter has us working with the 
+<a href="https://github.com/bulletphysics">Bullet phsics SDK</a>. I'm using
+version 3.2.4. So far I haven't noticed any big differences between the book
+version and this version. I did need to add another compile flag for visual
+studio, otherwise I got this error:</p>
+<pre>BulletCollision_Debug.lib(btCollisionObject.obj) : error LNK2038: mismatch detected for '_ITERATOR_DEBUG_LEVEL': value '2' doesn't match value '0' in main.obj</pre>
+<p>Adding the flag /MTd fixed this.</p>
+<p>I also needed to use BulletCollision_Debug.lib, and BulletDynamics_Debug.lib
+instead of Bullet3Collsion/Bullet3Dynamics lib files, otherwise I got unresolved
+linker errors to different functions. TODO is create a test program to verify that
+physics is working.</p>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
