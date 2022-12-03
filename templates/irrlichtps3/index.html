@@ -69,6 +69,42 @@ it works on that:</p>
     <source src="./images/tut1_textured_09_04_2022.webm" type="video/webm"/>
 </video>
 
+<h3>12/02/2022</h3>
+<p>Static text drawing working; missing the border rectangle currently.
+Had to implement the "draw2DImageBatch" function in the PS3 driver, for which
+I made another simple shader which doesn't do any position transformation:</p>
+<pre><code>#version 130
+
+in vec3 aPos;
+in vec2 aTexCoord;
+
+out vec2 texCoord;
+
+void main()
+{
+    gl_Position = vec4(aPos,1.0);
+    texCoord = aTexCoord;
+}
+</code></pre>
+
+<pre><code>#version 130
+
+out vec4 FragColor;
+
+in vec2 texCoord;
+
+uniform sampler2D uTexture;
+uniform vec3 uColor;
+
+void main()
+{
+    FragColor.a = texture2D(uTexture, texCoord).a;
+    FragColor.rgb = uColor.rgb;
+}
+</code></pre>
+
+<img src="./images/tut1_text_12_02_2022.jpg" width="800px"/>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
