@@ -1754,6 +1754,20 @@ for the PSP:</p>
 
 <p>I still need to do some code cleanup and then merge these changes back into develop/master.</p>
 
+<h3>12/05/2022</h3>
+<p>Working on adding skeletal animation via <a href="https://github.com/assimp/assimp">assimp</a>,
+which would remove the need to have different gltf/iqm/whatever animated mesh classes.
+Currently following the
+<a href="https://learnopengl.com/Guest-Articles/2020/Skeletal-Animation">learnopenl tutorial</a>,
+but as some of the article comments have pointed out the code could use some optimization.
+Instead of using a shader to animate, I'm performing this on the CPU side so it will be more
+portable to the console platforms. The example dae model is working; TODO is support multiple
+animations and the aforementioned code cleanup/optimization:</p>
+
+<video controls width="600px">
+    <source src="./images/assimp_anim_12_05_2022.webm" type="video/webm"/>
+</video>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
