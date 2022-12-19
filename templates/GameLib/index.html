@@ -1768,6 +1768,56 @@ animations and the aforementioned code cleanup/optimization:</p>
     <source src="./images/assimp_anim_12_05_2022.webm" type="video/webm"/>
 </video>
 
+<h3>12/18/2022</h3>
+<p>Refactored the skeletal anim code following "Game Programming in C++" by Sanjay Madhav.
+I replaced the book's custom file format with Assimp, drawing from the previous/above code.
+The biggest issue/bump I hit was finding that Assimp pre-calculates the global inverse
+bind matrix for each bone for you (as opposed to the local bind pose matrix):</p>
+<pre><code>void AssimpMesh::Skeleton::ComputeGlobalInvBindPose()
+{
+    // resize to number of bones, which auto fills identity
+    mGlobalInvBindPoses.resize(GetNumBones());
+    
+#if 0
+    // Step 1: Compute global bind pose for each bone
+    mGlobalInvBindPoses[0] = mBones[0].mLocalBindPose;
+    for (size_t i=1; i&lt;mGlobalInvBindPoses.size(); ++i) {
+        const HopsMath::Mat4 localMat = mBones[i].mLocalBindPose;
+        mGlobalInvBindPoses[i] = 
+            mGlobalInvBindPoses[mBones[i].mParent] * localMat;
+    }
+
+    // Step 2: Invert
+    for (size_t i=0; i&lt;mGlobalInvBindPoses.size(); ++i) {
+        mGlobalInvBindPoses[i] = HopsMath::Inverse(mGlobalInvBindPoses[i]);
+    }
+#endif
+
+    // Assimp already calculates the global inverse bind poses for us
+    mGlobalInvBindPoses[0] = mBones[0].mLocalBindPose;
+    for (size_t i=1; i&lt;mGlobalInvBindPoses.size(); ++i) {
+        const HopsMath::Mat4 localMat = mBones[i].mLocalBindPose;
+        mGlobalInvBindPoses[i] = localMat;
+    }
+}
+</code></pre>
+
+<p>I think there's a slight issue still with the fingers or last bones in the
+skeleton, which seem to "pop" between frames, like they're not being interpolated
+properly maybe?</p>
+
+<p>To help during the debugging process (as an excuse since I wanted to learn it
+anyways), I'm working on integrating <a href="https://github.com/ocornut/imgui/">ImGUI</a>
+into the current testbed example. The screencasts below are hardcoded to use the SDL2/OpenGL3
+imgui implementations, but I've started writing my own backend for HopsLib.</p>
+
+<video controls width="600px">
+    <source src="./images/skeletalanim_vampire_12_18_2022.webm" type="video/webm"/>
+</video>
+<video controls width="600px">
+    <source src="./images/skeletalanim_woman_12_18_2022.webm" type="video/webm"/>
+</video>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
