@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebGL beginner's guide - Basic Animation (independant moving and drawing)</title>
+  
+  <style>
+    #mycanvas {
+      border: 2px solid blue;
+    }
+  </style>
+  
+</head>
+<body onLoad="runWebGLApp()">
+
+  <div>
+<canvas id="canvas-element-id" width="640" height="480" onmousedown="mouseDown()" onmouseup="mouseUp()" onmousemove="mouseMove()">
+  Your browser doesn't support the canvas element :(
+</canvas>
+    </div>
+
+<div>
+<label for="animrate">Animation Rate (Delay: higher = slower)</label>
+<input type="number" name="animrate" id="animrate" value="30" min="0" max="100"/>
+</div>
+<div>
+<p id="fps">FPS: 0</p>
+</div>
+
+<div>
+<label for="ballbounce">Ball Bounciness</label>
+<input type="number" id="ballbounce" value="0.75" min="0.05" max="1.0" step = "0.05" name="ballbounce"/>
+<input type="button" onclick="resetBall()" value="Reset Ball"/>
+</div>
+
+
+<div>
+
+<!-- MATH Libraries //-->
+<script type='text/javascript' src='js/math/gl-matrix-min.js'></script>
+<!-- WEBGL Libraries //-->
+<script type='text/javascript' src='js/webgl/Globals.js'></script>
+<script type='text/javascript' src='js/webgl/Utils.js'></script>
+<script type='text/javascript' src='js/webgl/Program.js'></script>
+<script type='text/javascript' src='js/webgl/Scene.js'></script>
+<script type='text/javascript' src='js/webgl/Axis.js'></script>
+<script type='text/javascript' src='js/webgl/Floor.js'></script>
+<script type='text/javascript' src='js/webgl/Camera.js'></script>
+<script type='text/javascript' src='js/webgl/CameraInteractor.js'></script>
+<script type='text/javascript' src='js/webgl/SceneTransforms.js'></script>
+<script type='text/javascript' src='js/webgl/WebGLApp.js'></script>
+
+<script id="shader-vs" type="x-shader/x-vertex">
+
+attribute vec3 aVertexPosition;
+attribute vec3 aVertexNormal;
+attribute vec4 aVertexColor;
+
+uniform mat4 uMVMatrix;
+uniform mat4 uPMatrix;
+uniform mat4 uNMatrix;
+uniform vec3 uLightPosition;
+uniform vec4 uMaterialDiffuse;
+uniform bool uWireframe;
+uniform bool uPerVertexColor;
+uniform bool uUpdateLight;
+
+varying vec3 vNormal;
+varying vec3 vLightRay;
+varying vec3 vEyeVec;
+varying vec4 vFinalColor;
+
+void main(void) {
+	
+  if (uWireframe) {
+        if (uPerVertexColor){
+            vFinalColor = aVertexColor;
+        }
+        else{
+            vFinalColor = uMaterialDiffuse;
+        }
+    }
+
+
+ //Transformed vertex position
+ vec4 vertex = uMVMatrix * vec4(aVertexPosition, 1.0);
+ 
+ //Transformed normal position
+ vNormal = vec3(uNMatrix * vec4(aVertexNormal, 1.0));
+
+ //Transformed light position
+ vec4 light = vec4(uLightPosition,1.0);
+ 
+ if(uUpdateLight){
+     light = uMVMatrix * vec4(uLightPosition,1.0);
+  }
+	
+ //Light position
+ vLightRay = vertex.xyz-light.xyz;
+ 
+ //Vector Eye
+ vEyeVec = -vec3(vertex.xyz);
+ 
+ //Final vertex position
+ gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+
+}	
+</script>
+
+<script id="shader-fs" type="x-shader/x-fragment">
+#ifdef GL_ES
+precision highp float;
+#endif
+
+uniform bool uWireframe;
+uniform vec4 uLightAmbient;
+uniform vec4 uLightDiffuse;
+uniform vec4 uLightSpecular;
+uniform vec4 uMaterialAmbient;
+uniform vec4 uMaterialDiffuse;
+uniform vec4 uMaterialSpecular;
+uniform float uShininess;       
+
+varying vec3 vNormal;
+varying vec3 vLightRay;
+varying vec3 vEyeVec;
+varying vec4 vFinalColor;
+
+void main(void)
+{
+	if(uWireframe){
+		gl_FragColor = vFinalColor;
+	}
+	else{
+    	vec3 L = normalize(vLightRay);
+    	vec3 N = normalize(vNormal);
+
+    	//Lambert's cosine law
+    	float lambertTerm = dot(N,-L);
+    
+    	//Ambient Term  
+    	vec4 Ia = uLightAmbient * uMaterialAmbient;
+
+    	//Diffuse Term
+    	vec4 Id = vec4(0.0,0.0,0.0,1.0);
+
+    	//Specular Term
+    	vec4 Is = vec4(0.0,0.0,0.0,1.0);
+
+    	if(lambertTerm > 0.0)
+    	{
+        	Id = uLightDiffuse * uMaterialDiffuse * lambertTerm; 
+        	vec3 E = normalize(vEyeVec);
+        	vec3 R = reflect(L, N);
+        	float specular = pow( max(dot(R, E), 0.0), uShininess);
+        	Is = uLightSpecular * uMaterialSpecular * specular;
+    	}
+
+    	//Final color
+    	vec4 finalColor = Ia + Id + Is;
+    	finalColor.a = 1.0;
+    	gl_FragColor = finalColor;
+    }
+
+}
+</script>
+
+<script id='code-js' type="text/javascript">
+
+var camera = null;
+var interactor = null;
+var transforms = null;
+
+function configure(){
+    gl.clearColor(0.3,0.3,0.3, 1.0);
+    gl.clearDepth(100.0);
+    gl.enable(gl.DEPTH_TEST);
+    gl.depthFunc(gl.LEQUAL);
+    
+    //Creates and sets up the camera location
+    camera = new Camera(CAMERA_ORBITING_TYPE);
+    camera.goHome([0,2,50]);
+    camera.setFocus([0.0,0.0,0.0]);
+    camera.hookRenderer = draw;
+    
+    //Creates and sets up the mouse and keyboard interactor
+    interactor = new CameraInteractor(camera, document.getElementById('canvas-element-id'));
+    
+    //Scene Transforms
+    transforms = new SceneTransforms(camera);
+   
+    //init transforms
+    transforms.init();
+}
+
+
+/**
+* Loads the scene
+*/
+function load(){
+  
+    Floor.build(80,2);
+    Axis.build(82);
+    Scene.addObject(Floor);
+    Scene.addObject(Axis);
+    Scene.loadObject('models/geometry/sphere.json','sphere');
+    Scene.loadObject('models/geometry/cone.json','cone');
+}
+
+
+
+/**
+* invoked on every rendering cycle
+*/
+var prevDrawTime = (new Date).getTime();
+function draw() {
+
+    // update fps
+    var newDrawTime = (new Date).getTime();
+    var timeDiffSeconds = (newDrawTime - prevDrawTime) / 1000.0;
+    var fps = 1.0 / timeDiffSeconds;
+    document.getElementById("fps").innerHTML = "FPS: " + fps;
+    prevDrawTime = newDrawTime;
+
+    gl.viewport(0, 0, c_width, c_height);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    transforms.updatePerspective();
+    
+    try{
+        gl.uniform1i(prg.uUpdateLight,updateLightPosition);
+        
+        for (var i = 0; i < Scene.objects.length; i++){
+            
+            var object = Scene.objects[i];
+			
+			transforms.calculateModelView();           
+            transforms.push();
+            if (object.alias == 'sphere'){
+            	var sphereTransform  = transforms.mvMatrix;
+            	mat4.translate(sphereTransform,[0,pos_sphere,0]);
+            }
+            else if (object.alias == 'cone'){
+                var coneTransform = transforms.mvMatrix;
+                mat4.translate(coneTransform, [pos_cone,0,0]);
+            }
+            transforms.setMatrixUniforms();
+            transforms.pop();
+            
+            //Setting uniforms
+            gl.uniform4fv(prg.uMaterialDiffuse, object.diffuse);
+            gl.uniform4fv(prg.uMaterialSpecular, object.specular);
+            gl.uniform4fv(prg.uMaterialAmbient, object.ambient);
+            
+            gl.uniform1i(prg.uWireframe,object.wireframe);
+            gl.uniform1i(prg.uPerVertexColor, object.perVertexColor);
+            
+            //Setting attributes
+            gl.enableVertexAttribArray(prg.aVertexPosition);
+            gl.disableVertexAttribArray(prg.aVertexNormal);
+            gl.disableVertexAttribArray(prg.aVertexColor);
+            
+            gl.bindBuffer(gl.ARRAY_BUFFER, object.vbo);
+            gl.vertexAttribPointer(prg.aVertexPosition, 3, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(prg.aVertexPosition);
+            
+            if(!object.wireframe){
+                gl.bindBuffer(gl.ARRAY_BUFFER, object.nbo);
+                gl.vertexAttribPointer(prg.aVertexNormal, 3, gl.FLOAT, false, 0, 0);
+                gl.enableVertexAttribArray(prg.aVertexNormal);
+            }
+            
+            if (object.perVertexColor){
+                gl.bindBuffer(gl.ARRAY_BUFFER, object.cbo);
+                gl.vertexAttribPointer(prg.aVertexColor,4,gl.FLOAT, false, 0,0);
+                gl.enableVertexAttribArray(prg.aVertexColor);
+            }
+            
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, object.ibo);
+            
+            if (object.wireframe){
+                gl.drawElements(gl.LINES, object.indices.length, gl.UNSIGNED_SHORT,0);
+            }
+            else{
+                gl.drawElements(gl.TRIANGLES, object.indices.length, gl.UNSIGNED_SHORT,0);
+            }
+            gl.bindBuffer(gl.ARRAY_BUFFER, null);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+            
+        }
+    }
+    catch(err){
+        alert(err);
+        console.error(err.description);
+    }
+}
+
+
+
+var dx_sphere = 0.1;
+var dx_cone = 0.15;
+var pos_sphere = 0;
+var pos_cone = 0;
+
+var animationRate = document.getElementById("animrate").value;
+var simulationRate = 300;
+ 
+var elapsedTime = undefined;
+var initialTime = undefined;
+
+const BALL_GRAVITY = 9.8;
+var prevBallTime = (new Date).getTime();
+var ballH0 = 12; // sphere Y position
+var ballV0 = 0;
+var ballVF = Math.sqrt(2 * BALL_GRAVITY * ballH0);
+var ballHF = 0;
+var ballBounciness = document.getElementById("ballbounce").value;
+
+var resetBall = function() {
+    prevBallTime = (new Date).getTime();
+    ballH0 = 12; // sphere Y position
+    ballV0 = 0;
+    ballVF = Math.sqrt(2 * BALL_GRAVITY * ballH0);
+    ballHF = 0;
+    ballBounciness = document.getElementById("ballbounce").value;
+}
+
+function animate(){
+
+    // parametric time, the time parameter is the offset from the start recording time
+    // which is reset once the ball 'bounces' (hits the floor)
+    var newTime = (new Date).getTime();
+    var t = (newTime - prevBallTime)/1000.0; // convert to seconds
+
+    var newPos = ballH0 + (ballV0 * t) - (0.5 * BALL_GRAVITY * t * t);
+    
+    // bounce if hit ground
+    if (newPos <= 0) {
+        prevBallTime = newTime;
+        ballV0 = ballVF * ballBounciness;
+        ballHF = (ballV0 * ballV0) / (2*BALL_GRAVITY);
+        ballVF = Math.sqrt(2*BALL_GRAVITY*ballHF);
+        ballH0 = 0;
+    }
+    // otherwise update position 
+    else {
+        pos_sphere = newPos;
+    }
+    
+    pos_cone += dx_cone;
+    if (pos_cone >= 35 || pos_cone <=-35){
+    	dx_cone = -dx_cone;
+    }
+	
+}
+
+function onFrame(){
+    elapsedTime = (new Date).getTime() - initialTime;
+    animationRate = document.getElementById("animrate").value;
+    if (elapsedTime < animationRate) {
+        return; //come back later!
+    }
+    
+
+    var steps = Math.floor(1.0*elapsedTime / (1.0*simulationRate));
+    do {
+        animate();
+        steps -= 1;
+    } while (steps > 0);
+    initialTime = (new Date).getTime();
+}
+
+function startAnimation(){
+    initialTime = (new Date).getTime();
+    console.log('Set interval!');
+	setInterval(onFrame,animationRate/1000);
+}
+
+
+/**
+* Entry point. This function is invoked when the page is loaded
+*/
+var app = null;
+function runWebGLApp() {
+    app = new WebGLApp("canvas-element-id")
+    app.configureGLHook = configure;
+    app.loadSceneHook   = load;
+    app.drawSceneHook   = draw;
+    app.run();
+    
+    startAnimation();
+
+}
+
+var updateLightPosition = false;
+
+function toggleLight(){
+    updateLightPosition = !updateLightPosition;
+}
+
+</script>
+
+</body>
+</html>
+

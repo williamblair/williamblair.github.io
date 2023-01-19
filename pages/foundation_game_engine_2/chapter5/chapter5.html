@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>BJ's Website</title>
+</head>
+<body>
+<h1>Chapter 5: Graphics Processing</h1>
+
+<pre><code>sat(x) = min(max(0,x),1)
+nrm(x) = v / ||v|| = normalize
+</code></pre>
+
+<h3>5.2/5.3 Color Space and Gamma Correction</h3>
+
+<p><b>pixel</b>: short for 'pixel element'</p>
+<p><b>gamut</b>: the set of all colors that can be reproduced in the RGB scope</p>
+<p><b>sRGB</b>: The given color value has been gamma corrected (color<sup>(1/&gamma;)</sup>)</p>
+<p><figure><figcaption>matrix transforming a color from XYZ space to sRGB space:</figcaption><img src="srgb_matrix.png"/></figure></p>
+<p><b>Linear</b>: The given color value has NOT been gamma corrected</p>
+<p><b>sRGB/Linear Conversion</b>: most image formats store in sRGB/gamma corrected format, but the graphics code happens in linear, then reconverted to sRGB before being displayed. 
+      There is generally hardware support to automatically convert between the two.</p>
+
+<p><b>Gamma Correction Example:</b><figure><img src="gamma_correction_blackwhite.png"/></figure></p>
+
+<p><b>Linear color to sRGB color and sRGB color to linear:</b><figure><img src="srgb_linear.png"/></figure></p>
+<p><b>Gamma correction graph:</b><figure><img src="gamma_correction_graph.png"/></figure></p>
+
+<h3>5.4 World Structure</h3>
+
+<p>Objects in a world called "nodes", which can be:
+<ul>
+<li>Geometry Nodes - triangles meshes/solid object</li>
+<li>Light Nodes</li>
+<li>Camera Nodes</li>
+<li>Effect Nodes - fire,particle systems,etc.</li>
+<li>Trigger Nodes - space that triggers an event when entered</li>
+<li>Shape Node - simplified representation of a object controlled by physics simulation</li>
+</ul>
+</p>
+<p><b>Coordinate spaces</b>: object space, world space, camera/view space, tangent space, viewport space/window coords/screen coords, normalized device coordinates
+<figure><img src="coordinate_transformations.png"/></figure>
+</p>
+<p><b>Model Matrix</b>: an objects model-to-world space transformation matrix first 3 columns are the directions into world space, 
+                        and the fourth column represents the location/translation of the object in world space</p>
+<p><b>Common world space coords</b>: the book uses x points right, y points forward, z points upward (right = [1,0,0], forward = [0,1,0], up = [0,0,1]).
+                                     Another common is x points right, y points up, -z points forward (right = [1,0,0], forward = [0,0,-1], up = [0,1,0].
+                                     To convert from y-up to z-up, <b>p</b><sub>z-up</sub> = <b>p</b><sub>y-up</sub>(x,-z,y,w).
+                                     To convert from z-up to y-up, <b>p</b><sub>y-up</sub> = <b>p</b><sub>z-up</sub>(x,z,-y,w).</p>
+
+<p><b>Transform hierarchy</b>: nodes are organized in a tree with parents and subnodes. The
+transform/coordinate space of children are relative to their parents
+<figure><img src="transform_hierarchy.png"/></figure>
+</p>
+
+<h3>5.5 Graphics Pipeline</h3>
+<p><b>Pipeline Stages:</b><figure><img src="pipeline_stages.png"/></figure></p>
+<p><b>Post Transform Cache</b>: when using indexed triangles for drawing,
+the post-transform cache can be used to store already accessed indices</p>
+<p><b>Vertex List Types</b>:<figure><img src="vertex_types.png"/></figure></p>
+<p><b>Scissor Test</b>: the GPU uses this to ensure triangles outside of the 
+viewport are not drawn. There is extra data outside of the viewport which is
+split into 'scissor rectangles': <figure><img src="scissor_rectangles.png"/></figure></p>
+<p><b>Stencil and Depth Tests</b>: optional pipeline stages used to generate effects
+like shadows <figure><img src="depth_stencil_test.png"/></figure></p>
+</body>
+</html>
+

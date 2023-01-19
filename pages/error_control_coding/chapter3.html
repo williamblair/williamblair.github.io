@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Beedge</title>
+
+</head>
+<body>
+
+<h1 style="text-align:center">Chapter 3 - Linear Block Codes</h1>
+
+<h3>Terms</h3>
+<ul>
+  <li>Block Code
+    <ul>
+      <li>Split into message blocks (<b>u</b>) of length <i>k</i></li>
+      <li>Encodes <b>u</b> into codeword <b>v</b> of length <i>n</i>, where <i>n</i>&gt;<i>k</i></li>
+      <li>Denoted as a (<i>n</i>,<i>k</i>) block code</li>
+    </ul>
+  </li>
+  <li>Linear Block Code - all possible 2<sup><i>k</i></sup> codewords form a subspace
+      of the vector space of all <i>n</i>-tuples over <i>GF(2)</i>
+    <ul>
+      <li>A binary block code is linear IFF the sum (mod 2) of two codewords is also
+          a codeword
+      </li>
+    </ul>
+  </li>
+  <li>Generator Matrix
+    <ul>
+      <li>Matrix whose rows are linearly independant codewords</li>
+      <li>These codewords are like the basis vectors for the linear block code</li>
+      <li>Every codeword can be represented as a linear combination of
+          these rows
+      </li>
+      <li>Given input vector <b>u</b>, the encoded codeword <b>v</b>=
+        <b>u</b>*<i>G</i>
+        <ul><li><i>G</i> is is the generator matrix</li></ul>
+      </li>
+      <li>Which is why the matrix <i>G</i> is called the generator matrix
+          since it 'generates' codewords from inputs
+        <figure>
+          <img src="images/generator_matrix_example.png" alt="generator matrix example"/>
+          <figcaption>Encoding example using a (7,4) generator matrix; 
+                      addition and multiplication done mod 2</figcaption>
+        </figure>
+      </li>
+      <li>Multiplication can also be done as follows:
+        <ul>
+          <li>(1100)*G = 1*<b>g</b><sub>0</sub> + 1*<b>g</b><sub>1</sub> + 0*<b>g</b><sub>2</sub> + 0*<b>g</b><sub>3</sub></li>
+          <li>= 1*(1101000) + 1*(0110100)</li>
+          <li>= (1011100)</li>
+        </ul>
+      </li>
+    </ul>
+  </li> 
+  <li>Systematic Code
+    <ul>
+      <li>Codeword split into <i>systematic</i> portion and <i>parity check</i>
+          portion
+      </li>
+      <li>Systematic portion - information bits, which are the same as the input
+          bits to the encoder
+      </li>
+      <li>Parity bits - checking part, which are linear sums of the input/systematic 
+          portion
+      </li>
+      <li>The above example (7,4) generator matrix is an example of a linear
+          systematic block code - the four right bits output equal the input
+          four bits
+      </li>
+      <li>The generator matrix in this case contains an identity matrix
+          of size <i>k</i> by <i>k</i> (the matrix above has the identity
+          matrix on the right side of size 4 by 4)
+        <ul><li>Denoted <b>G</b>=[<b>PI</b>], where <b>I</b> is the 
+                identity portion</li>
+        </ul>
+      </li>
+    </ul>
+  </li> 
+  <li>Parity Check Matrix
+    <ul>
+      <li>The non-identity matrix portions when multiplying input <b>u</b>
+          with the generator matrix <b>G</b> are known as the parity-check
+          equations
+      </li>
+      <li>i.e. v<sub>j</sub> = u<sub>0</sub>p<sub>0,j</sub> + u<sub>1</sub>p<sub>1,j</sub> ...
+          u<sub>k-1</sub>p<sub>(k-1),j</sub>
+        <ul><li>Where p<sub>i,j</sub> are from the parity (<b>P</b>) portion of the
+                generator matrix <b>G</b>=[<b>PI</b>]
+            </li>
+        </ul>
+      </li>
+      <li>Parity check matrix (<b>H</b>): (<i>n</i>-<i>k</i>) by <i>n</i> matrix
+          with rows that are 
+          <ol>
+            <li>linearly independant and</li>
+            <li>orthogonal to any vector in the row space of generator matrix <b>G</b></li>
+          </ol>
+      </li>
+      <li><b>v</b> is a codeword from <b>G</b> IFF <b>v</b>*<b>H<sup>T</sup></b> = <b>0</b></li>
+      <li>Parity check matrix <b>H</b> forms a (<i>n</i>,<i>n</i>-<i>k</i>) linear code</li>
+      <li>From matrix <b>G</b>=[<b>PI</b>], <b>H</b> can be created by
+        <ul>
+          <li><b>H</b>=[<b>I</b><sub><i>n-k</i></sub><b>P</b><sup>T</sup>]
+          </li>
+          <li>
+            <figure>
+              <img src="images/parity_check_matrix_example.png" alt="parity check matrix example"/>
+              <figcaption>Parity check matrix formation</figcaption>
+            </figure>
+          </li>
+        </ul>
+      </li>
+      <li><b>G</b>*<b>H</b><sup>T</sup> = <b>0</b></li>
+    </ul>
+  </li> 
+  <li>Error vector: <b>e</b> = <b>r</b> + <b>v</b>
+    <ul>
+      <li><b>r</b> = received vector after transmission (rx), possibly with errors
+                    due to noise and such
+      </li>
+      <li><b>v</b> = sent, original transmitted vector</li>
+      <li>If the bits <b>r</b><sub>i</sub> and <b>v</b><sub>i</sub> are
+          the same, then their sum will be 0 (1+1=0, 0+0=0)
+      </li>
+      <li>If the bits are different, their sum will be 1 (1+0=1, 0+1=1)</li>
+      <li>So any nonzero bit in <b>e</b> is an error for that message index</li>
+    </ul>
+  </li>
+  <li>Syndrome
+    <ul>
+      <li><b>s</b> = <b>r</b>*<b>H</b><sup>T</sup></li>
+      <li><b>s</b> = <b>0</b> IFF <b>r</b> is a valid codeword (no errors)</li>
+      <li>else <b>r</b> has errors</li>
+      <li>  
+        <figure>
+          <img src="images/syndrome_calc_example.png" alt="syndrome calc example"/>
+          <figcaption>Syndrome calc matrix example using the Generator matrix for
+                      the (7,4) code above
+          </figcaption>
+        </figure>
+      </li>
+      <li><b>s</b> = <b>r</b>*<b>H</b><sup>T</sup> = (<b>e</b>+<b>v</b>)<b>H</b><sup>T</sup>
+        = <b>e</b>*<b>H</b><sup>T</sup>+<b>v</b>*<b>H</b><sup>T</sup> 
+        = <b>e</b>*<b>H</b><sup>T</sup> (since <b>v</b>*<b>H</b><sup>T</sup> = 0)
+      </li>  
+      <li><b>s</b> is a set of linear combinations of the error digits with the parity matrix</li>
+      <li>Error correction/decoding solves these sets of equations</li>
+      <li>Since there can be multiple solutions, the one with the least amount
+          of errors (nonzero) numbers is considered the solution for BSC codes
+        <ul>
+          <li>Example: using the (7,4) code above</li>
+          <li><b>r</b> = (1001001) but <b>v</b> = (1001011) (second LSB error)</li>
+          <li><b>s</b> = <b>r</b>*<b>H</b><sup>T</sup> = (111) = 
+            ((e0+e3+e5+e6),(e1+e3+e4+e5),(e2+e4+e5+e6))
+          </li>
+          <li>which gives us the set of equations
+            <ul>
+              <li>1 = e0 + e3 + e5 + e6</li>
+              <li>1 = e1 + e3 + e4 + e5</li>
+              <li>1 = e2 + e4 + e5 + e6</li>
+            </ul>
+          </li>
+          <li>There are 16 possible solutions, but the one with the
+              fewest errors (1s) is (0000010), so that's our chosen
+              error vector
+          </li>
+          <li>To correct <b>r</b>, flip the bits wherever the index in <b>e</b>
+              is 1, so the second LSB in <b>r</b> is flipped
+            <ul>
+              <li>(10010<b>0</b>1) --&gt; (10010<b>1</b>1)</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li> 
+  <li>Minimum Distance
+    <ul>
+      <li>Hamming weight (w(<b>v</b>)) - the number of 1s in a vector</li>
+      <li>Hamming distance (d(<b>a</b>,<b>b</b>)) - the number of places the
+          vectors differ (ex: d([1001011],[0100011]) = 3)
+      </li>
+      <li>d(<b>a</b>,<b>b</b>) = w(<b>a</b> + <b>b</b>)</li>
+      <li>minimum distance - d<sub>min</sub> is the minimum
+          d(<b>a</b>,<b>b</b>) where <b>a</b> != <b>b</b> within an entire block
+          code <i>C</i>.
+        <ul>
+          <li>= min{w(<b>a</b>+<b>b</b>)} where <b>a</b>,<b>b</b> are in
+              <i>C</i>
+          </li>
+          <li>= min{w(<b>x</b>)} where <b>x</b> is in <i>C</i> and <b>x</b>!=<b>0</b></li>
+          <li>= w<sub>min</sub> (d<sub>min</sub> = w<sub>min</sub> for nonzero vecs) (minimum weight)</li>
+        </ul>
+      </li>
+      <li>The minimum distance for <i>C</i> given its parity matrix <b>H</b> is the smallest
+          number of columns in <b>H</b> needed to sum to <b>0</b>
+        <ul>
+          <li>E.g. for the (7,4) example code the minimum distance is 3
+              since no two columns in <b>H</b> sum to <b>0</b>, but with 
+              3 cols its possible (ex. [110]+[011]+[101] = [000])
+          </li>
+        </ul>
+      </li>
+      <li>random-error-detecting capability: 
+          An error code with min distance d<sub>min</sub> can detect
+          at most d<sub>min</sub>-1 errors
+        <ul>
+          <li>can detect 2<sup>n</sup> - 2<sup>k</sup> error patterns
+              of length n (fraction of total possible codeword combos)
+              (detectable error patterns)
+          </li>
+          <li>An 'error' pattern is an impossible sequence of bits,
+              for length n error patterns it's the entire codeword
+          </li>
+          <li>There are 2<sup>k</sup>-1 undetectable error patterns
+              since a sent codeword could have errors such that
+              the received bits are another different yet valid
+              codeword
+          </li>
+          <li>Block code C can correct all error patterns with
+              <i>t</i> or fewer errors, where
+            <ul>
+              <li>2<i>t</i>+1 &lt;= d<sub>min</sub> &lt;= 2<i>t</i>+2</li>
+              <li><i>t</i> = floor((d<sub>min</sub>-1)/2)</li>
+              <li><i>t</i> is called the random error correcting capability</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>Standard Array
+    <ul>
+      <li>Really a matrix</li>
+      <li>Used to map 2<sup>n</sup> possible received codewords into 2<sup>k</sup>
+          decoded vectors
+      </li>
+      <li>Format:
+        <img src="images/standard_array_example.png" alt="standard_array_example"/>
+        <ul>
+          <li>Where <b>v</b><sub>1</sub>...<b>v</b><sub>2<sup>k</sup></sub> are
+          all possible valid codewords of <i>C</i>,
+          </li>
+          <li><b>e</b><sub>2</sub>...<b>e</b><sub>2<sup>n-k</sup></sub> are the
+              remaining possible received n-tuples (the possible n-tuples after removing
+              the valid codewords <b>v</b><sub>1</sub>...<b>v</b><sub>2<sup>k</sup></sub>,
+              hence the notation <b>e</b><sub>i</sub> for 'error'
+          </li>
+          <li><b>v</b><sub>1</sub> = <b>0</b> (of length n since its an n-tuple)</li>
+        </ul>
+      </li>
+      <li>Each entry in the array is unique (the rows are 'disjoint (no intersections) 
+          and so are the columns')</li>
+      <li>Each row is a 'coset' of <i>C</i></li>
+      <li>The first entry in each row is the 'coset leader/representative'</li>
+      <li>The columns of the standard array are used to decode the codewords
+        <ul>
+          <li>The correct version of a received vector is in its corresponding
+              column (any of <b>v</b><sub>1...2<sup>k</sup></sub>) if the error pattern 
+              (vector with ones where the errors are (<b>e</b><sub>2...2<sup>n-k</sup></sub>)) which
+              caused it is any coset leader. Example:
+            <ul>
+              <li><b>e</b><sub>2</sub> = 100000 (coset leader for row 2)</li>
+              <li><b>v</b><sub>3</sub> = 101010 (first entry of column 3)</li>
+              <li>Received vector <b>r</b> = 001010 = <b>e</b><sub>2</sub>+<b>v</b><sub>3</sub> (error in first MSB)</li>
+              <li>So the correct version is <b>v</b><sub>3</sub>, the first entry in the third
+                  column
+              </li>
+            </ul>
+          </li>
+          <li>The codeword will be properly corrected IFF the error pattern
+              is a coset leader, so the coset leaders are called 'correctable error
+              patterns'
+          </li>
+        </ul>
+      </li>
+      <li>All n-tuples of the same coset have the same syndrome
+      <li>Each coset has a different syndrome</li>
+      <li>Using the above two properties, decoding can be done as follows
+          (called 'syndrome decoding' or 'table lookup decoding'):
+        <ul>
+          <li>For initialization, create a table of the 2<sup>n-k</sup> coset
+              leaders and their corresponding syndrome
+          </li>
+          <li>Compute the syndrome of the receieved vector <b>r</b> 
+              (<b>s</b> = <b>r</b>*<b>H</b><sup>T</sup>)
+          </li> 
+          <li>Use the look up table to find the corresponding coset leader
+              <b>e</b><sub>l</sub> for that syndrome (<b>s</b>)
+          </li>
+          <li>Decode <b>r</b> into the codeword <b>v</b><sup>*</sup> = 
+              <b>r</b> + <b>e</b><sub>l</sub>
+          </li>
+          <li>Example:
+            <figure>
+              <img src="images/syndrome_decoding_example.png" alt="syndrome decoding example"/>
+              <figcaption>Syndrome decoding example using the (7,4) code</figcaption>
+            </figure>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li> 
+</ul>
+
+<h3>Dual Code</h3>
+<ul>
+<li>2<sup>n-k</sup> linear combinations of the rows of parity matrix <b>H</b></li>
+<li>An (n,n-k) linear code <b>C</b><sub>d</sub></li>
+<li>Is the null space of linear (n-k) code (<b>v</b>*<b>w</b>=<b>0</b>,
+    where <b>v</b> is any codeword from original code and <b>w</b> is any codeword
+    from the (n,n-k) dual code
+</li>
+</ul>
+
+<h3>Single Parity Check Codes (SPC)</h3>
+<ul>
+    <li>Linear block code with a single parity check digit</li>
+    <li>The parity digit is the mod 2 sum of all digits in the unencoded message</li>
+    <li>The encoded message is the parity digit + the original message, so it
+        generates a (k+1,k) code
+    </li>
+    <li>Codeword <b>v</b>=(p,u0,u1,u2,...u(k-1))</li>
+    <li>p=1 if weight of unencoded <b>u</b> is odd (odd number of 1s)</li>
+    <li>p=0 if weight of unencoded <b>u</b> is even (even number of 1s)</li>
+    <li>
+    Generator matrix and Parity Check Matrix = 
+        <figure>
+        <img src="images/spc_generator_and_parity_matrices.png" alt="Generator and Parity Check Matrices"/>
+        <figcaption>Generator and Parity Check matrix for Systematic SPC</figcaption>
+        </figure>
+    </li>
+    <li>Also called an "even parity check code" because all codewords have even weights
+    (even amount of 1s)</li>
+</ul>
+
+<h3>Repitition Code</h3>
+<ul>
+<li>Code of (n,1) where the code is either all zeros or all ones</li>
+<li>Made by repeating the input bit n times</li>
+<li>Generator matrix <b>G</b>=[1,1,1,...,1]</li>
+<li>(n,1) rep code and (n,n-1) SPC codes are dual codes of each other</li>
+<li>Rep code and SPC codes are combined for constructing "long, powerful codes"</li>
+</ul>
+
+<h3>Self Dual Code</h3>
+<ul>
+<li>Code where its dual code <b>C</b><sub>d</sub> is equal to itself's code <b>C</b></li>
+<li>Its generator matrix is also its parity matrix; <b>G</b>*<b>G</b><sup>T</sup>=<b>0</b></li>
+<li>Code of size (n,n/2) and n must be even; its code rate is 1/2</li>
+<li>Example self-dual code is the (24,12) Golay code</li>
+</ul>
+
+</body>
+</html>

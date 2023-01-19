@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>BJ's Website</title>
+    <link href="https://unpkg.com/@fortawesome/fontawesome-free@5.13.0/css/all.css" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="../../bulmaswatch.bjsite.min.css"/>
+    
+    <style>
+        #mycanvas {
+            width: 600px;
+            height: 300px;
+            overflow: hidden;
+        }
+    </style>
+
+  </head>
+  <body>
+    <section style="margin:10px;">
+        <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
+            <div id="navbarBasicExample" class="navbar-menu is-active">
+                <div class="navbar-start">
+                    <a href="../../index.html" class="navbar-item"><strong>BJ's Website</strong></a>
+                    <a href="../../general.html" class="navbar-item">General</a>
+                    <a href="../../programming.html" class="navbar-item">Programming</a>
+                    <a href="../../school.html" class="navbar-item">School</a>
+                    <a href="../../books.html" class="navbar-item">Books</a>
+                    <a href="../../tech.html" class="navbar-item">Tech</a>
+                </div>
+                <div class="navbar-end">
+                    <a href="https://github.com/williamblair" class="navbar-item"><span class="icon"><i class="fab fa-github"></i></span><span>Github</span></a>
+                    <a href="https://bitbucket.org/williamblair" class="navbar-item"><span class="icon"><i class="fab fa-bitbucket"></i></span>Bitbucket</a>
+                </div>
+            </div>
+        </nav>
+    </section>
+    <section class="section">
+        <div class="container">
+
+        <h1 class="title">Fire Effect</h1>
+        <h3>Information from <a href="https://lodev.org/cgtutor/fire.html">here</a> and <a href="https://fabiensanglard.net/doom_fire_psx/">here</a></h3>
+        <hr/>
+        <canvas id="mycanvas" width="600" height="300"></canvas>
+        <div>
+        Wind
+        <input type="number" name="wind" id="wind" min="-3" max="3" value="0"/>
+        </div>
+
+
+        <script id="fireScript">
+var canvas = document.getElementById("mycanvas");
+var ctx = canvas.getContext("2d");
+
+var palette = [
+    0x070707,
+    0x1f0707,
+    0x2f0f07,
+    0x470f07,
+    0x571707,
+    0x671f07,
+    0x771f07,
+    0x8f2707,
+    0x9f2f07,
+    0xaf3f07,
+    0xbf4707,
+    0xc74707,
+    0xDF4F07,
+    0xDF5707,
+    0xDF5707,
+    0xD75F07,
+    0xD7670F,
+    0xcf6f0f,
+    0xcf770f,
+    0xcf7f0f,
+    0xCF8717,
+    0xC78717,
+    0xC78F17,
+    0xC7971F,
+    0xBF9F1F,
+    0xBF9F1F,
+    0xBFA727,
+    0xBFA727,
+    0xBFAF2F,
+    0xB7AF2F,
+    0xB7B72F,
+    0xB7B737,
+    0xCFCF6F,
+    0xDFDF9F,
+    0xEFEFC7,
+    0xFFFFFF
+];
+
+//var BUFF_WIDTH = 300;
+//var BUFF_HEIGHT = 100;
+var BUFF_WIDTH=600;
+var BUFF_HEIGHT=300;
+
+// testing double the size
+var PIX_BUF_WIDTH = 600;
+var PIX_BUF_HEIGHT = 300;
+var BYTES_PER_PIXEL = 4;
+
+var SCALE = BUFF_WIDTH/PIX_BUF_WIDTH; // scale from array to larger pixel texture
+
+var buff = ctx.createImageData(PIX_BUF_WIDTH, PIX_BUF_HEIGHT); // actual pixel data
+var pal_buf = [];
+for (var i=0; i<(BUFF_HEIGHT-1)*BUFF_WIDTH; i++) {
+    pal_buf.push(0);
+}
+for (var i=0; i<BUFF_WIDTH; i++) {
+    pal_buf.push(palette.length-1);
+}
+
+function drawFire() 
+{
+    var wind = document.getElementById("wind").valueAsNumber;
+    
+    for (var x=0; x<BUFF_WIDTH; x++)
+    {
+        for (var y=BUFF_HEIGHT-2; y>=0; y--)
+        {
+            // scale the height of our flame by randomly choosing wether to decrease or not
+            var newVal = pal_buf[x+BUFF_WIDTH*(y+1)]-(Math.random() < 0.2);
+            if (newVal < 0) newVal = 0;
+            
+            var xRand = (x-2+Math.floor(Math.random()*5) + wind)%BUFF_WIDTH;
+            pal_buf[y*BUFF_WIDTH+xRand] = newVal;
+        }
+    }
+    
+    update();
+    
+    requestAnimationFrame(drawFire);
+}
+
+requestAnimationFrame(drawFire);
+
+function update() {
+    var x=0, y=0;
+    for (var i=0; i<pal_buf.length; i++) {
+    
+        var val = palette[pal_buf[i]];
+        var r = (val>>16) & 0xFF;
+        var g = (val>>8) & 0xFF;
+        var b = val & 0xFF;
+        
+        for (var offset_x=0; offset_x < SCALE; offset_x++) {
+            for (var offset_y=0; offset_y<SCALE; offset_y++) {
+                var index = ((y+offset_y)*PIX_BUF_WIDTH+(x+offset_x))*BYTES_PER_PIXEL;
+                
+                buff.data[index+0] = r;
+                buff.data[index+1] = g;
+                buff.data[index+2] = b;
+                buff.data[index+3] = 255;
+            }
+        }
+        
+        x += SCALE;
+        if (x >= PIX_BUF_WIDTH) {
+            x = 0;
+            y += SCALE;
+        }
+    }
+    ctx.putImageData(buff, 0,0);
+}
+        </script>
+
+        <div style="margin-top:20px;">
+        <textarea cols="80" rows="10" id="codeArea"></textarea>
+        </div>
+        <div style="margin-top:5px;">
+        <button class="btn btn-primary" type="button" id="runButton">Run</button>
+        </div>
+
+        <script>
+        var physScr = document.querySelector("#fireScript");
+        var codeArea = document.querySelector("#codeArea");
+        codeArea.value = physScr.text;
+        document.querySelector("#runButton").onclick = function() {
+            var runFunc = new Function(codeArea.value);
+            runFunc();
+        }
+        </script>
+      
+        <div style="margin-top:20px;">
+        <p><a href="../../index.html">&lt;-- Back to Home</a></p>
+        </div>
+
+        </div>
+    </section>
+
+  </body>
+</html>
+
+

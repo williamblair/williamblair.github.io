@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebGL beginner's guide - Setting WebGL Context Attributes</title>
+  
+  <style>
+    #mycanvas {
+      border: 2px solid blue;
+    }
+  </style>
+  
+</head>
+<body onload="main()">
+
+  <div>
+<canvas id="mycanvas" width="640" height="480">
+  Your browser doesn't support the canvas element :(
+</canvas>
+    </div>
+
+<script>
+  
+  var canvas_width = 640;
+  var canvas_height = 480;
+  
+  // Check for & get the WebGL context
+  var getGLContext = function() {
+    var canvas = document.getElementById('mycanvas');
+    
+    var gl = null;
+    
+    var names = [
+      "webgl",
+      "experimental-webgl",
+      "webkit-3d",
+      "moz-webgl"
+    ];
+    for (var i = 0; i < names.length; i++) {
+      try {
+        gl = canvas.getContext(names[i]);
+        
+        // context was found, so exit early
+        if (gl) {
+          break;
+        }
+        
+      } catch(e) {}
+    }
+    
+    if (gl == null) {
+      alert("No WebGL Context Available");
+    }
+    else {
+      //alert("GL Context Available");
+    }
+    
+    return gl;
+  }
+  
+  // Clears the screen context with the current
+  // screen color
+  var clearScreen = function(gl) {
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.viewport(0, 0, canvas_width, canvas_height);
+  }
+  
+  var main = function() {
+    var gl = getGLContext();
+    
+    // Change the ctx clear color or display current color
+    // based on the key pressed
+    window.onkeydown = function(ev) {
+      switch (ev.keyCode) 
+      {
+        case 49: {
+          gl.clearColor(0.3, 0.7, 0.2, 1.0);
+          clearScreen(gl);
+          break;
+        }
+        case 50: {
+          gl.clearColor(0.3,0.2,0.7,1.0);
+          clearScreen(gl);
+          break;
+        }
+        case 51: {
+          var color = gl.getParameter(gl.COLOR_CLEAR_VALUE);
+          
+          alert('Clear Color: ' + color[0] + ', ' + 
+                                color[1] + ', ' + 
+                                color[2]);
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+    }
+  }
+  
+</script>
+  
+  <p>Press 1,2,3 to change color and view current color</p>
+
+</body>
+</html>
+

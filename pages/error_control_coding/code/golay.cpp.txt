@@ -1,0 +1,443 @@
+#include <iostream>
+#include <cstdint>
+#include <cstring>
+#include <cassert>
+
+// (24,12) Golay encoder and decoder
+class Golay_coder
+{
+public:
+
+  static const size_t BLOCK_SIZE = 24;
+  static const size_t INFO_SIZE  = 12;
+
+  Golay_coder(){};
+  ~Golay_coder(){};
+
+  // input size must be 24, output size must be 12
+  void encode(uint8_t *input, uint8_t *output)
+  {
+      for (size_t generator_col=0; generator_col<BLOCK_SIZE; ++generator_col)
+      {
+          output[generator_col] = 0;
+          for (size_t generator_row=0; generator_row<INFO_SIZE; ++generator_row)
+          {
+              output[generator_col] ^= input[generator_row] * Golay_generator[generator_row][generator_col];
+          }
+      }
+  }
+
+  bool decode(uint8_t *input, 
+              size_t input_size,
+              uint8_t *output,
+              size_t output_size)
+  {
+      if (input_size != BLOCK_SIZE) {
+          std::cout << "Invalid input size" << std::endl;
+          return false;
+      }
+      // this will equal input size as well
+      if (output_size != INFO_SIZE) {
+          std::cout << "Invalid output size" << std::endl;
+          return false;
+      }
+      
+      uint8_t error_vec[BLOCK_SIZE];
+      uint8_t syndrome[INFO_SIZE];
+      uint8_t corrected_codeword[BLOCK_SIZE];
+      uint8_t syndrome_parity_row_sum[INFO_SIZE];
+      size_t  syndrome_parity_row_index;
+      uint8_t u_i[INFO_SIZE];
+      uint8_t syndrome_parity_product[INFO_SIZE];
+      uint8_t syndrome_parity_product_sum_row[INFO_SIZE];
+      
+      // vector with a 1 in the ith index
+      //  i is the syndrome parity row index
+      std::memset(u_i, 0, sizeof(u_i));
+      
+      // 1. compute syndrome from receieved r (s = r * transpose(H))
+      calc_syndrome(input, syndrome);
+      
+      // 2. if weight(s) <= 3
+      //      e = (s,0)
+      //      goto 8
+      if (calc_weight(syndrome, INFO_SIZE) <= 3)
+      {
+          std::memset(error_vec, 0, sizeof(error_vec));
+          std::memcpy(error_vec, syndrome, sizeof(syndrome));
+      }
+      // 3. if w(s + p_i) <= 2 for some row p_i in P
+      //      e = (s+p_i, u_i)
+      //      goto 8
+      else if (syndrome_parity_row_sum_weight_at_most_two(syndrome, syndrome_parity_row_sum, &syndrome_parity_row_index))
+      {
+          std::memcpy(error_vec, syndrome_parity_row_sum, sizeof(syndrome_parity_row_sum));
+          u_i[syndrome_parity_row_index] = 1;
+          std::memcpy(&error_vec[INFO_SIZE], u_i, sizeof(u_i));
+      }
+      // 4. compute s*P
+      // 5. if weight(s*P) == 2 or 3
+      //      e = (0, s*P)
+      //      goto 8
+      else if (syndrome_parity_product_two_or_three(syndrome, syndrome_parity_product))
+      {
+          std::memset(error_vec, 0, sizeof(error_vec));
+          std::memcpy(&error_vec[INFO_SIZE], syndrome_parity_product, sizeof(syndrome_parity_product));
+      }
+      
+      // 6. if w(s*P+p_i) = 2 for some row p_i in P
+      //      e = (u, s*P + p_i)
+      //      goto 8
+      else if (syndrome_parity_product_row_sum_weight_is_two(syndrome_parity_product, syndrome_parity_product_sum_row, &syndrome_parity_row_index))
+      {
+          std::memset(u_i, 0, sizeof(u_i));
+          u_i[syndrome_parity_row_index] = 1;
+          std::memcpy(error_vec, u_i, sizeof(u_i));
+          std::memcpy(&error_vec[INFO_SIZE], syndrome_parity_product_sum_row, sizeof(syndrome_parity_product_sum_row));
+      }
+      // 7. Error out - uncorrectable codeword
+      else
+      {
+          std::cout << "Error decoding codeword\n";
+          return false;
+      }
+      
+      // 8. Decoded output v* = r + e
+      calculate_output(input, error_vec, corrected_codeword);
+      
+      // the information bits are stored in the latter half of the codeword
+      std::memcpy(output, &corrected_codeword[INFO_SIZE], INFO_SIZE);
+      
+      return true;
+  }
+
+private:
+  static const uint8_t Golay_generator              [INFO_SIZE]  [BLOCK_SIZE];
+  static const uint8_t Golay_parity_check           [INFO_SIZE]  [BLOCK_SIZE];
+  static const uint8_t Golay_parity_check_transpose [BLOCK_SIZE] [INFO_SIZE];
+  static const uint8_t Golay_parity_matrix          [INFO_SIZE]  [INFO_SIZE];
+
+  // compute r * transpose(H)
+  void calc_syndrome(uint8_t *input, uint8_t *output)
+  {
+      for (size_t parity_col=0; parity_col<INFO_SIZE; ++parity_col)
+      {
+          output[parity_col] = 0;
+          for (size_t parity_row=0; parity_row<BLOCK_SIZE; ++parity_row)
+          {
+              // binary Modulo 2 addition for GF(2)
+              output[parity_col] ^= input[parity_row] * Golay_parity_check_transpose[parity_row][parity_col];
+          }
+      }
+  }
+
+  size_t calc_weight(uint8_t *input, size_t input_size)
+  {
+      size_t sum = 0;
+      for (size_t i=0; i<input_size; ++i)
+      {
+          // assumes input is always 0 or 1
+          sum += input[i];
+      }
+      return sum;
+  }
+
+  bool syndrome_parity_row_sum_weight_at_most_two(uint8_t *syndrome, uint8_t *syndrome_parity_row_sum, size_t *syndrome_parity_row_index)
+  {
+      for (size_t parity_row = 0; parity_row < INFO_SIZE; ++parity_row)
+      {
+          *syndrome_parity_row_index = parity_row;
+      
+          // 1. calculate the sum for the current row p_i
+          for (size_t i=0; i<INFO_SIZE; ++i)
+          {
+              // Modulo-2 binary addition for GF(2)
+              syndrome_parity_row_sum[i] = syndrome[i] ^ Golay_parity_matrix[parity_row][i];
+          }
+          
+          // 2. If the weight of the sum is less than 2, return true
+          if (calc_weight(syndrome_parity_row_sum, INFO_SIZE) <= 2)
+          {
+              return true;
+          }
+      }
+      
+      return false;
+  }
+
+  bool syndrome_parity_product_two_or_three(uint8_t *syndrome, uint8_t *syndrome_parity_product)
+  {
+      // 1. calculate product s*P
+      for (size_t parity_col=0; parity_col<INFO_SIZE; ++parity_col)
+      {
+          syndrome_parity_product[parity_col] = 0;
+          for (size_t parity_row=0; parity_row<INFO_SIZE; ++parity_row)
+          {
+              // modulo 2 binary addition for GF(2)
+              syndrome_parity_product[parity_col] ^= syndrome[parity_row] * Golay_parity_matrix[parity_row][parity_col];
+          }
+      }
+      
+      // 2. Check if the weight is 2 or 3
+      size_t weight = calc_weight(syndrome_parity_product, INFO_SIZE);
+      
+      return (weight == 2 || weight == 3);
+  }
+
+  bool syndrome_parity_product_row_sum_weight_is_two(uint8_t *syndrome_parity_product, uint8_t *syndrome_parity_product_sum_row, size_t *syndrome_parity_row_index)
+  {
+      for (size_t parity_row = 0; parity_row < INFO_SIZE; ++parity_row)
+      {
+          *syndrome_parity_row_index = parity_row;
+      
+          // 1. calculate the sum for the current row p_i
+          for (size_t i=0; i<INFO_SIZE; ++i)
+          {
+              // Modulo-2 binary addition for GF(2)
+              syndrome_parity_product_sum_row[i] = syndrome_parity_product[i] ^ Golay_parity_matrix[parity_row][i];
+          }
+          
+          // 2. If the weight is equal to 2, return true
+          if (calc_weight(syndrome_parity_product_sum_row, INFO_SIZE) == 2)
+          {
+              return true;
+          }
+      }
+      
+      return false;
+  }
+  
+  void calculate_output(uint8_t *in_codeword, uint8_t *error_vec, uint8_t *output)
+  {
+      // 1. calculate output v = r + e;
+      for (size_t i=0; i<BLOCK_SIZE; ++i)
+      {
+          // Modulo 2 binary addition for GF(2)
+          output[i] = in_codeword[i] ^ error_vec[i];
+      }
+  }
+  
+}; // end class Golay_coder
+
+// Generator matrix
+const uint8_t Golay_coder::Golay_generator[12][24] = {
+    {1,0,0,0,1,1,1,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,1,1,1,0,1,1,0,1,1,0,1,0,0,0,0,0,0,0,0,0,0},
+    {0,0,1,1,1,0,1,1,0,1,0,1,0,0,1,0,0,0,0,0,0,0,0,0},
+    {0,1,1,1,0,1,1,0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0},
+    {1,1,1,0,1,1,0,1,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0},
+    {1,1,0,1,1,0,1,0,0,0,1,1,0,0,0,0,0,1,0,0,0,0,0,0},
+    {1,0,1,1,0,1,0,0,0,1,1,1,0,0,0,0,0,0,1,0,0,0,0,0},
+    {0,1,1,0,1,0,0,0,1,1,1,1,0,0,0,0,0,0,0,1,0,0,0,0},
+    {1,1,0,1,0,0,0,1,1,1,0,1,0,0,0,0,0,0,0,0,1,0,0,0},
+    {1,0,1,0,0,0,1,1,1,0,1,1,0,0,0,0,0,0,0,0,0,1,0,0},
+    {0,1,0,0,0,1,1,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,1,0},
+    {1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1}
+};
+
+// Parity check matrix
+const uint8_t Golay_coder::Golay_parity_check[12][24] = {
+    {1,0,0,0,0,0,0,0,0,0,0,0, 1,0,0,0,1,1,1,0,1,1,0,1},
+    {0,1,0,0,0,0,0,0,0,0,0,0, 0,0,0,1,1,1,0,1,1,0,1,1}, 
+    {0,0,1,0,0,0,0,0,0,0,0,0, 0,0,1,1,1,0,1,1,0,1,0,1}, 
+    {0,0,0,1,0,0,0,0,0,0,0,0, 0,1,1,1,0,1,1,0,1,0,0,1}, 
+    {0,0,0,0,1,0,0,0,0,0,0,0, 1,1,1,0,1,1,0,1,0,0,0,1}, 
+    {0,0,0,0,0,1,0,0,0,0,0,0, 1,1,0,1,1,0,1,0,0,0,1,1}, 
+    {0,0,0,0,0,0,1,0,0,0,0,0, 1,0,1,1,0,1,0,0,0,1,1,1}, 
+    {0,0,0,0,0,0,0,1,0,0,0,0, 0,1,1,0,1,0,0,0,1,1,1,1},
+    {0,0,0,0,0,0,0,0,1,0,0,0, 1,1,0,1,0,0,0,1,1,1,0,1}, 
+    {0,0,0,0,0,0,0,0,0,1,0,0, 1,0,1,0,0,0,1,1,1,0,1,1}, 
+    {0,0,0,0,0,0,0,0,0,0,1,0, 0,1,0,0,0,1,1,1,0,1,1,1}, 
+    {0,0,0,0,0,0,0,0,0,0,0,1, 1,1,1,1,1,1,1,1,1,1,1,0}
+};
+
+// Parity check matrix transposed
+const uint8_t Golay_coder::Golay_parity_check_transpose[24][12] = {
+    {1,0,0,0,0,0,0,0,0,0,0,0},
+    {0,1,0,0,0,0,0,0,0,0,0,0},
+    {0,0,1,0,0,0,0,0,0,0,0,0},
+    {0,0,0,1,0,0,0,0,0,0,0,0},
+    {0,0,0,0,1,0,0,0,0,0,0,0},
+    {0,0,0,0,0,1,0,0,0,0,0,0},
+    {0,0,0,0,0,0,1,0,0,0,0,0},
+    {0,0,0,0,0,0,0,1,0,0,0,0},
+    {0,0,0,0,0,0,0,0,1,0,0,0},
+    {0,0,0,0,0,0,0,0,0,1,0,0},
+    {0,0,0,0,0,0,0,0,0,0,1,0},
+    {0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,1,1,1,0,1,1,0,1},
+    {0,0,0,1,1,1,0,1,1,0,1,1},
+    {0,0,1,1,1,0,1,1,0,1,0,1},
+    {0,1,1,1,0,1,1,0,1,0,0,1},
+    {1,1,1,0,1,1,0,1,0,0,0,1},
+    {1,1,0,1,1,0,1,0,0,0,1,1},
+    {1,0,1,1,0,1,0,0,0,1,1,1},
+    {0,1,1,0,1,0,0,0,1,1,1,1},
+    {1,1,0,1,0,0,0,1,1,1,0,1},
+    {1,0,1,0,0,0,1,1,1,0,1,1},
+    {0,1,0,0,0,1,1,1,0,1,1,1},
+    {1,1,1,1,1,1,1,1,1,1,1,0}
+};
+
+// Parity matrix (P)
+const uint8_t Golay_coder::Golay_parity_matrix[12][12] = {
+    {1,0,0,0,1,1,1,0,1,1,0,1},
+    {0,0,0,1,1,1,0,1,1,0,1,1},
+    {0,0,1,1,1,0,1,1,0,1,0,1},
+    {0,1,1,1,0,1,1,0,1,0,0,1},
+    {1,1,1,0,1,1,0,1,0,0,0,1},
+    {1,1,0,1,1,0,1,0,0,0,1,1},
+    {1,0,1,1,0,1,0,0,0,1,1,1},
+    {0,1,1,0,1,0,0,0,1,1,1,1},
+    {1,1,0,1,0,0,0,1,1,1,0,1},
+    {1,0,1,0,0,0,1,1,1,0,1,1},
+    {0,1,0,0,0,1,1,1,0,1,1,1},
+    {1,1,1,1,1,1,1,1,1,1,1,0}
+};
+
+// run the example decode calculation from the book
+inline void run_book_test(void)
+{
+    uint8_t codeword[Golay_coder::BLOCK_SIZE] = {1,0,0,0,0,0,1,1,0,1,0,0,1,1,0,0,0,0,0,0,0,0,0,1};
+    uint8_t output[Golay_coder::INFO_SIZE];
+
+    Golay_coder golay_coder;
+    
+    std::cout << "Input vec:    (";
+    for (size_t i=0; i<Golay_coder::BLOCK_SIZE; ++i)
+    {
+        std::cout << (int)codeword[i] << " ";
+    }
+    std::cout << ")\n";
+    
+    if (!golay_coder.decode(codeword, Golay_coder::BLOCK_SIZE, output, Golay_coder::INFO_SIZE))
+    {
+        return;
+    }
+
+    std::cout << "Output:                               (";
+    for (size_t i=0; i<Golay_coder::INFO_SIZE; ++i)
+    {
+        std::cout << (int)output[i] << " ";
+    }
+    std::cout << ")" << std::endl;
+}
+
+inline void test_coding()
+{
+  Golay_coder golay_coder;
+
+  // single bit errors over total bits (both check bits and information bits)
+  for (size_t error_pos = 0; error_pos<Golay_coder::BLOCK_SIZE; ++error_pos)
+  {
+    uint8_t unencoded_1[Golay_coder::INFO_SIZE] = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1};
+    uint8_t encoded_1[Golay_coder::BLOCK_SIZE];
+    uint8_t decoded_1[Golay_coder::INFO_SIZE];
+    
+    // encode our message
+    golay_coder.encode(unencoded_1, encoded_1);
+    
+    // introduce an error
+    encoded_1[error_pos] = !encoded_1[error_pos];
+    
+    // decode the receieved errored word
+    assert(golay_coder.decode(encoded_1, Golay_coder::BLOCK_SIZE, decoded_1, Golay_coder::INFO_SIZE));
+    
+    // verify outputs match
+    for (size_t i=0; i<Golay_coder::INFO_SIZE; ++i)
+    {
+        assert(decoded_1[i] == unencoded_1[i]);
+    }
+  }
+
+  std::cout << std::endl;
+
+  // double bit errors
+  for (size_t error_pos_1 = 0; error_pos_1<Golay_coder::BLOCK_SIZE; ++error_pos_1)
+  {
+    for (size_t error_pos_2 = 0; error_pos_2<Golay_coder::BLOCK_SIZE; ++error_pos_2)
+    {
+      // ensure the two errors positions aren't the same place
+      if (error_pos_1 == error_pos_2)
+      {
+        continue;
+      }
+
+      uint8_t unencoded_1[Golay_coder::INFO_SIZE] = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1};
+      uint8_t encoded_1[Golay_coder::BLOCK_SIZE];
+      uint8_t decoded_1[Golay_coder::INFO_SIZE];
+      
+      // encode our message
+      golay_coder.encode(unencoded_1, encoded_1);
+      
+      // introduce both errors
+      encoded_1[error_pos_1] = !encoded_1[error_pos_1];
+      encoded_1[error_pos_2] = !encoded_1[error_pos_2];
+      
+      // decode the receieved errored word
+      assert(golay_coder.decode(encoded_1, Golay_coder::BLOCK_SIZE, decoded_1, Golay_coder::INFO_SIZE));
+      
+      // verify outputs match
+      for (size_t i=0; i<Golay_coder::INFO_SIZE; ++i)
+      {
+          assert(decoded_1[i] == unencoded_1[i]);
+      }
+    }
+  }
+
+  // Triple bit errors
+  for (size_t error_pos_1 = 0; error_pos_1<Golay_coder::BLOCK_SIZE; ++error_pos_1)
+  {
+    for (size_t error_pos_2 = 0; error_pos_2<Golay_coder::BLOCK_SIZE; ++error_pos_2)
+    { 
+      // ensure the two errors positions aren't the same place
+      if (error_pos_1 == error_pos_2)
+      {
+        continue;
+      }
+      
+      for (size_t error_pos_3 = 0; error_pos_3<Golay_coder::BLOCK_SIZE; ++error_pos_3)
+      {
+        // ensure all three error positions don't overlap
+        if (error_pos_3 == error_pos_1 || error_pos_3 == error_pos_2)
+        {
+          continue;
+        }  
+
+        uint8_t unencoded_1[Golay_coder::INFO_SIZE] = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1};
+        uint8_t encoded_1[Golay_coder::BLOCK_SIZE];
+        uint8_t decoded_1[Golay_coder::INFO_SIZE];
+        
+        // encode our message
+        golay_coder.encode(unencoded_1, encoded_1);
+        
+        // introduce all errors
+        encoded_1[error_pos_1] = !encoded_1[error_pos_1];
+        encoded_1[error_pos_2] = !encoded_1[error_pos_2];
+        encoded_1[error_pos_3] = !encoded_1[error_pos_3];
+        
+        // decode the receieved errored word
+        assert(golay_coder.decode(encoded_1, Golay_coder::BLOCK_SIZE, decoded_1, Golay_coder::INFO_SIZE));
+        
+        // verify outputs match
+        for (size_t i=0; i<Golay_coder::INFO_SIZE; ++i)
+        {
+            assert(decoded_1[i] == unencoded_1[i]);
+        }
+      }
+    }
+  }
+
+}
+
+int main(void)
+{
+  // test basic decoding example given in the book
+  //run_book_test();
+    
+  // test and verify all possible bit error combinations of 3 or less are corrected
+  test_coding();
+    
+  return 0;
+}
+

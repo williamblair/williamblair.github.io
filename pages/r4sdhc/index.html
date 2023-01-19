@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>BJ's Website</title>
+    <link href="https://unpkg.com/@fortawesome/fontawesome-free@5.13.0/css/all.css" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="../../bulmaswatch.bjsite.min.css"/>
+    <style>
+        p {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!--<section class="section">-->
+    <section style="margin:10px;">
+        <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
+            <div id="navbarBasicExample" class="navbar-menu is-active">
+                <div class="navbar-start">
+                    <a href="../../index.html" class="navbar-item"><strong>BJ's Website</strong></a>
+                    <a href="../../general.html" class="navbar-item">General</a>
+                    <a href="../../programming.html" class="navbar-item">Programming</a>
+                    <a href="../../school.html" class="navbar-item">School</a>
+                    <a href="../../books.html" class="navbar-item">Books</a>
+                    <a href="../../tech.html" class="navbar-item">Tech</a>
+                </div>
+                <div class="navbar-end">
+                    <a href="https://github.com/williamblair" class="navbar-item"><span class="icon"><i class="fab fa-github"></i></span><span>Github</span></a>
+                    <a href="https://bitbucket.org/williamblair" class="navbar-item"><span class="icon"><i class="fab fa-bitbucket"></i></span>Bitbucket</a>
+                </div>
+            </div>
+        </nav>
+    </section>
+    <!--</section>-->
+    <section class="section">
+        <div class="container">
+            <h1 class="title">R4SDHC</h1>
+
+            <p>I got a Nintendo DS lite at a thrift store recently!
+            Never had one growing up but I remember kids on the bus either
+            playing multiplayer Mario Kart or using Pictochat. Anyways, now
+            I have another device to try and program for :)</p>
+
+            <p>R4SDHC is a device that lets you put NDS games and media
+            on a micro SD card and load them without needing any hardware
+            modifications to the device. There seem to be a lot of different
+            versions and clones online. I ended up going with the RTS LITE from
+            here:
+            <a href="https://www.ebay.com/itm/165808325394?hash=item269af24312:g:6g0AAOSwr4NhHhBR">
+                https://www.ebay.com/itm/165808325394?hash=item269af24312:g:6g0AAOSwr4NhHhBR</a>.</p>
+
+            <img src="./images/r4card.jpg" width="600px"/>
+
+            <p>I also had trouble finding where to
+            download the required firmware and files to put on the SD card.
+            I ended up going with:
+            <a href="https://gbatemp.net/download/kernel-v4-0b-for-r4-sdhc-gold-pro-rts-lite-dual-core-snoopy-upgrade-r4isdhc-com.37072/">
+            https://gbatemp.net/download/kernel-v4-0b-for-r4-sdhc-gold-pro-rts-lite-dual-core-snoopy-upgrade-r4isdhc-com.37072/</a>.</p>
+
+            <p>The page notes that this firmware will stop working if the time is past Sep. 3, 2024 I think,
+            but you should be able to set the system time before that.</p>
+            <img src="./images/firmwarenote.png"/>
+
+            <p>When you boot up the DS, it shows up as a bomberman game:</p>
+            <img src="./images/dshomescreen.jpg" width="600px"/><br/>
+
+            <p>Then when you load the "game", it boots into this screen:</p>
+            <img src="./images/bootmenu.jpg" width="600px"/>
+
+            <p>At first I had an error related to formatting the SD card:</p>
+            <img src="./images/sdfragmenterror.jpg" width="600px"/>
+
+            <p>I downloaded and reformatted the card using Panasonic SD formatter
+            from here: <a href="https://gbatemp.net/download/panasonic-sd-formatter-windows.32483/">
+            https://gbatemp.net/download/panasonic-sd-formatter-windows.32483/</a>. Under options I
+            changed "format size adjustment" to "on".</p>
+
+            <p>After re-formatting and copying the firmware files back on the card, my test
+            helloworld program showed up like expected and booted into it successfully:</p>
+
+            <img src="./images/helloworldrunning.jpg" width="600px"/>
+
+        </div> <!-- container -->
+    </section>
+</body>
+</html>
+

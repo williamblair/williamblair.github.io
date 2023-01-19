@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Refactoring SerialDate</TITLE>
+<META NAME="description" CONTENT="Refactoring SerialDate">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="main.css">
+
+<LINK REL="next" HREF="node19.html">
+<LINK REL="previous" HREF="node17.html">
+<LINK REL="up" HREF="main.html">
+<LINK REL="next" HREF="node19.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html250"
+  HREF="node19.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="next.png"></A> 
+<A NAME="tex2html248"
+  HREF="main.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="up.png"></A> 
+<A NAME="tex2html242"
+  HREF="node17.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html251"
+  HREF="node19.html">Smells and Heuristics</A>
+<B> Up:</B> <A NAME="tex2html249"
+  HREF="main.html">clean code notes</A>
+<B> Previous:</B> <A NAME="tex2html243"
+  HREF="node17.html">JUnit Internals</A>
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION000170000000000000000">
+Refactoring SerialDate</A>
+</H1>
+
+<P>
+Again, a chapter on cleaning up a Java class. This time JCommon
+org.jfree.date
+
+<P>
+Some examples of improvements:
+
+<UL>
+<LI>Replacing multiple related constants with an enum
+</LI>
+<LI>changing names for clarification
+	
+<UL>
+<LI>one example was to change <SPAN  CLASS="textit">date.addDays()</SPAN> to <SPAN  CLASS="textit">date.plusDays()</SPAN>
+		to imply that the function does not modify the <SPAN  CLASS="textit">date</SPAN> object
+		but instead returns a new date with the addition of days sent to <SPAN  CLASS="textit">plusDays</SPAN>
+		(think like immutable strings in Java)
+	
+</LI>
+</UL>
+</LI>
+<LI>Moving code apart from unrelated areas to related areas (e.g. a new
+	or existing class)
+	
+<UL>
+<LI>Example - a search for use of a group of variables shows they
+		are only used in one derivative class - then move them to that class!
+	
+</LI>
+</UL>
+</LI>
+<LI>Adding a factory class to generate instances with specific constraints/
+	details
+</LI>
+<LI>deleting redundant comments
+</LI>
+<LI>adding "explaining temporary variables" to complicated algorithms
+	for clarity
+</LI>
+<LI>replacing magic numbers with explanatory variables
+</LI>
+</UL>
+
+<P>
+<BR><HR>
+<ADDRESS>
+bj
+2019-09-22
+</ADDRESS>
+</BODY>
+</HTML>

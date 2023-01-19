@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Chapter 4</title>
+  <style>
+      html, body {
+          background-color: #000000;
+          color: #FFFFFF;
+      }
+  </style>
+</head>
+<body>
+<h1 id="chapter-4">Chapter 4</h1>
+<h2 id="flynn-s-taxonomy-parallel-operation-types-">Flynn&#39;s Taxonomy (parallel operation types)</h2>
+<ul>
+<li>Single Instruction Single Data (SISD)<ul>
+<li><img src="sisd_diagram.png" alt="SISD Diagram"></li>
+</ul>
+</li>
+<li>Multiple Instruction Multiple Data (MIMD)<ul>
+<li><img src="mimd_diagram.png" alt="MIMD Diagram"></li>
+</ul>
+</li>
+<li>Single Instruction Multiple Data (SIMD)<ul>
+<li><img src="simd_diagram.png" alt="SIMD Diagram"></li>
+</ul>
+</li>
+<li>Multiple Instruction Single Data (MISD)<ul>
+<li><img src="misd_diagram.png" alt="MISD Diagram"></li>
+</ul>
+</li>
+</ul>
+<h2 id="pipelining">Pipelining</h2>
+<ul>
+<li>Instruction level parallelism (ILP)</li>
+<li>Non-pipelined CPU execution:<ul>
+<li><img src="no_pipeline.png" alt="Non-pipelined CPU"></li>
+</ul>
+</li>
+<li>Non-pipelined CPU execution:<ul>
+<li><img src="pipeline.png" alt="Pipelined CPU"></li>
+</ul>
+</li>
+</ul>
+<h2 id="branch-prediction-in-games-consoles">Branch Prediction in games consoles</h2>
+<ul>
+<li>PS3 Cell prcessor had poor branch prediction</li>
+<li>PS4 and Xbox ONE AMD Jaguar has advanced branch prediction 
+hardware</li>
+</ul>
+<h2 id="fast-branch-avoidant-code-for-safe-floating-point-division">Fast branch-avoidant code for safe floating point division</h2>
+<h3 id="-handle-divide-by-zero-">(handle divide-by-zero)</h3>
+<pre><code><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">SafeFloatDivide_pred</span><span class="hljs-params">(<span class="hljs-keyword">float</span> a, <span class="hljs-keyword">float</span> b, <span class="hljs-keyword">float</span> d)</span>
+</span>{
+  <span class="hljs-comment">// convert Boolean (b != 0.0f) into either 1U or 0U</span>
+  <span class="hljs-keyword">const</span> <span class="hljs-keyword">unsigned</span> condition = (<span class="hljs-keyword">unsigned</span>)(b != <span class="hljs-number">0.0f</span>);
+
+  <span class="hljs-comment">// convert 1U -&gt; 0xFFFFFFFFU</span>
+  <span class="hljs-comment">// convert 0U -&gt; 0x00000000U</span>
+  <span class="hljs-keyword">const</span> <span class="hljs-keyword">unsigned</span> mask = <span class="hljs-number">0U</span> - condition;
+
+  <span class="hljs-comment">// calculate quotient (will be QNaN if b == 0.0f)</span>
+  <span class="hljs-keyword">const</span> <span class="hljs-keyword">float</span> q = a / b;
+
+  <span class="hljs-comment">// select quotient when mask is all ones, or default</span>
+  <span class="hljs-comment">// value d when mask is all zeros (<span class="hljs-doctag">NOTE:</span> this won't</span>
+  <span class="hljs-comment">// work as written -- you'd need to use a union to</span>
+  <span class="hljs-comment">// interpret the floats as unsigned for masking)</span>
+  <span class="hljs-keyword">const</span> <span class="hljs-keyword">float</span> result = (q &amp; mask) | (d &amp; ~mask);
+  <span class="hljs-keyword">return</span> result;
+}
+</code></pre><p>This technique for selecting one of two possible values is
+called predication or a select operation</p>
+<h2 id="very-long-instruction-word-vliw-cpu-design">Very Long Instruction Word (VLIW) CPU Design</h2>
+<ul>
+<li>The CPU is made up of multiple of the same compute element
+(ALU, FPU, etc.)</li>
+<li>Each &quot;instruction&quot; is comprised of 2 or more instructions,
+one for each compute element</li>
+<li>Example of this is PS2: The vector units VU0 and VU1 can
+dispatch two instructions per cycle each</li>
+</ul>
+<h2 id="multi-core-cpus">Multi Core CPUs</h2>
+<ul>
+<li>PS4 and Xbox One both contain multicore CPUs</li>
+<li>Each has an accelerated processing unit (APU)<ul>
+<li>two quad-core AMD Jaguars in a single die with a GPU, memory controller, and video codec</li>
+<li>Of the 8 total cores, 7 are available to game applications</li>
+</ul>
+</li>
+<li>PS4 Architecture:
+<img src="ps4_arch.png" alt="PS4 CPU arch"></li>
+<li>XBox One Architecture:
+<img src="xboxone_arch.png" alt="Xbox one CPU arch"></li>
+</ul>
+<h2 id="symmetric-vs-assymetric-parallelism">Symmetric vs Assymetric Parallelism</h2>
+<ul>
+<li>Symmetric CPUs - all cores are copies of the same hardware; 
+threads run the same on each core; threads can have core affinities.
+PS4/Xbox One are examples of this, with 8 equal cores</li>
+<li>Asymmetric CPUs - cores can be different and are treated differently by the OS.
+A master core runs the OS and other cores are slaves. Example of this is PS3&#39;s Cell
+Broadband Engine (PPU,SPUs)</li>
+</ul>
+<h2 id="console-shared-libraries">Console Shared Libraries</h2>
+<ul>
+<li>The PS4 OS uses shared libraries called PRX (name from PS3 - PPU Relocatable Executable)</li>
+</ul>
+<h2 id="fibers">Fibers</h2>
+<ul>
+<li>Provide cooperative multitasking - essentially threads except the programmer has 
+explicit control over when they are scheduled compared to other Fibers - for when
+you want to write your own job system for your program</li>
+</ul>
+<h2 id="mutexes-vs-semaphores">Mutexes vs Semaphores</h2>
+<ul>
+<li>A mutex has a binary state: locked or unlocked</li>
+<li>A sempahore is a counter with an integer value of N, allowing a max of N
+threads to use it at once; when the semaphore value is 0 any requesting
+threads are blocked. A nonzero value means the semaphore is &quot;signaled&quot; (true/allow)
+and a zero value is &quot;nonsignaled&quot; (block/forbid)<ul>
+<li>A mutex can only be unlocked by the thread that locked it;</li>
+<li>A semaphore can be be decremented/incremented by different threads; thus
+is more commonly used as a signal</li>
+</ul>
+</li>
+<li>Semaphore example:<pre><code>Queue g_queue;
+<span class="hljs-keyword">sem_t</span> g_semUsed; <span class="hljs-comment">// initialized to 0</span>
+<span class="hljs-keyword">sem_t</span> g_semFree; <span class="hljs-comment">// initialized to 1</span>
+<span class="hljs-function"><span class="hljs-keyword">void</span>* <span class="hljs-title">ProducerThreadSem</span><span class="hljs-params">(<span class="hljs-keyword">void</span>*)</span>
+</span>{
+  <span class="hljs-comment">// keep on producing forever...</span>
+  <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>)
+  {
+      <span class="hljs-comment">// produce an item (can be done non-</span>
+      <span class="hljs-comment">// atomically because it's local data)</span>
+      Item item = ProduceItem();
+      <span class="hljs-comment">// decrement the free count</span>
+      <span class="hljs-comment">// (wait until there's room)</span>
+      sem_wait(&amp;g_semFree);
+      AddItemToQueue(&amp;g_queue, item);
+      <span class="hljs-comment">// increment the used count</span>
+      <span class="hljs-comment">// (notify consumer that there's data)</span>
+      sem_post(&amp;g_semUsed);
+  }
+  <span class="hljs-keyword">return</span> <span class="hljs-literal">nullptr</span>;
+}
+<span class="hljs-function"><span class="hljs-keyword">void</span>* <span class="hljs-title">ConsumerThreadSem</span><span class="hljs-params">(<span class="hljs-keyword">void</span>*)</span>
+</span>{
+  <span class="hljs-comment">// keep on consuming forever...</span>
+  <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>)
+  {
+      <span class="hljs-comment">// decrement the used count</span>
+      <span class="hljs-comment">// (wait for the data to be ready)</span>
+      sem_wait(&amp;g_semUsed);
+      Item item = RemoveItemFromQueue(&amp;g_queue);
+      <span class="hljs-comment">// increment the free count</span>
+      <span class="hljs-comment">// (notify producer that there's room)</span>
+      sem_post(&amp;g_semFree);
+      <span class="hljs-comment">// consume the item (can be done non-</span>
+      <span class="hljs-comment">// atomically because it's local data)</span>
+      ConsumeItem(item);
+  }
+  <span class="hljs-keyword">return</span> <span class="hljs-literal">nullptr</span>;
+}
+</code></pre></li>
+</ul>
+<h2 id="c-atomic">C++ Atomic</h2>
+<ul>
+<li>Protects variables without the need for a mutex via CPU specific instructions
+(normally)<pre><code><span class="hljs-built_in">std</span>::atomic&lt;<span class="hljs-keyword">float</span>&gt; g_data;
+<span class="hljs-built_in">std</span>::atomic_flag g_ready = <span class="hljs-literal">false</span>;
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">ProducerThread</span><span class="hljs-params">()</span>
+</span>{
+  <span class="hljs-comment">// produce some data</span>
+  g_data = <span class="hljs-number">42</span>;
+  <span class="hljs-comment">// inform the consumer</span>
+  g_ready = <span class="hljs-literal">true</span>;
+}
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">ConsumerThread</span><span class="hljs-params">()</span>
+</span>{
+  <span class="hljs-comment">// wait for the data to be ready</span>
+  <span class="hljs-keyword">while</span> (!g_ready)
+  PAUSE();
+  <span class="hljs-comment">// consume the data</span>
+  ASSERT(g_data == <span class="hljs-number">42</span>);
+}
+</code></pre></li>
+</ul>
+<h2 id="testing-if-a-lock-is-needed">Testing if a lock is needed</h2>
+<ul>
+<li>If it is known beforehand, due to code architecture,
+that a race condition probably won&#39;t happen, you can
+use a volatile boolean (so the compiler doesnt optimize
+it out) to assert that the overlapping
+race condition never happens. This code can then be
+defined out for production builds</li>
+<li>Has been used and been successful at Naughy Dog
+<pre><code>
+class UnnecessaryLock
+{
+volatile bool m_locked;
+public:
+  void Acquire()
+  {
+    // assert no one already has the lock
+    assert(!m_locked);
+    // now lock (so we can detect overlapping
+    // critical operations if they happen)
+    m_locked = true;
+  }
+  void Release()
+  {
+    // assert correct usage (that Release()
+    // is only called after Acquire())
+    assert(m_locked);
+    // unlock
+    m_locked = false;
+  }
+};
+
+#if ASSERTIONS_ENABLED
+  #define BEGIN_ASSERT_LOCK_NOT_NECESSARY(L) (L).Acquire()
+  #define END_ASSERT_LOCK_NOT_NECESSARY(L) (L).Release()
+#else
+  #define BEGIN_ASSERT_LOCK_NOT_NECESSARY(L)
+  #define END_ASSERT_LOCK_NOT_NECESSARY(L)
+#endif
+
+// Example usage...
+UnnecessaryLock g_lock;
+void EveryCriticalOperation()
+{
+  BEGIN_ASSERT_LOCK_NOT_NECESSARY(g_lock);
+  printf(&quot;perform critical op...\n&quot;);
+  END_ASSERT_LOCK_NOT_NECESSARY(g_lock);
+}
+</code></pre>
+</li></ul>
+
+
+</body>
+</html>
+

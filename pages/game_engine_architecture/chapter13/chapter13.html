@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Chapter 13</title>
+  <style>
+      html, body {
+          background-color: #000000;
+          color: #FFFFFF;
+      }
+  </style>
+</head>
+<body>
+
+<h2 id="popular-collision-and-physics-libraries">Popular Collision and Physics Libraries</h2>
+<ul>
+<li><strong><a href="http://www.ode.org/"><img src="ode.png" alt="ODE" width="300px"></a></strong></li>
+<li><strong><a href="https://pybullet.org/wordpress/index.php/forum-2/">Bullet</a></strong></li>
+<li><strong><a href="http://trueaxis.com/"><img src="trueaxis.jpg" alt="TrueAxis" width="300px"></a></strong></li>
+<li><strong><a href="https://developer.nvidia.com/gameworks-physx-overview"><img src="physx.jpg" alt="PhysX" width="300px"></a></strong></li>
+<li><strong><a href="http://www.havok.com"><img src="havok.png" alt="Havok" width="300px"></a></strong></li>
+<li><strong><a href="http://www.adrianboeing.com/pal/index.html"><img src="pal.gif" alt="Physics Abstraction Layer (PAL)" width="300px"></a></strong></li>
+<li><strong><a href="http://www.pixeluxentertainment.com"><img src="dmm.png" alt="Digital Molecular Matter (DMM)" width="300px" style="background-color:black;"></a></strong></li>
+</ul>
+<h2 id="collidable-representation">Collidable Representation</h2>
+<ul>
+<li>The intersection shapes/primitives for an object in the scene are stored via its own
+geometry and transformation (its &#39;collision representation&#39;)</li>
+<li>Some common intersectable shapes used include<ul>
+<li>sphere</li>
+<li>capsule</li>
+<li>Axis Aligned Bounding Box (AABB)</li>
+<li>Discrete Oriented Polytopes (DOP)<ul>
+<li><img src="dop.png" alt="DOP"></li>
+</ul>
+</li>
+<li>Polygon Soup (Poly Soup)</li>
+</ul>
+</li>
+<li>These are also called &#39;collision volumes&#39;</li>
+<li>Scene objects can contain multiple collision primitives
+representing them (e.g. a chair can be represented by a cube
+and a triangular prism)<ul>
+<li><img src="chair_example.png" alt="Chair"></li>
+<li>This can also be used for early-termination checking:
+a coarse check of a larger,wrapping primitive can be
+used as an easy first-check for intersection<ul>
+<li><img src="early_test.png" alt="Early Test"></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Usually the collision engine contains a &#39;collision/physics world&#39;
+in which all collidable objects are represented<ul>
+<li>benefit of cache coherency</li>
+</ul>
+</li>
+</ul>
+<h2 id="convex-concave">Convex/Concave</h2>
+<ul>
+<li>Usually convex shapes are used as a line can only enter
+and exit a convex shape once (concave adds more complexity)<ul>
+<li>If a concave shape is shrink-wrapped, there will be air
+pockets; convex shapes will have NO air pockets when
+shrink wrapped</li>
+</ul>
+</li>
+</ul>
+<h2 id="poly-soup">Poly Soup</h2>
+<ul>
+<li>A collection of non-convex shapes, not necessarily enclosed
+or in a &#39;shape&#39; form</li>
+<li>Used to represent complex static geometry like terrain and buildings<ul>
+<li><img src="poly_soup.png" alt="Poly Soup"></li>
+</ul>
+</li>
+<li>Front-face is used to represent &#39;outside&#39; (via stored winding
+order) and back-face represents &#39;inside&#39;</li>
+</ul>
+<h2 id="sphere-intersection-test">Sphere intersection test</h2>
+<ul>
+<li><strong>s</strong> = <strong>c</strong> - <strong>p</strong></li>
+<li>if |<strong>s</strong>| &lt;= <em>r</em>, then <strong>p</strong> is inside the sphere<ul>
+<li><strong>c</strong> = sphere center, <strong>p</strong> = test point, <em>r</em> = sphere radius</li>
+</ul>
+</li>
+</ul>
+<h2 id="sphere-intersecting-other-sphere-test">Sphere intersecting other sphere test</h2>
+<ul>
+<li><strong>s</strong> = <strong>c1</strong> - <strong>c2</strong></li>
+<li>if |<strong>s</strong>|<sup>2</sup> &lt;= (<em>r1</em> + <em>r2</em>)<sup>2</sup>, then
+the spheres intersect<ul>
+<li>Difference squared is used to prevent square root calculation (|<strong>s</strong>|)
+for performance</li>
+</ul>
+</li>
+</ul>
+<h2 id="separating-axis-theorem">Separating axis theorem</h2>
+<ul>
+<li>If there is a line that can separate the projection of 
+two convex shapes, then they do not intersect</li>
+<li><img src="separating_axis_theorem.png" alt="Separating Axis"></li>
+<li><img src="sphere_axis_theorem.png" alt="Sphere Separating Axis"></li>
+</ul>
+<h2 id="gjk-algorithm">GJK Algorithm</h2>
+<ul>
+<li>Works for intersection testing between arbitrary polytopes
+(convex polygons in 2d, convex polyhedra in 3d)</li>
+<li><a href="http://mollyrocket.com/849">http://mollyrocket.com/849</a></li>
+<li>Uses the &#39;minkowski difference&#39;<ul>
+<li>Takes difference between all points within shape A and B</li>
+</ul>
+</li>
+<li>If the set contains the origin point, then the shapes intersect<ul>
+<li>since any point minus itself is 0 or the origin</li>
+</ul>
+</li>
+<li>The minkowski difference between two convex shapes is also a
+convex shape<ul>
+<li><img src="minkowski_shape.png" alt="Minkowski Shape"></li>
+</ul>
+</li>
+<li>Attempts to create a tetrahedron that surrounds the origin from
+the minkowski difference set</li>
+<li>If this tetrahdron cannot be created, then the shapes do not intersect</li>
+<li><img src="tetrahedron.png" alt="Tetrahedron">  </li>
+<li><img src="minkowski_tetrahedron.png" alt="Minkowski Tetrahedron"></li>
+</ul>
+<h2 id="paper-bullet-problem-tunneling-">Paper Bullet Problem (Tunneling)</h2>
+<ul>
+<li>If an object is moving faster than its size each, it can
+&quot;skip over&quot; an intersection<ul>
+<li><img src="paper_bullet.png" alt="Paper Bullet"></li>
+</ul>
+</li>
+<li>Can be solved via<ul>
+<li>Swept Shapes: create a new shape as the combination
+of the previous and next frame<ul>
+<li><img src="swept_shapes.png" alt="Swept Shapes"></li>
+<li>Only works well for moving in a straight line</li>
+</ul>
+</li>
+<li>Continuous Collision Detection (CCD)<ul>
+<li>Finds the earliest &#39;Time of Impact&#39; (TOI) between
+two objects over a time interval</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="performance-optimizations">Performance Optimizations</h2>
+<ul>
+<li>Collision detection can be expensive, esp. if you check
+every possible object with each other (O(n<sup>2</sup>))</li>
+<li>Can use techniques we&#39;ve seen before in the render
+such as spacial partitioning<ul>
+<li>Octtrees</li>
+<li>Binary Space Parititioning Trees (BSPs)</li>
+<li>etc.</li>
+</ul>
+</li>
+<li>Other techniques:<ul>
+<li>Temporal Coherency (Save calculated values that haven&#39;t
+changed from the previous frame)</li>
+<li>Broad Phase, Midphase, and Narrow Phase<ul>
+<li>Broad Phase: Use AABBs to determine which collidables
+are potentially intersecting</li>
+<li>Midphase: Use coarse bounding volumes, such as spheres
+for another early termination step</li>
+<li>Narrow Phase: Use the individual primitives for
+the closest/specific possible collision detection</li>
+</ul>
+</li>
+<li>Sweep and Prune algorithm<ul>
+<li>sort the minimum and maximum dimensions of the AABBs
+along the x,y,z axes then check for intersection
+along the sorted list</li>
+<li>Can reduce O(n log n) to O(n)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="collision-queries">Collision Queries</h2>
+<ul>
+<li>Most physics engines support checking things such as
+&quot;What is the earliest intersection if I move this character
+ in this direction&quot; or &quot;find all enemy objects within this 
+ radius&quot;</li>
+</ul>
+<h2 id="raycasting">Raycasting</h2>
+<ul>
+<li>Have paramtetric line segment p(t) = p0 + td, 0&lt;=t&lt;=1</li>
+<li>Check for intersection along this line</li>
+<li>Example ray casting usage: check for line of sight
+from an AI to the character by ray casting from the
+AI point of view to the main characters chest, and seeing
+if any intersections get in the way</li>
+</ul>
+<h2 id="shape-casting">Shape Casting</h2>
+<ul>
+<li>Move a collision volume along a parametric line segment
+and check for intersections along the way</li>
+<li>This is more complex as you can have multiple
+collision points at the same time; usually returns 
+an array of collisions</li>
+<li><img src="shape_cast_1.png" alt="Shape Cast 1"></li>
+<li><img src="shape_cast_2.png" alt="Shape Cast 2"></li>
+<li>Can be used to move 3d objects, and do things like
+automatically move up a curb or move left/right against
+a wall</li>
+</ul>
+<h2 id="phantoms">Phantoms</h2>
+<ul>
+<li>Collision objects which can intersect with regular objects,
+but regular objects cannot collide with them</li>
+<li>regular collisions with a phantom are ignored, but a phantom
+can still collide with regular objects</li>
+</ul>
+<h2 id="collision-filtering">Collision Filtering</h2>
+<ul>
+<li>Ability to group collision types together to only
+check between collisions of the same types<ul>
+<li>Uses masking or layers (e.g. a grouping bitmask)</li>
+</ul>
+</li>
+<li>Also ability to turn collision on/off for an object</li>
+</ul>
+<h2 id="collision-materials">Collision Materials</h2>
+<ul>
+<li>Holds information such as friction, sound effects,
+particle effects, etc. for an object types such as skin,
+wood, metal, etc.</li>
+</ul>
+<h2 id="ordinary-differential-equations-odes-">Ordinary Differential Equations (ODEs)</h2>
+<ul>
+<li>Used in physics engines for calculations</li>
+<li>Utilize derivatives and linear integration</li>
+<li>An ODE has a single independant variable, such as time,
+as the input to a function, where the ODE is a function
+containing derivatives up to the n-1th order:<ul>
+<li><img src="ode_general_form.png" alt="ODE General Form"></li>
+</ul>
+</li>
+<li>For example, the classic force = mass * acceleration (F=ma)
+is more accurately represented as an ODE:<ul>
+<li><img src="force_equation_ode.png" alt="Force ODE equation"></li>
+<li>r**(t) is acceleration (2nd derivative of position), r*(t) is velocity (first derivative of position)</li>
+</ul>
+</li>
+<li>Used to approximate &#39;Taylor Series&#39; (1+x+x<sup>2</sup>+x<sup>3</sup> ... inf.)<ul>
+<li>The error of the ODE is represented via big O notation as O(n<sup>x</sup>),
+where x is the number after the highest power in the equation<ul>
+<li><img src="taylor_error.png" alt="Error Example"></li>
+<li>The error is &Delta;t<sup>2</sup> because the highest power
+the approximation goes is 1; t<sup>2</sup> and above do
+not effect the calculation</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="common-ode-methods">Common ODE methods</h2>
+<ul>
+<li>Explicit Euler method: good for when velocity is nearly constant, otherwise inaccurate</li>
+<li>Verlet Integration<ul>
+<li>Regular Verlet</li>
+<li>Velocity Verlet</li>
+</ul>
+</li>
+</ul>
+<h2 id="plastic-vs-elastic-collisions">Plastic vs. Elastic Collisions</h2>
+<ul>
+<li>Elastic collisions have &#39;bounce&#39; - opposite reactions
+to a force</li>
+<li>Plastic collisions have no bounce - no reactive
+force when a collision happens</li>
+</ul>
+<h2 id="newton-s-law-of-restitutaion-for-instantaneous-collisions-with-no-friction">Newton&#39;s law of restitutaion for instantaneous collisions with no friction</h2>
+<ul>
+<li>Assumes the following when a collision happens:<ul>
+<li>An instantaneous force; it is an &#39;impulse&#39;</li>
+<li>There is no friction at the contact point</li>
+<li>There is a coefficient of restitutaion describing
+how much energy is lost.<ul>
+<li>1 = no energy lost; is an elastic collision</li>
+<li>0 = all enery lost; is a plastic collision</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="penalty-forces">Penalty Forces</h2>
+<ul>
+<li>Manually introduce penalty forces to 
+force interpenatrating objects apart<ul>
+<li>Optimization compared to resolving all
+collisions via the physical simulation</li>
+<li>SONY PS3 Rubber Duck demo used this</li>
+</ul>
+</li>
+</ul>
+<h2 id="coming-to-rest">Coming to Rest</h2>
+<ul>
+<li>Forcing an object to stop as otherwise it&#39;s forces
+will never completely reach zero due to floating
+point error and non-exact algorithms<ul>
+<li>Can be achieved by putting the physics on 
+an object &#39;to sleep&#39; if its close enough
+to zero force and meeting required criteria</li>
+</ul>
+</li>
+</ul>
+<h2 id="gravity">Gravity</h2>
+<ul>
+<li>Usually set globally in the physics engine</li>
+</ul>
+<h2 id="torque-and-force">Torque and Force</h2>
+<ul>
+<li>A torque is a force off-center from the center of mass
+on the object, causing a rotational force</li>
+<li>Force: applied to the center of mass, thus causing
+pure movement and not rotation</li>
+</ul>
+<h2 id="impulse">Impulse</h2>
+<ul>
+<li>Instantanius change in velocity/momentum; duration
+too short for time step &Delta;t to handle
+properly</li>
+</ul>
+<h2 id="the-collision-physics-step">The collision/physics step</h2>
+<p>Updates every frame:</p>
+<ol>
+<li>Forces and Torques integrated by time step &Delta;t</li>
+<li>Collision Detection library checks for new contact</li>
+<li>Resolve/Handle Collisions</li>
+<li>Constraints Resolved by the Constraint Solver</li>
+</ol>
+<h2 id="attaching-physics-to-a-game-object">Attaching physics to a game object</h2>
+<p><img src="game_object_diagram.png" alt="Game Object Diagram"></p>
+<h2 id="game-driven-vs-physics-driven">Game-Driven vs. Physics-Driven</h2>
+<ul>
+<li>Game Driven: the game manually controls object movement</li>
+<li>Physics Driven: The physics/collision system controls
+object movement</li>
+<li>A single object can switch between these two
+properties as required</li>
+</ul>
+<h2 id="constraint">Constraint</h2>
+<ul>
+<li>A restriction on the movement of an object
+(reduces degrees of freedom from normal 6)</li>
+<li>For example, a hinge forcing a door to rotate
+only around a single axis</li>
+</ul>
+<h2 id="powered-constraint">Powered Constraint</h2>
+<ul>
+<li>Constraints where the translation/orientation can
+be controller externally, such as from the animation
+system</li>
+<li>For example, an elbow constraint on a human character
+can be forced to limit its rotation if the forearm
+further up the skeleton is hitting another object
+blocking its path</li>
+<li><img src="elbow_constraint.png" alt="Elbow Constraint Example"></li>
+</ul>
+<h2 id="rag-dolls">Rag Dolls</h2>
+<ul>
+<li>Are implemented via rigid bodies connected
+via constraints</li>
+<li>Uses &quot;Constraint chains&quot; to improve the stability
+of the simulation</li>
+</ul>
+<h2 id="fixed-bodies">Fixed Bodies</h2>
+<ul>
+<li>Collision only bodies that do not take part in
+dynamics simulation</li>
+<li>Provide an optimization/performance boost</li>
+</ul>
+<h2 id="physics-simulation-update-frame-steps">Physics Simulation Update Frame Steps</h2>
+<ul>
+<li>Update Game-Driven Rigid Bodies</li>
+<li>Update phantoms</li>
+<li>Update forces, apply impulses, adjust constraints</li>
+<li>Step the Simlulation<ul>
+<li>Numerically integrate equations</li>
+<li>Collision Detection</li>
+<li>Apply Constraints</li>
+</ul>
+</li>
+<li>Update physics-driven game objects</li>
+<li>Query Phantoms</li>
+<li>Perform collision cast queries</li>
+</ul>
+<h2 id="bullet-ray-casting-bullet-traces">Bullet Ray Casting / Bullet Traces</h2>
+<ul>
+<li>Ray casts are good if the bullet is moving
+in a straight line</li>
+<li>to account for gravity causing the bullet to drop
+or similar, the bullet can be modeled as a real rigid
+body with gravity applied<ul>
+<li>Throwing bricks/bottles in The Last of Us does this</li>
+</ul>
+</li>
+</ul>
+<h2 id="collision-vs-visible-geometry">Collision vs. Visible Geometry</h2>
+<ul>
+<li>To avoid case where it looks like the bullet
+hit the target but not hit was registered, due to the
+collision object not exactly matching the rendered object,
+can instead check against a rendered texture which a pixel
+represents which object it is, and check against that</li>
+</ul>
+<h2 id="explosions">Explosions</h2>
+<ul>
+<li>Can have the explosion apply impulses to objects
+within its radius</li>
+<li>Can have animations for characters/objects to react
+to the explosion</li>
+<li>Can have animation system apply a force to foliage,
+such as swaying/bending plants, grass, trees, etc.
+due to the shock wave</li>
+</ul>
+<h2 id="destructable-objects">Destructable Objects</h2>
+<ul>
+<li>Can be made up of many smaller rigid body objects</li>
+<li>Possibility to have two versions of the object: 
+a non-desructable, single-piece object and then
+the desructabl, many-piece version. Swap between the
+two as necessary</li>
+</ul>
+<h2 id="camera-collision">Camera collision</h2>
+<p>Some tricks/things to keep in mind when implementing a third
+person camera, to avoid the camera hitting things or going
+inside things</p>
+<ul>
+<li>Zooming in to avoid collisions</li>
+<li>Be careful with horizontal angle adjustment: too much can
+mess up the player&#39;s aim or focus, for example.<ul>
+<li>Good to limit depending if the player is in combat or not</li>
+</ul>
+</li>
+<li>be careful to limit vertical movement, e.g. so the camera doesn&#39;t
+end up pointing straight down at the character&#39;s head</li>
+<li>Avoid objects between the camera and the player by either swinging
+the camera around the object or making the object transparent</li>
+</ul>
+<h2 id="current-areas-of-research-for-physics-in-games">Current Areas of research for physics in games</h2>
+<ul>
+<li>Deformable Bodies - DMM Engine</li>
+<li>Cloth - Havok Engine</li>
+<li>Hair - can be implemented via cloth with a transparent hair texture</li>
+<li>Water Surface simulations/buoyancy</li>
+<li>General Fluid Dynamics Simulations</li>
+<li>Physically Based Audio Synthesis</li>
+<li>GPGPU - Naughty Dog Cloth Engine runs on the PS4 GPU</li>
+</ul>
+
+</body>
+</html>

@@ -1,0 +1,273 @@
+12/18/18
+--------
+- implemented SDL_FillRect
+- implemented SDL_MapRGB
+- Implemented SDL_PollEvent
+- Implemented Initial Joystick functionality (directional hats)
+- Switched compilation to make libSDL.a instead of source as part of project
+
+12/19/18
+--------
+- Added diagonals to directional buttons
+- Added square/cross/triangle/circle
+- Added a debug print to the screen (in addition to tty)
+- Added select/start/R1/R2/L1/L2
+
+12/23/18
+--------
+- Added joysticks
+- Changed mapping of buttons/joysticks to match XBox 360 controller mappings on PC
+
+12/26/18
+--------
+- Started working towards SDL_LoadBMP
+    i. Basic File I/O (SDL_rwops) working
+   ii. SDL_AllocFormat
+- Started implementing SDL_CalculateBlit
+
+12/31/18
+--------
+- Finished SDL_CalculateBlit
+- SDL_BlitSurface now basically implemented, but either isn't working
+  or my SDL_CreateRGB surface test isn't done properly 
+
+01/04/19
+--------
+-Fixed SDL_BlitSurface
+  i. Turns out the issue was my texture size for the PSX was too large (256px instead of 255)
+-SDL_LoadBMP now fully implemented!
+
+01/29/19
+--------
+-Optimized SDL_BlitSurface
+  i. Surface data is now stored in PSX Vram, so we can draw them as PSX sprites for hardware acceleration
+  ii. If the surface being blitted to is the surface created by SDL_SetVideoMode() (the background),
+      we draw it as a sprite instead of actually 'blitting' (copying pixels) for a huge performance boost!
+
+02/01/19
+--------
+-Optimized SDL_FillRect
+  i. Instead of creating an SDL surface/filling it to the background, we draw a PSX GPU Rectangle primitive
+     (again, for hardware acceleration!)
+
+02/04/19
+--------
+-Working on fixing SDL_LoadBMP
+  i. It turns out the colors are backwards since the PSX stores pixels in BGR format, so we need to switch
+     the R and B components of each pixel on load
+-Removed the two-times scale from all drawing that we were previously using before, as we have
+ hardware acceleration now and don't need to worry about size for performance any more
+-Added automatic texture upload location to vram (for storing multiple surfaces/sprites)
+  i. TODO - what if we want to delete/remove an image or need to make room for new sprites?
+
+02/05/19
+--------
+-Added uv texture offset (texture clipping) support, so you can select an area from INSIDE the texture
+ to use to draw (useful for sprite animations)
+
+02/08/19
+--------
+-Lots of code cleanup
+
+02/12/19
+--------
+-Started setup for SDL_mixer (music library)
+
+02/13/19
+--------
+-Added Mix_OpenAudio()
+-Added Mix_GetError() (TODO - add SDL_GetError())
+-Added wav2vag function for converting .WAV input files to .RAW (copied/modified from psxsdk wav2vag source)
+
+02/15/19
+--------
+-Added Mix_LoadMUS()
+  i. Limitations - file must be in .RAW format, must be single channel, and if converted from a WAV
+     file, must have a frequency of 11025 Hz
+  i. the second argument, 'loops' doesnt do anything
+-Added Mix_PlayMusic()
+
+02/16/19
+--------
+-Added SDL_Delay and SDL_SetColorKey as dummy functions
+  i. e.g. they do nothing; they are defined as ';' in the header
+  ii. This is because the PSX already runs at 60Hz approximately,
+      and automatically treats black (0,0,0) as transparent
+
+02/17/19
+--------
+-Added SDL_JoystickUpdate(), SDL_JoystickGetAxis(), SDL_JoystickGetHat()
+  i. This allows for easier programming when checking button/directional
+     presses as you don't have to run them within an SDL_PollEvent loop,
+     and can just directly check if a button is pressed or not instead
+     of checking for an UP or DOWN event in the event loop
+
+02/22/19
+--------
+- Added SDL_Quit(), Mix_CloseAudio(), SDL_WM_ToggleFullScreen() as dummy functions
+- Fixed VRAM loading
+  i. I was incorrectly calculating new texture x locations aligned to widths of 64 (the width of a texture page)
+
+02/24/19
+--------
+- Added 8bit bmp image support
+  i. Re added the SDL code to load bmp images
+  ii. 8bit image palettes are stored underneath the two display buffers
+  iii. added logic to align images width to match 2 bytes
+       display correctly/load correctly in PSX vram (since vram is 16bit --> buffers loaded must be 2 byte aligned)
+
+02/26/19
+--------
+- Added 640x480 resolution support
+  i. However, when running actual 640x480 code on the psx i appear to get screen tearing/flickering
+
+03/07/19
+--------
+Added project paper repository, initial layout
+
+03/08/19
+--------
+- Added Mix_FreeMusic() and Mix_FreeChunk() dummy functions
+
+03/10/19
+--------
+- Added images for GPU and system hardware to writeup
+
+03/11/19
+--------
+- Added GTE information to writeup and references
+
+03/13/19
+--------
+- Added list of SDL ports to related work in writeup
+
+03/14/19
+--------
+- Added SDL information to writeup
+
+03/16/19
+--------
+- Added Order Table information to writeup
+
+03/18/19
+--------
+- Added psxsdk installation instructions to writeup
+
+03/20/19
+--------
+- Added implementation chapter base, description of psxsdk hello world program and screenshot to writeup
+- Worked on test/example program to test SDL implementation
+
+03/21/19
+--------
+- Started optimizing SDL load BMP b/c it's very slow on the PSX
+with all of the file I/O --> converting it to use a buffer
+after loading the entire file into memory instead
+
+03/22/19
+--------
+- Finished Optimized SDL BMP loading
+  i. Had issue at first with 16bit images, made it use my function
+     for loading 16bit images instead
+- Added example of drawing primitives and sprites using PSXSDK 
+  to writeup
+
+03/21/19
+--------
+- Added SDL_Init and SDL_SetVideoMode to implementation chapter of writeup
+
+03/22/19
+--------
+- Reformatted code listings for SDL_Init and SDL_SetVideoMode
+  i. SDL_SetVideoMode took up two pages of just the functions code; broke it
+     down into smaller chunks
+- Added original implementation attempt (driver for each subsystem) to writeup
+
+03/25/19
+--------
+- Started video implementation (SDL_Init())
+
+03/26/19
+--------
+- Reformatted code listings (writeup)
+- Added to original implementation (driver) attempt
+
+03/27/19
+--------
+- Added basic SDL Program description to writeup (annotated example
+  code listing)
+
+03/28/19
+--------
+- Added SDL_BlitSurface() description and image to writeup
+
+03/29/19
+--------
+- Added SDL_JOYSTICK example code to writeup
+
+03/30/19
+--------
+- Added PSXSDK controller usage to writeup
+
+03/31/19
+--------
+- Added sound example for PSXSDK to writeup
+
+04/03/19
+--------
+- Added more PSXSDK sound examples (VAG and MOD format)
+  to writeup
+
+04/04/19
+--------
+- Added MDEC description and screen sprite diagram
+  (original video backend implementation) to writeup
+
+04/05/19
+--------
+- Added second blit method diagram to writeup
+- Added SDLBlitSurface listing to writeup
+- Added end of SDL bmp listing to writeup
+
+04/09/19
+--------
+- added second sdl blit method description
+
+04/14/19
+--------
+- added vram texture calculation handling description
+- added different load bmp section listings to writeup
+
+04/15/19
+--------
+- added different load bmp section descriptions
+	- 8 bit and 16 bit bmp handling
+
+04/16/19
+--------
+- Added description and image for aligned vs unaligned 8 bit bmp image loading
+
+04/17/19
+--------
+- Added audio implementation section to writeup
+- Added Events implementation section to writeup
+- Added joysticks section
+
+04/18/19
+--------
+- Added NOPSX emulator and PSIO description to writeup
+- Worked on test/example application using SDL 
+
+04/19/19
+--------
+- Added Mix chunks to SDL_Mixer implementation
+- Worked on test/example application using SDL
+
+04/20/19
+--------
+- Fixed texture page calcuation in SDL
+  i. Didn't account for the texture page Y coordinate when textures start to wrap around towards the bottom half of VRAM; is now calculated as tpage = tpage_y*16+tpage_x
+- Basically finished example SDL application
+    simple space themed shooter; you fire lazers at an alien. utilizes SDL mixer for both music and sounds, controller/joystick events, 8bit and 16bit images, sdl fillrect
+- Added Mix_PauseMusic and Mix_HaltMusic to stop music from playing
+

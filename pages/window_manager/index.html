@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>BJ's Website</title>
+    <link href="https://unpkg.com/@fortawesome/fontawesome-free@5.13.0/css/all.css" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="../../bulmaswatch.bjsite.min.css"/>
+</head>
+<body>
+    <section style="margin:10px;">
+        <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
+            <div id="navbarBasicExample" class="navbar-menu is-active">
+                <div class="navbar-start">
+                    <a href="../../index.html" class="navbar-item"><strong>BJ's Website</strong></a>
+                    <a href="../../general.html" class="navbar-item">General</a>
+                    <a href="../../programming.html" class="navbar-item">Programming</a>
+                    <a href="../../school.html" class="navbar-item">School</a>
+                    <a href="../../books.html" class="navbar-item">Books</a>
+                    <a href="../../tech.html" class="navbar-item">Tech</a>
+                </div>
+                <div class="navbar-end">
+                    <a href="https://github.com/williamblair" class="navbar-item"><span class="icon"><i class="fab fa-github"></i></span><span>Github</span></a>
+                    <a href="https://bitbucket.org/williamblair" class="navbar-item"><span class="icon"><i class="fab fa-bitbucket"></i></span>Bitbucket</a>
+                </div>
+            </div>
+        </nav>
+    </section>
+    <section class="section">
+        <div class="container">
+        
+        <h1 class="title">X11 Window Manager</h1>
+        <h3 class="subtitle">Undergraduate Capstone by myself and Ian Kurzrock</h3>
+        
+        <hr/>
+    
+        <div>
+            <div>
+              
+                <div id="imageDiv">
+                            <a href="./images/window_manager_screenshot.png">
+                                <img src="./images/window_manager_screenshot.png" width="400"/>
+                            </a>
+                        </div>
+                        <h2>How it Works</h2>
+                        <div id="imageDiv">
+                            <a href="./images/window_manager_explained.png">
+                                <img src="./images/window_manager_explained.png" width="800"/>
+                            </a>
+                        </div>
+                        <h3>1. The X Server / Root Window</h3>
+                        <p>
+                        Every object in X11 is considered a window. The background/Desktop in X11 is a Window 
+                        itself - it's called the <b>Root Window</b>. Every GUI application on your desktop is 
+                        a child of the Root Window.
+                        </p>
+
+                        <h3>2. Frame Window</h3>
+                        <p>
+                        In a <b>reparenting window manager</b>, all application windows are children of a 
+                        container window, which holds other elements like the title bar and buttons.
+                        In our program the frame windows and their children are stored in a linked list
+                        of structs called <b>WMClient</b>s:
+                        </p>
+                        <pre><code>
+// groups frame windows and the actual app windows
+typedef struct WMClient
+{   
+    Window frame;    // the border/container window
+    Window titleBar; // the title bar to click/drag
+    Window minWin; // minimize, maximize, and close subwindows
+    Window maxWin;
+    Window closeWin;
+    Window child;  // the actual application content window
+    Window task_icon;
+    
+    unsigned int x; // the x and y position before maximizing the window
+    unsigned int y; 
+    unsigned int w; // the width and height before maximizing the window
+    unsigned int h;
+    
+    Bool maximized; // true if the window is fullscreen
+    Bool minimized; // true if the window is minimized
+    
+    char title[50]; // title of the window
+    
+    struct WMClient *next;
+} WMClient;
+                        </code></pre>
+
+                        <h3>3. Title Bar</h3>
+                        <p>
+                        The window inside the frame that you click and drag on to move and contains the
+                        application title. It's size is equal to frameWidth - (buttonSize*numberOfButtons),
+                        so there's room for the maximize, minimze, and close buttons.
+                        </p>
+
+                        <h3>4. Minimize/Maximize/Close Buttons</h3>
+                        <p>
+                        These are (shocker) also just windows, whose mouse press (called button presses in Xlib)
+                        are mapped to the minimize, maximize, and close functions for the window:
+                        </p>
+                        <pre><code>
+/* test if any special windows were pressed */
+if(e.window == temp->minWin)
+{
+    hMinimize(e, temp);
+    return True;
+}
+else if(e.window == temp->maxWin)
+{
+       hMaximize(e, temp);
+       return True;
+}
+else if(e.window == temp->closeWin)
+{
+    hClose(e, temp);
+    return True;
+}
+                        </code></pre>
+                        ...
+                        <pre><code>
+Bool hMinimize(const XButtonEvent e, WMClient *c)
+{
+    printf("Minimize area!\n");
+
+    ...
+}
+
+Bool hMaximize(const XButtonEvent e, WMClient *c) 
+{
+    printf("Maximize Button Clicked!\n");
+
+    ...
+}
+
+Bool hClose(const XButtonEvent e, WMClient *c)
+{
+    printf("Close button pressed!\n");
+
+    ...
+}
+                        </code></pre>
+
+                        <h3>5. Application Window</h3>
+                        <p>
+                        This where the actual program contents are contained. When the
+                        program is first started it sends MapRequest event to the X server.
+                        This is when we reparent the window into a frame and give it a titlebar/
+                        buttons:
+                        </p>
+                        <pre><code>
+Bool hMapRequest(const XMapRequestEvent e)
+{
+    printf("Map Request Event!\n");
+    
+    reparentWindow(e.window, False);
+    
+    XMapWindow(d, e.window);
+    
+    return True;
+}
+                        </code></pre>
+                        ...
+                        <pre><code>
+Bool reparentWindow(Window child, Bool before_wm)
+{
+    ...
+
+    XReparentWindow(
+        d,
+        child,
+        c->frame,
+        0, TITLE_HEIGHT
+    );
+
+    ...
+}
+                        </code></pre>
+                        
+                        <p>
+                        Source: <a href="https://github.com/williamblair/capstone-wm-github">https://github.com/williamblair/capstone-wm-github</a>
+                        </p>
+                        <p>
+                        References: <a href="https://seasonofcode.com/posts/how-x-window-managers-work-and-how-to-write-one-part-i.html">Chuan Ji</a>
+                        </p>
+              
+            </div>
+        </div>
+        
+    <p><a href="../../index.html">&lt;-- Back to Home</a></p>
+
+</body>
+</html>
+

@@ -1,0 +1,142 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Comments</TITLE>
+<META NAME="description" CONTENT="Comments">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="main.css">
+
+<LINK REL="next" HREF="node7.html">
+<LINK REL="previous" HREF="node4.html">
+<LINK REL="up" HREF="main.html">
+<LINK REL="next" HREF="node7.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html130"
+  HREF="node7.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="next.png"></A> 
+<A NAME="tex2html128"
+  HREF="main.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="up.png"></A> 
+<A NAME="tex2html122"
+  HREF="node5.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html131"
+  HREF="node7.html">Formatting</A>
+<B> Up:</B> <A NAME="tex2html129"
+  HREF="main.html">clean code notes</A>
+<B> Previous:</B> <A NAME="tex2html123"
+  HREF="node5.html">Function arguments</A>
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00050000000000000000">
+Comments</A>
+</H1>
+
+<P>
+
+<UL>
+<LI>Inaccurate comments are worse than no comments at all. e.g. code is updated and
+    comments are no longer accurate
+</LI>
+<LI>comments do not make up for bad code
+</LI>
+<LI>code should express itself instead, e.g. 
+<BR>    // Check to see if the employee is eligible for full benefits 
+<BR>
+if (employee.flags &amp; HOURLY_FLAG &amp;&amp; employee.age <SPAN CLASS="MATH"><IMG
+ WIDTH="16" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img2.png"
+ ALT="$&gt;$"></SPAN> 65) 
+<BR>
+vs. 
+<BR>
+if (employee.isElegibleForBenefits())
+</LI>
+<LI>informative comments - should convey information that CANNOT be conveyed with code/naming 
+<BR>
+e.g. a regular expression: 
+<BR>        // format matched: kk:mm:ss EEE, MMM dd, yyy 
+<BR>        <PRE>Pattern timeMatcher = Pattern.compile("\\d*:$\\$d* $\\$w*")
+</PRE>
+</LI>
+<LI>clarifying code that you cannot change or alter (e.g. part of a library or something)
+    is good
+</LI>
+<LI>TODOs are also fine - jobs that you think should be done but can't at the moment for
+    some reason
+</LI>
+<LI>Amplification - emphasizes the importance of something that at first glance may seem 
+    trivial
+</LI>
+<LI>a comment that requires you to look elsewhere to find its meaning is bad
+</LI>
+<LI>redundant comments are bad - they are just distracting noise
+</LI>
+<LI>don't leave commented out lines of code - delete them! that's what source control is for
+</LI>
+<LI>instead of marking ends of loops and such; try and make the function/section shorter
+</LI>
+<LI>position markers (marking related sections/functions) are generally noise
+</LI>
+<LI>don't add systemwide information to a local comment - if it contains information
+    that could change elsewhere besides the current code, there's no guarantee that comment
+    will be changed later and hence could become incorrect
+</LI>
+</UL>
+
+<P>
+<SPAN  CLASS="textbf">Don't use a comment when you can use a function or variable</SPAN>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A NAME="tex2html130"
+  HREF="node7.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="next.png"></A> 
+<A NAME="tex2html128"
+  HREF="main.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="up.png"></A> 
+<A NAME="tex2html122"
+  HREF="node5.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html131"
+  HREF="node7.html">Formatting</A>
+<B> Up:</B> <A NAME="tex2html129"
+  HREF="main.html">clean code notes</A>
+<B> Previous:</B> <A NAME="tex2html123"
+  HREF="node5.html">Function arguments</A></DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+bj
+2019-09-22
+</ADDRESS>
+</BODY>
+</HTML>

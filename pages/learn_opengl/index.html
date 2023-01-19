@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>BJ's Website</title>
+    <link href="https://unpkg.com/@fortawesome/fontawesome-free@5.13.0/css/all.css" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="../../bulmaswatch.bjsite.min.css"/>
+</head>
+<body>
+    <section style="margin:10px;">
+        <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
+            <div id="navbarBasicExample" class="navbar-menu is-active">
+                <div class="navbar-start">
+                    <a href="../../index.html" class="navbar-item"><strong>BJ's Website</strong></a>
+                    <a href="../../general.html" class="navbar-item">General</a>
+                    <a href="../../programming.html" class="navbar-item">Programming</a>
+                    <a href="../../school.html" class="navbar-item">School</a>
+                    <a href="../../books.html" class="navbar-item">Books</a>
+                    <a href="../../tech.html" class="navbar-item">Tech</a>
+                </div>
+                <div class="navbar-end">
+                    <a href="https://github.com/williamblair" class="navbar-item"><span class="icon"><i class="fab fa-github"></i></span><span>Github</span></a>
+                    <a href="https://bitbucket.org/williamblair" class="navbar-item"><span class="icon"><i class="fab fa-bitbucket"></i></span>Bitbucket</a>
+                </div>
+            </div>
+        </nav>
+    </section>
+    <section class="section">
+        <div class="container">
+
+        <h1 class="title">Learn OpenGL - Graphics Programming</h1>
+
+        <p>Screenshots of programs following "Learn OpenGL"
+        by Joey de Vries</p>
+        <p>
+        <a href="https://learnopengl.com/">
+        <img src="bookcover.jpg" width="300"/>
+        </a>
+        </p>
+
+        <p>The Code is here: 
+        <a href="https://github.com/williamblair/learnopengl">
+        https://github.com/williamblair/learnopengl
+        </a>
+        </p>
+
+        <figure>
+        <figcaption>13 - Model Loading</figcaption>
+        <img src="images/13_model_loading.png"/>
+        </figure>
+
+        <figure>
+        <figcaption>15 - Stencil Buffer</figcaption>
+        <img src="images/15_stencil_buffer.png"/>
+        </figure>
+
+        <figure>
+        <figcaption>16 - Blending</figcaption>
+        <img src="images/16_blending_windows.png"/>
+        <img src="images/16_grass_texture.png"/>
+        </figure>
+
+        <figure>
+        <figcaption>17 - Face Culling</figcaption>
+        <img src="images/17_culling.png"/>
+        </figure>
+
+        <figure>
+        <figcaption>18 - Post Processing/Frame Buffers</figcaption>
+        <img src="images/18_01_edge_detection.png"/>
+        <img src="images/18_02_inverted_colors.png"/>
+        <img src="images/18_03_grayscale.png"/>
+        <img src="images/18_04_sharpening.png"/>
+        <img src="images/18_05_blurring.png"/>
+        </figure>
+
+        <figure>
+        <figcaption>19 - Skybox/Cube Map</figcaption>
+        <img src="images/19_skybox.png"/>
+        </figure>
+
+        <figure>
+        <figcaption>20 - Reflection and Refraction</figcaption>
+        <img src="images/20_reflection.png"/>
+        <img src="images/20_refraction.png"/>
+        </figure>
+
+        <figure>
+        <figcaption>22 - Geometry Shader (Explosion and normals display)</figcaption>
+        <img src="images/22_01_explode.gif"/>
+        <img src="images/22_02_normals_display.png"/>
+        </figure>
+
+        <figure>
+        <figcaption>23 - Instanced Drawing (draw many instances with a single render call)</figcaption>
+        <img src="images/23_02_instanced.png"/>
+        </figure>
+
+        <figure>
+        <figcaption>24 - Blinn-phong shading (compared to just phong)</figcaption>
+        <img src="images/24_blinn_phong.png"/>
+        <img src="images/24_phong.png"/>
+        </figure>
+
+        <figure>
+        <figcaption>25 - Gamma correction (For manual, gamma = 2.2)</figcaption>
+        <table>
+          <tr><td></td><th>GL_RGB Texture</th><th>GL_SRGB texture</th></tr>
+          <tr><th>OpenGL SRGB Buffer</th><td><img src="images/25_opengl.png"/></td><td><img src="images/25_tex_srgb_opengl_gamma.png"/></td></tr>
+          <tr><th>Manual</th><td><img src="images/25_manual.png"/></td><td><img src="images/25_tex_srgb_manual_gamma.png"></td></tr>
+        </table>
+        Reference image (no gamma correction)
+        <img src="images/25_tex_rgb_no_gamma.png"/>
+        </figure>
+
+        <figure>
+        <figcaption>26 - Basic Shadows with using Depth Maps</figcaption>
+        <table>
+          <tr><td>Depth Map Texture</td><td><img src="images/26_depth_map_texture.png"/></td></tr>
+          <tr><td>Result render with "shadow acne"</td><td><img src="images/26_depth_map_uncorrected_shadow.png"/></td></tr>
+          <tr><td>Result render with "shadow acne"</td><td><img src="images/26_depth_map_uncorrected_shadow_2.png"/></td></tr>
+          <tr><td>Result render with bias calculation to prevent "shadow acne"</td><td><img src="images/26_depth_map_shadow_bias.png"/></td></tr>
+          <tr><td>Result render with oversampling issue</td><td><img src="images/26_depth_map_oversampling.png"/></td></tr>
+          <tr><td>Result render fixed oversampling issue (clamp depth map texture and border color)</td><td><img src="images/26_depth_map_fixed_oversampling.png"/></td></tr>
+          <tr><td>Result render with PCF smoothing on the shadows</td><td><img src="images/26_depth_map_pcf_smoothing.png"/></td></tr>
+        </table>
+        </figure>
+
+        <figure>
+        <figcaption>26 02 - Omnidirection shadows (shadows from point lights) using Depth Cube maps</figcaption>
+        <img src="images/26_02_movingshadow.gif"/>
+        <table>
+          <tr><td>Without PCF Filtering</td><td>With PCF filtering</td></tr>
+          <tr><td><img src="images/26_02_shadows_no_pcf.png"/></td><td><img src="images/26_02_shadows_pcf.png"/></td></tr>
+        </table>
+        </figure>
+
+        <figure>
+        <figcaption>27 - Normal/Bump maps and tangent space</figcaption>
+        <table>
+          <tr><td>Without Normal Mapped Texture</td><td>With Normal Mapped Texture</td></tr>
+          <tr><td><img src="images/27_without_normal_map.png"/></td><td><img src="images/27_with_normal_map.png"/></td></tr>
+        </table>
+        </figure>
+
+        <figure>
+        <figcaption>28 - Parallax texture mapping</figcaption>
+        <table>
+          <tr><td>Height Scale = 0.1</td><td>Height Scale = 0.3</td></tr>
+          <tr><td><img src="images/28_parallax_mapping.png"/></td><td><img src="images/28_parallax_scale_0.3.png"/></td></tr>
+        </table>
+        </figure>
+
+        <figure>
+        <figcaption>29 - High Dynamic Range (HDR) Lighting</figcaption>
+        <table>
+          <tr><td>HDR Enabled (Exposure = ~5.0)</td><td>HDR Disabled</td></tr>
+          <tr><td><img src="images/29_hdr_enable_woodtex.png"/></td><td><img src="images/29_hdr_disabled_woodtex.png"/></td></tr>
+          <tr><td><img src="images/29_hdr_enable_woodtex_closeup.png"/></td><td><img src="images/29_hdr_disabled_woodtex_closeup.png"/></td></tr>
+        </table>
+        </figure>
+
+        <figure>
+        <figcaption>30 - Bloom Lighting</figcaption>
+        <table>
+          <tr><td>Default Render</td><td><img src="images/30_bloom_original.png"/></td></tr>
+          <tr><td>Brightness Image (High intensity filtered)</td><td><img src="images/30_bloom_bright.png"/></td></tr>
+          <tr><td>Blurred Image</td><td><img src="images/30_bloom_blurred.png"/></td></tr>
+          <tr><td>Final Result</td><td><img src="images/30_bloom_combined.png"/></td></tr>
+        </table>
+        </figure>
+
+        <figure>
+        <figcaption>31 - Deferred Rendering</figcaption>
+        <table>
+          <tr><td>Position Buffer</td><td><img src="images/31_deferred_position.png"/></td></tr>
+          <tr><td>Normal Buffer</td><td><img src="images/31_deferred_normal.png"/></td></tr>
+          <tr><td>Color and Specular Buffer</td><td><img src="images/31_deferred_color_specular.png"/></td></tr>
+          <tr><td>Final Result</td><td><img src="images/31_deferred_result.png"/></td></tr>
+        </table>
+        </figure>
+
+        <figure>
+        <figcaption>32 - Screen Space Ambient Occlusion (SSAO)</figcaption>
+        <table>
+          <tr><td>Position Buffer</td><td><img src="images/32_ssao_pos_buffer.png"/></td></tr>
+          <tr><td>Normal Buffer</td><td><img src="images/32_ssao_normal_buffer.png"/></td></tr>
+          <tr><td>SSAO Occlusion Buffer</td><td><img src="images/32_ssao_output_buffer.png"/></td></tr>
+          <tr><td>SSAO Blurred Occlusion Buffer</td><td><img src="images/32_ssao_output_buffer_blurred.png"/></td></tr>
+          <tr><td>Final Result (SSAO Disabled)</td><td><img src="images/32_ssao_result_disabled.png"/></td></tr>
+          <tr><td>Final Result (SSAO Enabled)</td><td><img src="images/32_ssao_result.png"/></td></tr>
+        </table>
+        </figure>
+
+        <figure>
+        <figcaption>33 - Basic Physically Based Rendering</figcaption>
+        <img src="images/33_pbr_untextured.png"/>
+        <img src="images/33_pbr_untextured_2.png"/>
+        <img src="images/33_pbr_textured.png"/>
+        <img src="images/33_pbr_textured_2.png"/>
+        </figure>
+
+        <figure>
+        <figcaption>34 - PBR Diffuse Irradiance</figcaption>
+        <table>
+        <tr><td>Irradiance Map as the environment cubemap</td><td><img src="images/34_pbr_irradiance_envmap.png"/></td></tr>
+        <tr><td>Irradiance map diffuse disabled</td><td><img src="images/34_pbr_irradiance_disabled.png"/></td></tr>
+        <tr><td>Irradiance map diffuse enabled</td><td><img src="images/34_pbr_irradiance_enabled.png"/></td></tr>
+        </table>
+        </figure>
+
+        <p>
+        <a href="../../index.html">&lt;-- Back to Home</a>
+        </p>
+
+        </div>
+    </section>
+
+</body>
+</html>
+

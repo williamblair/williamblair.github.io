@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>BJ's Website</title>
+    <link href="https://unpkg.com/@fortawesome/fontawesome-free@5.13.0/css/all.css" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="../../bulmaswatch.bjsite.min.css"/>
+</head>
+<body>
+    <section style="margin:10px;">
+        <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
+            <div id="navbarBasicExample" class="navbar-menu is-active">
+                <div class="navbar-start">
+                    <a href="../../index.html" class="navbar-item"><strong>BJ's Website</strong></a>
+                    <a href="../../general.html" class="navbar-item">General</a>
+                    <a href="../../programming.html" class="navbar-item">Programming</a>
+                    <a href="../../school.html" class="navbar-item">School</a>
+                    <a href="../../books.html" class="navbar-item">Books</a>
+                    <a href="../../tech.html" class="navbar-item">Tech</a>
+                </div>
+                <div class="navbar-end">
+                    <a href="https://github.com/williamblair" class="navbar-item"><span class="icon"><i class="fab fa-github"></i></span><span>Github</span></a>
+                    <a href="https://bitbucket.org/williamblair" class="navbar-item"><span class="icon"><i class="fab fa-bitbucket"></i></span>Bitbucket</a>
+                </div>
+            </div>
+        </nav>
+    </section>
+    <section class="section">
+        <div class="container">
+
+<h1 class="title">Wii Homebrew Installation</h1>
+
+<p>Bought a Wii that was for sale at the local Salvation Army, so of course
+the first thing I wanted to do was hack it!</p>
+
+<p>First, whoever donated it didn't bother removing their accounts or data
+from it. Also, annoyingly, it had parental controls enabled with an unknown
+pin... This was preventing me from factory resetting the system and even
+connecting to the internet.</p>
+
+<p>I was able to get around this following this video:
+</p>
+<div>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/zQmeBr5DNUk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div>
+
+<ol>
+<li>Go to the Wii settings</li>
+<li>Ensure date, time, country are up to date (change if necessary)</li>
+<li>Parental Controls</li>
+<li>"I forgot", "I forgot"</li>
+<li>Write down the confirmation number</li>
+<li>On your pc, go to <a href="https://wii.marcan.st/parental">https://wii.marcan.st/parental</a></li>
+<li>Enter the confirmation number from 2 steps previous</li>
+<li>Enter your current date, click "get reset code"</li>
+<li>On the wii, enter the code generated on the website. The wii should now have parental controls removed!</li>
+</ol>
+
+<p>Now I could go about connecting to the internet (needed for the homebrew install).
+I manually entered my wireless network information as it wasn't showing up in the wii search.
+Figured out the security setting was wpa2 psk, based on looking on the connection settings
+on my phone.  Also did a factory reset via "Format Wii System Memory."</p>
+
+<p>For the actual homebrew channel installation, followed this video:
+</p>
+<div>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/qymPEZ7lXb4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div>
+
+<ol>
+<li>Ensure the Wii system menu version is 4.3 (if not, do a system update)</li>
+<li>Note the letter after 4.3 (in my case U)</li>
+<li>Write down/save the system's MAC address by going to system settings</li>
+<li>On a pc, format a SD card to FAT32</li>
+<li>Go to <a href="https://please.hackmii.com/">https://please.hackmii.com/</a>,
+    select the system menu version, enter the MAC address, check I'm not a
+    robot, and click "cut the [red|blue] wire" (doesn't matter which one)
+</li>
+<li>Extract the downloaded zip contents to the root of the SD card</li>
+<li>Make a folder called "apps" on the SD card root</li>
+<li>Go to <a href="https://wii.guide/hbb.html">https://wii.guide/hbb.html</a>
+    and click/download "Homebrew Browser." Extract the zip contents to
+    the "app" directory on the SD card.
+</li>
+<li>Insert the SD card into the Wii</li>
+<li>Browse the mail (wii message board) screen from the bottom right of the Wii's home page</li>
+<li>Scroll to the previous day's date; should see a "letter bomb" logo; select it</li>
+<li>Wait a minute then press 1 to continue when it says to</li>
+<li>Make sure the homebrew channel says "Can be installed"; select continue</li>
+<li>Move to and select "Install the Homebrew Channel"</li>
+<li>Move to and select "Exit"</li>
+<li>And wahlah, the homebrew channel is installed!</li>
+</ol>
+
+<a href="../../index.html">&lt;-- Back to Home</a>
+
+        </div>
+    </section>
+
+</body>
+</html>
+

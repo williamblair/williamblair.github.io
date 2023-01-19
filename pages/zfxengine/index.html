@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>BJ's Website</title>
+    <link href="https://unpkg.com/@fortawesome/fontawesome-free@5.13.0/css/all.css" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="../../bulmaswatch.bjsite.min.css"/>
+</head>
+<body>
+    <section style="margin:10px;">
+        <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
+            <div id="navbarBasicExample" class="navbar-menu is-active">
+                <div class="navbar-start">
+                    <a href="../../index.html" class="navbar-item"><strong>BJ's Website</strong></a>
+                    <a href="../../general.html" class="navbar-item">General</a>
+                    <a href="../../programming.html" class="navbar-item">Programming</a>
+                    <a href="../../school.html" class="navbar-item">School</a>
+                    <a href="../../books.html" class="navbar-item">Books</a>
+                    <a href="../../tech.html" class="navbar-item">Tech</a>
+                </div>
+                <div class="navbar-end">
+                    <a href="https://github.com/williamblair" class="navbar-item"><span class="icon"><i class="fab fa-github"></i></span><span>Github</span></a>
+                    <a href="https://bitbucket.org/williamblair" class="navbar-item"><span class="icon"><i class="fab fa-bitbucket"></i></span>Bitbucket</a>
+                </div>
+            </div>
+        </nav>
+    </section>
+    <section class="section">
+        <div class="container">
+
+        <h1 class="title">ZFX Engine OpenGL</h1>
+
+        <p>Attempting an OpenGL implementation of ZFXEngine from
+        "3D Game Engine Programming" by Zerbst,Duvel. I'd like
+        to try and port it to PS3,Wii as well.</p>
+
+        <a href="https://www.amazon.com/3D-Game-Engine-Programming-Development/dp/1592003516">
+        <img src="https://images-na.ssl-images-amazon.com/images/I/41K+0ST6iJL._SX407_BO1,204,203,200_.jpg" width="400px"/>
+        </a>
+
+        <h2>Chapter 4</h2>
+        <h3>07/31/2022</h3>
+        <p>The book uses Visual Studio inline assembly syntax (__asm) for
+        AVX instructions and AVX cpu detection. I instead used GCC inline
+        asm with AT&amp;T syntax
+        (<a href="https://www.ibiblio.org/gferg/ldp/GCC-Inline-Assembly-HOWTO.html">
+            https://www.ibiblio.org/gferg/ldp/GCC-Inline-Assembly-HOWTO.html</a>)
+        and then <a href="https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#">intrinsics</a>. Example:</p>
+
+        <pre><code>// book inline asm vector normalize:
+w = 0.0f;
+__asm {
+    mov    esi,   this            ; vector u
+    movups xmm0,  [esi]           ; first vector in xmm0
+    movaps xmm2,  xmm0            ; copy original vector
+    mulps  xmm0,  xmm0            ; mul with 2nd vector
+    movaps xmm1,  xmm0            ; copy result
+    shufps xmm1,  xmm1, 4Eh       ; shuffle: f1,f0,f3,f2
+    addps  xmm0,  xmm1            ; add: f3+f1,f2+f0,f1+f3,f0+f2 
+    movaps xmm1,  xmm0            ; copy results
+    shufps xmm1,  xmm1, 11h       ; shuffle: f0+f2,f1+f3,f0+f2,f1+f3 
+    addps  xmm0,  xmm1            ; add: x,x,f0+f1+f2+f3,f0+f1+f2+f3
+
+    rsqrtps xmm0,  xmm0           ; recip. sqrt (faster than ss + shufps)
+    mulps   xmm2,  xmm0           ; mul by reciprocal
+    movups  [esi], xmm2           ; bring back result
+}
+w = 1.0f;
+
+// with intrinsics instead:
+w = 0.0f; // clear w so it doesn't effect calculation
+__m128 vec = _mm_loadu_ps(&x); // load x,y,z,w into vec
+__m128 vecOrig = vec; // save copy of original values
+vec = _mm_mul_ps(vec,vec);
+__m128 tmp = _mm_shuffle_ps(vec,vec,0x4E);
+vec = _mm_add_ps(vec,tmp);
+tmp = _mm_shuffle_ps(vec,vec,0x11);
+vec = _mm_add_ps(vec,tmp);
+vec = _mm_rsqrt_ps(vec); // calc reciprocal square root
+vecOrig = _mm_mul_ps(vecOrig,vec); // multiply by inv square root
+_mm_storeu_ps(&x,vecOrig); // store result back in *this
+w = 1.0f; // restore w
+        </code></pre>
+
+        <h2>Chapter 6</h2>
+        <h3>08/29/2022</h3>
+        <p>Have enough of the OpenGL render device, Vertex Cache, and Vertex Cache manager
+        implemented to render a basic triangle. Learned you need to use
+        glVertexAttribIPointer for integer attributes. Also learned the last
+        argument to glDrawElements is used as a byte offset into the index
+        buffer to use for drawing, assuming an index buffer is currently bound.</p>
+        <img src="./images/basictriangle_08_29_2022.png"/>
+
+        <h3>08/30/2022</h3>
+        <p>Started the shaders for each vertex type in the vertex cache manager,
+        vert cache manager render naked working.</p>
+
+        <h3>08/31/2022</h3>
+        <p>Render lines, points primitives working:</p>
+        <img src="./images/drawprimitives_08_31_2022.png"/>
+
+        <h3>09/03/2022</h3>
+        <p>Added ZFXModel class for s3d models, and fixed the uu/VERTEX struct shader.
+        The vector-matrix multiplication order needed to be switched because of the
+        ZFXMatrix implementation:</p>
+        <pre><code>//gl_Position = uWvpMatrix * vec4(aPos,1.0);
+gl_Position = vec4(aPos,1.0) * uWvpMatrix;
+        </code></pre>
+        <p>Most of the chapter 6 demo now works; not implemented are multiple windows/viewports
+        and font drawing, also lighting:</p>
+        <img src="./images/chp06_demo_09_03_2022.png"/>
+
+        <h3>09/14/2022</h3>
+        <p>Initial Render Device CreateFont and DrawText working. Using fnt format font from
+        <a href="https://angelcode.com/products/bmfont/">https://angelcode.com/products/bmfont/</a>,
+        as the book implementation uses a built-in direct X library for loading Windows fonts.</p>
+        <p>stb image was not properly loading the tga format generated for some reason, and I had
+        to convert the image to a bmp instead:</p>
+        <img src="./images/fntfonttexturenotworking_09_14_2022.png"/><br/>
+        <img src="./images/fntfonttextureworking_09_14_2022.png"/><br/>
+        <p>After that, we can successfully call DrawText():</p>
+        <img src="./images/fntfonttextworking_09_14_2022.png"/>
+
+        <p>09/15/2022</p>
+        <p>Started the chapter 7 demo (shaders). Just the basic unlit version for starters.
+        Had to enable face culling and set the front face to clockwise instead of counter-clockwise:</p>
+        <pre><code>glEnable(GL_CULL_FACE);                                                                         
+glFrontFace(GL_CW); 
+        </code></pre>
+        <img src="./images/chp07demo_started_09_15_2022.png"/>
+
+        <p>09/18/2022</p>
+        <p>Added two more chapter 7 demos - basic ambient lighting and multitexturing.</p>
+        <img src="./images/chp07demo_basiclighting_09_18_2022.png"/><br/>
+        <img src="./images/chp07demo_multitexturing_09_18_2022.png"/><br/>
+
+        <p>
+        <a href="../../index.html">&lt;-- Back to Home</a>
+        </p>
+
+        </div>
+    </section>
+
+</body>
+</html>
+

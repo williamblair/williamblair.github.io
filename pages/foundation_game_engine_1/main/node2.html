@@ -1,0 +1,241 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2019.2 (Released June 5, 2019) -->
+<HTML lang="EN">
+<HEAD>
+<TITLE>Matrix Formulas</TITLE>
+<META NAME="description" CONTENT="Matrix Formulas">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2019.2">
+
+<LINK REL="STYLESHEET" HREF="main.css">
+
+<LINK REL="next" HREF="node3.html">
+<LINK REL="previous" HREF="node1.html">
+<LINK REL="next" HREF="node3.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A
+ HREF="node3.html">
+<IMG WIDTH="37" HEIGHT="24" ALT="next" SRC="next.png"></A> 
+<A
+ HREF="main.html">
+<IMG WIDTH="26" HEIGHT="24" ALT="up" SRC="up.png"></A> 
+<A
+ HREF="node1.html">
+<IMG WIDTH="63" HEIGHT="24" ALT="previous" SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A
+ HREF="node3.html">Transformations</A>
+<B> Up:</B> <A
+ HREF="main.html">Foundations of Game Engine</A>
+<B> Previous:</B> <A
+ HREF="node1.html">Vector Formulas</A>
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H1><A ID="SECTION00020000000000000000">
+Matrix Formulas</A>
+</H1>
+
+<P>
+<TABLE class="PAD " style="">
+<TR><TD CLASS="LEFT"><!-- MATH
+ $\textbf{A}_{n,m}\textbf{B}_{m,p} = \textbf{C}_{n,p}$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.48ex; vertical-align: -0.78ex; " SRC="img26.svg"
+ ALT="$\textbf{A}_{n,m}\textbf{B}_{m,p} = \textbf{C}_{n,p} $"></SPAN></TD>
+<TD CLASS="RIGHT">Matrix mult result size; 
+also cols A must equal rows B</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $\textbf{M}_{i,j}^T = \textbf{M}_{j,i}$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 3.24ex; vertical-align: -1.01ex; " SRC="img27.svg"
+ ALT="$\textbf{M}_{i,j}^T = \textbf{M}_{j,i} $"></SPAN></TD>
+<TD CLASS="RIGHT">Matrix transpose</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $\textbf{M} = [\textbf{a} \textbf{b} \textbf{c}]$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.55ex; vertical-align: -0.70ex; " SRC="img28.svg"
+ ALT="$\textbf{M} = [\textbf{a} \textbf{b} \textbf{c}]$"></SPAN></TD>
+<TD CLASS="RIGHT">Column vector representation</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $\textbf{M} = \begin{bmatrix}
+	X & a & b \\
+	a & X & c \\
+	b & c & X
+	\end{bmatrix}$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 8.56ex; vertical-align: -3.72ex; " SRC="img29.svg"
+ ALT="$\textbf{M} = \begin{bmatrix}
+X &amp; a &amp; b \\
+a &amp; X &amp; c \\
+b &amp; c &amp; X
+\end{bmatrix} $"></SPAN></TD>
+<TD CLASS="RIGHT">Symmetric matrix (X is be any value)</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $\textbf{M}^T = \textbf{M}$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.35ex; vertical-align: -0.12ex; " SRC="img30.svg"
+ ALT="$\textbf{M}^T = \textbf{M}$"></SPAN></TD>
+<TD CLASS="RIGHT">&nbsp;</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $\textbf{M} = \begin{bmatrix}
+	0 & a & b \\
+	-a & 0 & c \\
+	-b & -c & 0
+	\end{bmatrix}$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 8.56ex; vertical-align: -3.72ex; " SRC="img31.svg"
+ ALT="$\textbf{M} = \begin{bmatrix}
+0 &amp; a &amp; b \\
+-a &amp; 0 &amp; c \\
+-b &amp; -c &amp; 0
+\end{bmatrix}$"></SPAN></TD>
+<TD CLASS="RIGHT">Antisymmetric matrix or skew-symmetric matrix 
+ (diagonals must be 0)</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $\textbf{M}^T = -\textbf{M}$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.55ex; vertical-align: -0.31ex; " SRC="img32.svg"
+ ALT="$\textbf{M}^T = -\textbf{M}$"></SPAN></TD>
+<TD CLASS="RIGHT">&nbsp;</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $\textbf{M}\textbf{v} = v_x \textbf{a} + v_y \textbf{b} + v_z \textbf{c}$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.50ex; vertical-align: -0.78ex; " SRC="img33.svg"
+ ALT="$\textbf{M}\textbf{v} = v_x \textbf{a} + v_y \textbf{b} + v_z \textbf{c}$"></SPAN></TD>
+<TD CLASS="RIGHT">Column vector mult notation (a,b,c cols of M)</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $\begin{vmatrix}a & b \\c & d \end{vmatrix} = ad - bc$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 5.79ex; vertical-align: -2.32ex; " SRC="img34.svg"
+ ALT="$\begin{vmatrix}a &amp; b \\ c &amp; d \end{vmatrix} = ad - bc$"></SPAN></TD>
+<TD CLASS="RIGHT">2D Matrix determinant</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $det(\textbf{M}) = \sum\limits_{i=0}^{n-1} M_{ik}(-1)^{i+k}|\textbf{M}_{\bar{ik}}|$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 5.97ex; vertical-align: -2.39ex; " SRC="img35.svg"
+ ALT="$det(\textbf{M}) = \sum\limits_{i=0}^{n-1} M_{ik}(-1)^{i+k}\vert\textbf{M}_{\bar{ik}}\vert $"></SPAN></TD>
+<TD CLASS="RIGHT">Recursive determinant (each <SPAN CLASS="MATH"><IMG STYLE="height: 2.55ex; vertical-align: -0.70ex; " SRC="img36.svg"
+ ALT="$\vert M_{ik}\vert$"></SPAN> is the sub matrix excluding the current col)</TD>
+</TR>
+<TR><TD CLASS="LEFT">&nbsp;</TD>
+<TD CLASS="RIGHT">k is chosen as any row; good when row is mostly zeros</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $C_{ij}(\textbf{M}) = (-1)^{i+j}|\textbf{M}_{\bar{ij}}|$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.97ex; vertical-align: -0.94ex; " SRC="img37.svg"
+ ALT="$C_{ij}(\textbf{M}) = (-1)^{i+j}\vert\textbf{M}_{\bar{ij}}\vert$"></SPAN></TD>
+<TD CLASS="RIGHT">Cofactor matrix definition</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $\textbf{M}^{-1} = \frac{1}{det(\textbf{M})} \textbf{C}^T(\textbf{M})$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 3.56ex; vertical-align: -1.32ex; " SRC="img38.svg"
+ ALT="$\textbf{M}^{-1} = \frac{1}{det(\textbf{M})} \textbf{C}^T(\textbf{M})$"></SPAN></TD>
+<TD CLASS="RIGHT">Inverse; <SPAN CLASS="MATH"><IMG STYLE="height: 2.76ex; vertical-align: -0.70ex; " SRC="img39.svg"
+ ALT="$C^T(M) =$"></SPAN> adjugate matrix</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $\textbf{A}^{-1} = \frac{1}{A_{00}A_{11} - A_{01}A_{10}}
+\begin{bmatrix}
+A_{11} & -A_{01} \\
+-A_{10} & A_{00}
+\end{bmatrix}$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 5.79ex; vertical-align: -2.32ex; " SRC="img40.svg"
+ ALT="$\textbf{A}^{-1} = \frac{1}{A_{00}A_{11} - A_{01}A_{10}}
+\begin{bmatrix}
+A_{11} &amp; -A_{01} \\
+-A_{10} &amp; A_{00}
+\end{bmatrix}$"></SPAN></TD>
+<TD CLASS="RIGHT">2D Matrix inverse</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $\textbf{B}^{-1} = \frac{1}{det(\textbf{B})}
+\begin{bmatrix}
+B_{11}B_{22} - B_{12}B_{21} & B_{02}B_{21} - B_{01}B_{22} & B_{01}B_{12} - B_{02}B_{11} \\
+B_{12}B_{20} - B_{10}B_{22} & B_{00}B_{22} - B_{02}B_{20} & B_{02}B_{10} - B_{00}B_{12} \\
+B_{10}B_{21} - B_{11}B_{20} & B_{01}B_{20} - B_{00}B_{21} & B_{00}B_{11} - B_{01}B_{10}
+\end{bmatrix} $
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 8.56ex; vertical-align: -3.72ex; " SRC="img41.svg"
+ ALT="$\textbf{B}^{-1} = \frac{1}{det(\textbf{B})}
+\begin{bmatrix}
+B_{11}B_{22} - B_{...
+...{20} &amp; B_{01}B_{20} - B_{00}B_{21} &amp; B_{00}B_{11} - B_{01}B_{10}
+\end{bmatrix} $"></SPAN></TD>
+<TD CLASS="RIGHT">3D Matrix inverse</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $\textbf{M}^{-1} = \frac{1}{[\textbf{a},\textbf{b},\textbf{c}]}
+\begin{bmatrix}
+\textbf{b} \times \textbf{c} \\
+\textbf{c} \times \textbf{a} \\
+\textbf{a} \times \textbf{b} \\
+\end{bmatrix}
+$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 8.56ex; vertical-align: -3.72ex; " SRC="img42.svg"
+ ALT="$\textbf{M}^{-1} = \frac{1}{[\textbf{a},\textbf{b},\textbf{c}]}
+\begin{bmatrix}...
+...\textbf{c} \times \textbf{a} \\
+\textbf{a} \times \textbf{b} \\
+\end{bmatrix}$"></SPAN></TD>
+<TD CLASS="RIGHT">3D matrix inverse (a,b,c cols of M)</TD>
+</TR>
+<TR><TD CLASS="LEFT"><!-- MATH
+ $\textbf{M}^{-1} = \frac{1}{\textbf{s} \cdot \textbf{v} + \textbf{t} \cdot \textbf{u}}
+\begin{bmatrix}
+\textbf{b} \times \textbf{v} + y\textbf{t} | -\textbf{b} \cdot \textbf{t} \\
+\textbf{v} \times \textbf{a} - x\textbf{t} | \textbf{a} \cdot \textbf{t} \\
+\textbf{d} \times \textbf{u} + w\textbf{s} | -\textbf{d} \cdot \textbf{s} \\
+\textbf{u} \times \textbf{c} - z\textbf{s} | \textbf{c} \cdot \textbf{s}
+\end{bmatrix}$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 11.34ex; vertical-align: -5.11ex; " SRC="img43.svg"
+ ALT="$\textbf{M}^{-1} = \frac{1}{\textbf{s} \cdot \textbf{v} + \textbf{t} \cdot \text...
+...\times \textbf{c} - z\textbf{s} \vert \textbf{c} \cdot \textbf{s}
+\end{bmatrix}$"></SPAN></TD>
+<TD CLASS="RIGHT">4D Matrix inverse. a,b,c,d = 3D column vectors of M.</TD>
+</TR>
+<TR><TD CLASS="LEFT">&nbsp;</TD>
+<TD CLASS="RIGHT">x,y,z,w = last row of M, x = <!-- MATH
+ $a \times b$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.03ex; vertical-align: -0.31ex; " SRC="img44.svg"
+ ALT="$a \times b$"></SPAN>, t = <!-- MATH
+ $c \times d$
+ -->
+<SPAN CLASS="MATH"><IMG STYLE="height: 2.03ex; vertical-align: -0.31ex; " SRC="img45.svg"
+ ALT="$c \times d$"></SPAN>,
+u = <SPAN CLASS="MATH"><IMG STYLE="height: 2.29ex; vertical-align: -0.57ex; " SRC="img46.svg"
+ ALT="$ya -xb$"></SPAN>, v = <SPAN CLASS="MATH"><IMG STYLE="height: 2.03ex; vertical-align: -0.31ex; " SRC="img47.svg"
+ ALT="$wc -zd$"></SPAN></TD>
+</TR>
+</TABLE> 
+<P>
+<BR><HR>
+
+</BODY>
+</HTML>

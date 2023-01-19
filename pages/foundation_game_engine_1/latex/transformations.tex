@@ -1,0 +1,113 @@
+\section{Transformations}
+
+{\setlength{\extrarowheight}{10pt}
+
+\begin{tabulary}{8in}{LR}
+
+$\textbf{M}\textbf{v} = v_x \textbf{a} + v_y \textbf{b} + v_z \textbf{c} $
+& Where a,b,c are the columns of M \\
+
+$ \textbf{M}^T \textbf{M} = \begin{bmatrix}
+a^2 & \textbf{a} \cdot \textbf{b} & \textbf{a} \cdot \textbf{c} \\
+\textbf{b} \cdot \textbf{a} & b^2 & \textbf{b} \cdot \textbf{c} \\
+\textbf{c} \cdot \textbf{a} & \textbf{c} \cdot \textbf{b} & c^2
+\end{bmatrix}
+$
+& Orthogonal transform; a,b,c are cols of M. Unit cols and all perpindicular. 
+$M^T = M^-1$ \\
+
+$ \textbf{B} = \textbf{M} \textbf{A} \textbf{M}^{-1} $
+& Transform from coord space A applied in coord space B. M = coord space transform. \\
+
+$ M_{rot_x}(\theta) = \begin{bmatrix}
+1 & 0 & 0 \\
+0 & cos \theta & -sin \theta \\
+0 & sin \theta & cos \theta
+\end{bmatrix}
+$
+& Rotation matrix about X axis \\
+
+$ M_{rot_y}(\theta) = \begin{bmatrix}
+ cos \theta & 0 & sin \theta \\
+0 & 1 & 0 \\
+sin \theta & 0 & cos \theta
+\end{bmatrix}
+$
+& Rotation matrix about Y axis \\
+
+$ M_{rot_z}(\theta) = \begin{bmatrix}
+cos \theta & -sin \theta & 0 \\
+sin \theta & cos \theta & 0 \\
+0 & 0 & 1
+\end{bmatrix}
+$
+& Rotation matrix about Z axis \\
+
+$ M_{rot}(\theta, \textbf{a}) = \begin{bmatrix}
+c + (1-c)a_x^2 & (1-c)a_x a_y - s a_z & (1-c)a_x a_z + s a_y \\
+(1-c)a_x a_y + s a_z & c + (1-c)a_y^2 & (1-c)a_y a_z - s a_x \\
+(1-c)a_x a_z - s a_y & (1-c)a_y a_z + s a_x & c + (1-c) a_z^2
+\end{bmatrix}
+$
+& Rotation matrix about arbitrary axis \textbf{a}. c = $cos \theta$, s = $ sin \theta $ \\
+
+$ M_{reflect}(\textbf{a}) = \begin{bmatrix}
+1 - 2a_x^2 & -2a_x a_y & -2a_x a_z \\
+-2a_x a_y & 1 -2a_y^2 & -2a_y a_z \\
+-2a_x a_z & -2a_y a_z & 1 - 2a_z^2
+\end{bmatrix}
+$
+& Reflection matrix about axis \textbf{a}, assumes a unit length. \\
+
+$ M_{invol}(\textbf{a}) = \begin{bmatrix}
+2a_x^2 - 1 & 2a_x a_y & 2a_x a_z \\
+2a_x a_y & 2a_y^2 - 1 & 2a_y a_z \\
+2a_x a_z & 2a_y a_z & 2a_z^2 - 1
+\end{bmatrix}
+$
+& Involution matrix about axis \textbf{a}, assumes a unit length. Negation of reflect mat.\\
+
+$ M_{scale}(s_x,s_y,s_z) = \begin{bmatrix}
+s_x & 0 & 0 \\
+0 & s_y & 0 \\
+0 & 0 & s_z
+\end{bmatrix}
+$
+& Scale matrix about x,y,z axes \\
+
+$ M_{scale}(s,\textbf{a}) = \begin{bmatrix}
+(s-1)a_x^2 + 1 & (s-1)a_x a_y & (s-1) a_x a_z \\
+(s-1)a_x a_y & (s-1) a_y^2 + 1 & (s-1)a_y a_z \\
+(s-1)a_x a_z & (s-1) a_y a_z & (s-1)a_z^2 + 1
+\end{bmatrix}
+$
+& Scale matrix along direction \textbf{a} \\
+
+\end{tabulary} % Transformations Table
+}
+
+{\setlength{\extrarowheight}{10pt}
+
+\begin{tabulary}{8in}{LR}
+
+$ M_{skew}(\theta, \textbf{a}, \textbf{b}) = \begin{bmatrix}
+a_x b_x tan \theta + 1 & a_x b_y tan \theta & a_x b_z tan \theta \\
+a_y b_x tan \theta & a_y b_y tan \theta + 1 & a_y b_z tan \theta \\
+a_z b_x tan \theta & a_z b_y tan \theta & a_z b_z tan \theta + 1
+\end{bmatrix}
+$
+& Skew matrix along direction \textbf{a} based on length projection \textbf{b} \\
+
+$ M_{skew}(\theta, \textbf{a}, \textbf{b}) = \textbf{I} + tan \theta (\textbf{a} \otimes \textbf{b})$
+&  Alternative skew matrix formation \\
+
+$\textbf{H} = \begin{bmatrix}\textbf{M} & \textbf{t} \\ \textbf{0} & 1 \end{bmatrix} $
+& Homogenous transformation matrix; M = 3x3 transf mat, t = translate vec \\
+
+$\textbf{H}^{-1} = \begin{bmatrix}
+\textbf{M}^{-1} & -\textbf{M}^{-1}\textbf{t} \\ \textbf{0} & 1 
+\end{bmatrix} $
+& Homogenous transformation matrix inverse \\
+
+\end{tabulary}
+}

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Chapter 5</title>
+
+  <style>
+    pre {
+        border: 1px solid black;
+        padding: 2px;
+    }
+
+    table, tr, td, th {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+
+    html, body {
+        background-color: #000000;
+        color: #FFFFFF;
+    }
+  </style>
+
+</head>
+<body>
+<h1>Chapter 5</h1>
+
+<h3>Subprograms</h3>
+<ul>
+  <li>Functions/methods/etc.</li>
+  <li>More complex subprograms which call other subprograms or modify
+      saved registers require more saving and setup
+  </li>
+  <li>This example, however, does not</li>
+  <li>jal sets the program counter ($pc) register equal to the subprogram
+      address so the next call will hop there, then also sets the return
+      address ($ra) register so it knows where to hop back to after the
+      subprogram is finished
+  </li>
+</ul>
+<pre><code>
+# example subprogram which just prints the newline character
+
+.text
+
+main:
+
+	# Read user input into $s0
+	li $v0, 4
+	la $a0, prompt
+	syscall
+	li $v0, 5
+	syscall
+	move $s0, $v0
+	
+	# print the value back
+	li $v0, 4
+	la $a0, result
+	syscall
+	
+	# call the newline print function
+	jal print_newline
+	
+	li $v0, 1
+	move $a0, $s0
+	syscall
+	
+	# call the exit subprogram
+	# jal = jump and link
+	jal exit
+
+
+.data
+prompt: .asciiz "Enter a number: &gt;"
+result: .asciiz "Result: "
+
+# Newline subprogram
+.text
+print_newline:
+	li $v0, 4
+	la $a0, __pnl_newline
+	syscall
+	# ra is auto filled with the return address upon jal call
+	jr $ra
+.data
+	__pnl_newline: .asciiz "\n"
+	
+# Exit subprogram
+.text
+exit:
+	li $v0, 10
+	syscall
+</code></pre>
+
+<h3>Subprogram parameters and return values</h3>
+<p>Params are stored in the $a0...$a4 registers</p>
+<p>Return vals are stored in $v0 and $v1</p>
+<pre><code>
+# example subprogram which takes in a parameter, stored in $a0
+# printstring subprogram
+
+.text
+
+main:
+
+	# Read user input into $s0
+	la $a0, prompt
+	jal print_string
+	li $v0, 5
+	syscall
+	move $s0, $v0
+	
+	# print the value back
+	la $a0, result
+	jal print_string
+
+    # print the return value, which was stored in $v0
+    move $a0, $v0
+    li $v0, 1
+    syscall
+	
+	# print the entered number
+	li $v0, 1
+	move $a0, $s0
+	syscall
+	
+	# call the exit subprogram
+	# jal = jump and link
+	jal exit
+
+.data
+prompt: .asciiz "Enter a number: &gt;"
+result: .asciiz "Result: "
+	
+# print string subprogram
+# args:
+# $a0 - the string to print
+.text
+print_string:
+	li $v0, 4
+	syscall
+
+    li $v0, 26 # dummy return value
+	jr $ra
+	
+# Exit subprogram
+.text
+exit:
+	li $v0, 10
+	syscall
+
+</code></pre>
+
+<h3>Using multiple ASM files</h3>
+<p>Files can be included via:</p>
+<pre><code>.include "myfile.asm"</code></pre>
+
+<p>Which can be anywhere in the program (not in between
+actual code of course)</p>
+
+</body>
+</html>
+

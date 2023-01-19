@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>BJ's Website</title>
+
+  <style>
+    pre {
+      border: 1px solid black;
+      padding-left:3px;
+      padding-bottom:3px;
+    }
+
+    .math {
+      display: inline-block;
+    }
+
+    html, body {
+        background-color: #000000;
+        color: #FFFFFF;
+    }
+  </style>
+
+</head>
+<body>
+
+<h1>Chapter 5 - Complex Signals, Spectra, and Quadrature Modulation</h1>
+
+<h3>Euler's Formula and other sines/cosines</h3>
+<p>e<sup>jwt</sup> = cos(wt) + j*sin(wt)</p>
+<p>cos(wt) = (e<sup>jwt</sup> + e<sup>-jwt</sup>)/2</p>
+<p>sin(wt) = (e<sup>jwt</sup> - e<sup>-jwt</sup>)/2</p>
+<p>cos(a)cos(b) = 0.5*cos(a+b) + 0.5*cos(a-b)</p>
+
+<h3>Amplitude, magnitude, and phase of a 3 component signal</h3>
+<p>signal composed of three sine waves, with frequencies 100Hz, 200Hz and 300Hz, and
+respective amplitudes, 10, 1, and 4</p>
+
+<img src="3components.png"/><br/>
+<img src="signalgraphs.png"/>
+
+<h3>Spectral Leakage</h3>
+<p>When performing FFT, if number of bins and sample frequency don't line up to exactly
+match a frequency component (e.g. if bins at a step of 10 Hz but your frequency is say 12 Hz),
+the result is data getting split up into the closest/nearby bins. e.g. (first no leakage, second leakage): 
+</p>
+<img src="noleakage.png"/><br/>
+<img src="leakage.png"/>
+
+<h3>Converting sin/cos representation to complex frequency representation</h3>
+<p>Using cos(wt) = (e<sup>jwt</sup> + e<sup>-jwt</sup>)/2:</p>
+<img src="cos_to_complex.png"/>
+<p>The resulting plot looks like:</p>
+<img src="complex_plot.png"/>
+
+<h3>Phase offset and resulting graph</h3>
+<p>Offsets are pi/4, pi/6, and none</p>
+<img src="phase_eq.png"/><br/>
+<img src="phase_offset_graph.png"/>
+
+<h3>Complex frequency represenation, with phase shifts (so I and Q are different now)</h3>
+<img src="complex_phase_eq.png"/>
+<p>This resulting graph is the "magnitude spectra" - gives the magnitude component at each
+   complex exponential value</p>
+<img src="magnitude_spectra.png"/>
+
+<h3>Quadrature Signals</h3>
+<p>Two independant or separate 'phases' of data are transmitted (modulating two
+independant baseband information signals onto sine and cosine carriers at the same 
+frequency)</p>
+
+<h3>Double Sideband Supressed Carrier Amplitude Modulation</h3>
+<p>The desired baseband signal, g(t), is "modulated" (in this case
+multiplied by) a high frequency carrier signal, c(t). So the resulting
+modulated signal s(t) = c(t)*g(t)
+</p>
+<p>Demodulation is done by multipliying the received signal again with
+   the carrier signal c(t): x(t) = c(t)*s(t) = c(t)*(c(t)*g(t)) then sending the 
+   output through a low pass filter
+</p>
+<p>This doesnt include phase locking and carrier synchronization, which is required
+if the receiever doesnt have the exact same frequency and phase (which is most often)
+</p>
+<p>If the phases dont match (e.g. the receiver has a phase offset of &theta;, 
+the resulting demodulated signal will have an extra cos(&theta;) in its amplitude
+(e.g. the demodulated signal is (A/2)g(t)cos(&theta;) instead of (A/2)g(t)</p>
+
+<h3>Quadrature Modulation and Demodulation (QAM)</h3>
+<p>Uses complex representation. Requires less bandwidth than amplitude modulation
+(which requires 2f Hz to transmit a f Hz signal). In this case we send to signals
+at frequency f at different phases, e.g. 90 degrees apart. One is a sine wave
+and the other is a cosine wave</p>
+<p>The cosine channel is In-Phase (I) ('real'), the sine channel is Quadrature Phase
+(Q) ('imaginary'). The sine value is -sin(2*pi*f*t) = cos(2*pi*f*t + pi/2). Notice
+the cosine version is 90 degrees phase offset from the cos (in-phase) signal</p>
+
+<p>To modulate, baseband signal g1(t) is multiplied by the in phase (cos/I) component,
+  the baseband signal g2(t) is multiplied by the quadrature (-sin/Q) component,
+then their results are added together</p>
+<p>The final result is y(t) = g1(t)*cos(2*pi*f*t) - g2(t)*sin(2*pi*f*t)</p>
+
+<p>To demodulate, you extract the in phase g1(t) by multiplying the input signal
+by the cosine component (I), and extract the quadrature g2(t) by multiplying
+the input signal by the -sin (Q) component. Both outputs have to then go through
+a lowpass filter.</p>
+<p>Again, non-matching rx phase and frequency must also be accounted for</p>
+
+<h3>QAM using complex notation</h3>
+
+<p>use g(t) = g1(t) + j*g2(t)</p>
+<p>The modulated signal v(t) = g(t)*e<sup>j*2*pi*f*t</sup>, which contains
+a real and imaginary component. The final transmitted signal y(t) is the real
+component only of v(t) (the imaginary component is dropped), which turns out
+to be the same as the above non-complex method 
+(y(t) = g1(t)*cos(2*pi*f*t) - g2(t)*sin(2*pi*f*t)</p>
+
+<p>Demodulation is done by multiplying the received by e<sup>-j*2*pi*f*t</sup>
+(same as for modulation except j is negative), then sending the output through
+a lowpass filter</p>
+<figure>
+<img src="qam_diagram.png"/>
+<figcaption>The real and complex representation of QAM</figcaption>
+</figure>
+
+<h3>Frequency Offset Error Correction</h3>
+<p>for if the receiving signal has a slight offset: f + f<sub>&Delta;</sub>
+instead of just f</p>
+<p>Then the receiver demodulated is x(t) = y(t)e<sup>-j*2*pi*(f+f<sub>&Delta;</sub>)*t</sup></p>
+<p>= [g1(t)cos(2*pi*f*t)-g2(t)sin(2*pi*f*t)]*e<sup>-j*2*pi*f*t</sup>*e<sup>-j*2*pi*f<sub>&Delta;</sub>*t</sup></p>
+<p>The last *e component is extra due to the frequency offset, meaning we have been shifted by
+that amount on the frequency spectrum</p>
+<p>The solution then to correct is to shift the demodulated signal by the opposite: multiply by the same
+extra e component except use +j instead of -j. The process is shown below:</p>
+<img src="freq_offset_correction.png"/>
+
+</body>
+</html>
+

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebGL beginner's guide - Asynchronous Object Loading</title>
+  
+  <style>
+    #mycanvas {
+      border: 2px solid blue;
+    }
+  </style>
+  
+</head>
+<body onload="main()">
+
+  <div>
+<canvas id="mycanvas" width="640" height="480">
+  Your browser doesn't support the canvas element :(
+</canvas>
+    </div>
+
+<script>
+  
+  // Check for & get the WebGL context
+  var getGLContext = function() {
+    var canvas = document.getElementById('mycanvas');
+    
+    var gl = null;
+    
+    var names = [
+      "webgl",
+      "experimental-webgl",
+      "webkit-3d",
+      "moz-webgl"
+    ];
+    for (var i = 0; i < names.length; i++) {
+      try {
+        gl = canvas.getContext(names[i]);
+        
+        // context was found, so exit early
+        if (gl) {
+          break;
+        }
+        
+      } catch(e) {}
+    }
+    
+    if (gl == null) {
+      alert("No WebGL Context Available");
+    }
+    //else {
+    //  alert("GL Context Available");
+    //}
+    
+    return gl;
+  }
+  
+  var gl = getGLContext();
+  
+  var createShader = function(gl, shaderType, source) {
+    var shader = gl.createShader(shaderType);
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+    
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+      alert(gl.getShaderInfoLog(shader));
+      return null;
+    }
+    
+    return shader;
+  }
+  
+  // used below once the json object is loaded
+  var squareObj = null;
+  var vertexBufferObj = null;
+  var indexBufferObj = null;
+  
+  var loadJsonObjectAJAX = function(filename) {
+	var request = new XMLHttpRequest();
+	var resource = "./"+filename;
+	console.log('resource: ' + resource);
+	request.open("GET", resource);
+	request.onreadystatechange = function() {
+	  if (request.readyState == 4) {
+	    if (request.status == 200 || (request.status == 0 && document.domain.length == 0)) {
+		  squareObj = JSON.parse(request.responseText);
+		  console.log('Obj: ');
+		  console.log(squareObj);
+		  handleLoadedObj(squareObj);
+		}
+	  }
+	  else {
+		console.log('readystate not 4: ' + request.readyState);
+	  }
+	}
+	
+	request.send();
+  }
+  
+  var handleLoadedObj = function(obj) {
+    vertexBufferObj = gl.createBuffer();
+    // this buffer object is used internally as the ARRAY_BUFFER
+    // until a new one is set or this one is cleared
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBufferObj);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(obj.vertices), gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARAY_BUFFER, null); // 'clear' the internal array buffer to use
+    
+    // Indices
+    //var indices = [1,3,0,
+    //              3,2,0];
+    indexBufferObj = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBufferObj);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(obj.indices),  gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+  }
+  
+  var main = function() {
+	
+	loadJsonObjectAJAX("squareModel.json");
+    
+    // Shaders
+    var vertexShaderCode = `attribute vec3 aVertexPosition;
+                        
+                        void main(void) {
+                          gl_Position = vec4(aVertexPosition,1.0);
+                        }
+                      `;
+                       
+    var fragmentShaderCode = `precision mediump float;
+                          
+                          void main(void) { 
+                            gl_FragColor = vec4(1.0,0.0,0.0,1.0);
+                          }
+                        `;
+    var vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderCode);
+    var fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderCode);
+    
+    var shaderProgram = gl.createProgram();
+    gl.attachShader(shaderProgram, vertexShader);
+    gl.attachShader(shaderProgram, fragmentShader);
+    gl.linkProgram(shaderProgram);
+    
+    if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+      alert("Failed to link shaders!");
+    }
+    gl.useProgram(shaderProgram);
+    
+    // bind shader attributes to data
+    var aVertexPosition = gl.getAttribLocation(shaderProgram, "aVertexPosition");
+    
+    
+    // enable 3d
+    gl.enable(gl.DEPTH_TEST);
+    
+    // draw
+    var draw = function()
+    {
+      gl.viewport(0,0,640,480);
+      gl.clearColor(0, 0.5, 0.5, 1.0);
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      
+	  // don't try to draw if the object hasn't been loaded
+	  if (indexBufferObj != null && vertexBufferObj != null) {
+        // bind data to use for drawing
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexBufferObj);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBufferObj);
+		
+		gl.vertexAttribPointer(aVertexPosition, // shader attrib index
+                            3,                // entries per vertex
+                            gl.FLOAT,         // data type
+                            false,            // calculate normals?
+                            0,                // stride (space between vertices)
+                            0);               // offset from beginning of array
+		gl.enableVertexAttribArray(aVertexPosition);
+      
+        // draw the bounded data
+        gl.drawElements(gl.TRIANGLES,     // draw mode
+                        squareObj.indices.length,   // number of elements to draw
+                        gl.UNSIGNED_SHORT, // type of values in indices
+                        0); // offset element to start from
+	  }
+      
+      // redraw again
+      window.requestAnimationFrame(draw);
+      
+    }
+    
+    // call the initial draw loop
+    window.requestAnimationFrame(draw);
+    
+  } // end main()
+  
+</script>
+
+</body>
+</html>
+

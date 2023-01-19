@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<title>Homework 3</title>
+
+	<style>
+		body, html {
+			background-color: #FFFFD0;
+		}
+	</style>
+</head>
+<body>
+<h1>Files</h1>
+<ul>
+	<li><a href="syscall_64.tbl.txt">syscall_64.tbl</a></li>
+	<li><a href="sys.c.txt">sys.c</a></li>
+	<li><a href="test_syscall.c.txt">test_syscall.c</a></li>
+	<li><a href="test_syscall_asm.c.txt">test_syscall_asm.c</a></li>
+</ul>
+<h1>Description</h1>
+<p>
+	Also described in the <a href="../../index.html">log</a>,
+	I implemented a system call following a mix of the textbook's
+	information (in chapter 5), and the information found
+	<a href="https://brennan.io/2016/11/14/kernel-dev-ep3/">here</a>.
+	It prints out the default thread size on the system, and doesn't
+	take any function arguments.
+</p>
+<p>
+	First, the system call is assigned a new number, which
+	happened to be 335 for the version of the kernel I was using.
+	This is defined in syscall_64.tbl, which automatically
+	generates the required source files on build.
+</p>
+<pre><code>
+335	common	bjfunc	__x64_sys_bjcall
+</code></pre>
+<p>
+	The actual code itself is defined in sys.c, with 
+	the function declaration `SYSCALL_DEFINE0(bjcall)` since the
+	function takes no arguments.
+</p>
+<pre><code>
+#include &lt;asm/page.h&gt;
+...
+/*
+ * BJ added dummy sys call test
+ * 
+ * returns the size of the per-process kernel stack
+ */
+SYSCALL_DEFINE0(bjcall)
+{
+    printk(KERN_INFO "Someone called bjcall!\n");
+    printk(KERN_INFO "Thread size is: %ld\n", THREAD_SIZE);
+    return THREAD_SIZE;
+}
+</code></pre>
+<p>
+	To test the code, you can either use the syscall function
+	or call the function via assembly, by setting the register
+	$rax to the number of the function you want to call,
+	with the result stored in $eax
+</p>
+<pre><code>
+
+#define _GNU_SOURCE
+#include &lt;unistd.h&gt;
+#include &lt;sys/syscall.h&gt;
+#include &lt;stdio.h&gt;
+
+/* The system call entry number added to the table */
+#define SYS_bjfunc 335
+
+int main(int argc, char *argv[])
+{
+    /* syscall(long number, ...) */
+    int thread_size = syscall(SYS_bjfunc);
+
+    printf("Thread size: %d\n", thread_size);
+
+    return 0;
+}
+</code></pre>
+<p>or</p>
+<pre><code>
+#include &lt;stdio.h&gt;
+
+#define SYS_bjfunc 335
+
+int main(int argc, char *argv[])
+{   
+    /* A system call stores the return value in eax according
+     * to the book */
+    register int call_return asm("eax");
+    printf("Call return before: %d\n", call_return);
+    
+    /* Call the system call via assembly,
+     * howto from here:
+     * https://jamesfisher.com/2018/02/19/how-to-syscall-in-c.html */
+    register int syscall_no asm("rax") = SYS_bjfunc;
+    asm("syscall");
+
+    /* Call return is already linked to $eax so it was
+     * updated on the above assembly syscall */
+    printf("Thread size: %d\n", call_return);
+    
+    return 0;
+}
+</code></pre>
+
+<h1>Screenshots</h1>
+
+<p>Result of calling the system call:</p>
+<img src="test_syscall.PNG"/>
+
+<p>You can see the `printk`s logged via the `dmesg` command:</p>
+<img src="syscall_printk.PNG"/>
+
+</body>
+</html>

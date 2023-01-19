@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>BJ's Website</title>
+
+  <style>
+    pre {
+      border: 1px solid black;
+      padding-left:3px;
+      padding-bottom:3px;
+    }
+
+    .math {
+      display: inline-block;
+    }
+    html, body {
+        background-color: #000000;
+        color: #FFFFFF;
+    }
+  </style>
+
+</head>
+<body>
+
+<h1>Chapter 7 - Frequency Tuning and Simple Synchronization</h1>
+
+<h3>Tuning</h3>
+<p>Select a frequency band of interest and capture/receive signals within
+that band. Center frequency is the local oscillator (LO). Bandwidth set
+by filtering and setting of sample rate</p>
+
+<h3>Synchronization</h3>
+<p>The need to correct for differences in time/frequency (e.g.
+frequency difference of the carrier signal)
+</p>
+
+<h3>Channel Effects</h3>
+<p>Radio signals go through attenuation, noise, interference, fixed or time
+varying propogation delay (translates into a phase shift of &theta; degrees), 
+and multipath propogation. If the transmitter/receiver are moving, the 
+propogation delay can increase or decrease over time (translates into a 
+frequency shift ("doppler shift")).</p>
+
+<h3>Phase Locked Loops (PLLs)</h3>
+<p>Are able to recreate an input sinusoid, track deviations in its frequency, and reject
+noise. Obtains "Phaselock" when the output PLL sine wave converges to the same original
+TX signal frequency (not necessarily same PHASE, but same FREQUENCY).</p>
+<p>Made up of 3 components:
+<ul>
+<li>Phase Detector: generates a varying signal based on the phase difference of rx and
+locally generated sin wave. Calculates "Phase Error" = &theta;<sub>e</sub>(t).
+In the diagram &theta;_i = input phase, &theta;_o = local oscillator phase.
+K_p is a scalar phase detector gain value. The phase error approaches 0 as 
+the PLL output signal approaches the original intended TX signal.</li>
+<li>Controllable Oscillator: A VCO (Voltage Controlled Oscillator) (analogue) 
+or NCO (Numerically Controlled Oscillator) (digital) which generates
+a sin output with phase/frequency based on its input. The filtered phase
+error is input, and "the larger the error, the larger the adjustment applied"</li>
+<li>Loop Filter: removes high frequency from phase detector and outputs to the VCO/NCO</li>
+</ul>
+</p>
+<img src="pll_diagram.png"/><br/>
+<img src="phase_detector_diagram.png"/><br/>
+<img src="loop_filter_diagram.png"/><br/>
+<img src="nco_diagram.png"/>
+
+<h3>Carrier Synchronization for transmitted carrier AM (AM-DSB-TC)</h3>
+<p>Coherent RX extracts the transmitted carrier component and uses it
+to demodulate to baseband. Done using a PLL with the carrier as the input
+reference signal.</p>
+<img src="am_tc_pll.png"/>
+
+<h3>Carrier Synchronization for supressed carrier AM (AM-DSB-SC)</h3>
+<p>for SC, the carrier is not explicitly present. Have to recover the
+carrier from the modulated RX signal, then demodulate. Commonly
+used way to do this is the "Costas Loop." </p>
+<img src="costas_loop.png"/>
+
+</body>
+</html>
+
+

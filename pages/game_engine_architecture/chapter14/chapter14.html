@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Chapter 14</title>
+  <style>
+      html, body {
+          background-color: #000000;
+          color: #FFFFFF;
+      }
+  </style>
+</head>
+<body>
+<p><img src="sound_signal.png" alt="Sound Signal">
+<img src="signal_period.png" alt="Signal Period">
+<img src="sin_and_cos.png" alt="Sin and Cos"></p>
+<h2 id="sound-pressure-level-spl-">Sound Pressure Level (SPL)</h2>
+<ul>
+<li>Sound intensity measured in decibels<ul>
+<li><img src="spl_equation.png" alt="SPL Equation"></li>
+</ul>
+</li>
+<li><img src="spl_intensity.png" alt="SPL Intensity"></li>
+</ul>
+<h2 id="audible-frequency-band">Audible Frequency Band</h2>
+<ul>
+<li>A typical adult can hear sounds with frequencies as low as 20 Hz and as high
+as 20,000 Hz (20 kHz) (although the upper limit generally decreases with age)</li>
+</ul>
+<h2 id="sound-wave-propogation-and-fall-off-propogation">Sound Wave Propogation and Fall off Propogation</h2>
+<ul>
+<li><p>an acoustic pressure wave propagates through space
+and can be absorbed or reflected by surfaces, diffracted around corners and
+through narrow “slits,” and refracted as it passes across the boundary between
+different transmission media</p>
+</li>
+<li><p><img src="sound_radiation.png" alt="Sound Radiation"></p>
+</li>
+<li><p>the intensity of the sound pressure
+wave it produces falls off with distance, following a 1/r<sup>2</sup> law, while pressure
+follows a 1/r law</p>
+<ul>
+<li><img src="sound_falloff.png" alt="Sound Falloff"></li>
+</ul>
+</li>
+</ul>
+<h2 id="interference-superposition-comb-filtering">Interference/Superposition/Comb Filtering</h2>
+<ul>
+<li>When multiple sound waves overlap in space, their amplitudes add toge-
+ther—this is called superposition</li>
+<li>If the waves
+are in phase—that is, their peaks and troughs line up—then the waves will pos-
+itively reinforce each other</li>
+<li>Likewise, if the waves are out of phase, the peaks
+of one wave can tend to cancel the troughs of the other and vice versa, and the
+result is a wave with lower (or even zero) amplitude</li>
+<li>Comb Filtering:  waves reflect off surfaces in such a way as to either almost completely
+cancel or completely reinforce certain frequencies. The result is a frequency
+response (see Section 14.2.5.7) with lots of narrow peaks and troughs, which
+when plotted look a bit like a comb (hence the name)</li>
+</ul>
+<h2 id="dry-wet-and-reverberations">Dry, Wet, and Reverberations</h2>
+<ul>
+<li>Direct (dry). Sound waves that arrive at the listener via a direct, un-
+obstructed path from the source are collectively known as direct or dry
+sound</li>
+<li>Early reflections (echo). Sound waves that arrive at the listener via an indi-
+rect path, after being reflected from and partially absorbed by surround-
+ing surfaces</li>
+<li>Late reverberations (tail). Once the sound waves have bounced around the
+listening space more than a few times, they superimpose and interfere
+with one another so much that the brain can no longer detect distinct
+echos. These are known as late reverberations or the diffuse tail</li>
+<li>the echos and the tail combine with the dry sound to create what
+is known as wet sound</li>
+<li><img src="wet_dry.png" alt="Wet and Dry"></li>
+</ul>
+<h2 id="the-doppler-effect">The Doppler Effect</h2>
+<ul>
+<li>The sound of the train seems higher pitched when it
+is approaching you, and becomes lower pitched as it races off into the distance</li>
+<li><img src="doppler_effect.png" alt="Doppler Effect"><ul>
+<li>where f is the original frequency, f&#39; is the Doppler-shifted (observed) 
+frequency at the listener, c is the speed of sound in air and v l and vs are the
+speeds of the listener and sound source, respectively</li>
+</ul>
+</li>
+</ul>
+<h2 id="perception-of-position">Perception of Position</h2>
+<ul>
+<li>Fall-off with distance</li>
+<li>Atmospheric Absorbtion</li>
+<li>Having two ears (left and right)</li>
+<li>Ear Shape</li>
+<li>Head Related Transfer Function (HRTF):  mathematical model of the
+minute effects that the folds of our ears (the pinnae) have on sounds
+coming from different directions</li>
+</ul>
+<h2 id="continuous-and-discrete-time-signals">Continuous and Discrete Time Signals</h2>
+<ul>
+<li>real number (decimals allowed, t = time), we call the signal a
+continuous-time signal, x(t)</li>
+<li>integer (n = index), we call the signal a
+discrete-time signal, x[n]</li>
+</ul>
+<h2 id="linear-time-invariant-systems-lti-">Linear Time-Invariant Systems (LTI)</h2>
+<ul>
+<li>A time-invariant system is one for which a time shift in the input signal
+causes an equal time shift in the output signal</li>
+<li>A linear system is one that possesses the property of superposition. This
+means that if an input signal consists of a weighted sum of other signals, then
+the output is a weighted sum of the individual outputs that would have been
+produced, had each of the other signals been fed through the system indepen-
+dently</li>
+</ul>
+<h2 id="unit-impulse">Unit Impulse</h2>
+<ul>
+<li>This signal is one of a family of related functions known as singularity
+functions because they all contain at least one discontinuity or “singularity.”</li>
+<li>It is a signal
+whose value is zero everywhere except at n = 0, where its value is one<ul>
+<li><img src="discrete_impulse.png" alt="Discrete Impulse"></li>
+<li><img src="discrete_impulse_graph.png" alt="Discrete Impulse Graph"></li>
+<li><img src="discrete_impulse_formula.png" alt="Discrete Impulse Formula"></li>
+</ul>
+</li>
+<li>In continuous time:<ul>
+<li><img src="continuous_impulse.png" alt="Continuous Impulse"></li>
+<li><img src="continuous_impulse_graph.png" alt="Continuous Impulse Graph"></li>
+<li><img src="continuous_impulse_equation.png" alt="Continuous Impulse Equation"></li>
+</ul>
+</li>
+</ul>
+<h2 id="convolution-impulse-response">Convolution/Impulse Response</h2>
+<ul>
+<li>Impulse Response Represented by h[n]</li>
+<li><img src="impulse_response_graph.png" alt="Impulse Response Graph"></li>
+<li>The output for the entire input signal is a time shifted
+impulse response, known as the convolution sum<ul>
+<li>represented by the * Operator</li>
+<li><img src="convolution_sum.png" alt="Convolution Sum"></li>
+<li><img src="convolution_sum_notation.png" alt="Conlution Sum Notation"></li>
+</ul>
+</li>
+<li>Convolution is commutative, associative, and distributive</li>
+</ul>
+<h2 id="fourier-transform-and-complex-notation">Fourier Transform and Complex Notation</h2>
+<ul>
+<li>Complex multiplication results in a rotation
+in the complex plane<ul>
+<li>Due to j=sqrt(-1) times itself repeats when
+continued many times</li>
+</ul>
+</li>
+<li><img src="complex_rotation.png" alt="Complex Rotation"></li>
+<li><img src="complex_projection.png" alt="Complex Projection"></li>
+<li><img src="fourier_transform.png" alt="Fourier Transform"></li>
+</ul>
+<h2 id="microphone-polar-patterns-input-sensitivity-regions-">Microphone Polar Patterns (input/sensitivity Regions)</h2>
+<ul>
+<li><img src="microphone_types.png" alt="Microphone Types"></li>
+</ul>
+<h2 id="low-frequency-effects-lfe-">Low Frequency Effects (LFE)</h2>
+<ul>
+<li>Another term for a subwoofer: bass/low frequency signals</li>
+</ul>
+<h2 id="amplification-gain-and-volume-control">Amplification/Gain and Volume control</h2>
+<ul>
+<li><img src="gain_formula.png" alt="Gain Formula"></li>
+<li>Volume control limits/lowers the gain out of the total max<ul>
+<li><img src="volume_control.png" alt="Volume Control"></li>
+</ul>
+</li>
+</ul>
+<h2 id="pulse-code-modulation-pcm-sound-signal">Pulse Code Modulation (PCM) sound signal</h2>
+<ul>
+<li>PCM Consists of:<ul>
+<li>Voltage measurement, in floating point or quantized to
+8,16,24,or 32 bits (analog to digital conversion (ADC))</li>
+<li>Bit depth also known as &quot;resolution&quot;</li>
+<li>Sampled at a sample-rate</li>
+<li>Stored in an array/memory </li>
+<li>Need to store the resulting sample rate and bit depth
+in order to reproduce the sound (e.g. other pcm stored
+data can have different sample rates, so need to convert
+/equalize them)</li>
+</ul>
+</li>
+<li>PCM storage types:<ul>
+<li>Raw headerless</li>
+<li>Linear PCM (LPCM)</li>
+<li>WAV</li>
+<li>WMA</li>
+<li>AIFF</li>
+<li>MP3</li>
+<li>ATRAC</li>
+<li>OGG Vorbis</li>
+<li>Dolby Digital</li>
+<li>DTS</li>
+<li>VAG: used in PS3</li>
+<li>MPEG-4 SLS/ALS/DST</li>
+</ul>
+</li>
+<li>The “PlayStation 3 Secrets” website also provides some
+excellent information on audio formats: <a href="https://bit.ly/2HOVtvR">https://bit.ly/2HOVtvR</a></li>
+</ul>
+<h2 id="rendering-audio-in-3d">Rendering audio in 3d</h2>
+<ul>
+<li>Overview in steps:<ul>
+<li>Sound Synthesis</li>
+<li>Spatialization (distance-based attenuation and Pan)</li>
+<li>Acoustical Modeling (early reflections/late reverberations)</li>
+<li>Doppler Shifting</li>
+<li>Mixing</li>
+</ul>
+</li>
+</ul>
+<h2 id="representation-in-the-world">Representation in the world</h2>
+<ul>
+<li>3D Sound Sources: have position, velocity, radiation pattern, range</li>
+<li>Listener: virtual microphone</li>
+<li>Environmental Model: geometry, acoustic properties</li>
+</ul>
+<h2 id="pan-and-constant-power-law">Pan and Constant Power Law</h2>
+<ul>
+<li>The term “pan” comes from early technology that used a “panoramic po-
+tentiometer” (variable resistor) or “pan pot” to control the relative volumes
+of the left and right speakers of a stereo system</li>
+<li>Use angle between sound source and listener<ul>
+<li><img src="pan_diagram.png" alt="Pan Diagram"></li>
+<li><img src="pan_angle_formula.png" alt="Pan Angle Formula"></li>
+</ul>
+</li>
+<li>Need to preserve constant power in order to keep the loudness
+the same from different angles<ul>
+<li><img src="constant_power.png" alt="Constant Power"></li>
+<li>A1 and A2 are the gain for each speaker</li>
+</ul>
+</li>
+</ul>
+<h2 id="sound-propogation-modeling">Sound Propogation Modeling</h2>
+<ul>
+<li>3 Types:<ul>
+<li>Geometric Analysis</li>
+<li>Perceptually Based Models<ul>
+<li>Uses LTI system model; expensive computationally
+(convolution) so not used in games really</li>
+</ul>
+</li>
+<li>Ad-hoc methods</li>
+</ul>
+</li>
+</ul>
+<h2 id="obstruction-occlusion-exclusion">Obstruction/Occlusion/Exclusion</h2>
+<ul>
+<li>Defined regions to figure out reverb/absorbtion</li>
+<li><img src="occlusion_diagram.png" alt="Occlusion Diagram"></li>
+</ul>
+<h2 id="sound-portals">Sound Portals</h2>
+<ul>
+<li>Used in The Last of Us</li>
+<li><img src="sound_portals.png" alt="Sound Portals"></li>
+</ul>
+<h2 id="audio-engine-architecture-and-pipeline">Audio Engine Architecture and Pipeline</h2>
+<p><img src="audio_architecture.png" alt="Audio Engine Architecture"></p>
+<ul>
+<li>Dry digital PCM signal is synthesized</li>
+<li>Distance based attenuation and reverb produces
+wet signal</li>
+<li>Wet and dry are panned independantly</li>
+<li>panned multi-channel of all 3d sounds are mixed<ul>
+<li>Each sound is called a &quot;voice&quot;, number of channels = number
+of voices</li>
+</ul>
+</li>
+<li><img src="audio_pipeline.png" alt="Audio Pipelline"></li>
+<li>Individual voice pipeline:<ul>
+<li><img src="voice_pipeline.png" alt="Vice Pipeline"></li>
+</ul>
+</li>
+</ul>
+<h2 id="aux-send">Aux Send</h2>
+<ul>
+<li>Routing the signal to an external effects pedal/device,
+then back into the main route</li>
+</ul>
+<h2 id="reverb-tank">Reverb Tank</h2>
+<ul>
+<li>A cheap/easy way to create reverb: store a history
+of the sound in a buffer and mixed back into the signal,
+introducing a delay</li>
+</ul>
+<h2 id="pre-post-send-filters">Pre/Post send filters</h2>
+<ul>
+<li>Pre-filter: used to model effects close to the sound
+source, such as a gas mask effect (dry and wet)</li>
+<li>Post-filter: used to muffle for obstruction/occlusion
+of the direct sound path (dry sound)</li>
+</ul>
+<h2 id="master-mixer-and-output-bus">Master mixer and output bus</h2>
+<ul>
+<li>Performs sample rate and bit depth conversion</li>
+<li>Can be done digital or analog</li>
+<li><img src="master_bus.png" alt="Master Bus"></li>
+</ul>
+<h2 id="digital-busses-and-latency">Digital Busses and Latency</h2>
+<ul>
+<li>Use ring buffers to connect different components</li>
+<li>Shared memory can used a shared ring buffer (same
+address space)</li>
+<li>Non-shared can use direct-memory access controller (DMAC),
+as done between PPU and SPU on PS3, or PCIe  for sound cards</li>
+<li>Larger buffer = more latency<ul>
+<li>We want low latency on a music creation/recording system
+in order to try and keep all components as synchronized
+as possible</li>
+<li>t.v. and playback can get away with larger delay, for
+example a few display/render frames at 1/60 Hz will be
+fine when playing</li>
+</ul>
+</li>
+</ul>
+<h2 id="sound-cues-and-groups">Sound Cues and Groups</h2>
+<ul>
+<li>Contains both the PCM data and metadata about the sound<ul>
+<li>3D or 2D</li>
+<li>Fall off curve</li>
+<li>Sound ID and sound type</li>
+</ul>
+</li>
+<li>Groups can be used to identify sound types, such
+as for &quot;frantic&quot; or &quot;calm&quot; events, enemy or friendly
+player groups</li>
+<li>These groups are used to mix/apply relative audio level
+compared to other groups based on importance</li>
+</ul>
+<h2 id="ducking">Ducking</h2>
+<ul>
+<li>Quickly lower a sound or groups volume in order to 
+make sure the player hears important audio such
+as dialog</li>
+</ul>
+<h2 id="instance-limiting">Instance limiting</h2>
+<ul>
+<li>Prevent the number of sounds playing at once due to
+hardware or aesthetic/overall pleasing constraints.</li>
+<li>Can be done via per-group limits, sound priorities, etc.</li>
+</ul>
+<h2 id="popular-audio-engines">Popular audio engines</h2>
+<ul>
+<li>Windows UAA (universal audio architecture)</li>
+<li>XAudio2: Xbox 360, Xbox One, Windows; replaces directaudio</li>
+<li>Scream, BoomRangBuss: used by PS3, PS4, PSVita, used
+by NaughtDog</li>
+<li>Advanced Linux Sound Architecture (ALSA): Linux</li>
+<li>QNX Sound Architecture</li>
+<li>OpenAL</li>
+<li>AeonWave 4D</li>
+<li>FMOD Studio</li>
+<li>Miles Sound System</li>
+<li>Wwise</li>
+<li>Unreal Engine sound system</li>
+</ul>
+<h2 id="game-audio-features">Game Audio Features</h2>
+<ul>
+<li>Split-screen support</li>
+<li>Physics-driven audio</li>
+<li>Dynamic Music System (based on mood/tension)</li>
+<li>Character Dialog System</li>
+<li>Sound Synthesis</li>
+<li>Crowd Modeling</li>
+</ul>
+<h2 id="character-dialog-system">Character Dialog System</h2>
+<ul>
+<li>Want to support:<ul>
+<li>Catalog all possible lines</li>
+<li>Each character/group has unique, recognizable voice</li>
+<li>Variety/randomness in dialog</li>
+<li>Audio Streaming for long audio such as music, long dialog</li>
+</ul>
+</li>
+<li><p>Naughty dog uses scheme scripting for dialog:</p>
+<pre><code>  (<span class="hljs-name">define-dialog-line</span> 'line-out-of-ammo
+      (<span class="hljs-name">character</span> 'drake
+          (<span class="hljs-name">lines</span> drk-out-of-ammo-01 <span class="hljs-comment">;; "Dammit, I'm out!"</span>
+                 drk-out-of-ammo-02 <span class="hljs-comment">;; "Crap, need more bullets."</span>
+                 drk-out-of-ammo-03 <span class="hljs-comment">;; "Oh, now I'm REALLY mad."</span>
+      )
+  )
+  (<span class="hljs-name">character</span> 'elena
+      (<span class="hljs-name">lines</span> eln-out-of-ammo-01 <span class="hljs-comment">;; "Help, I'm out!"</span>
+             eln-out-of-ammo-02 <span class="hljs-comment">;; "Got any more bullets?"</span>
+      )
+  )
+  (<span class="hljs-name">character</span> 'pirate-a
+      (<span class="hljs-name">lines</span> pira-out-of-ammo-01 <span class="hljs-comment">;; "I'm out!"</span>
+             pira-out-of-ammo-02 <span class="hljs-comment">;; "Need more ammo!"</span>
+                                 <span class="hljs-comment">;; ...</span>
+      )
+  )
+ (<span class="hljs-name">character</span> 'pirate-h
+      (<span class="hljs-name">lines</span> pirh-out-of-ammo-01 <span class="hljs-comment">;; "I'm out!"</span>
+             pirh-out-of-ammo-02 <span class="hljs-comment">;; "Need more ammo!"</span>
+
+  (<span class="hljs-name">define-conversation-segment</span> 'conv-searching-for-stuff-01
+       <span class="hljs-symbol">:rule</span> []
+            <span class="hljs-symbol">:line</span> 'line-did-you-find-anything <span class="hljs-comment">;; "Hey, did you find anything?"</span>
+            <span class="hljs-symbol">:next-seg</span> 'conv-searching-for-stuff-02
+  )
+  (<span class="hljs-name">define-conversation-segment</span> 'conv-searching-for-stuff-02
+      <span class="hljs-symbol">:rule</span> []
+          <span class="hljs-symbol">:line</span> 'line-nope-not-yet <span class="hljs-comment">;; "I've been looking for an hour..."</span>
+          <span class="hljs-symbol">:next-seg</span> 'conv-searching-for-stuff-03
+ )
+ (<span class="hljs-name">define-conversation-segment</span> 'conv-searching-for-stuff-03
+     <span class="hljs-symbol">:rule</span> []
+     <span class="hljs-symbol">:line</span> 'line-shut-up-keep-looking <span class="hljs-comment">;; "Well then shut up and keep looking!"</span>
+ )
+
+ (<span class="hljs-name">define-conversation-segment</span> 'conv-player-hit-by-bullet
+     (
+         <span class="hljs-symbol">:rule</span> [ ('health &lt; <span class="hljs-number">25</span>) ]
+         <span class="hljs-symbol">:line</span> 'line-i-need-a-doctor <span class="hljs-comment">;; "I'm bleeding bad... need a doctor!"</span>
+     )
+     (
+         <span class="hljs-symbol">:rule</span> [ ('health &lt; <span class="hljs-number">75</span>) ]
+         <span class="hljs-symbol">:line</span> 'line-im-in-trouble <span class="hljs-comment">;; "Now I'm in real trouble."</span>
+     )
+     (
+         <span class="hljs-symbol">:rule</span> [ ] <span class="hljs-comment">;; no criteria acts as an "else" case</span>
+         <span class="hljs-symbol">:line</span> 'line-that-was-close <span class="hljs-comment">;; "Ah! Can't let that happen again!"</span>
+     )
+ )
+(<span class="hljs-name">define-conversation-segment</span> 'conv-shot-at--start
+    (
+         <span class="hljs-symbol">:rule</span> [ ]
+         <span class="hljs-symbol">:line</span> 'line-are-you-ok <span class="hljs-comment">;; "Are you OK?"</span>
+         <span class="hljs-symbol">:next-seg</span> 'conv-shot-at--health-check
+         <span class="hljs-symbol">:next-speaker</span> 'listener <span class="hljs-comment">;; \*\*\* see comments below</span>
+    )
+)
+(<span class="hljs-name">define-conversation-segment</span> 'conv-shot-at--health-check
+    (
+        <span class="hljs-symbol">:rule</span> [ (('speaker 'shot-recently) == false) ]
+        <span class="hljs-symbol">:line</span> 'line-yeah-im-fine <span class="hljs-comment">;; "Yeah, I'm fine."</span>
+        <span class="hljs-symbol">:next-seg</span> 'conv-shot-at--not-hit
+        <span class="hljs-symbol">:next-speaker</span> 'listener <span class="hljs-comment">;; \*\*\* see comments below</span>
+    )
+   (
+        <span class="hljs-symbol">:rule</span> [ (('speaker 'shot-recently) == true) ]
+        <span class="hljs-symbol">:line</span> 'line-not-exactly <span class="hljs-comment">;; "(panting) Not exactly."</span>
+        <span class="hljs-symbol">:next-seg</span> 'conv-shot-at--hit
+        <span class="hljs-symbol">:next-speaker</span> 'listener <span class="hljs-comment">;; \*\*\* see comments below</span>
+   )
+)
+</code></pre></li>
+</ul>
+<h2 id="context-regional-sensitive-dialog">Context/Regional sensitive dialog</h2>
+<ul>
+<li>Can have AI say different dialog based on player location
+to make them seem smarter</li>
+<li><img src="context_regions.png" alt="Context Regions"></li>
+</ul>
+<h2 id="music-stinger">Music Stinger</h2>
+<ul>
+<li>A short musical clip/sound to indicate an event/change
+in the game, such as the enemy spotted you, or death music</li>
+</ul>
+</body>
+</html>

@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Beedge</title>
+
+</head>
+<body>
+
+<h1 style="text-align:center">Chapter 2 - Introduction to Algebra</h1>
+
+<h1>Groups</h1>
+<p>Group: a binary operation denoted as * on a set that meets these conditions:</p>
+<ul>
+<li>a * (b*c) = (a*b) * c (associative)</li>
+<li>a*element = element*a = a (has an identity element)</li>
+<li>element_1*element_2 = identity (each member has a pair member that when applied makes the identity element)</li>
+</ul>
+
+<p>Example of a group: XOR on binary numbers (Group = {0,1}, binary operation = XOR, identity elem = 0). Denoted
+as &#8853;. Also called modulo-2 addition.
+</p>
+<ul>
+<li>Order: the size of the group (e.g. order of binary numbers group is 2)</li>
+<li>finite group: has a fixed, known amount of elements (not infinite)</li>
+</ul>
+
+<h1>Fields</h1>
+<p>Have two elements: addition and multiplication, which meet the following:</p>
+<ul>
+<li>commutative when using +</li>
+<li>Has a zero element for + where a+0=a</li>
+<li>Multiplication with nonzeros is commutative, has a unit element for * where a*1=a</li>
+<li>* is distributive with +: a*(b+c) = a*b + a*c</li>
+</ul>
+
+<p>Like with groups, <i>Order</i> is the size of the field and a <i>finite field</i>
+has a finite, known number of elements</p>
+
+<h1>Prime Fields</h1>
+<ul>
+<li>Denoted <i>GF(p)</i> where <i>p</i> is a prime number</li>
+<li>Addition and multiplication are defined as modulo-<i>p</i>
+addition and multiplication</li>
+<li>E.g. <i>GF(2)</i> uses mod 2 multiplication and mod 2 addition</li>
+<li>Example: <i>GF(7)</i>
+  <ul>
+    <li>G = {0,1,2,3,4,5,6}</li>
+    <li>3 / 2 = 5
+      <ul>
+        <li>3 / 2 = 3 * (2<sup>-1</sup>) = 3 * 4 = 5
+          <ul>
+            <li>2<sup>-1</sup> = 4 because (2*4) % 7 = 1 (multiplicative inverse)</li>
+            <li>3 * 4 = 5 because (3*4) % 7 = 5</li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+
+    <li>3 - 6 = 4
+      <ul>
+        <li>3 - 6 = 3 + (-6) = 3 + 1 = 4
+          <ul>
+            <li>-6 = 1 because (6+1) % 7 = 0 (additive inverse)</li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</li>
+<li>Characteristic (λ): the number of increments it takes for the field to
+loop back to 0. in <i>GF(p)</i> this is always equal to <i>p</i>
+  <ul>
+    <li>e.g. λ of <i>GF(7)</i> = 7 because (1+1+1+1+1+1+1) % 7 = 0</li>
+  </ul>
+</li>
+</ul>
+
+<h1>Binary Field Arithmetic</h1>
+<p>Most error coding algs use <i>GF(2)</i> or <i>GF(2<sup>m</sup>)</i></p>
+<ul>
+<li>Uses Modulo 2 addition and multiplication</li>
+<li>Example: solve the set of equations (just like regular algebra)
+  <ul>
+    <li>1) X + Y = 1</li>
+    <li>2) X + Z = 0</li>
+    <li>3) X + Y + Z = 1</li>
+    <li>
+      <ul>
+        <li>(X+Y)+Z=1</li>
+        <li>1+Z=1 -&gt; Z=0 (substitute X+Y in eq 3 with eq 1)</li>
+        <li>X+0=0 -&gt; X=0 (substitute Z in eq 2 with 0)</li>
+        <li>0+Y+0=1 -&gt; Y=1 (substitute X and Z in eq 3 with 0)</li>
+        <li>X=0, Y=1, Z=0</li>
+      </ul>
+    </li>
+  </ul>
+</li>
+</ul>
+
+<h1>Binary Field Polynomials</h1>
+<p>Regular polynomials where there is one variable and
+its coefficients are either 0 or 1</p>
+<ul>
+<li>Like so: f(X) = f<sub>0</sub> + f<sub>1</sub>X + f<sub>2</sub>X<sup>2</sup> + f<sub>3</sub>X<sup>3</sup> ... 
+  <ul><li>where f<sub>0</sub>, f<sub>1</sub>, ... are 0 or 1</li></ul>
+</li>
+<li>"A polynomial over <i>GF(2)</i>" means a polynomial with coefficients as 0 or 1</li>
+</ul>
+
+<h3>Binary Polynomial Arithmetic</h3>
+<ul>
+<li>Addition/subtraction
+  <ul>
+    <li>f(X) + g(X) = ((f<sub>0</sub>+g<sub>0</sub>)%2) + ((f<sub>1</sub>+g<sub>1</sub>)%2)X + ((f<sub>2</sub>+g<sub>2</sub>)%2)X<sup>2</sup> ... </li>
+  </ul>
+</li>
+<li>Multiplication
+  <ul>
+    <li>f(X) * g(X) = f<sub>0</sub>*g<sub>0</sub> + (f<sub>0</sub>*g<sub>1</sub> + f<sub>1</sub>*g<sub>0</sub>)X + (f<sub>0</sub>*g<sub>2</sub> + f<sub>1</sub>*g<sub>1</sub> + f<sub>2</sub>*g<sub>0</sub>)X<sup>2</sup> ...
+      <ul>
+        <li>Where all addition/multiplication is done Modulo 2 </li>
+      </ul>
+    </li>
+  </ul>
+</li>
+<li>Division - Euclid's division algorithm
+  <ul>
+    <li>given g(X) is NOT 0, f(X)/g(X) = q(X)g(X)+r(X), where q(X) is the quotient and r(X) is the remainder</li>
+    <li>Example: f(X) = 1 + X + X<sup>4</sup> + X<sup>5</sup> + X<sup>6</sup>, g(X) = 1 + X + X<sup>3</sup>
+      <figure><img src="images/polynomial_div_example.png" alt="poly div image"/>
+        <figcaption>Notice all the would be negative coefficients turn into positives,
+        since in <i>GF(2)</i> 1 = -1, since additive inverse means a + (-a) = 0, so 1 + (-1) = 0 --&gt; 1 + 1 = 0
+        </figcaption>
+      </figure>
+    </li>
+  </ul>
+</li>
+</ul>
+
+<h3>Properties of Binary Field Polynomials</h3>
+<ul>
+<li>If <i>a</i> is a root of f(X) (f(<i>a</i>)=0), then f(X) is divisible by X-<i>a</i></li>
+<li>If the polynomial has an even number of terms, it is divisible by X+1</li>
+<li>Irreducible: for f(X) of degree <i>m</i>, f(X) is irreducible if it isn't divisible
+    by any g(X) of degree less than <i>m</i> and greater than 0.</li>
+<li>Any irreducible f(X) of degree <i>m</i> evenly divides X<sup>2<sup>m</sup>-1</sup> + 1
+  <ul>
+    <li>Primitive: an irreducible f(X) is primitive if X<sup>2<sup><i>m</i></sup>-1</sup>+1 is the 
+        smallest polynomial it divides evenly</li>
+  </ul>
+</li>
+<li>f(X)<sup>2<sup>i</sup></sup> = f(X<sup>2<sup>i</sup></sup>) for i &gt;= 0</li>
+</ul>
+
+<h1>Galois Field <i>GF(2<sup>m</sup>)</i></h1>
+<p>Field over <i>GF(2)</i> with 2<sup>m</sup> elements as opposed to just 0 and 1</p>
+<ul>
+<li>Field F = {0,1,<i>a</i>,<i>a<sup>2</sup></i>,<i>a<sup>3</sup></i>,...}
+  with 2<sup><i>m</i></sup> elements (F finite = {0,1,<i>a</i>,<i>a<sup>1</sup></i>,
+  ...<i>a<sup>2<sup><i>m</i></sup>-2</sup></i>})
+</li>
+<li>Addition, subtraction, multiplication done Modulo 2 - Notably, when using <i>a</i>:
+  <ul>
+    <li><i>a<sup>i</sup></i> * <i>a<sup>j</sup></i> = <i>a<sup>i+j</sup></i></li>
+    <li><i>a<sup>0</sup></i> = 1</li>
+    <li><i>a</i><sup>i</sup> + <i>a</i><sup>j</sup> = (<i>a</i><sub>i,0</sub> + <i>a</i><sub>j,0</sub>) + 
+       (<i>a</i><sub>i,1</sub> + <i>a</i><sub>j,1</sub>)<i>a</i> + 
+       ... (<i>a</i><sub>i,<i>m</i>-1</sub> + <i>a</i><sub>j,<i>m</i>-1</sub>)
+            <i>a<sup>m-1</sup></i> (using modulo 2 addition)
+      <ul>
+        <li>0&lt;= i &lt; 2<sup><i>m</i></sup>-1</li>
+        <li><i>a</i><sub>i</sub>(X) = <i>a</i><sub>i,0</sub> + ... <i>a</i><sub>i,<i>m</i>-1</sub>X<sup><i>m</i>-1</sup> 
+          is the remainder from dividing X<sup>i</sup> by p(X)
+        </li>
+        <li>
+          p(X) is primitive with degree <i>m</i> over <i>GF(2)</i>, where p(<i>a</i>) = 0
+          (<i>a</i> is a root of p(X))
+        </li>
+        <li><i>a</i><sup>2<sup><i>m</i></sup>-1</sup> = 1 using modulo 2 addition</li>
+        <li>Similarly, <i>a</i><sup>2<sup><i>m</i></sup>+i</sup>
+          loops back around starting at <i>a</i><sup>0</sup>=1
+          <ul>
+            <li>e.g. <i>a</i><sup>16</sup>=<i>a</i>, <i>a</i><sup>17</sup>=<i>a</i><sup>2</sup>, 
+              <i>a</i><sup>18</sup>=<i>a</i><sup>3</sup>, etc.</li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</li>
+
+<li>Example using <i>a</i> within F finite (also denoted F<sup>*</sup>)
+  <ul>
+    <li><i>m</i>=4, p(X) = 1+X+X<sup>4</sup></li>
+    <li>Since <i>a</i> must be a root of p(X), 
+        p(<i>a</i>)=1+<i>a</i>+<i>a</i><sup>4</sup> = 0
+        <ul><li>1+<i>a</i> = <i>a</i><sup>4</sup> (using mod 2 arith (1 = -1))</li></ul>
+    </li>
+    <li>Use this identity to form the rest of F<sup>*</sup>
+      <ul>
+        <li><i>a</i><sup>5</sup>=<i>a</i>*<i>a</i><sup>4</sup>=<i>a</i>(1+<i>a</i>)=<i>a</i>+<i>a</i><sup>2</sup></li>
+        <li><i>a</i><sup>6</sup>=<i>a</i>*<i>a</i>*<i>a</i><sup>4</sup>=<i>a</i><sup>2</sup>*(1+<i>a</i>)=<i>a</i><sup>2</sup>+<i>a</i><sup>3</sup></li>
+        <li>...</li>
+        <li><i>a</i><sup>15</sup> = 1 (last property <i>a</i>bove (2<sup>4</sup>-1 = 15))</li>
+        <li>So F<sup>*</sup> = {0,1,<i>a</i>,<i>a</i><sup>2</sup>,<i>a</i><sup>3</sup>,<i>a</i><sup>4</sup>,
+            (<i>a</i>+<i>a</i><sup>2</sup>),(<i>a</i><sup>2</sup>+<i>a</i><sup>3</sup>),...}</li>
+      </ul>
+    </li>
+  </ul>
+</li>
+<li>The <i>a</i><sup>i</sup> representation makes multiplication easier
+  <ul>
+    <li><i>a</i><sup>5</sup>*<i>a</i><sup>7</sup>=<i>a</i><sup>12</sup></li>
+    <li><i>a</i><sup>12</sup>*<i>a</i><sup>7</sup>=<i>a</i><sup>19</sup>=
+        <i>a</i><sup>15</sup>*<i>a</i><sup>4</sup>=1*<i>a</i><sup>4</sup>=<i>a</i><sup>4</sup></li>
+  </ul>
+</li>
+<li>The polynomial representation makes addition easier
+  <ul>
+    <li><i>a</i><sup>5</sup>+<i>a</i><sup>7</sup>=(<i>a</i>+<i>a</i><sup>2</sup>)+(1+<i>a</i>+<i>a</i><sup>3</sup>)=1+(1+1)<i>a</i>+<i>a</i><sup>2</sup>+<i>a</i><sup>3</sup>
+      =1+<i>a</i><sup>2</sup>+<i>a</i><sup>3</sup>=<i>a</i><sup>13</sup>
+    </li>
+  </ul>
+</li>
+<li>Binary representation makes addition yet again even easier
+  <ul>
+    <li>Each bit represents a coefficient in the polynomial, e.g. (1011) 
+        = 1+<i>a</i><sup>2</sup>+<i>a</i><sup>3</sup>
+    </li>
+    <li>Given A=1+a<sup>2</sup>+a<sup>3</sup>=(1011), B=1+a<sup>2</sup>=(1010),
+      <ul>
+      <li>A+B = (<i>a</i><sub>0</sub>+b<sub>0</sub>)(<i>a</i><sub>1</sub>+b<sub>1</sub>)...
+          (<i>a</i><sub>3</sub>+b<sub>3</sub>)
+      </li>
+      <li>=(1+1)(0+0)(1+1)(1+0)=(0001)=<i>a</i><sup>3</sup>
+        <ul>
+          <li>Can be done as a single XOR in C: A^B = (1011)^(1010)=0001</li>
+        </ul>
+      </li>
+      </ul>
+    </li>
+  </ul>
+</li>
+</ul>
+
+<h1>Properties of <i>GF(2<sup>m</sup>)</i></h1>
+<ul>
+<li>A polynomial without real roots in <i>GF(2)</i> can have roots in <i>GF(2<sup>m</sup>)</i>
+  <ul>
+    <li>Ex: X<sup>4</sup>+X<sup>3</sup>+1 has no roots in <i>GF(2)</i></li>
+    <li>Plugging in elements from the example <i>GF(2<sup>4</sup>)</i></li>
+    <li>f(X)=X<sup>4</sup>+X<sup>3</sup>+1, X=<i>a</i><sup>7</sup>
+      <ul>
+        <li>(<i>a</i><sup>7</sup>)<sup>4</sup>+(<i>a</i><sup>7</sup>)<sup>3</sup>+1</li>
+        <li><i>a</i><sup>28</sup>+<i>a</i><sup>21</sup>+1</li>
+        <li><i>a</i><sup>13</sup>+<i>a</i><sup>6</sup>+1</li>
+        <li>(1+<i>a</i><sup>2</sup>+<i>a</i><sup>3</sup>)+(<i>a</i><sup>2</sup>+<i>a</i><sup>3</sup>) + 1</li>
+        <li>(1101) + (1100) + 1 = (0001) + 1 = 0</li>
+      </ul>
+    </li>
+    <li>Hence <i>a</i><sup>7</sup> is <i>a</i> root of f(X). The same can be found for
+    <i>a</i><sup>11</sup>,<i>a</i><sup>13</sup>, and <i>a</i><sup>14</sup></li>
+  </ul>
+</li>
+
+<li>Conjugate of a polynomial root 
+  <ul><li>If <i>B</i> is a polynomial in <i>GF(2<sup>m</sup>)</i> and is a root
+      of a polynomial f(X) in <i>GF(2)</i>, then <i>B<sup>2<sup>l</sup></i></sup>
+      is also a root of f(X) for any <i>l</i> &gt;=0</li>
+      <li><i>B<sup>2<sup>l</sup></i> is a conjugate of <i>B</i></li>
+  </ul>
+</li>
+
+<li> Minimal polynomial of <i>B</i>
+  <ul>
+    <li>&#981;(X) is the polynomial of the smallest degree where <i>B</i>
+    is a root (&#981;(<i>B</i>)=0), &#981;(X) is in <i>GF(2)</i>
+    and <i>B</i> is in <i>GF(2<sup>m</sup>)</i></li>
+    <li>Example: the minimum polynomial &#981;(X) for <i>B</i>=0 is
+        &#981;(X)=X (since &#981;(<i>B</i>)=0)</li>
+    <li>Example: &#981;(X) for <i>B</i>=1 is
+        &#981;(X)=1+X (since &#981;(<i>B</i>)=1+1=0)</li>
+  </ul>
+</li>
+</ul>
+
+<h1>Finding the Minimal Polynomial of <i>B</i></h1>
+<ul>
+  <li>&#981;(X) = (X+<i>B</i><sup>2<sup>0</sup></sup>) *
+                  (X+<i>B</i><sup>2<sup>1</sup></sup>) * ... 
+                  (X+<i>B</i><sup>2<sup><i>e</i>-1</sup></sup>)
+    <ul>
+      <li>Where <i>e</i> is the smallest number so that
+          <i>B</i><sup>2<sup><i>e</i></sup></sup>=<i>B</i></li>
+
+      <li>Example: <i>B</i>=<i>a</i><sup>3</sup> in <i>GF(2<sup>4</sup>)</i>
+        <ul>
+          <li><i>B</i><sup>2</sup>=(<i>a</i><sup>3</sup>)<sup>2</sup>=<i>a</i><sup>6</sup></li>
+          <li><i>B</i><sup>4</sup>=(<i>a</i><sup>3</sup>)<sup>4</sup>=<i>a</i><sup>12</sup></li>
+          <li><i>B</i><sup>8</sup>=(<i>a</i><sup>3</sup>)<sup>8</sup>=<i>a</i><sup>24</sup>=<i>a</i><sup>9</sup></li>
+          <li>&#981;(X) = (X+<i>a</i><sup>3</sup>) * 
+                          (X+<i>a</i><sup>6</sup>) * 
+                          (X+<i>a</i><sup>12</sup>) * 
+                          (X+<i>a</i><sup>24</sup>)
+          </li>
+          <li>which simplifies to &#981;(X) = X<sup>4</sup> + X<sup>3</sup> + X<sup>2</sup> + X + 1
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h1>Example Computations Using <i>GF(2<sup>m</sup>)</i></h1>
+
+<ul>
+<li>Solve the linear equations 
+    X+<i>a</i><sup>7</sup>Y = <i>a</i><sup>2</sup> and
+    <i>a</i><sup>12</sup>X + <i>a</i><sup>8</sup>Y = <i>a</i><sup>4</sup>
+    over <i>GF(2<sup>4</sup>)</i>
+  <ul>
+    <li>
+      <figure>
+      <img src="images/gf2_computation_example.png" alt="gf2 computation example"/>
+      <figcaption>Many of the substitutions come from the <i>GF(2<sup>4</sup>)</i>
+        element table using the polynomial representations. Also again remember
+        <i>a</i> = -<i>a</i> because of the additive inverse in mod 2
+      </figcaption>
+      </figure>
+    </li>
+    <li>We can also use Cramer's rule to solve the set of equations (see section 2.6)</li>
+  </ul>
+</li>
+
+<li>Find the roots of the equation f(X) = X<sup>3</sup> + <i>a</i><sup>7</sup>X + <i>a</i>
+  <ul>
+    <li>Can't use quadratic equation because of the divide by 2, and in <i>GF(2)</i>, 2=(1+1)=0
+    </li>
+    <li>
+      Instead, plug in and try all of the power representations <i>a<sup>i</sup></i>
+      for X and see which ones are roots (f(X) = 0)
+        <ul>
+          <li>f(<i>a</i><sup>6</sup>) = (<i>a</i><sup>6</sup>)<sup>2</sup> + (<i>a</i><sup>7</sup>)(<i>a</i><sup>6</sup>) + 
+            <i>a</i> = <i>a</i><sup>12</sup> + <i>a</i><sup>13</sup> + <i>a</i> = 0
+           </li>
+          <li>f(<i>a</i><sup>10</sup>) = (<i>a</i><sup>10</sup>)<sup>2</sup> + (<i>a</i><sup>7</sup>)(<i>a</i><sup>10</sup>) + 
+            <i>a</i> = <i>a</i><sup>5</sup> + <i>a</i><sup>2</sup> + <i>a</i> = 0
+           </li>
+        </ul>
+    </li>
+  </ul>
+</li>
+<li>The above two previous examples are used in BCH and Reed-Solomon coding</li>
+</ul>
+
+<h1>Vector Spaces</h1>
+<p>Vector space over <i>GF(2)</i></p>
+<ul>
+  <li>n-tuple over <i>GF(2)</i>: (a<sub>0</sub>,a<sub>1</sub>,a<sub>2</sub>,a<sub>3</sub>...a<sub>n-1</sub>)
+    where a<sub>0</sub>...a<sub>n-1</sub> are in <i>GF(2)</i> (equal 0 or 1)
+  </li>
+  <li>V<sub>n</sub> = the set of all possible n-tuples (2<sup>n</sup> possible tuples)</li>
+  <li>for n-tuples <b>u</b> and <b>v</b>,
+    <ul>
+      <li><b>u</b> + <b>v</b> = (u<sub>0</sub> + v<sub>0</sub>, u<sub>1</sub> + v<sub>1</sub>, ...)
+        <ul><li>Where addition is Modulo 2</li></ul>
+      </li>
+      <li><b>v</b>+<b>v</b>=<b>0</b> (since 1+1=0)</li>
+      <li>The additive inverse of <b>v</b> (-<b>v</b>) is <b>v</b> itself</li>
+    </ul>
+  </li>
+  <li>Scalar multiplication: a*<b>v</b> = (a*v<sub>0</sub>,a*v<sub>1</sub>,...)
+    <ul><li>Multiplication is Modulo 2</li></ul>
+  </li>
+  <li>Linear combination: a<sub>1</sub><b>v</b><sub>1</sub> + a<sub>2</sub><b>v</b><sub>2</sub> + ... a<sub>k</sub><b>v</b><sub>k</sub>
+    <ul>a<sub>1...k</sub> and <b>v</b><sub>1...k</sub> are k scalars and vectors from vector space <i>V</i> and field <i>F</i></ul>
+  </li>
+</ul>
+
+<h1>Matrices</h1>
+<p>A k by n matrix <b>G</b> over <i>GF(2)</i> has k rows and n columns, where
+each entry is in <i>GF(2)</i> (0 or 1)</p>
+<ul>
+  <li>Matrix can also be represented by its k rows, where each row is a n-tuple vector</li>
+  <li>Row space: If the k rows (assuming k &lt;= n) are linearly independant, then any linear
+      combination of these rows called the row space of <b>G</b>
+  </li>
+  <li>Elementary row operations:
+    Adding or swapping any of these rows is valid and is called a elementary row operation
+    <figure>
+      <img src="images/elementary_row_operations_example.png" alt="elementary row ops example"/>
+      <figcaption>Example: adding row 3 to the first row and swapping rows 2 and 3</figcaption>
+    </figure>
+  </li>
+  <li>Adding matrices:
+    <ul>
+      <li>The number of rows and cols must be the same</li>
+      <li>Uses scalar addition: <b>A</b>+<b>B</b>=<b>C</b>, where C<sub>i,j</sub> = A<sub>i,j</sub>+B<sub>i,j</sub></li>
+    </ul>
+  </li>
+  <li>Multiplying matrices:
+    <ul>
+    <li>Number of cols in <b>A</b> must equal the number of rows in <b>B</b></li>
+    <li>Each entry in result is the dot product/inner product of the row in <b>A</b> and col in <b>B</b></li>
+    </ul>
+  </li>
+</ul>
+
+</body>
+</html>

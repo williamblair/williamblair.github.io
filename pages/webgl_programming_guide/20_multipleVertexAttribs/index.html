@@ -1,0 +1,198 @@
+<!-- code samples from the book can be found here:
+     https://sites.google.com/site/webglbook/
+-->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>20 multiple vertex attributes</title>
+</head>
+<body onload="initMain()">
+<div style="display:flex;">
+    <canvas id="mycanvas" width="600" height="600">
+        Your Browser doesn't support canvas :(
+    </canvas>
+    <div>
+        <textarea cols="80" rows="40" id="codeArea" style="padding:5px;"></textarea>
+        <br/>
+        <button type="button" id="runButton">Run</button>
+    </div>
+</div>
+
+<script src="../lib/webgl-utils.js"></script>
+<script src="../lib/webgl-debug.js"></script>
+<script src="../lib/cuon-utils.js"></script>
+<script src="../lib/cuon-matrix.js"></script>
+
+<script id="WebGLScript">
+    
+// vertex shader program
+var VertexShaderStr =`
+    attribute vec4 aPosition; // vertex data passed into the shader
+    attribute float aPointSize;
+    void main() {
+        gl_Position = aPosition; // coordinates
+        gl_PointSize = aPointSize;
+    }
+`;
+
+// fragment shader program
+var FragmentShaderStr = `
+    precision mediump float;
+    uniform vec4 uColor; // fragment color
+    void main() {
+        gl_FragColor = uColor; // fragment color
+    }
+`;
+
+function main() {
+
+    
+    // retrieve the canvas element
+    var canvas = document.getElementById("mycanvas");
+    
+    if (!canvas) {
+        console.log("Failed to get canvas element");
+        return false;
+    }
+    
+    var gl = getWebGLContext(canvas);
+    if (!gl) {
+        console.log("Failed to get OpenGL context");
+        return false;
+    }
+    
+    // Load and compile shader programs
+    if (!initShaders(gl, VertexShaderStr, FragmentShaderStr)) {
+        console.log("Failed to init shaders");
+        return false;
+    }
+    
+    // create vertex buffers
+    var n = initVertexBuffers(gl); // n = number of vertices
+    if (n < 0) {
+        console.log("Failed to set positions of the vertices");
+        return false;
+    }
+    
+    // Get pixel color uniform
+    var uColor = gl.getUniformLocation(gl.program, "uColor");
+    if (uColor < 0) {
+        console.log("Failed to get point color attribute");
+        return false;
+    }
+    
+    // send pixel color to fragment shader uniform
+    var pixelColor = new Float32Array([0.0, 1.0, 0.0, 1.0]);
+    gl.uniform4fv(uColor, pixelColor);
+    
+    // specify the color to clear the canvas with
+    gl.clearColor(1.0, 0.0, 0.0, 1.0);
+    
+    // clear the canvas
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    
+    // draw a point
+    gl.drawArrays(gl.POINTS, // mode; gl.POINTS, gl.LINES, gl.LINE_STRIP, gl.LINE_LOOP, gl.TRIANGLES, gl.TRIANGLE_STRIP, or gl.TRIANGLE_FAN
+                  0,         // vertex offset to draw from
+                  n);        // number of MODE to draw
+}
+
+// creates and stores 3 points in a vertex buffer, returning the number
+// of vertices in the buffer
+function initVertexBuffers(gl) {
+    
+    // the vertices to store in the buffer
+    var vertices = new Float32Array([0.0, 0.5,  // first point
+                                     -0.5, -0.5, // second point
+                                     0.5, -0.5]); // third point
+    var n = 3; // number of vertices
+    
+    // create the buffer object
+    var vertexBuffer = gl.createBuffer();
+    if (!vertexBuffer) {
+        console.log("Failed to create vertex buffer obj");
+        return -1;
+    }
+    
+    // bind the buffer object that we are currently referring to
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+    // send data to the buffer
+    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+    
+    // Get vertex attribute
+    var aPosition = gl.getAttribLocation(gl.program, "aPosition");
+    if (aPosition < 0) {
+        console.log("Failed to get aPosition attribute");
+        return -1;
+    }
+    
+    // tell opengl about the data we just sent it
+    gl.vertexAttribPointer(aPosition,   // the attribute location
+                            2,          // number of points per vertex
+                            gl.FLOAT,   // vertex data type
+                            false,      // does the data need normalization?
+                            0,          // how many bytes to move to the next vertex (0 for default)
+                            0);         // first vertex entry offset
+    // give opengl the OK to use these properties for this attribute
+    gl.enableVertexAttribArray(aPosition);
+    
+    
+    
+    // point sizes to store in the buffer
+    var sizes = new Float32Array([4.0,  // first point
+                                  8.0,  // second point
+                                  12.0]); // third point
+    
+    // create the buffer object
+    var pointSizeBuffer = gl.createBuffer();
+    if (!pointSizeBuffer) {
+        console.log("Failed to create point buffer obj");
+        return -1;
+    }
+    
+    // bind the buffer object that we are currently referring to
+    gl.bindBuffer(gl.ARRAY_BUFFER, pointSizeBuffer);
+    // send data to the buffer
+    gl.bufferData(gl.ARRAY_BUFFER, sizes, gl.STATIC_DRAW);
+    
+    // Get vertex attribute
+    var aPointSize = gl.getAttribLocation(gl.program, "aPointSize");
+    if (aPointSize < 0) {
+        console.log("Failed to get aPointSize attribute");
+        return -1;
+    }
+    
+    // tell opengl about the data we just sent it
+    gl.vertexAttribPointer(aPointSize,   // the attribute location
+                            1,          // number of points per element
+                            gl.FLOAT,   // vertex data type
+                            false,      // does the data need normalization?
+                            0,          // how many bytes to move to the next vertex (0 for default)
+                            0);         // first vertex entry offset
+    // give opengl the OK to use these properties for this attribute
+    gl.enableVertexAttribArray(aPointSize);
+    
+    // give back the number of vertices in the buffer
+    return n;
+}
+main();
+</script>
+<script>
+function initMain() {
+    var codeArea = document.getElementById("codeArea");
+    var webGLScript = document.getElementById("WebGLScript");
+
+    codeArea.value = webGLScript.text;
+
+    var runButton = document.getElementById("runButton");
+    runButton.onclick = function() {
+        var runFunc = new Function(codeArea.value);
+        runFunc();
+    }
+    //var initialRunFunc = new Function(codeArea.value);
+    //initialRunFunc();
+}
+</script>
+</body>
+</html>

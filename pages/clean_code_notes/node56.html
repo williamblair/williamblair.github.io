@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Functions Descending More Than One Level of Abstraction</TITLE>
+<META NAME="description" CONTENT="Functions Descending More Than One Level of Abstraction">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="main.css">
+
+<LINK REL="next" HREF="node57.html">
+<LINK REL="previous" HREF="node55.html">
+<LINK REL="up" HREF="node34.html">
+<LINK REL="next" HREF="node57.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html708"
+  HREF="node57.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="next.png"></A> 
+<A NAME="tex2html706"
+  HREF="node34.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="up.png"></A> 
+<A NAME="tex2html700"
+  HREF="node55.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html709"
+  HREF="node57.html">Keep Configurable Data at</A>
+<B> Up:</B> <A NAME="tex2html707"
+  HREF="node34.html">General</A>
+<B> Previous:</B> <A NAME="tex2html701"
+  HREF="node55.html">Encapsulate Boundary Conditions</A>
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION0001842200000000000000">
+Functions Descending More Than One Level of Abstraction</A>
+</H3>
+
+<P>
+A function should only go down one level of logic. This mixes with a function should do one thing only.
+Example:
+
+<P>
+<PRE>
+public String render() throws Exception {
+  StringBuffer html = new StringBuffer(''hr'');
+  if (size &gt; 0) html.append('' size = \'''').append(size + 1).append(`\`'');
+  html.append(`&gt;`);
+  
+  return html;
+}
+</PRE>
+
+<P>
+This function contains both html structure and html syntax (two different abstractions) in the same
+function and instead be broken up, e.g.
+
+<P>
+<PRE>
+...
+HtmlTag hr = new HtmlTag(`hr`);
+...
+</PRE>
+
+<P>
+<BR><HR>
+<ADDRESS>
+bj
+2019-09-22
+</ADDRESS>
+</BODY>
+</HTML>

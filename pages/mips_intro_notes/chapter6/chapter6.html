@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Chapter 6</title>
+
+  <style>
+    pre {
+        border: 1px solid black;
+        padding: 2px;
+    }
+
+    table, tr, td, th {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+
+    html, body {
+        background-color: #000000;
+        color: #FFFFFF;
+    }
+  </style>
+
+</head>
+<body>
+<h1>Chapter 6</h1>
+
+<h3>Memory Types</h3>
+<ul>
+<li>Static (Referred to in this case as data memory - stored in the .data segment)</li>
+<li>Stack Dynamic</li>
+<li>Heap Dynamic</li>
+</ul>
+
+<h3>Words and Halfwords</h3>
+<ul>
+<li>Word: 4 bytes (integer). If 32bits are not aligned on a word boundry, 
+   it is not considered a word and cannot be addressed as such</li>
+<li>Half-Word: 2 bytes (short)</li>
+</ul>
+
+<h3>Static Data</h3>
+<ul>
+<li>Memory stored from address 0x10000000 to 0x10040000</li>
+<li>The assembler keeps track of the next available address for
+    this area (initially 0x10010000)</li>
+<li>The assembler automatically places data appropriately aligned by
+    skipping some bytes if necessary</li>
+<li>"In assembly there is no context maintained with memory; its really
+     just a collection of bits"</li>
+</ul>
+
+<h3>Loading/storing memory</h3>
+<table>
+<tr>
+  <th>Operators</th><th>Description</th>
+</tr>
+<tr>
+  <td>lb/sb</td><td>Load/Store byte</td>
+</tr>
+<tr>
+  <td>lh/sh</td><td>Load/Store half-word</td>
+</tr>
+<tr>
+  <td>lw/sw</td><td>Load/Store word</td>
+</tr>
+<tr>
+  <td>ld/sd</td><td>Load/Store double word</td>
+</tr>
+</table>
+
+<p>lw format</p>
+<pre>
+<code>lw Rt, Immediate(Rs) # Rt = Memory[Rs + Immediate]
+lw Rt, Rs, label # Rt = Memory[Label] (pseudo op; Rs = 0x10010000)
+</code></pre>
+<p>sw format</p>
+<pre>
+<code>sw Rt, Immediate(Rs) # Memory[Rx + Immediate] = Rt
+sw Rt, Rs, Label # Memory[label] = Rt (pseudo op; Rs = 0x10010000)
+</code></pre>
+
+<h3>Addressing by Label (When label in .data segment)</h3>
+<pre>
+<code>lw $t5, a
+sw $t6, a
+...
+.data
+a: .word 4</code>
+</pre>
+
+<h3>Addressing by direct register</h3>
+<p>Register directly contains the value to use</p>
+<pre>
+<code>li $t5, 5</code>
+</pre>
+
+<h3>Addressing by indirect register</h3>
+<p>Register contains the address of the value to use</p>
+<pre>
+<code>lui $t0, 0x1001   # load the starting memory address into $t0
+lw $t5, 0($t0)          # $t5 = $t0[0]
+addi $t0, $t0, 4        # Increase $t0 by 4 bytes
+lw $t6, 0($t0)          $ $t6 = $t0[0]
+...
+.data
+    .word 5
+    .word 2
+    .word 3
+    .word 0
+y:  .word 0
+</code></pre>
+
+
+<h3>Addressing by register offset</h3>
+<p>Register contains a starting address which then needs to be offset</p>
+<pre>
+<code>lui $t0, 0x1001   # load the starting memory address into $t0
+lw $t5, 0($t0)          # $t5 = $t0[0]
+lw $t6, 4($t0)          $ $t6 = $t0[1], where $t0 would be a 32bit word array
+lw $t7, 8($t0)          $ $t7 = $t0[2], where $t0 would be a 32bit word array
+...
+.data
+    .word 5
+    .word 2
+    .word 3
+    .word 0
+y:  .word 0
+</code></pre>
+
+<h3>Pointer static variables</h3>
+<p>In this program the constants_ptr label contains the address of the constants data</p>
+<pre><code>
+# Shows static memory access and a "pointer" variable (constants_ptr)
+
+.text
+
+main:
+
+    # Access the constants memory
+    lui $t0, 0x1001 # $t0 = 0x10010000 (MIPS starting static memory address)
+    lw $t0, 0($t0)  # $t0 = $t0[0] = constants_ptr
+    lw $t1, 0($t0)  # $t1 = $t0[0] = constats_ptr[0]
+    lw $t2, 4($t0)  # $t1 = $t0[4] = constats_ptr[1]
+    lw $t3, 8($t0)  # $t1 = $t0[8] = constats_ptr[2]
+    
+    # print the numbers
+    li $v0, 1
+    move $a0, $t1
+    syscall
+    move $a0, $t2
+    syscall
+    move $a0, $t3
+    syscall
+    
+    # call the exit subprogram
+    # jal = jump and link
+    jal exit
+
+.data
+constants_ptr: .word constants # points to constants address down below
+y:             .word 0
+constants:
+    .word 5
+    .word 4
+    .word 3
+    .word 0
+        
+# Exit subprogram
+.text
+exit:
+    li $v0, 10
+    syscall
+</code></pre>
+
+</body>
+</html>
+

@@ -1,0 +1,27 @@
+## Accelerometers
+* Input that detects movement and orientation; e.g. the wiimote
+* Use 'relative' inputs as numbers
+  * Acceleration along the x,y, and z axes up to 3g (gravity force, where 1 G = earth gravity)
+  * For example: if pointed upwards, will have 1g along the Y axis, 0g along the z axis
+  
+## Common HID (Human Interface Device) code features
+* Deadzones
+* Analog input filtering
+  * low-pass filter or running average
+* Event detection
+* button sequences (combos) or multi-button presses at the same time (chords)
+* gesture detection
+* multi-controller support
+* Multi-platform abstraction 
+  *cross platform support for different controller types
+* Input remappiong
+* Context-sensitive input
+* Input disabling (e.g. for cutscenes)
+
+## Button sequence detection (e.g. fighting game button combo)
+
+* Keep a history of the last pressed button in the expected sequence
+  and the time it was pressed
+* When the next button in the sequence is pressed
+  * If the button was pressed within the time limit, update the sequence
+  * else reset the sequence to the beginning (sequence failed)

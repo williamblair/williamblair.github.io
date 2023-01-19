@@ -1,0 +1,1086 @@
+\batchmode
+\documentclass{article}
+\RequirePackage{ifthen}
+
+
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\usepackage{amsmath}
+
+
+\title{Foundations of Game Engine Development 1: Mathematics}
+\author{bj}
+\date{August 2020}
+
+
+
+
+\usepackage{xcolor}
+
+\usepackage[]{inputenc}
+
+
+
+\makeatletter
+
+\makeatletter
+\count@=\the\catcode`\_ \catcode`\_=8 
+\newenvironment{tex2html_wrap}{}{}%
+\catcode`\<=12\catcode`\_=\count@
+\newcommand{\providedcommand}[1]{\expandafter\providecommand\csname #1\endcsname}%
+\newcommand{\renewedcommand}[1]{\expandafter\providecommand\csname #1\endcsname{}%
+  \expandafter\renewcommand\csname #1\endcsname}%
+\newcommand{\newedenvironment}[1]{\newenvironment{#1}{}{}\renewenvironment{#1}}%
+\let\newedcommand\renewedcommand
+\let\renewedenvironment\newedenvironment
+\makeatother
+\let\mathon=$
+\let\mathoff=$
+\ifx\AtBeginDocument\undefined \newcommand{\AtBeginDocument}[1]{}\fi
+\newbox\sizebox
+\setlength{\hoffset}{0pt}\setlength{\voffset}{0pt}
+\addtolength{\textheight}{\footskip}\setlength{\footskip}{0pt}
+\addtolength{\textheight}{\topmargin}\setlength{\topmargin}{0pt}
+\addtolength{\textheight}{\headheight}\setlength{\headheight}{0pt}
+\addtolength{\textheight}{\headsep}\setlength{\headsep}{0pt}
+\setlength{\textwidth}{349pt}
+\newwrite\lthtmlwrite
+\makeatletter
+\let\realnormalsize=\normalsize
+\global\topskip=2sp
+\def\preveqno{}\let\real@float=\@float \let\realend@float=\end@float
+\def\@float{\let\@savefreelist\@freelist\real@float}
+\def\liih@math{\ifmmode$\else\bad@math\fi}
+\def\end@float{\realend@float\global\let\@freelist\@savefreelist}
+\let\real@dbflt=\@dbflt \let\end@dblfloat=\end@float
+\let\@largefloatcheck=\relax
+\let\if@boxedmulticols=\iftrue
+\def\@dbflt{\let\@savefreelist\@freelist\real@dbflt}
+\def\adjustnormalsize{\def\normalsize{\mathsurround=0pt \realnormalsize
+ \parindent=0pt\abovedisplayskip=0pt\belowdisplayskip=0pt}%
+ \def\phantompar{\csname par\endcsname}\normalsize}%
+\def\lthtmltypeout#1{{\let\protect\string \immediate\write\lthtmlwrite{#1}}}%
+\usepackage[tightpage,active]{preview}
+\newbox\lthtmlPageBox
+\newdimen\lthtmlCropMarkHeight
+\newdimen\lthtmlCropMarkDepth
+\long\def\lthtmlTightVBox#1#2{%
+    \setbox\lthtmlPageBox\vbox{\hbox{\catcode`\_=8 #2}}%
+    \lthtmlCropMarkHeight=\ht\lthtmlPageBox \advance \lthtmlCropMarkHeight 6pt
+    \lthtmlCropMarkDepth=\dp\lthtmlPageBox
+    \lthtmltypeout{^^J:#1:lthtmlCropMarkHeight:=\the\lthtmlCropMarkHeight}%
+    \lthtmltypeout{^^J:#1:lthtmlCropMarkDepth:=\the\lthtmlCropMarkDepth:1ex:=\the \dimexpr 1ex}%
+    \begin{preview}\copy\lthtmlPageBox\end{preview}}%
+\long\def\lthtmlTightFBox#1#2{%
+    \adjustnormalsize\setbox\lthtmlPageBox=\vbox\bgroup %
+    \let\ifinner=\iffalse \let\)\liih@math %
+    {\catcode`\_=8 #2}%
+    \@next\next\@currlist{}{\def\next{\voidb@x}}%
+    \expandafter\box\next\egroup %
+    \lthtmlCropMarkHeight=\ht\lthtmlPageBox \advance \lthtmlCropMarkHeight 6pt
+    \lthtmlCropMarkDepth=\dp\lthtmlPageBox
+    \lthtmltypeout{^^J:#1:lthtmlCropMarkHeight:=\the\lthtmlCropMarkHeight}%
+    \lthtmltypeout{^^J:#1:lthtmlCropMarkDepth:=\the\lthtmlCropMarkDepth:1ex:=\the \dimexpr 1ex}%
+    \begin{preview}\copy\lthtmlPageBox\end{preview}}%
+    \long\def\lthtmlinlinemathA#1#2\lthtmlindisplaymathZ{\lthtmlTightVBox{#1}{#2}}
+    \def\lthtmlinlineA#1#2\lthtmlinlineZ{\lthtmlTightVBox{#1}{#2}}
+    \long\def\lthtmldisplayA#1#2\lthtmldisplayZ{\lthtmlTightVBox{#1}{#2}}
+    \long\def\lthtmlinlinemathA#1#2\lthtmlindisplaymathZ{\lthtmlTightVBox{#1}{#2}}
+    \def\lthtmlinlineA#1#2\lthtmlinlineZ{\lthtmlTightVBox{#1}{#2}}
+    \long\def\lthtmldisplayA#1#2\lthtmldisplayZ{\lthtmlTightVBox{#1}{#2}}
+    \long\def\lthtmldisplayB#1#2\lthtmldisplayZ{\\edef\preveqno{(\theequation)}%
+        \lthtmlTightVBox{#1}{\let\@eqnnum\relax#2}}
+    \long\def\lthtmlfigureA#1#2\lthtmlfigureZ{\let\@savefreelist\@freelist
+        \lthtmlTightFBox{#1}{#2}\global\let\@freelist\@savefreelist}
+    \long\def\lthtmlpictureA#1#2\lthtmlpictureZ{\let\@savefreelist\@freelist
+        \lthtmlTightVBox{#1}{#2}\global\let\@freelist\@savefreelist}
+\def\lthtmlcheckvsize{\ifdim\ht\sizebox<\vsize 
+  \ifdim\wd\sizebox<\hsize\expandafter\hfill\fi \expandafter\vfill
+  \else\expandafter\vss\fi}%
+\providecommand{\selectlanguage}[1]{}%
+\makeatletter \tracingstats = 1 
+\providecommand{\Zeta}{\textrm{Z}}
+\providecommand{\Beta}{\textrm{B}}
+\providecommand{\Eta}{\textrm{H}}
+\providecommand{\Tau}{\textrm{T}}
+\providecommand{\omicron}{\textrm{o}}
+\providecommand{\Omicron}{\textrm{O}}
+\providecommand{\Mu}{\textrm{M}}
+\providecommand{\Chi}{\textrm{X}}
+\providecommand{\Rho}{\textrm{R}}
+\providecommand{\Epsilon}{\textrm{E}}
+\providecommand{\Kappa}{\textrm{K}}
+\providecommand{\Iota}{\textrm{J}}
+\providecommand{\Alpha}{\textrm{A}}
+\providecommand{\Nu}{\textrm{N}}
+
+
+\begin{document}
+\pagestyle{empty}\thispagestyle{empty}\lthtmltypeout{}%
+\lthtmltypeout{latex2htmlLength hsize=\the\hsize}\lthtmltypeout{}%
+\lthtmltypeout{latex2htmlLength vsize=\the\vsize}\lthtmltypeout{}%
+\lthtmltypeout{latex2htmlLength hoffset=\the\hoffset}\lthtmltypeout{}%
+\lthtmltypeout{latex2htmlLength voffset=\the\voffset}\lthtmltypeout{}%
+\lthtmltypeout{latex2htmlLength topmargin=\the\topmargin}\lthtmltypeout{}%
+\lthtmltypeout{latex2htmlLength topskip=\the\topskip}\lthtmltypeout{}%
+\lthtmltypeout{latex2htmlLength headheight=\the\headheight}\lthtmltypeout{}%
+\lthtmltypeout{latex2htmlLength headsep=\the\headsep}\lthtmltypeout{}%
+\lthtmltypeout{latex2htmlLength parskip=\the\parskip}\lthtmltypeout{}%
+\lthtmltypeout{latex2htmlLength oddsidemargin=\the\oddsidemargin}\lthtmltypeout{}%
+\makeatletter
+\if@twoside\lthtmltypeout{latex2htmlLength evensidemargin=\the\evensidemargin}%
+\else\lthtmltypeout{latex2htmlLength evensidemargin=\the\oddsidemargin}\fi%
+\lthtmltypeout{}%
+\makeatother
+\setcounter{page}{1}
+\onecolumn
+
+% !!! IMAGES START HERE !!!
+
+\stepcounter{section}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1373}%
+$ ||\textbf{v}|| = \sqrt{ v_x^2  + v_y^2 + v_z^2 + ...} $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1375}%
+$ ||\textbf{v}|| = \sqrt{ \textbf{v} \cdot \textbf{v} } $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1377}%
+$ ||t\textbf{v}|| = |t| ||\textbf{v}|| $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1379}%
+$ \textbf{a} \cdot \textbf{b} = a_x b_x + a_y b_y + a_x b_z + ... $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1381}%
+$ \textbf{a} \cdot \textbf{b} = ||\textbf{a}|| ||\textbf{b}|| cos\theta $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1383}%
+$ \textbf{a} \cdot \textbf{a} = a^2$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1385}%
+$ \textbf{a} \cdot \textbf{b} = 0$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1387}%
+$ \textbf{a} \times \textbf{b} = \begin{bmatrix}
+	a_y b_z - a_z b_y \\
+	a_z b_x - a_x b_z \\
+	a_x b_y - a_y b_x
+	\end{bmatrix}
+$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1389}%
+$ \textbf{a} \times \textbf{b} = ||\textbf{a}|| ||\textbf{b}|| cos \theta$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1391}%
+$ A = \frac{1}{2} ||(\textbf{p}_1 - \textbf{p}_0) \times (\textbf{p}_2 - \textbf{p}_0)|| $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1393}%
+$ \textbf{p}_0, \textbf{p}_1, \textbf{p}_2$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1395}%
+$ ||\textbf{a} \times \textbf{b}|| = ||\textbf{a}|| ||\textbf{b}|| sin\theta$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1397}%
+$ \hat{\textbf{v}} = \frac{\textbf{v}}{||\textbf{v}||} $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1399}%
+$ \textbf{a} \times (\textbf{b} \times \textbf{c}) = 
+\textbf{b}(\textbf{a} \cdot \textbf{c}) - \textbf{c}(\textbf{a} \cdot \textbf{b})$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1401}%
+$ [ \textbf{a}, \textbf{b}, \textbf{c} ] 
+= (\textbf{a} \times \textbf{b}) \cdot \textbf{c} = (\textbf{b} \times 
+\textbf{c}) \cdot \textbf{a} 
+= (\textbf{c} \times \textbf{a}) \cdot \textbf{b} $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1403}%
+$ [ \textbf{a}, \textbf{b}, \textbf{c} ] = -[ \textbf{c}, \textbf{b}, \textbf{a} ]$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1405}%
+$ \textbf{a}_{||\textbf{b}} = \frac{\textbf{a} \cdot \textbf{b}}{b^2} \textbf{b} $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1407}%
+$ \textbf{a}_{||\textbf{b}} = \frac{1}{b^2} \begin{bmatrix}
+  b_x^2 & b_x b_y & b_x b_z \\
+  b_x b_y & b_y^2 & b_y b_z \\
+  b_x b_z & b_y b_z & b_z^2 \\
+\end{bmatrix} 
+\begin{bmatrix}
+a_x \\
+a_y \\
+a_z \\
+\end{bmatrix}
+$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1409}%
+$ \textbf{a}_{\perp \textbf{b}} = \textbf{a} - \textbf{a}_{||\textbf{b}} $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1411}%
+$ (\textbf{a}_{||\textbf{b}})^2 + (\textbf{a}_{\perp \textbf{b}})^2 = a^2 $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1413}%
+$ \textbf{u}_1 = \textbf{v}_1, 
+\textbf{u}_2 = \textbf{v}_2 - (\textbf{v}_2)_{||\textbf{u}_1}, 
+\textbf{u}_3 = \textbf{v}_3 - (\textbf{v}_3)_{||\textbf{u}_1} - (\textbf{v}_3)_{||\textbf{u}_2}, ... $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1415}%
+$ \textbf{a} \otimes \textbf{b} = \textbf{a} \textbf{b}^T = \begin{bmatrix}a_x \\a_y \\a_z \\\end{bmatrix}
+\begin{bmatrix}b_x & b_y & b_z \\\end{bmatrix} $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1417}%
+$ =
+\begin{bmatrix}
+a_x b_z & a_x b_y & a_x b_z \\
+a_y b_x & a_y b_y & a_y b_z \\
+a_z b_x & a_z b_y & a_z b_z \\
+\end{bmatrix}
+$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1419}%
+$ \textbf{v} = (v_x, v_y, v_z, 0)$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1421}%
+$ \textbf{\textit{p}} = (v_x, v_y, v_z, 1)$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{section}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1474}%
+$ \textbf{A}_{n,m}\textbf{B}_{m,p} = \textbf{C}_{n,p} $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1476}%
+$ \textbf{M}_{i,j}^T = \textbf{M}_{j,i} $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1478}%
+$ \textbf{M} = [\textbf{a} \textbf{b} \textbf{c}]$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1480}%
+$ \textbf{M} = \begin{bmatrix}
+	X & a & b \\
+	a & X & c \\
+	b & c & X
+	\end{bmatrix}
+ $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1482}%
+$ \textbf{M}^T = \textbf{M}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1484}%
+$ \textbf{M} = \begin{bmatrix}
+	0 & a & b \\
+	-a & 0 & c \\
+	-b & -c & 0
+	\end{bmatrix}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1486}%
+$ \textbf{M}^T = -\textbf{M}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1488}%
+$ \textbf{M}\textbf{v} = v_x \textbf{a} + v_y \textbf{b} + v_z \textbf{c}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1490}%
+$ \begin{vmatrix}a & b \\c & d \end{vmatrix} = ad - bc$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1492}%
+$ det(\textbf{M}) = \sum\limits_{i=0}^{n-1} M_{ik}(-1)^{i+k}|\textbf{M}_{\bar{ik}}| $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1494}%
+$ |M_{ik}|$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1496}%
+$ C_{ij}(\textbf{M}) = (-1)^{i+j}|\textbf{M}_{\bar{ij}}|$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1498}%
+$ \textbf{M}^{-1} = \frac{1}{det(\textbf{M})} \textbf{C}^T(\textbf{M})$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1500}%
+$ C^T(M) =$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1502}%
+$ \textbf{A}^{-1} = \frac{1}{A_{00}A_{11} - A_{01}A_{10}} 
+\begin{bmatrix}
+A_{11} & -A_{01} \\
+-A_{10} & A_{00}
+\end{bmatrix}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1504}%
+$ \textbf{B}^{-1} = \frac{1}{det(\textbf{B})} 
+\begin{bmatrix}
+B_{11}B_{22} - B_{12}B_{21} & B_{02}B_{21} - B_{01}B_{22} & B_{01}B_{12} - B_{02}B_{11} \\
+B_{12}B_{20} - B_{10}B_{22} & B_{00}B_{22} - B_{02}B_{20} & B_{02}B_{10} - B_{00}B_{12} \\
+B_{10}B_{21} - B_{11}B_{20} & B_{01}B_{20} - B_{00}B_{21} & B_{00}B_{11} - B_{01}B_{10}
+\end{bmatrix} $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1506}%
+$ \textbf{M}^{-1} = \frac{1}{[\textbf{a},\textbf{b},\textbf{c}]} 
+\begin{bmatrix}
+\textbf{b} \times \textbf{c} \\
+\textbf{c} \times \textbf{a} \\
+\textbf{a} \times \textbf{b} \\
+\end{bmatrix}
+$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1508}%
+$ \textbf{M}^{-1} = \frac{1}{\textbf{s} \cdot \textbf{v} + \textbf{t} \cdot \textbf{u}}
+\begin{bmatrix}
+\textbf{b} \times \textbf{v} + y\textbf{t} | -\textbf{b} \cdot \textbf{t} \\
+\textbf{v} \times \textbf{a} - x\textbf{t} | \textbf{a} \cdot \textbf{t} \\
+\textbf{d} \times \textbf{u} + w\textbf{s} | -\textbf{d} \cdot \textbf{s} \\
+\textbf{u} \times \textbf{c} - z\textbf{s} | \textbf{c} \cdot \textbf{s}
+\end{bmatrix}
+$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1510}%
+$ a \times b$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1512}%
+$ c \times d$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1514}%
+$ ya -xb$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1516}%
+$ wc -zd$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{section}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1557}%
+$ \textbf{M}^T \textbf{M} = \begin{bmatrix}
+a^2 & \textbf{a} \cdot \textbf{b} & \textbf{a} \cdot \textbf{c} \\
+\textbf{b} \cdot \textbf{a} & b^2 & \textbf{b} \cdot \textbf{c} \\
+\textbf{c} \cdot \textbf{a} & \textbf{c} \cdot \textbf{b} & c^2
+\end{bmatrix}
+$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1559}%
+$ M^T = M^-1$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1561}%
+$ \textbf{B} = \textbf{M} \textbf{A} \textbf{M}^{-1} $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1563}%
+$ M_{rot_x}(\theta) = \begin{bmatrix}
+1 & 0 & 0 \\
+0 & cos \theta & -sin \theta \\
+0 & sin \theta & cos \theta
+\end{bmatrix}
+$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1565}%
+$ M_{rot_y}(\theta) = \begin{bmatrix}
+ cos \theta & 0 & sin \theta \\
+0 & 1 & 0 \\
+sin \theta & 0 & cos \theta
+\end{bmatrix}
+$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1567}%
+$ M_{rot_z}(\theta) = \begin{bmatrix}
+cos \theta & -sin \theta & 0 \\
+sin \theta & cos \theta & 0 \\
+0 & 0 & 1
+\end{bmatrix}
+$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1569}%
+$ M_{rot}(\theta, \textbf{a}) = \begin{bmatrix}
+c + (1-c)a_x^2 & (1-c)a_x a_y - s a_z & (1-c)a_x a_z + s a_y \\
+(1-c)a_x a_y + s a_z & c + (1-c)a_y^2 & (1-c)a_y a_z - s a_x \\
+(1-c)a_x a_z - s a_y & (1-c)a_y a_z + s a_x & c + (1-c) a_z^2
+\end{bmatrix}
+$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1571}%
+$ cos \theta$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1573}%
+$ sin \theta $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1575}%
+$ M_{reflect}(\textbf{a}) = \begin{bmatrix}
+1 - 2a_x^2 & -2a_x a_y & -2a_x a_z \\
+-2a_x a_y & 1 -2a_y^2 & -2a_y a_z \\
+-2a_x a_z & -2a_y a_z & 1 - 2a_z^2
+\end{bmatrix}
+$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1577}%
+$ M_{invol}(\textbf{a}) = \begin{bmatrix}
+2a_x^2 - 1 & 2a_x a_y & 2a_x a_z \\
+2a_x a_y & 2a_y^2 - 1 & 2a_y a_z \\
+2a_x a_z & 2a_y a_z & 2a_z^2 - 1
+\end{bmatrix}
+$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1579}%
+$ M_{scale}(s_x,s_y,s_z) = \begin{bmatrix}
+s_x & 0 & 0 \\
+0 & s_y & 0 \\
+0 & 0 & s_z
+\end{bmatrix}
+$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1581}%
+$ M_{scale}(s,\textbf{a}) = \begin{bmatrix}
+(s-1)a_x^2 + 1 & (s-1)a_x a_y & (s-1) a_x a_z \\
+(s-1)a_x a_y & (s-1) a_y^2 + 1 & (s-1)a_y a_z \\
+(s-1)a_x a_z & (s-1) a_y a_z & (s-1)a_z^2 + 1
+\end{bmatrix}
+$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+
+
+\setlength{\extrarowheight}{10pt}%
+
+\setlength{\extrarowheight}{10pt}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1605}%
+$ M_{skew}(\theta, \textbf{a}, \textbf{b}) = \begin{bmatrix}
+a_x b_x tan \theta + 1 & a_x b_y tan \theta & a_x b_z tan \theta \\
+a_y b_x tan \theta & a_y b_y tan \theta + 1 & a_y b_z tan \theta \\
+a_z b_x tan \theta & a_z b_y tan \theta & a_z b_z tan \theta + 1
+\end{bmatrix}
+$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1607}%
+$ M_{skew}(\theta, \textbf{a}, \textbf{b}) = \textbf{I} + tan \theta (\textbf{a} \otimes \textbf{b})$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1609}%
+$ \textbf{H} = \begin{bmatrix}\textbf{M} & \textbf{t} \\\textbf{0} & 1 \end{bmatrix} $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1611}%
+$ \textbf{H}^{-1} = \begin{bmatrix}
+\textbf{M}^{-1} & -\textbf{M}^{-1}\textbf{t} \\\textbf{0} & 1 
+\end{bmatrix} $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{section}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1622}%
+$ \textbf{q} = xi + yj + zk + w $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1624}%
+$ \textbf{q} = \textbf{v} + s $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1626}%
+$ \textbf{q} = (sin \frac{\theta}{2})\textbf{a} + cos\frac{\theta}{2}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1628}%
+$ \theta$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1630}%
+$ \textbf{q}_1\textbf{q}_2 = \textbf{v}_1 \times \textbf{v}_2 + s_1 \textbf{v}_2 + s_2 \textbf{v}_1 + s_1 s_2 - \textbf{v}_1 \cdot \textbf{v}_2
+$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1632}%
+$ \textbf{q}_2\textbf{q}_1 = \textbf{q}_1\textbf{q}_2 - 2(\textbf{v}_1 \times \textbf{v}_2) $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1634}%
+$ \textbf{q}^*  = -\textbf{v} + s $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1636}%
+$ \textbf{q}\textbf{q}^* = \textbf{q}^*\textbf{q} = v^2 + s^2 $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1638}%
+$ ||\textbf{q}|| = \sqrt{\textbf{q}\textbf{q}^*} = \sqrt{v^2 + s^2} $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1640}%
+$ \textbf{q}^{-1} = \frac{\textbf{q}^*}{\textbf{q}\textbf{q}^*} = \frac{-\textbf{v} + s}{v^2 + s^2}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1642}%
+$ \textbf{v}^\lq = \textbf{q} \textbf{v} \textbf{q}^{-1}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1644}%
+$ v_x i + v_y j + v_z k + 0$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1646}%
+$ \textbf{v}^\lq = \textbf{q} \textbf{v} \textbf{q}^*$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1648}%
+$ \textbf{v}^\lq = (\textbf{q}_2\textbf{q}_1)\textbf{v}(\textbf{q}_2\textbf{q}_1)^*$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1650}%
+$ \textbf{M}_{rot}(\textbf{q}) = \begin{bmatrix}
+1 - 2y^2 - 2z^2 & 2(xy -wz) & 2(xz + wy) \\
+2(xy + wz) & 1 - 2x^2 -2z^2 & 2(yz -wx) \\
+2(xz - wy) & 2(yz + wx) & 1 - 2x^2 - 2y^2
+\end{bmatrix}
+$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{section}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1679}%
+$ \textbf{n} = (\textbf{p}_1 - \textbf{p}_0) \times (\textbf{p}_2 - \textbf{p}_0)$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1681}%
+$ \textbf{n}^B = \textbf{n}^A \textbf{M}^{-1}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1683}%
+$ \textbf{n}^B = \textbf{n}^A adj(\textbf{M}) = \textbf{n}^A det(\textbf{M})\textbf{M}^{-1}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1685}%
+$ d = \sqrt{u^2 - \frac{(\textbf{u} \cdot \textbf{v})^2}{v^2}}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1687}%
+$ d = \sqrt{\frac{(\textbf{u} \times \textbf{v})^2}{v^2}}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1689}%
+$ \begin{bmatrix}t_1 \\t_2 \end{bmatrix} = 
+\frac{1}{(\textbf{v}_1 \cdot \textbf{v}_2)^2 - v_1^2 v_2^2}
+\begin{bmatrix}-v_2^2 & \textbf{v}_1 \cdot \textbf{v}_2 \\
+-\textbf{v}_1 \cdot \textbf{v}_2 & v_1^2\end{bmatrix}
+\begin{bmatrix}(\textbf{p}_2 - \textbf{p}_1) \cdot \textbf{v}_1 \\
+(\textbf{p}_2 - \textbf{p}_1) \cdot \textbf{v}_2\end{bmatrix}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1691}%
+$ p_1, p_2 (L1(t) = p_1 + t_1 v_1)$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1693}%
+$ d = ||L_2(t_2) - L_1(t_1)|| $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1695}%
+$ d = \sqrt{\frac{[(\textbf{p}_2 - \textbf{p}_1) \times \textbf{v}_1]^2}{v_1^2}}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1697}%
+$ \textbf{f} \cdot \textbf{p} = 0, \textbf{f} = [n_x n_y n_z d] = 
+[\textbf{n}|d] $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1699}%
+$ d = \textbf{f} \cdot \textbf{p}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1701}%
+$ \textbf{p}' = \textbf{p} - 2(\textbf{f} \cdot \textbf{p}) \textbf{n} $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1703}%
+$ \textbf{H}_{reflect}(\textbf{f}) = \begin{bmatrix}
+1 - 2n_x^2 & -2n_xn_y & -2n_xn_z & -2n_xd \\
+-2n_xn_y & 1 - 2n_y^2 & -2n_yn_z & -2n_yd \\
+-2n_xn_z & -2n_yn_z & 1 - 2n_z^2 & -2n_zd \\
+0 & 0 & 0 & 1 
+\end{bmatrix}
+$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1705}%
+$ \textbf{q} = \textbf{p} - \frac{\textbf{f} \cdot \textbf{p}}{\textbf{f} \cdot \textbf{v}} \textbf{v}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1707}%
+$ \textbf{p} = \frac{d_1(\textbf{n}_3 \times \textbf{n}_2) + d_2(\textbf{n}_1 \times \textbf{n}_3) + d_3(\textbf{n}_2 \times \textbf{n}_1)}
+{[\textbf{n}_1, \textbf{n}_2, \textbf{n}_3]}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1709}%
+$ \textbf{p} = \frac{d_1(\textbf{v} \times \textbf{n}_2) + d_2(\textbf{n}_1 \times \textbf{v})}
+{v^2} $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1711}%
+$ \textbf{v} = \textbf{n}_1 \times \textbf{n}_2$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1713}%
+$ \textbf{f}^B = \textbf{f}^A det(\textbf{H})\textbf{H}^{-1} = 
+\textbf{f}^A adj(\textbf{H}) $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1715}%
+$ \{\textbf{v}|\textbf{m}\}, 
+\textbf{m} = \textbf{p}_1 \times \textbf{p}_2 $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1717}%
+$ (\textbf{p} | w) $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1719}%
+$ d = \frac{|\textbf{v}_1 \cdot \textbf{m}_2 + \textbf{v}_2 \cdot \textbf{m}_1|}
+{||\textbf{v}_1 \times \textbf{v}_2||} $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+
+
+\setlength{\extrarowheight}{10pt}%
+
+\setlength{\extrarowheight}{10pt}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1759}%
+$ \{\textbf{v}^B | \textbf{m}^B\} = \{\textbf{M}\textbf{v}^A | 
+\textbf{m}^A adj(\textbf{M}) + \textbf{t} \times (\textbf{M}\textbf{v}^A)\}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{section}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1764}%
+$ \textbf{a} \wedge \textbf{b} = (a_yb_z - a_zb_y)\textbf{e}_{23} + (a_zb_x - a_xb_z)\textbf{e}_{31}
++ (a_xb_y - a_yb_x)\textbf{e}_{12} $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1766}%
+$ \textbf{e}_i \wedge \textbf{e}_j = \textbf{e}_{ij}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1768}%
+$ \textbf{a} \vee \textbf{b} = (a_yb_z - a_zb_y)\textbf{e}_{1} + (a_zb_x - a_xb_z)\textbf{e}_{2}
++ (a_xb_y + a_yb_x)\textbf{e}_{3} $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1770}%
+$ \textbf{a} \wedge \textbf{b} = -\textbf{b} \wedge \textbf{a}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1772}%
+$ \textbf{a} \wedge \textbf{a} = 0 $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1774}%
+$ \textbf{a} \wedge \textbf{b} \wedge \textbf{c} = 
+(a_xb_yc_z + a_yb_zc_x + a_zb_xc_y - a_xb_zc_y - a_yb_xc_z - a_zb_yc_x)
+(\textbf{e}_1 \wedge \textbf{e}_2 \wedge \textbf{e}_3) $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1776}%
+$ gr(\textbf{A} \wedge \textbf{B})  = gr(\textbf{A}) + gr(\textbf{B}) $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1778}%
+$ gr(\textbf{A} \wedge \textbf{B}) = -1^{gr(\textbf{A})gr(\textbf{B})}(\textbf{B} \wedge \textbf{A}) $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1780}%
+$ \textbf{E}_n = \textbf{e}_{12...n} = \textbf{e}_1 \wedge \textbf{e}_2 \wedge ... \textbf{e}_n $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1782}%
+$ \textbf{A} \wedge \overline{\textbf{A}} = \textbf{E}_n $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1784}%
+$ \textbf{a} \times \textbf{b} = \overline{\textbf{a} \wedge \textbf{b}} $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1786}%
+$ \underline{\textbf{A}} = (-1)^{k(n-k)}\overline{\textbf{A}} $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1788}%
+$ \overline{\textbf{A} \wedge \textbf{B}} = \overline{\textbf{A}} \vee \overline{\textbf{B}} $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1790}%
+$ \textbf{a} \cdot \textbf{b} = \textbf{a} \vee \overline{\textbf{b}} $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1792}%
+$ \textbf{p} \wedge \textbf{q} = (q_x - p_x)\textbf{e}_{41} + (q_y - p_y)\textbf{e}_{42} + 
+(q_z - p_z)\textbf{e}_{43} + (p_yq_z - p_zq_y)\textbf{e}_{23} + (p_zq_x - p_xq_z)\textbf{e}_{31} +
+(p_xq_y - p_yq_x)\textbf{e}_{12} $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1794}%
+$ \textbf{p} \wedge \textbf{L} = (L_{vy}p_z - L_{vz}p_y + L_{mx})\overline{\textbf{e}_1} +
+(L_{vz}p_x - L_{vx}p_z + L_{my})\overline{\textbf{e}_2} +
+(L_{vx}p_y - L_{vy}p_x + L_{mz})\overline{\textbf{e}_3} + 
+(-L_{mx}p_x - L_{my}p_y - L_{mz}p_z)\overline{\textbf{e}_4} $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1796}%
+$ q \wedge r $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1798}%
+$ \{v|m\}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1800}%
+$ \textbf{f} \vee \textbf{g} = (f_zg_y - f_yg_z)\textbf{e}_{41} + (f_xg_z - f_zg_x)\textbf{e}_{42} + 
+(f_yg_x - f_xg_y)\textbf{e}_{43} + (f_xg_w - f_wg_x)\textbf{e}_{23} + (f_yg_w - f_wg_y)\textbf{e}_{31}
++ (f_zg_w - f_wg_z)\textbf{e}_{12} $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1802}%
+$ \textbf{f} \vee \textbf{L} = (L_{my}f_z - L_{mz}f_y + L_{vx}f_w)\textbf{e}_1 +
+(L_{mz}f_x - L_{mx}f_z + L_{vy}f_w)\textbf{e}_2 +
+(L_{mx}f_y - L_{my}f_x + L_{vz}f_w)\textbf{e}_3 +
+(-L_{vx}f_x - L_{vy}f_y - L_{vz}f_z)\textbf{e}_4 $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1804}%
+$ d = \frac{\textbf{L}_1 \vee \textbf{L}_2}{|| \textbf{v}_1 \wedge \textbf{v}_2||} $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1806}%
+$ L = \{v | m\}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1808}%
+$ d = \frac{\textbf{p} \vee \textbf{f}}{|| \textbf{n} ||} $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1810}%
+$ f = \{\textbf{n} | d\}$%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+
+
+\setlength{\extrarowheight}{10pt}%
+
+\setlength{\extrarowheight}{10pt}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1850}%
+$ [\textbf{a} \textbf{b} \textbf{c}]^{-1} = 
+\frac{1}{\underline{\textbf{a} \wedge \textbf{b} \wedge \textbf{c}}} 
+\begin{bmatrix}
+\underline{\textbf{b} \wedge \textbf{c}} \\
+-\underline{\textbf{a} \wedge \textbf{c}} \\
+\underline{\textbf{a} \wedge \textbf{b}}
+\end{bmatrix} $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline1852}%
+$ [\textbf{a} \textbf{b} \textbf{c} \textbf{d}]^{-1} = 
+\frac{1}{\underline{\textbf{a} \wedge \textbf{b} \wedge \textbf{c} \wedge \textbf{d}}} 
+\begin{bmatrix}
+\underline{\textbf{b} \wedge \textbf{c} \wedge \textbf{d}} \\
+-\underline{\textbf{a} \wedge \textbf{c} \wedge \textbf{d}} \\
+\underline{\textbf{a} \wedge \textbf{b} \wedge \textbf{d}} \\
+-\underline{\textbf{a} \wedge \textbf{b} \wedge \textbf{c}}
+\end{bmatrix} $%
+\lthtmlindisplaymathZ
+\lthtmlcheckvsize\clearpage}
+
+
+\end{document}

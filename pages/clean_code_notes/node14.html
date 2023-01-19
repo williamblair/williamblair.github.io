@@ -1,0 +1,212 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Emergence</TITLE>
+<META NAME="description" CONTENT="Emergence">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="main.css">
+
+<LINK REL="next" HREF="node15.html">
+<LINK REL="previous" HREF="node13.html">
+<LINK REL="up" HREF="main.html">
+<LINK REL="next" HREF="node15.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html210"
+  HREF="node15.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="next.png"></A> 
+<A NAME="tex2html208"
+  HREF="main.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="up.png"></A> 
+<A NAME="tex2html202"
+  HREF="node13.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html211"
+  HREF="node15.html">Concurrency</A>
+<B> Up:</B> <A NAME="tex2html209"
+  HREF="main.html">clean code notes</A>
+<B> Previous:</B> <A NAME="tex2html203"
+  HREF="node13.html">Systems</A>
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION000130000000000000000">
+Emergence</A>
+</H1>
+
+<P>
+Four rules of simple design - A design is "simple" if it follows these rules:
+
+<P>
+
+<OL>
+<LI>Runs all the tests
+</LI>
+<LI>Contains no duplication
+</LI>
+<LI>Expresses the intent of the programmer
+</LI>
+<LI>Minimizes the number of classes and methods
+</LI>
+</OL>
+
+<P>
+
+<UL>
+<LI>Refactoring the code - each time we add some code we should go back and check
+    if we've dirtied the existing code - if so we need to clean up/refactor.
+
+<P>
+</LI>
+<LI>No duplication - it adds additional work and complexity if you need to change something.
+    Also, lines that look very similar but differ slightly can count as duplication. Even
+    small amounts of repeated code can be cleaned:
+    <PRE>
+void scaleToOneDimension(...){
+    if (Math.abs(desiredDimension - imageDimension) &lt; errorThreshold) 
+        return;
+    float scalingFactor = ...;
+    ...
+    RenderedOp newImage = ImageUtilities.getScaledImage(image, scalingFactor,
+        scalingFactor);
+    image.dispose();
+    System.gc();
+    image = newImage;
+}
+void rotate(int degrees) {
+    RenderedOp newImage = ImageUtilities.getRotatedImage(image, degrees);
+    image.dispose();
+    System.gc();
+    image = newImage();
+}
+</PRE>
+    Could be changed to 
+    <PRE>
+void scaleToOneDimension(...) {
+    if (Math.abs(desiredDimension - imageDimension) &lt; errorThreshold) 
+        return;
+    float scalingFactor = ...;
+    ...
+    replaceImage(ImageUtilities.getScaledImage(image, scalingFactor, 
+        scalingFactor));
+}
+void rotate(int degrees) {
+    replaceImage(ImageUtilities.getRotatedImage(image, degrees));
+}
+void replaceImage(RenderedOp newImage) {
+    image.dispose();
+    System.gc();
+    image = newImage();
+}
+</PRE>
+    Additionally, the fact that we need <SPAN  CLASS="textit">replaceImage</SPAN> shows
+    we violate the single responsibility principle; so the replaceImage method
+    might be extracted into its own class.
+
+<P>
+</LI>
+<LI>The <SPAN  CLASS="textit">template method</SPAN> pattern also helps eliminate
+    duplication. For different sections of code that are largely the
+    same with minor differences, break the code up into multiple higher
+    level functions, and have different function implementations
+    in the places that differ slightly.
+
+<P>
+ex:
+
+<P>
+<PRE>
+class VacationPolicy
+{
+    public void accrueVacation() {
+        calculateBaseVacationHours();
+        alterForLegalMinimums();
+        applyToPayroll();
+    }
+    void calculateBaseVacationHours() {...}
+    abstract void alterForLegalMinimums(); // to be implemented
+    void applyToPayroll() {...}
+}
+class USVacationPolicy extends VacationPolicy
+{
+    @Override void alterForLegalMinimums() {
+        ...
+    }
+}
+class EUVacationPolicy extends VacationPolicy
+{
+    @Override void alterForLegalMinimums() {
+        ...
+    }
+}
+</PRE>
+
+<P>
+</LI>
+<LI>Expressing the intent of the programmer - Try to be careful and clear with
+your code (should be obvious what a class/function does, good names, short
+methods/classes) - basically take PRIDE in your code and have good craftsmanship
+- it should be clear that you tried and care about the code.
+
+<P>
+</LI>
+<LI>Minimal classes and methods - although the above suggests adding many, many
+classes/methods/etc. in the name of expressiveness, don't go overboard - our goal
+is to have as few methods and classes while at the same time keeping the overall
+system small.
+
+<P>
+</LI>
+</UL>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A NAME="tex2html210"
+  HREF="node15.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="next.png"></A> 
+<A NAME="tex2html208"
+  HREF="main.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="up.png"></A> 
+<A NAME="tex2html202"
+  HREF="node13.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html211"
+  HREF="node15.html">Concurrency</A>
+<B> Up:</B> <A NAME="tex2html209"
+  HREF="main.html">clean code notes</A>
+<B> Previous:</B> <A NAME="tex2html203"
+  HREF="node13.html">Systems</A></DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+bj
+2019-09-22
+</ADDRESS>
+</BODY>
+</HTML>

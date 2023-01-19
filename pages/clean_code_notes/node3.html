@@ -1,0 +1,207 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Meaningful Names</TITLE>
+<META NAME="description" CONTENT="Meaningful Names">
+<META NAME="keywords" CONTENT="main">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="main.css">
+
+<LINK REL="next" HREF="node4.html">
+<LINK REL="previous" HREF="node2.html">
+<LINK REL="up" HREF="main.html">
+<LINK REL="next" HREF="node4.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html101"
+  HREF="node4.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="next.png"></A> 
+<A NAME="tex2html99"
+  HREF="main.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="up.png"></A> 
+<A NAME="tex2html93"
+  HREF="node2.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html102"
+  HREF="node4.html">Functions</A>
+<B> Up:</B> <A NAME="tex2html100"
+  HREF="main.html">clean code notes</A>
+<B> Previous:</B> <A NAME="tex2html94"
+  HREF="node2.html">Clean Code</A>
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00030000000000000000">
+Meaningful Names</A>
+</H1>
+
+<UL>
+<LI>Use intention revealing names 
+<BR>
+example:    
+<BR>
+int d; // elapsed time in days  - BAD; 
+<BR>
+other options: 
+<BR>
+int elapsedTimeInDays; 
+<BR>
+int daysSinceCreation; 
+<BR>
+int daysSinceModification; 
+<BR>
+int fileAgeInDays; 
+<BR>        
+<BR>
+Method Example: 
+<BR>
+public List<SPAN CLASS="MATH"><IMG
+ WIDTH="16" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img1.png"
+ ALT="$&lt;$"></SPAN>int[]<SPAN CLASS="MATH"><IMG
+ WIDTH="16" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img2.png"
+ ALT="$&gt;$"></SPAN> getThem() vs. 
+        public List<SPAN CLASS="MATH"><IMG
+ WIDTH="16" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img1.png"
+ ALT="$&lt;$"></SPAN>int[]<SPAN CLASS="MATH"><IMG
+ WIDTH="16" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img2.png"
+ ALT="$&gt;$"></SPAN> getFlaggedCells() 
+<BR>
+List<SPAN CLASS="MATH"><IMG
+ WIDTH="16" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img1.png"
+ ALT="$&lt;$"></SPAN>int[]<SPAN CLASS="MATH"><IMG
+ WIDTH="16" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img2.png"
+ ALT="$&gt;$"></SPAN> list1  vs List<SPAN CLASS="MATH"><IMG
+ WIDTH="16" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img1.png"
+ ALT="$&lt;$"></SPAN>int[]<SPAN CLASS="MATH"><IMG
+ WIDTH="16" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img2.png"
+ ALT="$&gt;$"></SPAN> flaggedCells 
+<BR>
+if (cell[0] == 4) vs if (cell[STATUS_VALUE] == FLAGGED) 
+<BR>        
+<BR>
+even better: 
+<BR>
+List<SPAN CLASS="MATH"><IMG
+ WIDTH="16" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img1.png"
+ ALT="$&lt;$"></SPAN>Cell<SPAN CLASS="MATH"><IMG
+ WIDTH="16" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img2.png"
+ ALT="$&gt;$"></SPAN> flaggedCells = new ArrayList<SPAN CLASS="MATH"><IMG
+ WIDTH="16" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img1.png"
+ ALT="$&lt;$"></SPAN>Cell<SPAN CLASS="MATH"><IMG
+ WIDTH="16" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img2.png"
+ ALT="$&gt;$"></SPAN>(); 
+<BR>
+if (cell.isFlagged()) flaggedCells.add(cell);
+
+<P>
+</LI>
+<LI>Avoid words whose "entrenched" meaning vary from the intended meaning
+</LI>
+<LI>avoid multiple names which vary in tiny/small ways (XYZControllerHandlingStrings vs
+    XYZControllerStorageStrings)
+</LI>
+<LI>avoid numeric variables (a1[i] = a1[i] vs. destination[i] = source[i])
+</LI>
+<LI>use pronounceable names (Date genymdhms vs. generationTimestamp)
+</LI>
+<LI>use searchable names 
+<BR>
+the length of a name should correspond to the size of its scope
+</LI>
+<LI>avoid encodings  
+<BR>
+encoding type or scope information to names adds extra burden of deciphering
+            (e.g. hungarian notation, member prefixes (your class should be small enough
+            that you dont need them!))
+</LI>
+<LI>interfaces and implementations 
+<BR>
+use ClassType -<SPAN CLASS="MATH"><IMG
+ WIDTH="16" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img2.png"
+ ALT="$&gt;$"></SPAN> ClassTypeImpl instead of IClassType -<SPAN CLASS="MATH"><IMG
+ WIDTH="16" HEIGHT="29" ALIGN="MIDDLE" BORDER="0"
+ SRC="img2.png"
+ ALT="$&gt;$"></SPAN> ClassType 
+<BR></LI>
+<LI>avoid mental mapping 
+<BR>        <SPAN  CLASS="textit">clarity is king!</SPAN>
+</LI>
+<LI>class names should be a noun (since they are an object, after all)
+</LI>
+<LI>methods should have a verb or verb phrase names, and use getThing, setThing, isStatus
+    (accessors, mutators, and predicates)
+</LI>
+<LI>use one word per concept (e.g. dont have three <SPAN  CLASS="textit">fetch</SPAN>, <SPAN  CLASS="textit">retrieve</SPAN>, <SPAN  CLASS="textit">get</SPAN> or
+    <SPAN  CLASS="textit">controller</SPAN>, <SPAN  CLASS="textit">manager</SPAN>, <SPAN  CLASS="textit">driver</SPAN>)
+</LI>
+<LI>add meaningful context (e.g. it should be clear what a variable applies to based on its namespace/
+    class its a part of etc.)
+</LI>
+</UL>
+
+<P>
+Our goal is to make the code as easy as possible to understand
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A NAME="tex2html101"
+  HREF="node4.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="next.png"></A> 
+<A NAME="tex2html99"
+  HREF="main.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="up.png"></A> 
+<A NAME="tex2html93"
+  HREF="node2.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html102"
+  HREF="node4.html">Functions</A>
+<B> Up:</B> <A NAME="tex2html100"
+  HREF="main.html">clean code notes</A>
+<B> Previous:</B> <A NAME="tex2html94"
+  HREF="node2.html">Clean Code</A></DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+bj
+2019-09-22
+</ADDRESS>
+</BODY>
+</HTML>
