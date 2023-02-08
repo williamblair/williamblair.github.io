@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Test</title>
+
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+        body {
+            background-color: #404040;
+        }
+        #containerDiv {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        canvas {
+            border: 1px solid #000000;
+        }
+    </style>
+
+    <script src="./Math.js"></script>
+    <script src="./Transform.js"></script>
+    <script src="./Camera.js"></script>
+    <script src="./Shader.js"></script>
+    <script src="./ShaderExtras.js"></script>
+    <script src="./RenderLoop.js"></script>
+    <script src="./Model.js"></script>
+    <script src="./Primitives.js"></script>
+    <script src="./GLUtil.js"></script>
+    <script src="./ObjLoader.js"></script>
+    <script src="./Debug.js"></script>
+    <script src="./GridFloor.js"></script>
+    <script src="./Resources.js"></script>
+    <script src="./Terrain.js"></script>
+    <script src="./Perlin.js"></script>
+    <script src="./main.js"></script>
+
+
+</head>
+<body onload="main()">
+
+<div id="containerDiv">
+<canvas id="mycanvas"></canvas><br/>
+<p>Click/Drag to orbit camera</p>
+</div>
+
+<script id="vertexShader" type="x-shader/x-vertex">#version 300 es
+in vec4 aPosition;
+in vec3 aNorm;
+in vec2 aUv;
+
+uniform mat4 uPMatrix;
+uniform mat4 uMVMatrix;
+uniform mat4 uCameraMatrix;
+
+out highp vec2 vUV;
+out highp vec3 posWorld;
+//out float diffuseAngle;
+
+const vec3 posLight = vec3(4.0, 3.0, 2.0);
+
+void main() {
+
+    //diffuseAngle = max(dot(aNorm, normalize(posLight - aPosition.xyz)), 0.0);
+    posWorld = (uMVMatrix * vec4(aPosition.xyz, 1.0)).xyz;
+
+    vUV = aUv;
+    gl_PointSize = 8.0;
+    gl_Position = uPMatrix *
+        uCameraMatrix *
+        uMVMatrix *
+        vec4(aPosition.xyz, 1.0);
+}
+</script>
+
+<script id="fragmentShader" type="x-shader/x-fragment">#version 300 es
+precision mediump float;
+
+in highp vec2 vUV;
+//in float diffuseAngle;
+in highp vec3 posWorld;
+out vec4 outColor;
+
+const vec3 posLight = vec3(4.0, 3.0, 2.0);
+const vec3 lightColor = vec3(0.0, 1.0, 0.0);
+const vec3 baseColor = vec3(1.0, 0.0, 0.0);
+
+void main() {
+
+    vec3 genNorm = normalize(cross(dFdx(posWorld), dFdy(posWorld))); // calc new normals based on world pos
+    float diffAngle = max(dot(genNorm, normalize(posLight - posWorld)), 0.0); // line angle
+    outColor = vec4(baseColor + lightColor * diffAngle, 1.0);
+
+    //vec3 finalColor = lightColor * diffuseAngle + baseColor;
+    //outColor = vec4(finalColor, 1.0);
+}
+</script>
+
+</body>
+</html>

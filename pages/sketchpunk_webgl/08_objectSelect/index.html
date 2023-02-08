@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <title>Test</title>
+
+  <style>
+    html, body {
+      margin: 0px;
+      padding: 0px;
+      width: 100%;
+      height: 100%;
+    }
+    body {
+      background-color: #404040;
+    }
+    canvas {
+      border: 0px solid black;
+    }
+    div {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      align-items: center;
+      justify-content: center;
+    }
+    #labelFps {
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      background: gray;
+      color: white;
+      font-weight: bold;
+      padding: 5px 5px;
+      width: 40px;
+      text-align: center;
+      font-family: arial;
+      font-size: 13px;
+    }
+    #directions {
+      position:absolute;;
+      top: 25px;
+      left: 0px;
+      background: grey;
+      color: white;
+      font-weight: bold;
+      padding: 5px 5px;
+      width: 100px;
+      text-align: center;
+      font-family: arial;
+      font-size: 13px;
+    }
+  </style>
+
+  <script src="./fungi.core.js"></script>
+  <script src="./fungi.primatives.js"></script>
+  <script src="./fungi.CameraMouseCtrl.js"></script>
+  <script src="./fungi.debug.js"></script>
+
+  <script>
+    var gCamera, gCameraCtrl, gRenderList, gRLoop, gDebugLine, gGridFloor, gShader, gModel;
+    var gLblFPS;
+
+    var fbo, cID = 100, colorID, blankID;
+
+    window.addEventListener("load", function() {
+
+      colorID = idToColor(cID);
+      blankID = idToColor(0);
+
+      // setup
+      Fungi.Init("FungiCanvas")
+        .fClearColor("FFFFFF")
+        .fFitScreen(1,1)
+        .fClear();
+
+      Fungi.Render.onItemRendered = function(itm) {
+        if (itm == gGridFloor) return;
+
+        // only render to FBO when mouse is down
+        gShader.setUniforms("uColorID", colorID);
+          Fungi.Shaders.FBO.activate(fbo);
+            itm.draw();
+          Fungi.Shaders.FBO.deactivate();
+        gShader.setUniforms("uColorID", blankID);
+      }
+
+      fbo = Fungi.Shaders.FBO.colorDepthFBO("picking");
+
+      // Camera
+      var uboTransform = Fungi.Shaders.UBO.createTransformUBO();
+      gCamera = new Fungi.CameraOrbit().setPosition(0.0, 0.5, 5.0)
+        .setEulerDegrees(-15, 45, 0);
+      //gCameraCtrl = new Fungi.CameraMouseCtrl(gCamera);
+      gCameraCtrl = new Fungi.KBMCtrl()
+        .addHandler("camera", new Fungi.KBMCtrl_Viewport(gCamera), true)
+        .addHandler("pick", new KBMCtrl_Picking())
+        .setDownOverride(function(e, ctrl, x, y) {
+          var yi = Fungi.gl.fHeight - y; // inverted y; flip y
+          var pixel = Fungi.Shaders.FBO.readPixel(fbo, x, yi);
+          var id = colorToID(pixel);
+
+          if (id === 0 || id === 16777215) return; // ignore black and white
+
+          // if selected a valid id, switch to the pick handler
+          ctrl.switchHandler("pick");
+        });
+
+      // Shaders and materials
+      gShader = Fungi.Shaders.New("DomShader", "vertexShader", "fragmentShader")
+        .prepareUniforms(
+          Fungi.UNI_MODEL_MAT_NAME, "mat4",
+          "uColorID", "vec3"
+        ).prepareUniformBlocks(uboTransform, 0);
+      var mat = Fungi.Shaders.Material.create("MatDomShader", "DomShader");
+      mat.useCulling = false;
+
+      // prepare renderables
+      gModel = new Fungi.Renderable(
+        Fungi.Primatives.FacedCube(),
+        "MatDomShader"
+      ).setPosition(0.0, 0.5, 0.0);
+
+      gGridFloor = Fungi.Debug.GridFloor.getRenderable();
+
+      gRenderList = [
+        gGridFloor,
+        gModel
+      ];
+
+      // create and start render loop
+      gRLoop = new Fungi.RenderLoop(onRender).start();
+
+      gLblFPS = document.getElementById("labelFps");
+      setInterval(function(){ gLblFPS.innerHTML = gRLoop.fps; }, 200);
+    });
+
+    function onRender(dt) {
+      gCamera.update();
+
+      Fungi.gl.fClear();
+      Fungi.Render(gRenderList);
+    }
+
+    function colorToID(a) {
+      return a[0] | (a[1] << 8) | (a[2] << 16);
+    }
+    function idToColor(v) {
+      var a = new Float32Array(3);
+      a[0] = ((v >> 0) & 0xFF) / 255.0;
+      a[1] = ((v >> 8) & 0xFF) / 255.0;
+      a[2] = ((v >> 16) & 0xFF) / 255.0;
+      return a;
+    }
+
+    class KBMCtrl_Picking {
+      constructor() { this.rate = 0.007; }
+      // return to normal camera control once released mouse
+      onMouseUp(e, ctrl, x, y, dx, dy) { ctrl.switchHandler("camera"); }
+
+      // move the selected object
+      onMouseMove(e, ctrl, xx, yy, dx, dy) {
+        var v = [0,0,0];
+        gModel.position.add(gCamera.left(v, dx*this.rate))
+          .add(gCamera.up(v, -dy*this.rate));
+      }
+    }
+  </script>
+
+</head>
+<body>
+
+<div>
+  <canvas id="FungiCanvas"></canvas>
+  <p>Click and drag the object to move it</p>
+</div>
+<span id="labelFps">0</span>
+<span id="directions">Click and drag the cube to move it around</span>
+
+<script id="vertexShader" type="x-shader/x-vertex">#version 300 es
+layout(location=0) in vec4 a_position;
+layout(location=1) in vec3 a_norm;
+layout(location=2) in vec2 a_uv;
+
+uniform UBOTransform {
+  mat4 matProjection;
+  mat4 matCameraView;
+};
+
+uniform mat4 uModelMatrix;
+uniform mat3 uNormalMatrix;
+
+const vec3 blankColorID = vec3(0.0, 0.0, 0.0);
+uniform vec3 uColorID;
+
+out highp vec2 vUV;
+out lowp vec3 color;
+
+void main() {
+  if (uColorID != blankColorID) color = uColorID;
+  else if (a_position.w == 0.0) color = vec3(1.0, 0.0, 0.0);
+  else if (a_position.w == 1.0) color = vec3(0.0, 1.0, 0.0);
+  else                          color = vec3(0.6, 0.6, 0.6);
+
+  vUV = a_uv;
+  gl_Position = matProjection *
+    matCameraView *
+    uModelMatrix *
+    vec4(a_position.xyz, 1.0);
+}
+</script>
+
+<script id="fragmentShader" type="x-shader/x-fragment">#version 300 es
+precision mediump float;
+
+in highp vec2 vUV;
+in lowp vec3 color;
+out vec4 outColor;
+
+void main() {
+  outColor = vec4(color, 1.0);
+}
+</script>
+
+</body>
+</html>

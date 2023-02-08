@@ -1,0 +1,473 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>WebGL</title>
+
+  <script src="./gl-matrix-min.js"></script>
+
+  <style>
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0px;
+      padding: 0px;
+    }
+    #canvasDiv {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        align-items: center;
+        justify-content: center;
+    }
+    canvas {
+        width: 100%;
+        height: 100%;
+        margin: 0px;
+    }
+  </style>
+
+</head>
+<body onload="main()">
+
+<div id="fpsDiv" style="position: absolute; top: 10px; left: 10px; color:white; background-color:blue;">
+  <span id="fpsSpan">FPS</span>
+</div>
+<div id="fovSliderDiv" style="position: absolute; top: 50px; left: 10px;">
+  <input id="fovSlider" type="range" min="10.0" max="90.0" value="45.0" class="slider" onchange="handleFovSlider(this.value)"/>
+  <label for="fovSlider" id="fovLabel">FOV: 45.0</label>
+</div>
+
+<img id="MonkeyDiffuse" src="./models/MonkeyDiffuse.jpg" style="display:none;"/>
+<img id="ZombieDiffuse" src="./models/ZombieDiffuse.png" style="display:none;"/>
+
+<img id="cube01Right" src="./images/grimmnight_right.png" style="display:none;"/>
+<img id="cube01Left" src="./images/grimmnight_left.png" style="display:none;"/>
+<img id="cube01Top" src="./images/grimmnight_top.png" style="display:none;"/>
+<img id="cube01Bottom" src="./images/grimmnight_bottom.png" style="display:none;"/>
+<img id="cube01Back" src="./images/grimmnight_back.png" style="display:none;"/>
+<img id="cube01Front" src="./images/grimmnight_front.png" style="display:none;"/>
+
+<div id="canvasDiv">
+<canvas id="myCanvas"></canvas>
+</div>
+
+<script src="./Debug.js"></script>
+<script src="./Renderer.js"></script>
+<script src="./LoopTimer.js"></script>
+<script src="./Shader.js"></script>
+<script src="./Material.js"></script>
+<script src="./Texture.js"></script>
+<script src="./Mesh.js"></script>
+<script src="./JSONMesh.js"></script>
+<script src="./GLTFMesh.js"></script>
+<script src="./SkyMap.js"></script>
+<script src="./FPSCamera.js"></script>
+<script src="./OrbitCamera.js"></script>
+<script src="./PositionLight.js"></script>
+<script src="./IqmMesh.js"></script>
+
+<!-- data array -->
+<script src="./models/zombie.iqm.js"></script>
+
+<script>
+// global vars
+var render = null;
+var timer = null;
+var shader = null;
+var skyMapShader = null;
+var camera = null;
+var posLight = null;
+
+var testJsMesh = null;
+var testGltfMesh = null;
+var identMat = null;
+var testTexture = null;
+var testSkyMap = null;
+
+class Zombie {
+    constructor(gl, dataArr) {
+        this.iqmMesh = new IqmMesh(gl, dataArr);
+        this.animTimer = 0.0;
+        
+        this.position = vec3.fromValues(0.0, 0.0, 0.0);
+        this.scale = vec3.fromValues(0.25, 0.25, 0.25);        
+        this.pitch = -90.0;
+        this.yaw = 180.0;
+        
+        this.modelMat = mat4.create();
+        this.UpdateModelMat();
+    }
+    
+    Update(dt) {
+        // 30 fps
+        this.animTimer += dt * 30.0;
+        while (this.animTimer >= this.iqmMesh.numFrames) {
+            this.animTimer -= this.iqmMesh.numFrames;
+        }
+        this.iqmMesh.Animate(this.animTimer);
+    }
+    
+    UpdateModelMat() {
+        mat4.identity(this.modelMat);
+        // scale
+        mat4.scale(
+            this.modelMat,
+            this.modelMat,
+            this.scale
+        );
+        // yaw rotation
+        mat4.rotate(
+            this.modelMat,
+            this.modelMat,
+            this.yaw * Math.PI / 180.0,
+            vec3.fromValues(0.0, 1.0, 0.0)
+        );
+        // pitch rotation
+        mat4.rotate(
+            this.modelMat,
+            this.modelMat,
+            this.pitch * Math.PI / 180.0,
+            vec3.fromValues(1.0, 0.0, 0.0)
+        );
+        // translation
+        mat4.translate(
+            this.modelMat,
+            this.modelMat,
+            this.position
+        );
+    }
+};
+var zombie = null;
+
+
+function drawSkyMap() {
+    skyMapShader.Use();
+    testSkyMap.Use();
+    testSkyMap.SetUniforms(
+        skyMapShader,
+        render.perspectiveMatrix,
+        camera.viewMatrix
+    );
+    render.DrawMesh(testSkyMap.mesh);
+}
+
+function drawTestMesh() {
+    shader.Use();
+
+    shader.SetMatrixUniform(
+        Shader.VIEW_MAT_UNIFORM,
+        camera.viewMatrix
+    );
+    shader.SetMatrixUniform(
+        Shader.PERSPECTIVE_MAT_UNIFORM,
+        render.perspectiveMatrix
+    );
+    shader.SetMatrixUniform(
+        Shader.MODEL_MAT_UNIFORM,
+        /*identMat*/zombie.modelMat
+    );
+    posLight.SetUniforms(shader);
+    testTexture.Use();
+    testTexture.SetUniforms(shader);
+    
+    zombie.iqmMesh.material.SetUniforms(shader);
+
+    //render.DrawMesh(testJsMesh);
+    //render.DrawMesh(testGltfMesh);
+    render.DrawMesh(zombie.iqmMesh);
+}
+
+function mainLoop() {
+
+    camera.Update(timer.dt / 1000.0);
+    zombie.Update(timer.dt / 1000.0);
+    timer.Update();
+
+    render.BeginFrame();
+        drawSkyMap()
+        drawTestMesh();
+    render.EndFrame();
+
+    window.requestAnimationFrame(mainLoop);
+}
+
+function main() {
+    render = new Renderer("myCanvas");
+    render.SetClearColor([0.0, 0.5, 0.5]);
+
+    timer = new LoopTimer("fpsSpan");
+
+    shader = new Shader(
+        render.gl,
+        document.getElementById("vertexShader").text,
+        document.getElementById("fragmentShader").text
+    );
+    skyMapShader = new Shader(
+        render.gl,
+        document.getElementById("skyVertexShader").text,
+        document.getElementById("skyFragmentShader").text,
+    );
+
+    shader.Use();
+
+    //camera = new FPSCamera();
+    camera = new OrbitCamera();
+    //camera.Update(1.0/60.0);
+
+    identMat = mat4.create();
+    mat4.identity(identMat);
+
+
+    posLight = new PositionLight(
+        [0.0, 10.0, 10.0], // position
+        [0.2, 0.2, 0.2], // ambient
+        [1.0, 1.0, 1.0], // diffuse
+        [1.0, 1.0, 1.0] // specular
+    );
+
+    //testTexture = new Texture(render.gl, "MonkeyDiffuse");
+    testTexture = new Texture(render.gl, "ZombieDiffuse", false);
+
+    testSkyMap = new SkyMap(
+        render.gl,
+        "cube01Right",
+        "cube01Left",
+        "cube01Top",
+        "cube01Bottom",
+        "cube01Back",
+        "cube01Front"
+    );
+    
+    // gl matrix 2.2.0 doesn't have these functions
+    mat4.multiplyScalar = function(res, mat, s) {
+        res[0] = mat[0] * s;
+        res[1] = mat[1] * s;
+        res[2] = mat[2] * s;
+        res[3] = mat[3] * s;
+        res[4] = mat[4] * s;
+        res[5] = mat[5] * s;
+        res[6] = mat[6] * s;
+        res[7] = mat[7] * s;
+        res[8] = mat[8] * s;
+        res[9] = mat[9] * s;
+        res[10] = mat[10] * s;
+        res[11] = mat[11] * s;
+        res[12] = mat[12] * s;
+        res[13] = mat[13] * s;
+        res[14] = mat[14] * s;
+        res[15] = mat[15] * s;
+    }
+    mat4.add = function(res, mat1, mat2) {
+        res[0] = mat1[0] + mat2[0];
+        res[1] = mat1[1] + mat2[1];
+        res[2] = mat1[2] + mat2[2];
+        res[3] = mat1[3] + mat2[3];
+        res[4] = mat1[4] + mat2[4];
+        res[5] = mat1[5] + mat2[5];
+        res[6] = mat1[6] + mat2[6];
+        res[7] = mat1[7] + mat2[7];
+        res[8] = mat1[8] + mat2[8];
+        res[9] = mat1[9] + mat2[9];
+        res[10] = mat1[10] + mat2[10];
+        res[11] = mat1[11] + mat2[11];
+        res[12] = mat1[12] + mat2[12];
+        res[13] = mat1[13] + mat2[13];
+        res[14] = mat1[14] + mat2[14];
+        res[15] = mat1[15] + mat2[15];
+    }
+    //zombieIqmMesh = new IqmMesh(render.gl, zombie_iqm);
+    //zombieIqmMesh.Animate(0.0);
+    zombie = new Zombie(render.gl, zombie_iqm);
+    zombie.Update(0.0);
+
+    // wait until server assets loaded before starting render loop
+    //getJSON("./models/Cube.json", assetsLoaded);
+    //getJSON("./models/Monkey.json", monkeyLoaded);
+    //getJSON("./models/Woman.gltf", gltfLoaded);
+    mainLoop();
+}
+
+function monkeyLoaded(err, data) {
+    if (err != null) {
+        console.log(err);
+        Debug.Error("Failed to load asset:" + err);
+        return;
+    }
+    testJsMesh = new JSONMesh(render.gl, data);
+    testJsMesh.material.SetUniforms(shader);
+
+    getJSON("./models/Woman.gltf", gltfLoaded);
+}
+function gltfLoaded(err, data) {
+    if (err != null) {
+        console.log(err);
+        Debug.Error("Failed to load gltf: " + err);
+        return;
+    }
+    testGltfMesh = new GLTFMesh(render.gl, data, 0.5);
+
+    // start rendering
+    mainLoop();
+}
+
+function handleFovSlider(fovDegrees) {
+    mat4.perspective(
+        render.perspectiveMatrix,
+        fovDegrees * Math.PI / 180.0,
+        render.canvas.width / render.canvas.height,
+        1.0,
+        1000.0
+    );
+    shader.SetMatrixUniform(
+        Shader.PERSPECTIVE_MAT_UNIFORM,
+        render.perspectiveMatrix
+    );
+    document.getElementById("fovLabel").innerHTML = "FOV: " + fovDegrees;
+}
+/* https://stackoverflow.com/questions/12460378/how-to-get-json-from-url-in-javascript */
+function getJSON(url, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.responseType = 'json';
+    xhr.onload = function() {
+        var status = xhr.status;
+        if (status === 200) {
+            callback(null, xhr.response);
+        }
+        else {
+            callback(status, xhr.response);
+        }
+    }
+    xhr.send();
+}
+</script>
+
+<script id="vertexShader" type="x-shader/x-vertex">#version 300 es
+layout(location = 0) in vec3 aPosition;
+layout(location = 1) in vec3 aNormal;
+layout(location = 2) in vec2 aTexCoord;
+
+uniform mat4 uPerspectiveMatrix;
+uniform mat4 uViewMatrix;
+uniform mat4 uModelMatrix;
+
+uniform vec3 uLightPosition;
+
+out vec3 vNormal;
+out vec3 vLightRay;
+out vec3 vEyeVec;
+out vec2 vTexCoord;
+
+void calcLighting() {
+
+    mat4 modelView = uViewMatrix * uModelMatrix;
+
+    // view space vertex pos and light pos
+    vec4 vertex = modelView * vec4(aPosition, 1.0);
+    vec4 light = modelView * vec4(uLightPosition, 1.0);
+
+    vLightRay = vertex.xyz - light.xyz;
+    vEyeVec = -vec3(vertex.xyz);
+
+    // transformed normal
+    mat4 uNormalMatrix = transpose(inverse(modelView));
+    vNormal = vec3(uNormalMatrix * vec4(aNormal, 1.0));
+}
+
+void main() {
+
+    calcLighting();
+
+    vTexCoord = aTexCoord;
+    gl_Position = uPerspectiveMatrix *
+                  uViewMatrix *
+                  uModelMatrix *
+                  vec4(aPosition, 1.0);
+}
+</script>
+
+<script id="fragmentShader" type="x-shader/x-fragment">#version 300 es
+precision mediump float;
+
+uniform vec3 uLightAmbient;
+uniform vec3 uLightDiffuse;
+uniform vec3 uLightSpecular;
+
+uniform vec3 uMaterialAmbient;
+uniform vec3 uMaterialDiffuse;
+uniform vec3 uMaterialSpecular;
+uniform float uMaterialShininess;
+
+uniform sampler2D uTexture;
+
+in vec3 vNormal;
+in vec3 vLightRay;
+in vec3 vEyeVec;
+in vec2 vTexCoord;
+
+vec4 calcBlinnPhong() {
+    vec3 L = normalize(vLightRay);
+    vec3 N = normalize(vNormal);
+
+    // Lambert's cosine law
+    float lambertTerm = dot(N,-L);
+
+    // ambient term, diffuse, specular terms
+    vec3 Ia = uLightAmbient * uMaterialAmbient;
+    vec3 Id = vec3(0.0, 0.0, 0.0);
+    vec3 Is = vec3(0.0, 0.0, 0.0);
+
+    if (lambertTerm > 0.0)
+    {
+        Id = uLightDiffuse *
+             texture(uTexture, vTexCoord).xyz *
+             uMaterialDiffuse *
+             lambertTerm;
+        vec3 E = normalize(vEyeVec);
+        vec3 R = reflect(L,N);
+        float specular = pow(max(dot(R,E),0.0), uMaterialShininess);
+        Is = uLightSpecular * uMaterialSpecular * specular;
+    }
+
+    vec4 finalColor = vec4(Ia + Id + Is, 1.0);
+    return finalColor;
+}
+
+out vec4 outColor;
+void main() {
+    //outColor = vec4(1.0, 0.0, 0.0, 1.0);
+    outColor = calcBlinnPhong();
+}
+</script>
+
+<script id="skyVertexShader" type="x-shader/x-vertex">#version 300 es
+layout(location = 0) in vec3 aPosition;
+
+uniform mat4 uPerspectiveMatrix;
+uniform mat4 uViewMatrix;
+
+out highp vec3 vTexCoord;
+
+void main() {
+    vTexCoord = aPosition.xyz;
+    gl_Position = uPerspectiveMatrix *
+                  uViewMatrix *
+                  vec4(aPosition.xyz, 1.0);
+}
+</script>
+
+<script id="skyFragmentShader" type="x-shader/x-fragment">#version 300 es
+precision mediump float;
+
+uniform samplerCube uCubeTexture;
+
+in highp vec3 vTexCoord;
+out vec4 outColor;
+void main() {
+    outColor = texture(uCubeTexture, vTexCoord);
+}
+</script>
+
+</body>
+</html>

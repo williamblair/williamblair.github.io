@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Test</title>
+
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+        body {
+            background-color: #404040;
+        }
+        #containerDiv {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        canvas {
+            border: 1px solid #000000;
+        }
+    </style>
+
+    <script src="./Math.js"></script>
+    <script src="./Transform.js"></script>
+    <script src="./Camera.js"></script>
+    <script src="./Shader.js"></script>
+    <script src="./ShaderExtras.js"></script>
+    <script src="./RenderLoop.js"></script>
+    <script src="./Model.js"></script>
+    <script src="./Primitives.js"></script>
+    <script src="./GLUtil.js"></script>
+    <script src="./ObjLoader.js"></script>
+    <script src="./Debug.js"></script>
+    <script src="./GridFloor.js"></script>
+    <script src="./Resources.js"></script>
+    <script src="./main.js"></script>
+
+    
+</head>
+<body onload="main()">
+
+<div id="containerDiv">
+<canvas id="mycanvas"></canvas><br/>
+<p>Click/Drag to orbit camera</p>
+</div>
+
+<div id="videoDiv">
+</div>
+
+<script id="vertexShader" type="x-shader/x-vertex">#version 300 es
+in vec4 aPosition;
+in vec3 aNorm;
+in vec2 aUv;
+
+uniform mat4 uPMatrix;
+uniform mat4 uMVMatrix;
+uniform mat4 uCameraMatrix;
+
+out highp vec2 vUV;
+
+void main() {
+    vUV = aUv;
+    gl_Position = uPMatrix * uCameraMatrix * uMVMatrix * vec4(aPosition.xyz, 1.0);
+}
+</script>
+
+<script id="fragmentShader" type="x-shader/x-fragment">#version 300 es
+precision mediump float;
+
+uniform sampler2D uTex;
+
+in highp vec2 vUV;
+out vec4 outColor;
+
+void main() {
+    outColor = texture(uTex, vUV);
+}
+</script>
+
+</body>
+</html>
+
