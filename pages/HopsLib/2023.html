@@ -81,6 +81,16 @@ detections.</p>
     <source src="./images/raycast_02_18_2023.webm" type="video/webm"/>
 </video>
 
+<h3>02/20/2023</h3>
+<p>Continue physics chapter 13. Frustum from view,projection matrices and sphere-frustum collision detection working.
+Referenced "Fast Extraction of Viewing Frustum Planes from the World-View-Projection Matrix" by Gribb and Hartmann:
+<a href="http://www.cs.otago.ac.nz/postgrads/alexis/planeExtraction.pdf">http://www.cs.otago.ac.nz/postgrads/alexis/planeExtraction.pdf</a>.
+The book code didn't work with my current code, presumably due to handed-ness and matrix orientation. Testing video below; the floor
+becomes dark if the sphere is outside of the view frustum, and light if the sphere is inside of the view frustum:</p>
+
+<video controls>
+    <source src="./images/sphereinfrustum_02_20_2023.webm" type="video/webm"/>
+</video>
 
 <ul>
 <li><a href="./index.html">&lt;-- Back to HopsLib</li>
