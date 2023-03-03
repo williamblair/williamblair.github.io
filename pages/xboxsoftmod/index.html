@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>BJ's Website</title>
+    <link href="https://unpkg.com/@fortawesome/fontawesome-free@5.13.0/css/all.css" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="../../bulmaswatch.bjsite.min.css"/>
+    
+    <style>
+        ol, li {
+            list-style-position: inside;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+        ul {
+            list-style-type: disc;
+        }
+    </style>
+</head>
+<body>
+    <section style="margin:10px;">
+        <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
+            <div id="navbarBasicExample" class="navbar-menu is-active">
+                <div class="navbar-start">
+                    <a href="../../index.html" class="navbar-item"><strong>BJ's Website</strong></a>
+                    <a href="../../general.html" class="navbar-item">General</a>
+                    <a href="../../programming.html" class="navbar-item">Programming</a>
+                    <a href="../../school.html" class="navbar-item">School</a>
+                    <a href="../../books.html" class="navbar-item">Books</a>
+                    <a href="../../tech.html" class="navbar-item">Tech</a>
+                </div>
+                <div class="navbar-end">
+                    <a href="https://github.com/williamblair" class="navbar-item"><span class="icon"><i class="fab fa-github"></i></span><span>Github</span></a>
+                    <a href="https://bitbucket.org/williamblair" class="navbar-item"><span class="icon"><i class="fab fa-bitbucket"></i></span>Bitbucket</a>
+                </div>
+            </div>
+        </nav>
+    </section>
+    <section class="section">
+        <div class="container">
+
+<h1 class="title">Original XBOX Softmod Install</h1>
+
+<p>Picked up an OG Xbox from Game Craze and am looking into creating homebrew for it using
+<a href="https://github.com/XboxDev/nxdk">nxdk</a>. I followed a video to install the
+<a href="https://github.com/Rocky5/Xbox-Softmodding-Tool">Rocky5 Softmod</a> from MrMario2011 on YouTube:
+<a href="https://www.youtube.com/watch?v=lW6QsGXTrFQ">https://www.youtube.com/watch?v=lW6QsGXTrFQ</a>.
+This one took a while as I hit some roadblocks and had to wait to order stuff:
+</p>
+
+<ol class="list has-background-dark" style="margin-top:20px;">
+<li>Plug flash drive into Xbox-controller adapter</li>
+<li>Turn on XBOX</li>
+<li>Should see message that the flash drive was erased
+    <img src="./images/20230121_173055.jpg"/>
+</li>
+<li>Go into "memory" and you should see the flash drive
+    <img src="./images/20230121_173254.jpg"/>
+</li>
+<li>Unplug the flash drive from the xbox &amp; plug it back into computer
+    <ul><li>Do NOT format disk when prompted</li></ul>
+</li>
+<li>Unzip rocky 5 xbox softmodding tool</li>
+<li>Unzip "Xbox Softmodding Tool.zip"</li>
+<li>Enter "Softmod Package" dir</li>
+<li>"Extract Here" on the mod matching the game you're using (I'm using 007 agent under fire)
+    <ul><li>should see "UDATA" folder</li></ul>
+</li>
+<li>"Extract Here" on the "Softmod Save" zip</li>
+<li>Extract &amp; Open Xplorer360</li>
+<li>Click "Drive" -> "Open" -> "Hardrive or Memcard"</li>
+<li>Drag and drop the folders in UDATA into the window</li></li>
+<li>Click "Drive" -> "Close" then "Drive" -> "Exit"</li>
+<li>Safe Eject the flash drive &amp; remove from pc</li>
+<li>Plug flash drive back into xbox
+    <ul>
+        <li>Original flash drived I used didn't work (Xbox didn't recognize it after plugging it back in)</li>
+        <li>Fixed by switching to a 2GB Sandisk drive</li>
+    </ul>
+</li>
+<li>Using the Xbox, copy the saves from the flash drive to the internal hard drive<br/>
+    <img src="./images/20230225_151634.jpg"/>
+</li>
+<li>Boot the game you're using and load the save from the hard drive
+    <ul>
+        <li>007 Agent Under Fire didn't work for me (it gave a blank screen after loading)</li>
+        <li>After re-watching the video, I think I might have skipped a step needed before loading the save</li>
+        <li>Ended up using Splinter Cell instead</li>
+    </ul>
+</li>
+<li>Load the harddrive copied save after booting splinter cell</li>
+<li>brings you to softmod tool screen, press a to run the softmod process<br/>
+    <img src="./images/20230302_175722.jpg"/>
+</li>
+<li>during process, need to reboot then remove disk as soon as reboots</li>
+<li>should bring you to softmodded console main menu</li>
+<li>changed skin theme to default</li>
+<li>clear hard-drive key:
+    <ul>
+        <li>open nkpatcher settings</li>
+        <li>go to EEPROM-&gt;advanced features-&gt;Hard Drive-&gt;null key</li>
+        <li><img src="./images/20230302_180841.jpg"/></li>
+        <li><img src="./images/20230302_180933.jpg"/></li>
+    </ul>
+</li>
+<li>copy/backup EEPROM data:
+    <ul>
+        <li>ftp to XBOX IP with username/pass xbox,xbox<br/>
+            <img src="./images/xbox_ftp_home.png"/>
+        </li>
+        <li>Copy /E/Backups/EEPROM to computer</li>
+        <li>gives EEPROM folder with eeprom.bin, eeprom.cfg, eeprom_original.bin, xbox info.txt<br/>
+            <img src="./images/xbox_eeprom_backup.png"/>
+        </li>
+    </ul>
+</li>
+</ol>
+
+<p>To run compiled homebrew on the Xbox, you do the following:</p>
+
+<ol class="list has-background-dark" style="margin-top:10px;">
+    <li>FTP to xbox</li>
+    <li>Make a folder called 'Games' in /E if it does not exist</li>
+    <li>Make folder in /E/Games to put your homebrew app in</li>
+    <li>Copy the compiled 'default.xbe' into /e/Games/WhateverFolder via FTP</li>
+    <li>Reboot the xbox</li>
+    <li>Should show up under the 'Games' menu<br/>
+        <img src="./images/20230302_184831.jpg"/>
+        <video width="640" height="480" controls>
+            <source src="./images/20230302_184629.webm" type="video/webm"/>
+        </video>
+    </li>
+</ol>
+
+<a href="../../index.html">&lt;-- Back to Home</a>
+
+        </div>
+    </section>
+
+</body>
+</html>
