@@ -112,6 +112,24 @@ RigidBodyVolume class.</p>
 <h3>02/28/2023</h3>
 <p>Continue physics chapter 15. Started collision resolution and rotational impulses.</p>
 
+<h3>03/27/2023</h3>
+<p>Have been working through "Game Phyisics Engine Development" by Ian Millington.
+Have implemented up to the Bridge demo, then paused to re-organize the repository
+to consolidate same/similar code.</p>
+
+<p>Next, got assimp library compiled for PSP and Wii, and tested a gltf model:</p>
+<video controls width="600px">
+    <source src="./images/psp_assimp_03_27_2023.webm" type="video/webm"/>
+</video>
+
+<p>For the PSP I had to disable/comment out the internal assimp logging,
+and for the Wii I basically had to make the same big endian changes I did for the PS3.
+The modified assimp repositories are: <a href="https://github.com/williamblair/assimp-wii">https://github.com/williamblair/assimp-wii</a>
+and <a href="https://github.com/williamblair/assimp-psp">https://github.com/williamblair/assimp-psp</a>.</p>
+
+<p>Finally, fixed lighting on the Wii to work properly with the textured assimp model.
+Mainly needed to change the GX_SetTevOp argument to GX_MODULATE for textured vertex buffers.</p>
+
 <ul>
 <li><a href="./index.html">&lt;-- Back to HopsLib</li>
 <li><a href="../../index.html">&lt;-- Back to Home</a></li>
