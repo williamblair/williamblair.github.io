@@ -130,6 +130,17 @@ and <a href="https://github.com/williamblair/assimp-psp">https://github.com/will
 <p>Finally, fixed lighting on the Wii to work properly with the textured assimp model.
 Mainly needed to change the GX_SetTevOp argument to GX_MODULATE for textured vertex buffers.</p>
 
+<h3>04/01/2023</h3>
+<p>Started rigid bodies/chapter 11 in Millington physics. Implemented the flight simulator demo, which seems to be basically
+working (although I think there might be a slight bug). There was a bug in QuatToMat4 (I had to revert from the "game
+physics in a weekend" book version). Getting the PSP version to work, I had to dynamically allocate the physics objects
+instead of having them be globally static. Then for the Wii version, I fixed a bug in the Mat3 row-col accessor by
+switching from [col][row] to [row][col] as the Wii matrices are row-major.</p>
+
+<video controls width="600px">
+    <source src="./images/flightsim_04_01_2023.webm" type="video/webm"/>
+</video>
+
 <ul>
 <li><a href="./index.html">&lt;-- Back to HopsLib</li>
 <li><a href="../../index.html">&lt;-- Back to Home</a></li>
