@@ -156,6 +156,27 @@ from Szauer's book.</p>
     <source src="./images/hopsphys_linear_04_16_2023.webm" type="video/webm"/>
 </video>
 
+<h3>05/01/2023</h3>
+<p>Fixed PSP crashing issue - the delta time was a garbage value initially on PSP because I forgot to initialize
+the game timer. The frame rate on the PSP being lower (I think related to the texture mapping on the ground tiles)
+is causing the physics to be much more unstable, including clipping and falling through the ground in some cases.</p>
+
+<video controls width="600px">
+    <source src="./images/szauer_physics_psp_05_01_2023.webm" type="video/webm"/>
+</video>
+
+<p>I've started looking into using Bullet3 physics instead. I have a test working on PC and PSP. To compile Bullet3
+for PSP I had to add some cmake flags to disable some extras, and comment out BulletOpenCL from a CMakeLists.txt. It
+is located here: <a href="https://github.com/williamblair/bullet3-pspsdk">https://github.com/williamblair/bullet3-pspsdk</a>.</p>
+
+<p>It seems to run pretty smoothly on the PSP if you're not on the tile floor (again, I think the performance hit
+is texture related, guessing I need to add mipmapping). TODO add the animated character back in. I'm working on
+figuring out how to properly move the character using Bullet, right now they are kind of slidy.</p>
+
+<video controls width="600px">
+    <source src="./images/bullet_physics_psp_05_01_2023.webm" type="video/webm"/>
+</video>
+
 <ul>
 <li><a href="./index.html">&lt;-- Back to HopsLib</li>
 <li><a href="../../index.html">&lt;-- Back to Home</a></li>
