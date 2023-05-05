@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>BJ's Website</title>
+    <link href="https://unpkg.com/@fortawesome/fontawesome-free@5.13.0/css/all.css" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="../../bulmaswatch.bjsite.min.css"/>
+    <style>
+        p {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <section style="margin:10px;">
+        <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
+            <div id="navbarBasicExample" class="navbar-menu is-active">
+                <div class="navbar-start">
+                    <a href="../../index.html" class="navbar-item"><strong>BJ's Website</strong></a>
+                    <a href="../../general.html" class="navbar-item">General</a>
+                    <a href="../../programming.html" class="navbar-item">Programming</a>
+                    <a href="../../school.html" class="navbar-item">School</a>
+                    <a href="../../books.html" class="navbar-item">Books</a>
+                    <a href="../../tech.html" class="navbar-item">Tech</a>
+                </div>
+                <div class="navbar-end">
+                    <a href="https://github.com/williamblair" class="navbar-item"><span class="icon"><i class="fab fa-github"></i></span><span>Github</span></a>
+                    <a href="https://bitbucket.org/williamblair" class="navbar-item"><span class="icon"><i class="fab fa-bitbucket"></i></span>Bitbucket</a>
+                </div>
+            </div>
+        </nav>
+    </section>
+    <section class="section">
+        <div class="container">
+
+<h1 class="title">Henkaku Installation on PS Vita for Homebrew</h1>
+<h3>05/04/2023</h3>
+
+<p>Starting to look into PS Vita homebrew development; as of writing
+there is only really one emulator and its currently in development:
+<a href="https://vita3k.org/">https://vita3k.org/</a>, so having
+real hardware to use is more important in this case</p>
+
+<p>For the custom firmware installation (Henkaku), you need a memory card
+installed first. Followed video for installation on stock PS vita firmware
+3.60:
+<a href="https://www.youtube.com/watch?v=CYRvqqJRfqc">https://www.youtube.com/watch?v=CYRvqqJRfqc</a>
+</p>
+
+<ol>
+    <li>Connect Vita to WiFi</li>
+    <li>Make sure your date and time is updated</li>
+    <li>Open the Vita webbrowser and go to http://henkaku.xyz</li>
+    <li>Follow the prompts to load henkaku initially</li>
+    <li>Back on homescreen open molecular shell</li>
+    <li>Press select to view FTP IP address</li>
+    <li>On desktop, open FTP program and connect to Vita (no username or password)</li>
+    <li>Download VitaShell v2.02 from <a href="https://github.com/TheOfficialFloW/VitaShell/releases">https://github.com/TheOfficialFloW/VitaShell/releases</a></li>
+    <li>Download enso v1.1 from <a href="https://github.com/henkaku/enso/releases">https://github.com/henkaku/enso/releases</a></li>
+    <li>In FTP Vita connection, create folder VPK in ux0</li>
+    <li>Copy the VitaShell and enso vpk files into the VPK Vita folder</li>
+    <li>Back on Vita, browse to udx0/VPK and install VitaShell vpk then enso vpk
+        <ul>
+            <li><img src="./images/vpklist.jpg" width="800px"/></li>
+        </ul>
+    </li>
+    <li>Go to Vita settings, henkaku settings, enable unsafe homebrew, set spoofed version to 3.73</li>
+    <li>Launch enso, follow prompts to install
+        <ul>
+            <li><img src="./images/homescreen.jpg" width="800px"/></li>
+        </ul>
+    </li>
+</ol>
+
+<p>At that point henkaku should be permenantly installed. Next, to allow vitaGL programs
+to run on the Vita, libshacccg.suprx needs to extracted:</p>
+
+<ol>
+    <li>On PC Download VitaDB/ShaRKBR33D from
+        <a href="https://vitadb.rinnegatamante.it/#/info/997">https://vitadb.rinnegatamante.it/#/info/997</a>
+    </li>
+    <li>On Vita, launch molecular shell and press select again to view FTP ip address</li>
+    <li>Copy ShaRKBR33D.vpk to udx0/VPK over FTP</li>
+    <li>On vita, install ShARKBR33D.vpk</li>
+    <li>Launch ShARKBR33D from homescreen</li>
+</ol>
+
+<p>More information:
+    <a href="https://cimmerian.gitbook.io/vita-troubleshooting-guide/shader-compiler/extract-libshacccg.suprx">
+    https://cimmerian.gitbook.io/vita-troubleshooting-guide/shader-compiler/extract-libshacccg.suprx</a></p>
+
+<p>And that should be it. To install future homebrew, again launch molecular shell
+and copy/install vpk files from udx0/VPK. I tested glesgear from the vitaGL sample:
+<a href="https://github.com/Rinnegatamante/vitaGL/tree/master/samples/glesgear">
+https://github.com/Rinnegatamante/vitaGL/tree/master/samples/glesgear</a></p>
+
+<video controls width="600px">
+    <source src="./images/glesgears_vita_05_04_2023.webm" type="video/webm"/>
+</video>
+
+<p>
+<a href="../../index.html">&lt;-- Back to Home</a>
+</p>
+
+        </div>
+    </section>
+
+</body>
+</html>
+
