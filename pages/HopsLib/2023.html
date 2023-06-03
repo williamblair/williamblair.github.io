@@ -177,6 +177,20 @@ figuring out how to properly move the character using Bullet, right now they are
     <source src="./images/bullet_physics_psp_05_01_2023.webm" type="video/webm"/>
 </video>
 
+<h3>06/02/2023</h3>
+<p>I added back in the IqmMesh class and got an initial skybox implementation working. Originally I was seeing
+edges along the sides of each box, which was fixed by changing the texture min/mag filter to GL_NEAREST
+instead of GL_LINEAR:</p>
+
+<img src="./images/skybox_notworking_06_02_2023.png" width="800"/>
+<img src="./images/skybox_working_06_02_2023.png" width="800"/>
+
+<p>I also used the method from "Game Coding Complete" to always center the skybox at the camera's position,
+as opposed to using a separate shader and cubemap feature from OpenGL, because I'm assuming this way
+(with 6 separate planes and textures) will be more portable to other platforms. I also had an issue that
+one of the triangles wasn't being rendered, which turned out to be because it was too far away/outside
+of my projection matrix's view depth. Lessening the size of each plane (from 1000 to 250) fixed this.</p>
+
 <ul>
 <li><a href="./index.html">&lt;-- Back to HopsLib</li>
 <li><a href="../../index.html">&lt;-- Back to Home</a></li>
