@@ -135,6 +135,38 @@ glFrontFace(GL_CW);
         <img src="./images/chp07demo_basiclighting_09_18_2022.png"/><br/>
         <img src="./images/chp07demo_multitexturing_09_18_2022.png"/><br/>
 
+        <p>06/29/2023</p>
+        <p>Finished remaining chapter 7 demos - multiple point lights,
+        grayscale filter, and bump mapping. For point lights, the book uses a multi-pass rendering technique
+        to render 1 light at a time, starting with a base ambient lighting pass. I instead used a single
+        shader with a hard-coded number of lights (2), and calculate point lighting using calculations from
+        <a href="https://learnopengl.com/Lighting/Multiple-lights">learnopengl</a>. For the grayscale
+        filtering demo, my glsl shader calculation is mostly the same as in the book, except I used a different
+        set of values following
+        <a href="https://gist.github.com/Volcanoscar/4a9500d240497d3c0228f663593d167a">this github gist</a>.
+        Finally, for the bump map demo, instead of transforming the light and other vectors into tangent
+        space like in the book, I instead followed the
+        <a href="https://learnopengl.com/Advanced-Lighting/Normal-Mapping">learnopengl</a> implementation and
+        transformed the tangent vectors into world space within the vertex and fragment shader.
+        To internally calculate the normal map texture from the input height texture, I used the already saved
+        pixels in the current OpenGL texture class loaded by stbi, performed the processing on those, and saved
+        the output file using stb_image_write to a png file:</p>
+
+        <div>
+            <img src="./images/textur_b.bmp"/>
+            <img src="./images/ZFXNormalMap.png"/>
+        </div>
+
+        <p>The book calculates each normal via 3 pixels (current, right, below), however from reading online
+        it's more common now to use a sobel filter on the current, top, bottom, left, and right pixels. The
+        book's method seems to work fine at least for this demo.</p>
+
+        <div>
+            <img src="./images/chp07Demo4MultipleLights_06_29_2023.png"/>
+            <img src="./images/chp07Demo4MultipleLightsGrayscale_06_29_2023.png"/>
+            <img src="./images/chp07Demo6BumpMapping_06_29_2023.png"/>
+        </div>
+
         <p>
         <a href="../../index.html">&lt;-- Back to Home</a>
         </p>
