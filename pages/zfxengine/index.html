@@ -167,6 +167,37 @@ glFrontFace(GL_CW);
             <img src="./images/chp07Demo6BumpMapping_06_29_2023.png"/>
         </div>
 
+        <h2>Chapter 8</h2>
+        <p>07/12/2023</p>
+
+        <p>Chapter 8 mostly finished. I initially was trying use and follow the book's custom model format,
+        but I was getting a parsing error with the included example model that I couldn't figure out, so
+        I switched to IQM using code from my HopsLib. The parse error from the book's cbf format (Chunk
+        Based Format) was related to the amount of bytes contained in the vertices portion of the file.
+        I confirmed I was reading the same amount of bytes indicated by the chunk header, but there were still
+        bytes remaining after that before the end-of-chunk indicator (0x9999), shown highlighted in the
+        hex editor:</p>
+
+        <div>
+            <img src="./images/cbf_error_07_12_2023.png"/>
+        </div>
+
+        <p>Sense it was a custom format anyways, it didn't make sense to put alot of effort into it.
+        Getting IQM models to work instead involved changing the HopsLib math objects with the ZFX versions
+        and generating CVERTEX output vertices. By doing this I ran into a couple of bugs in the ZFXOpenGLVertexCache
+        class related to skin/material selection and vertex buffer updating. I narrowed one down by
+        using <a href="https://renderdoc.org/">RenderDoc</a> for the first time, which showed that the
+        two IQM model vertex buffers from the test model contained identical vertices after the first frame,
+        meaning the second buffer was being overwritten by the contents of the first buffer. This was because
+        I was missing a call to glBindVertexArray prior to binding the buffer and updating the vertices.
+        The second bug was that the second mesh's material wasn't being applied because its properties except
+        the texture were identical, leading the code to believe a material change wasn't needed. The only thing left
+        I think is a memory-out-of bounds error that seems to happen occasionally on Windows and every run on Linux.</p>
+
+        <div>
+            <img src="./images/iqmmodel_07_12_2023.png"/>
+        </div>
+
         <p>
         <a href="../../index.html">&lt;-- Back to Home</a>
         </p>
