@@ -198,6 +198,22 @@ glFrontFace(GL_CW);
             <img src="./images/iqmmodel_07_12_2023.png"/>
         </div>
 
+        <p>08/01/2023</p>
+
+        <p>I am dumb. The memory error was that I was freeing the buffer the IQM data is stored in before
+        the object is destructed:</p>
+        <pre>buf = new uchar[hdr.filesize];
+if (fread(buf+sizeof(hdr), ...) ...
+...
+fclose(f);
+delete[] buf;</pre>
+
+        <p>I didn't notice it was freed initially because the buf pointer wasn't
+        set to null after being freed, so I thought it was still valid...</p>
+        <p>Now the IQM class just needs some cleanup, mostly related to time/frame
+        tracking, which is hard-coded to update 1.0/60.0 seconds every frame
+        regardless of the input time.</p>
+
         <p>
         <a href="../../index.html">&lt;-- Back to Home</a>
         </p>
