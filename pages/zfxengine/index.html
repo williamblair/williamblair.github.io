@@ -214,6 +214,25 @@ delete[] buf;</pre>
         tracking, which is hard-coded to update 1.0/60.0 seconds every frame
         regardless of the input time.</p>
 
+        <p>08/18/2023</p>
+        <p>Added support for glb meshes via Assimp. Was originally planning on adding b3d mesh support,
+        as I found the mesh used in the book in this format
+        <a href="http://web.archive.org/web/20071202174732/http://www.psionic3d.co.uk/gallery/displayimage.php?album=2&pos=4">here</a>.
+        Assimp apparently supports this format, however the animation code I have using assimp errored out due to "nodes" not
+        counting as "bones". Converted the also-included milkshape 3d format (ms3d) model to glb by downloading Blender 2.66
+        from <a href="https://download.blender.org/release/Blender2.66/">here</a> (which included support for ms3d),
+        exporting to dae, importing the dae to the default installed blender 3, and finally exporting to glb from there.</p>
+
+        <img src="./images/blender2_zombie_ms3d.png" width="800px"/><br/>
+        <img src="./images/zombie_blender3.png" width="800px"/>
+
+        <p>The assimp animation code still has an issue with the resulting converted dae and fbx
+        files, also due to nodes vs bones data structures, but this is good enough for now I think.
+        It also has issues with some parts of the animation being jerky/some weird frames, I'm
+        guessing due to how I'm estimating keyframes with interpolation</p>
+
+        <img src="./images/zombieAnim08182023.png"/>
+
         <p>
         <a href="../../index.html">&lt;-- Back to Home</a>
         </p>
