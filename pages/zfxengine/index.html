@@ -233,6 +233,22 @@ delete[] buf;</pre>
 
         <img src="./images/zombieAnim08182023.png"/>
 
+        <p>08/24/2023</p>
+
+        <p>The zombie animation is fully working after converting it to IQM format.
+        Finished chapter 9 - input system, using SDL2 and SDL2 joystick. Modified
+        GetPosition() as the book only allowed for 1 object per joystick axis. I added an index
+        argument as well to specify which analog stick/joystick to read. Also found out the joystick
+        axes for an XBox 360 controller show up in the following order for SDL: 0 = left analog X axis,
+        1 = left analog Y axis, 2 = Left Trigger, 3 = right analog X axis, 4 = right analog Y axis,
+        5 = Right Trigger. The issue with this is GetPostion() takes in a ZFXPoint which reads both
+        X and Y, and for the triggers there is only one axis. I re-ordered the read values so
+        that the left and right trigger are paired as axes 4 and 5 instead of 2 and 5.</p>
+
+        <p>The demo for this chapter is fairly simple, just displays text to the screen of input values:</p>
+
+        <img src="./images/zfxInput08242023.png"/>
+
         <p>
         <a href="../../index.html">&lt;-- Back to Home</a>
         </p>
