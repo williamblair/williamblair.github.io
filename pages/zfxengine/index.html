@@ -249,6 +249,159 @@ delete[] buf;</pre>
 
         <img src="./images/zfxInput08242023.png"/>
 
+        <p>08/31/2023</p>
+
+        <p>Partial completion of chapter 10 (audio) and I think full completion of chapter 11 networking.</p>
+
+        <p>For audio, using SDL_Mixer, there is support to play a single sound/song at a time using "Mix_Music"
+        objects. There is no 3D audio support currently. To support this, I would need to switch to use
+        "Mix_Chunk" objects along with the "Mix_SetPosition" function, which takes in an angle and distance
+        from the listener. Switching to chunks would also allow for multiple sounds to play at once.</p>
+
+        <p>For networking, I learned about Win32 WSA sockets, through following the book's implementation.
+        It is pretty similar to POSIX sockets, so alot of the code between the Windows and Linux versions
+        matches. Most of the differences I used macros/defines to map to the correct platform:</p>
+
+        <pre><code>// ZFXNetworkDevice.h
+#ifdef _WIN32
+#define ZFX_USE_WIN_SOCKET
+#else
+#define ZFX_USE_POSIX_SOCKET
+#endif
+
+#ifdef ZFX_USE_POSIX_SOCKET
+typedef int SOCKET; // POSIX socket file descriptor type
+#define INVALID_SOCKET (-1)
+#endif
+
+#ifdef ZFX_USE_WIN_SOCKET
+#include &lt;winsock2.h&gt;
+#include &lt;ws2tcpip.h&gt;
+#endif
+
+// ZFXNetworkDevice.cpp
+#ifdef ZFX_USE_POSIX_SOCKET
+#include &lt;sys/types.h&gt;
+#include &lt;sys/socket.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;netdb.h&gt;
+#include &lt;netinet/in.h&gt;
+#include &lt;netinet/ip.h&gt;
+#include &lt;arpa/inet.h&gt;
+
+#define ZFX_CLOSE_SOCKET close
+#define ZFX_SHUTDOWN_READWRITE SHUT_RDWR
+#define ZFX_SELECT_SUCCESS(ret) (((ret) != -1) &amp;&amp; ((ret) != 0))
+#define ZFX_SELECT_ERROR(ret) ((ret) < 0)
+#endif
+
+#ifdef ZFX_USE_WIN_SOCKET
+#define ZFX_CLOSE_SOCKET closesocket
+#define ZFX_SHUTDOWN_READWRITE SD_BOTH
+#define ZFX_SELECT_SUCCESS(ret) (((ret) != SOCKET_ERROR) && ((ret) > 0))
+#define ZFX_SELECT_ERROR(ret) ((ret) == SOCKET_ERROR)
+#endif
+...
+#ifdef ZFX_USE_WIN_SOCKET
+    WSADATA wsaData;
+    WORD wVersion = MAKEWORD(2,0);
+    int nRes = WSAStartup(wVersion, &amp;wsaData);
+    if (nRes != 0) {
+        printf("WSAStartup failed\n");
+        return false;
+    }
+#endif
+...
+#ifdef ZFX_USE_WIN_SOCKET
+    WSACleanup();
+#endif
+...
+shutdown(m_skSocket, ZFX_SHUTDOWN_READWRITE);
+ZFX_CLOSE_SOCKET(m_skSocket);
+...
+        </code></pre>
+
+        <p>Additionally, unlike the book which used the Windows event system for async socket read/writes,
+        I instead made a polling background thread that works for both implementations, which uses "select"
+        to check if any events have occured on the socket:</p>
+
+<pre><code>void ZFXNetworkDeviceImpl::EventPollThreadFcn()
+{
+    fd_set set;
+    struct timeval timeout;
+    int ret;
+
+    while (m_bRunning)
+    {
+        timeout.tv_sec = 0;
+        timeout.tv_usec = 50;
+
+        if (m_Mode == NMD_SERVER) {
+
+            // check for any connection requests
+            FD_ZERO(&amp;set);
+            FD_SET(m_pSockObj-&gt;GetSocket(), &amp;set);
+            ret = select(m_pSockObj-&gt;GetSocket()+1, &amp;set, nullptr, nullptr, &amp;timeout);
+            if (ZFX_SELECT_SUCCESS(ret)) {
+                //printf("Poll thread calling OnAccept\n");
+                OnAccept();
+            }
+
+            // check for any messages from clients
+            for (int i = 0; i<m_ClCount; ++i) {
+                if (m_Clients[i].skToClient == INVALID_SOCKET) {
+                    continue;
+                }
+                FD_ZERO(&set);
+                FD_SET(m_Clients[i].skToClient, &set);
+                ret = select(m_Clients[i].skToClient+1, &set, nullptr, nullptr, &timeout);
+                if (ZFX_SELECT_SUCCESS(ret)) {
+                    //printf("Poll thread calling OnReceive\n");
+                    OnReceive(m_Clients[i].skToClient);
+                }
+            }
+
+            // check for any disconnects from clients
+            // (apparently not possible unless you get ret val 0 from read()
+            // https://stackoverflow.com/questions/283375/detecting-tcp-client-disconnect
+        } else { // NMD_CLIENT
+            FD_ZERO(&set);
+            FD_SET(m_pSockObj->GetSocket(), &amp;set);
+            ret = select(m_pSockObj-&gt;GetSocket()+1, &amp;set, nullptr, nullptr, &amp;timeout);
+            if (ZFX_SELECT_SUCCESS(ret)) {
+                //printf("Client Poll thread calling OnReceive\n");
+                OnReceive(m_pSockObj-&gt;GetSocket());
+            }
+        }
+
+        // let some other processing occur
+        std::this_thread::yield();
+    }
+}
+</code></pre>
+
+        <p>For the demo application, I didn't make the full chat or file transfer applications
+        as they used the Win32 API. Instead, I just made a simple test command line program where
+        the server and client send each other a couple of messages with some test data:</p>
+
+<pre>...
+Server read pkg of size 20
+  Server Pkg size: 4
+  Server Data: 0,1,2,3,
+Client read pkg of size 20
+  Client pkg size: 4
+  Client Data: 0x10,0x11,0x12,0x13,
+Server read pkg of size 20
+  Server Pkg size: 4
+  Server Data: 0,1,2,3,
+Client read pkg of size 20
+  Client pkg size: 4
+  Client Data: 0x10,0x11,0x12,0x13,
+Server read pkg of size 20
+  Server Pkg size: 4
+  Server Data: 0,1,2,3,
+</pre>
+
         <p>
         <a href="../../index.html">&lt;-- Back to Home</a>
         </p>
