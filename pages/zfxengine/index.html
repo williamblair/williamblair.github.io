@@ -402,6 +402,61 @@ Server read pkg of size 20
   Server Data: 0,1,2,3,
 </pre>
 
+        <p>09/02/2023</p>
+
+        <p>Finished chapter 12 - movement. For the demo application, the data included on the book CD seemed to be missing
+        the movement code and was identical to the chapter 6 demo. I chose to add a ZFXMCEgo controller (which is what the
+        book calls the class for FPS style input) and directly binded movement to SDL2. I could have used our previously made
+        input class, but sense it's just a chapter demo I was lazy. One note is that the input class seems to only allow
+        forward and backward movement, not left and right, which seems kind of strange.</p>
+<pre><code>ZFXMCEgo* g_pMoveCtrl = nullptr;
+...
+// update time
+Uint32 curTime = SDL_GetTicks();
+Uint32 ticksPassed = curTime - lastTime;
+float fElapsedTime = ((float)ticksPassed)/1000.0f;
+
+// update input
+g_pMoveCtrl-&gt;SetRotationSpeedX(0);
+g_pMoveCtrl-&gt;SetRotationSpeedY(0);
+SDL_Event e;
+while (SDL_PollEvent(&amp;e))
+{
+    float fMoveSpd = 0.01f;
+    float fRotSpd = 0.001f;
+    if (e.type == SDL_QUIT) {
+        g_bDone = true;
+    } else if (e.type == SDL_KEYDOWN) {
+        switch (e.key.keysym.sym) {
+        case SDLK_w: g_pMoveCtrl-&gt;SetSpeed(fMoveSpd); break;
+        case SDLK_s: g_pMoveCtrl-&gt;SetSpeed(-fMoveSpd); break;
+        default:
+            break;
+        }
+    } else if (e.type == SDL_KEYUP) {
+        switch (e.key.keysym.sym) {
+        case SDLK_w: g_pMoveCtrl-&gt;SetSpeed(0.0f); break;
+        case SDLK_s: g_pMoveCtrl-&gt;SetSpeed(0.0f); break;
+        default:
+            break;
+        }
+    } else if (e.type == SDL_MOUSEMOTION) {
+        float fMouseMoveX = (float)e.motion.xrel;
+        float fMouseMoveY = (float)e.motion.yrel;
+        g_pMoveCtrl-&gt;SetRotationSpeedX(
+            -fMouseMoveY*fRotSpd
+        );
+        g_pMoveCtrl-&gt;SetRotationSpeedY(
+            -fMouseMoveX*fRotSpd
+        );
+    }
+}
+</code></pre>
+
+        <video controls width="640" height="480">
+            <source src="./images/chp12demo09022023.webm" type="video/webm"/>
+        </video>
+
         <p>
         <a href="../../index.html">&lt;-- Back to Home</a>
         </p>
