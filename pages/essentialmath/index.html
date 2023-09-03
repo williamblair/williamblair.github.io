@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <meta charset="utf-8"/>
+  <title>Essential Math for Games</title>
+
+  <!--<script src="https://fred-wang.github.io/TeXZilla/TeXZilla-min.js"></script>-->
+  <!--<script src="https://fred-wang.github.io/TeXZilla/examples/customElement.js"></script>-->
+  <script src="./TeXZilla-min.js"></script>
+  <script src="./customElement.js"></script>
+
+  <style>
+    html, body {
+        background-color: #000000;
+        color: #FFFFFF;
+    }
+    table,th,td {
+      border: 1px solid;
+      border-collapse: collapse;
+      padding: 5px;
+    }
+  </style>
+
+</head>
+<body>
+<h1>Notes for "Essential Mathematics for Games and Interactive Applications"</h1>
+<h2>By James M. Van Verth and Lars M. Bishop</h2>
+
+<h3>Chapter 1 - Representing Real Numbers</h3>
+
+<div>
+<p>Useful c++ for floats:</p>
+<table>
+  <tr><td><code>isinf()</code></td><td>Is Infinite</td></tr>
+  <tr><td><code>isnan()</code></td><td>Is NaN (Not a Number)</td></tr>
+  <tr><td><code>abs(a-b)&lt;=epsilon*(abs(a)+abs(b)+1)</code></td><td>Accurate are floats equal test</td></tr>
+  <tr><td><code>FLT_MAX</code></td><td>Maximum float value</td></tr>
+</table>
+</div>
+
+<h3>Chapter 2 - Vectors and Points</h3>
+
+<ul>
+  <li><b>Point</b>: location in space</li>
+  <li><b>Vector</b>: Displacement between points</li>
+</ul>
+
+<div style="margin-top:30px">
+<span>Scalar Multiplication Rules</span>
+<table>
+  <tr><td><la-tex>(ab)\vec{v} = a(b\vec{v})</la-tex></td><td>Associative Property</td></tr>
+  <tr><td><la-tex>(a+b)\vec{v} = a\vec{v} + b\vec{v}</la-tex></td><td>Distributive Property</td></tr>
+  <tr><td><la-tex>a(\vec{v}+\vec{w}) = a\vec{v} + a\vec{w}</la-tex></td><td>Distributive Property</td></tr>
+  <tr><td><la-tex>1\vec{v} = \vec{v}</la-tex></td><td>Multiplicative Identity</td></tr>
+</table>
+</div>
+
+<div style="margin-top:30px">
+<span>Dot Product Rules</span>
+<table>
+  <tr><td><la-tex>\vec{v}\bullet\vec{w} = \vec{w}\bullet\vec{v}</la-tex></td><td>Symmetry</td></tr>
+  <tr><td><la-tex>(\vec{u}+\vec{v})\bullet\vec{w} = \vec{u}\bullet\vec{w} + \vec{v}\bullet\vec{w}</la-tex></td><td>Additivity</td></tr>
+  <tr><td><la-tex>a(\vec{v}\bullet\vec{w}) = (a\vec{v})\bullet\vec{w} = \vec{v}\bullet(a\vec{w})</la-tex></td><td>Homogeneity</td></tr>
+  <tr><td><la-tex>\vec{v}\bullet\vec{v} \geq 0</la-tex></td><td>Positivity</td></tr>
+  <tr><td><la-tex>\vec{v}\bullet\vec{v} = 0 \iff \vec{v} = \vec{0}</la-tex></td><td>Definiteness</td></tr>
+</table>
+</div>
+
+<div style="margin-top:30px">
+<span>Cross Product Rules</span>
+<table>
+  <tr><td><la-tex>\vec{v}\times\vec{w} = -(\vec{w}\times\vec{v})</la-tex></td></tr>
+  <tr><td><la-tex>\vec{u}\times(\vec{v}+\vec{w}) = (\vec{u}\times\vec{v})+(\vec{u}\times\vec{w})</la-tex></td></tr>
+  <tr><td><la-tex>(\vec{u}+\vec{v})\times\vec{w} = (\vec{u}\times\vec{w})+(\vec{v}\times\vec{w})</la-tex></td></tr>
+  <tr><td><la-tex>a(\vec{v}\times\vec{w}) = (a\vec{v})\times\vec{w} = \vec{v}\times(a\vec{w})</la-tex></td></tr>
+  <tr><td><la-tex>\vec{v}\times\vec{0} = \vec{0}\times\vec{v} = \vec{0}</la-tex></td></tr>
+  <tr><td><la-tex>\vec{v}\times\vec{v} = \vec{0}</la-tex></td></tr>
+</table>
+</div>
+
+<div style="margin-top:30px">
+<span>Dot Product Properties</span>
+<table>
+  <tr><td><la-tex>\vec{v}\bullet\vec{w} = 0</la-tex></td><td>Perpindicular/Orthogonal</td></tr>
+  <tr><td><la-tex>\hat{v}\bullet\hat{w} \cong 1</la-tex></td><td>Pointing in similar directions (v,w normalized)</td></tr>
+  <tr><td><la-tex>\hat{v}\bullet\hat{w} \cong \minus1</la-tex></td><td>Pointing in opposite directions (v,w normalized)</td></tr>
+  <tr><td><la-tex>1-(\hat{v}\bullet\hat{w})^2 = 1-\cos^2\theta = \sin^2\theta</la-tex></td><td>sine (v,w normalized)</td></tr>
+  <tr><td><la-tex>\vec{v}\bullet\vec{w} \gt 0</la-tex></td><td>Angle &lt; 90</td></tr>
+  <tr><td><la-tex>\vec{v}\bullet\vec{w} \lt 0</la-tex></td><td>Angle &gt; 90</td></tr>
+  <tr><td><la-tex>\vec{v}^\perp\bullet\vec{w} = \|\vec{v}\|\|\vec{w}\|\sin\theta</la-tex></td><td>Perpindicular dot product in <la-tex>\Re^2</la-tex></td></tr>
+</table>
+</div>
+
+<div style="margin-top:30px">
+<span>Triple Product Properties</span>
+<table>
+  <tr><td><la-tex>\vec{w}\times(\vec{v}\times\vec{w})</la-tex></td><td>Vector triple product; <la-tex>\vec{w}, (\vec{v}\times\vec{w}), \vec{w}\times(\vec{v}\times\vec{w})</la-tex> are orthogonal</td></tr>
+  <tr><td><la-tex>\vec{u}\bullet(\vec{v}\times\vec{w}) = \|\vec{u}\|\|\vec{v}\times\vec{w}\|\cos\theta</la-tex></td><td>Scalar triple product; signed volume of box made of u,v,w</td></tr>
+  <tr><td><la-tex>\vec{u}\bullet(\vec{v}\times\vec{w}) \gt 0</la-tex></td><td>Shortest rotation from v to w is counterclockwise (for right-handed vectors) about u</td></tr>
+  <tr><td><la-tex>\vec{u}\bullet(\vec{v}\times\vec{w}) \lt 0</la-tex></td><td>Shortest rotation from v to w is clockwise (for right-handed vectors) about u</td></tr>
+  <tr><td><la-tex>\vec{u}\times(\vec{v}\times\vec{w}) = (\vec{u}\bullet\vec{w})\vec{v}-(\vec{u}\bullet\vec{v})\vec{w}</la-tex></td><td></td></tr>
+  <tr><td><la-tex>(\vec{u}\times\vec{v})\times\vec{w} = (\vec{u}\bullet\vec{w})\vec{v}-(\vec{v}\bullet\vec{w})\vec{u}</la-tex></td><td></td></tr>
+  <tr><td><la-tex>\vec{u}\bullet(\vec{v}\times\vec{w}) = \vec{w}\bullet(\vec{u}\times\vec{v}) = \vec{v}\bullet(\vec{w}\times\vec{u})</la-tex></td><td></td></tr>
+</table>
+</div>
+
+<div style="margin-top:30px">
+<span>Real Vector Space <i>V</i></span>
+<table>
+  <tr><td><la-tex>\forall \vec{u},\vec{v} \in V \Rightarrow \vec{u}+\vec{v} \in V</la-tex></td><td>Additive Closure</td></tr>
+  <tr><td><la-tex>\forall a \in \Re, \vec{v} \in V \Rightarrow a\vec{v} \in V</la-tex></td><td>Multiplicative Closure</td></tr>
+</table>
+<p>Example: <la-tex>\Re^2 = \{(x,y) | x,y \in \Re\}</la-tex></p>
+</div>
+
+<div style="margin-top:30px">
+<span>Linear Combination for Vectors:</span><br/>
+<span>
+Given vectors <la-tex>\{\vec{v}_0,...,\vec{v}_{n-1}\}</la-tex> and scalars
+<la-tex>\{a_0,...,a_{n-1}\}</la-tex>,
+</span><br/>
+<span>
+Linear combination = <la-tex>\vec{v} = a_0\vec{v}_0 + ... + a_{n-1}\vec{v}_{n-1}
+= \sum_{i=0}^{n-1}a_i\vec{v}_i</la-tex>
+</span><br/>
+<span>Span T = all possible linear combinations of all vectors in S; S spans T</span><br/>
+</div>
+
+<div style="margin-top:30px">
+<ul>
+  <li><b>Linearly Dependant</b>: A vector in S exists that can be a linear combination of other vectors in S</li>
+  <li><b>Linearly Independant</b>: No vector in S exists that can be a linear combination of other vectors in S</li>
+  <li><b>Basis</b>: Set B is a basis if both spans V and is linearly independant. Entries are called basis vectors.</li>
+  <li><b>Standard Basis</b>: For <la-tex>\Re^n, \{\vec{e}_0,...,\vec{e}_{n-1}\}=\{\vec{i},\vec{j},...\}</la-tex> where <la-tex>\vec{e}_0=(1,0,...0),...,\vec{e}_{n-1}=(0,0,...1)</la-tex></li>
+</ul>
+</div>
+
+<div style="margin-top:30px">
+<span>Vector Formulas:</span><br/>
+<table>
+  <tr><td><la-tex>\|\vec{v}\|</la-tex> = <la-tex>\sqrt{\sum{v_i^2}}</la-tex> = <la-tex>\sqrt{v_0^2 + v_1^2 + ... + v_{n-1}^2}</la-tex></td><td>Vector l2 norm = length</td></tr>
+  <tr><td><la-tex>\hat{v} = \frac{\vec{v}}{\|\vec{v}\|}</la-tex></td><td>Normalized <la-tex>\vec{v}</la-tex></td></tr>
+  <tr><td><la-tex>\vec{v}\bullet\vec{w} = \|\vec{v}\|\|\vec{w}\|\cos\theta = \sum{v_iw_i} = v_0w_0+...+v_{n-1}w_{n-1}</la-tex></td><td>Dot Product/Euclidean Inner Product</td></tr>
+  <tr><td><la-tex>proj_\vec{w}\vec{v} = \frac{\vec{v}\bullet\vec{w}}{\|\vec{w}\|^2}\vec{w} = \frac{\vec{v}\bullet\vec{w}}{\vec{w}\bullet\vec{w}}\vec{w}</la-tex></td><td>Projection of v onto w. Component of v which is parallel to w.</td></tr>
+  <tr><td><la-tex>perp_\vec{w}\vec{v} = \vec{v} - \frac{\vec{v}\bullet\vec{w}}{\|\vec{w}\|^2}\vec{w} = \vec{v} - \frac{\vec{v}\bullet\vec{w}}{\vec{w}\bullet\vec{w}}\vec{w}</la-tex></td><td>Perpindicular of v onto w. Component of v which is perpindicular to w.</td></tr>
+  <tr><td><la-tex>proj_{\hat{w}}\vec{v} = (\vec{v}\bullet\hat{w})\hat{w}</la-tex></td><td>Projection of v onto w if w is normalized.</td></tr>
+  <tr><td><la-tex>\vec{v}\times\vec{w} = (v_yw_z,v_zw_x,v_xw_y)-(w_yv_z,w_zv_x,w_xv_y)</la-tex></td><td>Cross/Vector product for <la-tex>\Re^3</la-tex></td></tr>
+  <tr><td><la-tex>\vec{v}^\perp = (-v_y,v_x)</la-tex></td><td>Perpindicular for <la-tex>\Re^2</la-tex></td></tr>
+</table>
+</div>
+
+<div style="margin-top:30px">
+<span>Affine Space:</span><br/>
+<span>Consists of a set of points W and vector space V, point O = origin</span><br/>
+<table>
+  <tr><td><la-tex>\forall P,Q \in W \Rightarrow \exists\vec{v} = P-Q</la-tex></td></tr>
+  <tr><td><la-tex>\forall P \in W, \vec{v} \in V \Rightarrow \exists Q = P + \vec{v}</la-tex></td></tr>
+  <tr><td><la-tex>\forall P \in W \Rightarrow P = O + \vec{v}</la-tex></td></tr>
+</table>
+<span>Coordinate frame: Point as linear combination of basis vectors of V: <la-tex>P = O + a_0\vec{v}_0+...+a_{n-1}\vec{v}_{n-1}</la-tex></span><br/>
+<span>Cartesian frame: uses origin O = (0,0,...0) and vector basis {(1,0,...,0),...,(0,0,...1)}</span><br/>
+<span>Affine combination: point <la-tex>P = a_0P_0 + a_1P_1 + ... + a_kP_k</la-tex> where <la-tex>\sum_{i=0}^k{a_i}=1</la-tex>,</span><br/>
+<span>alternatively written as <la-tex>P = P_0 + a_1\vec{u}_1 + ... + a_k\vec{u}_k</la-tex>, where <la-tex>\vec{u}_i = (P_i-P_0)</la-tex></span><br/>
+<span>Affinely independant: points <la-tex>P_0...P_k</la-tex> affine combinations with linearly independant vectors <la-tex>\vec{u}_1...\vec{u}_k</la-tex>. Ordered points = simplex and coefficients = barycentric coordinates</span><br/>
+</div>
+
+<div style="margin-top:30px">
+<span>Convex set: points where line between any pair remains within the set</span><br/>
+<span>Convex hull: smallest convex set that includes all the points.</span><br/>
+<span>Convex combination: restrict ceofficients of points between 0 and 1. The span of this is the convex hull.</span><br/>
+</div>
+
+<div style="margin-top:30px">
+<span>Point formulas:</span><br/>
+<table>
+  <tr><td><la-tex>dist(Q,P)=\|\vec{v}\|=\sqrt{\sum(Q_i-P_i)^2}=\sqrt{(Q_0-P_0)^2+...+(Q_{n-1}-P_{n-1})^2}</la-tex></td><td>Distance between points</td></tr>
+  <tr><td><la-tex>dist(P,O)=\|\vec{v}\|=\sqrt{\sum{P_i^2}}=\sqrt{P_0^2+...+P_{n-1}^2}</la-tex></td><td>Distance of point from origin O</td></tr>
+  <tr><td><la-tex>x = r\cos\theta, y = r\sin\theta</la-tex></td><td>Polar to cartesian 2d points</td></tr>
+  <tr><td><la-tex>r = \sqrt{x^2+y^2}, \theta = arctan2(y,x)</la-tex></td><td>Cartesian 2d to polar points</td></tr>
+  <tr><td><la-tex>x = \rho\sin\phi\cos\theta, y = \rho\sin\phi\sin\theta, z = \rho\cos\phi</la-tex></td><td>Spherical to cartesian 3d points</td></tr>
+  <tr><td><la-tex>\rho = \sqrt{x^2+y^2+z^2}, \phi = arctan2(\sqrt{x^2+y^2},z), \theta = arctan2(y,x)</la-tex></td><td>Cartesian 3d to spherical points</td></tr>
+  <tr><td><la-tex>s = \frac{b}{c}, t = \frac{a}{c}, a = \frac{1}{2}\|\vec{u}\times\vec{w}\|, b = \frac{1}{2}\|\vec{v}\times\vec{w}\|, c = \frac{1}{2}\|\vec{u}\times\vec{v}\|</la-tex></td><td>Point P to barycentric coordinates calculation. <la-tex>\vec{u}=P_1-P_0, \vec{v}=P_2-P_0, \vec{w}=P-P_0</la-tex></td></tr>
+</table>
+</div>
+
+<div style="margin-top:30px">
+<span>Parameterized Primitives:</span><br/>
+<table>
+    <tr><td><la-tex>L(t) = P_0 + t\vec{d}</la-tex></td><td>Parameterized line formula. t between [0,1] gives a line segment. t &gt;= 0 gives ray.</td></tr>
+    <tr><td><la-tex>P(s,t) = P_0 + s(P_1-P_0) + t(P_2-P_0)</la-tex></td><td>Parameterized plane formula.</td></tr>
+    <tr><td><la-tex>ax+by+cz+d = 0, \vec{n}=(a,b,c), P=(x,y,z)</la-tex></td><td>Normal-point plane equation</td></tr>
+</table>
+</div>
+
+<div style="margin-top:30px">
+<span>Collinear: 3 or more points that all lie on one line.</span><br/>
+<span>Coplanar: 4 or more points that all lie on one plane.</span><br/>
+</div>
+
+<h3>Chapter 3 - Linear Transformations and Matrices</h3>
+
+<div>
+<span>Linear transformation T: mapping between vector spaces V, W where for all <la-tex>\vec{v} \in V</la-tex> and all scalars <la-tex>a</la-tex>:</span>
+<ul>
+  <li><la-tex>T(\vec{v}_0 + \vec{v}_1) = T(\vec{v}_0) + T(\vec{v}_1)</la-tex></li>
+  <li><la-tex>T(a\vec{v}) = aT(\vec{v})</la-tex></li>
+</ul>
+<span>Which can be proven by showing <la-tex>T(a\vec{x}+\vec{y}) = aT(\vec{x}) + T(\vec{y})</la-tex></span><br/>
+<span>Can also be represented the linear combo of basis vectors of V: <la-tex>T(\vec{x}) = x_0T(\vec{v}_0)+...+x_{n-1}T(\vec{v}_{n-1})</la-tex></span>
+<ul>
+    <li>Range R(T): all vectors in W that are mapped to by at least one vector in V (<la-tex>\{T(\vec{x}) | \vec{x} \in V\}</la-tex>)</li>
+  <li>Rank(R(T)): dimension of R(T)</li>
+  <li>Null space/Kernel N(T): all <la-tex>\vec{v}</la-tex> in V that map to <la-tex>\vec{0} (T(\vec{v}) = \vec{0})</la-tex></li>
+  <li>Nullity: dimension of N(T)</li>
+  <li>N(T) is a subspace of V and R(T) is a subspace of W</li>
+  <li>nullity(T) + rank(T) = dim(V)</li>
+</ul>
+</div>
+
+<div>
+<span>Matrix representation of linear transformation:</span>
+<p>Given transform of standard basis <la-tex>\{\vec{e}_0,\vec{e}_1,...\vec{e}_{n-1}\} \in V</la-tex> to
+<la-tex>\{\vec{a}_0,\vec{a}_1,...\vec{a}_{n-1}\} \in W</la-tex>, store the transformed basis
+vectors as the columns of matrix <la-tex>\mathbf{A}=[\vec{a}_0 \vec{a}_1 ... \vec{a}_{n-1}]</la-tex></p>
+</div>
+
+<div>
+<span>Matrix Definitions:</span>
+<ul>
+  <li>Square Matrix: num rows (m) = num cols (n)</li>
+  <li>Zero Matrix: all elements = 0</li>
+  <li>Main diagonal: all of the diagonal elements
+    <ul><li>Trace = sum of main diagonal</li></ul>
+  </li>
+  <li>Upper Triangular Matrix: all elements below diagonal = 0</li>
+  <li>Lower Triangular Matrix: all elements above diagonal = 0</li>
+  <li>Diagonal Matrix: square matrix where all non-diagonal elements = 0</li>
+  <li>Transpose <la-tex>\mathbf{A}^T_{i,j} = \mathbf{A}_{j,i}</la-tex> (swap elements location rows and cols)</li>
+  <li>Symmetric Matrix: <la-tex>\mathbf{A}^T=\mathbf{A}</la-tex> (elements are symmetric about the diagonal)</li>
+  <li>Skew Symmetric Matrix: Like Symmetric Matrix but <la-tex>\mathbf{A}_{i,j}=-\mathbf{A}_{j,i}</la-tex> (diagonal is all zeros)</li>
+  <li>Identity matrix: diagonal square matrix where all diagonal elements = 1, rest = 0. <la-tex>\mathbf{AI}=\mathbf{IA}=\mathbf{A}</li>
+  <li>Column Space: vector space spanned by a matrix's column vectors</li>
+  <li>Row Space: vector space spanned by a matrix's row vectors</li>
+  <li>Null Space: all vectors <la-tex>\vec{x}</la-tex> such that <la-tex>\mathbf{A}\vec{x} = \vec{0}</la-tex></li>
+  <li>Minor of <la-tex>a_{i,j}</la-tex>: <la-tex>det(\mathbf{\tilde{A}}_{i,j})</la-tex> where <la-tex>\mathbf{\tilde{A}}_{i,j}</la-tex> is submatrix by removing row i, col j from A.</li>
+  <li>Cofactor of <la-tex>a_{i,j}</la-tex>: <la-tex>(-1)^{i+j}det(\mathbf{\tilde{A}}_{i,j})</la-tex></li>
+  <li>Adjoint matrix: <la-tex>\mathbf{A}^{adj}</la-tex> = each element of A replaced with its cofactor</li>
+</ul>
+</div>
+
+<div>
+<span>Matrix algebraic rules:</span>
+<table>
+  <tr><td><la-tex>\mathbf{A}+\mathbf{B} = \mathbf{B}+\mathbf{A}</la-tex></td></tr>
+  <tr><td><la-tex>\mathbf{A}+(\mathbf{B}+\mathbf{C}) = (\mathbf{A}+\mathbf{B})+\mathbf{C}</la-tex></td></tr>
+  <tr><td><la-tex>\mathbf{A}+\mathbf{0} = \mathbf{A}</la-tex></td></tr>
+  <tr><td><la-tex>\mathbf{A}+(-\mathbf{A}) = \mathbf{0}</la-tex></td></tr>
+  <tr><td><la-tex>a(\mathbf{A}+\mathbf{B}) = a\mathbf{A}+a\mathbf{B}</la-tex></td></tr>
+  <tr><td><la-tex>a(b\mathbf{A}) = (ab)\mathbf{A}</la-tex></td></tr>
+  <tr><td><la-tex>(a+b)\mathbf{A}) = a\mathbf{A}+b\mathbf{A}</la-tex></td></tr>
+  <tr><td><la-tex>1\mathbf{A} = \mathbf{A}</la-tex></td></tr>
+  <tr><td><la-tex>\mathbf{A}(\mathbf{B}\mathbf{C}) = (\mathbf{A}\mathbf{B})\mathbf{C}</la-tex></td></tr>
+  <tr><td><la-tex>a(\mathbf{B}\mathbf{C}) = (a\mathbf{B})\mathbf{C}</la-tex></td></tr>
+  <tr><td><la-tex>\mathbf{A}(\mathbf{B}+\mathbf{C}) = \mathbf{A}\mathbf{B}+\mathbf{A}\mathbf{C}</la-tex></td></tr>
+  <tr><td><la-tex>(\mathbf{A}+\mathbf{B})\mathbf{C} = \mathbf{A}\mathbf{C}+\mathbf{B}\mathbf{C}</la-tex></td></tr>
+  <tr><td><la-tex>(\mathbf{A}\mathbf{B})^T = \mathbf{B}^T\mathbf{A}^T</la-tex></td></tr>
+</table>
+</div>
+
+<div>
+<span>Matrix transpose rules:</span>
+<table>
+  <tr><td><la-tex>(\mathbf{A}^T)^T = \mathbf{A}</la-tex></td></tr>
+  <tr><td><la-tex>(a\mathbf{A}^T) = a\mathbf{A}^T</la-tex></td></tr>
+  <tr><td><la-tex>(\mathbf{A}+\mathbf{B})^T = \mathbf{A}^T+\mathbf{B}^T</la-tex></td></tr>
+</table>
+</div>
+
+<div>
+<span>Outer Product/Tensor Product</span>
+<table>
+  <tr><td><la-tex>\mathbf{T}=\vec{v}\vec{w}^T=\vec{v}\otimes\vec{w}<la-tex></td><td>Tensor product of vectors v,w resulting in matrix T</td></tr>
+  <tr><td><la-tex>(\vec{u}\bullet\vec{w})\vec{v}=(\vec{v}\otimes\vec{w})\vec{u}<la-tex></td><td>Tensor product representation of dot product expression</td></tr>
+  <tr><td><la-tex>(\vec{u}\bullet\hat{v})\hat{v}=(\hat{v}\otimes\hat{v})\vec{u}<la-tex></td><td>Tensor product representation of unit vector projection</td></tr>
+</table>
+</div>
+
+<div>
+<span>Cross Product with Skew Symmetric Matrix</span>
+<table>
+    <tr><td><la-tex>\begin{bmatrix}0 & -v_z & v_y \\ v_z & 0 & -v_x \\ -v_y & v_x & 0\end{bmatrix}\begin{bmatrix}w_x\\w_y\\w_z\end{bmatrix}=\begin{bmatrix}v_yw_z-w_yv_z\\v_zw_x-w_zv_x\\v_xw_y-w_xv_y\end{bmatrix}</la-tex></td><td>Matrix calculation of cross product <la-tex>\vec{v}\times\vec{w}</la-tex></td></tr>
+</table>
+</div>
+
+<div>
+<span>Systems of Linear Equations with Gaussian Elimination</span><br/>
+<p>Elementary row operations used:
+<ul>
+  <li>Multiply row by k (multiplies determinant by k)</li>
+  <li>Add multiple of one row to another (no effect on determinant)</li>
+  <li>Swap rows (changes sign of determinant)</li>
+</ul>
+</p>
+<span>Given multiple linear equations:
+<ul>
+  <li><la-tex>b_0 = a_{0,0}x_0 + a_{0,1}x_1 + ... + a_{0,n-1}x_{n-1}</la-tex></li>
+  <li><la-tex>b_1 = a_{1,0}x_0 + a_{1,1}x_1 + ... + a_{1,n-1}x_{n-1}</la-tex></li>
+  <li><la-tex>...</la-tex></li>
+  <li><la-tex>b_{m-1} = a_{m-1,0}x_0 + a_{m-1,1}x_1 + ... + a_{m-1,n-1}x_{n-1}</la-tex></li>
+</ul>
+</span>
+<p>
+To solve for <la-tex>x_0,x_1,...x_{n-1}</la-tex>,
+Place the <i>a</i> elements on the left side and <i>b</i> elements in the rightmost column of an "augmented" matrix:
+</p>
+<p>
+<la-tex>\begin{bmatrix}
+    a_{0,0} & a_{0,1} & ... & a_{0,n-1} & | & b_0 \\
+    a_{1,0} & a_{1,1} & ... & a_{1,n-1} & | & b_1 \\
+    ... & ... & ... & ... & | & ... \\
+    a_{m-1,0} & a_{m-1,1} & ... & a_{m-1,n-1} & | & b_{m-1}
+\end{bmatrix}</la-tex>
+Then perform gaussian elimination, which steps are shown in this pseudocode:
+</p>
+<pre>
+for p = 1 to n do
+    // find the element with the largest value in col p
+    
+    // if the max is zero, stop
+    
+    // if the max element is not in row p, swap rows
+    
+    // set the pivot element to 1
+    multiply row p by 1/A[p][p]
+
+    // clear lower column entries
+    for r = p+1 to n do
+        subtract row p times A[r][p] from current row, so element in pivot column becomes 0
+
+// do backwards substitution
+for row = n-1 to 1 do
+    for col = row+1 to n do
+        // subtract out known quantities
+        b[row] = b[row] - A[row][col]*b[col]
+</pre>
+</div>
+
+<div>
+<span>Matrix inverse properties</span>
+<table>
+  <tr><td><la-tex>\mathbf{A}^T=\mathbf{A}^{-1}</la-tex></td><td>Inverse of orthogonal matrices</td></tr>
+  <tr><td><la-tex>(\mathbf{AB})^{-1}=\mathbf{B}^{-1}\mathbf{A}^{-1}</la-tex></td><td>Given A,B are square, invertible matrices</td></tr>
+</table>
+</div>
+
+<div>
+<span>Matrix determinant properties</span>
+<table>
+  <tr><td><la-tex>det(\mathbf{AB})=det(\mathbf{A})det(\mathbf{B})</la-tex></td></tr>
+  <tr><td><la-tex>det(\mathbf{A}^{-1})=\frac{1}{det(\mathbf{A})}</la-tex></td></tr>
+  <tr><td><la-tex>\begin{vmatrix}a & b \\ c & d\end{vmatrix}=ad-bc</la-tex></td></tr>
+  <tr><td><la-tex>\begin{vmatrix}a & b & c \\ d & e & f \\ g & h & i\end{vmatrix}=a(ei-fh) - b(di-fg) + c(dh-eg)</la-tex></td></tr>
+</table>
+</div>
+
+<div>
+<span>Cramer's Inverse Method</span>
+<table>
+  <tr><td><la-tex>\mathbf{A}^{-1} = \frac{1}{det(\mathbf{A})}\mathbf{A}^{adj}</la-tex></td></tr>
+</table>
+</div>
+
+<div>
+<span>Eigenvalues/Eigenvectors</span>
+<table>
+  <tr><td><la-tex>\mathbf{A}\vec{x} = \lambda\vec{x}</la-tex></td><td>lambda=eigenvalue, x=eigenvector</td></tr>
+  <tr><td><la-tex>det(\lambda\mathbf{I}-\mathbf{A})=0</la-tex></td><td>characteristic equation; nonzero solution IFF this is true</td></tr>
+</table>
+<span>To solve for eigenvalues/eigenvectors, expand characteristic equation to get n-degree polynomial
+of <la-tex>\lambda</la-tex>, then solve for the polynomial roots</span>
+</div>
+
+<h3>Chapter 4 - Affine Transformations</h3>
+
+<div>
+<span>Matrix definition</span>
+<table>
+<tr>
+<td>
+<la-tex>\mathbf{A}\vec{x}+\vec{y} =
+\begin{bmatrix}
+\mathbf{A} & \vec{y} \\
+\vec{0}^T & 1
+\end{bmatrix}
+\begin{bmatrix}
+\vec{x} \\
+1
+\end{bmatrix} =
+\begin{bmatrix}
+\mathbf{A}\vec{x} + \vec{y} \\
+1
+\end{bmatrix}</la-tex>
+</td>
+<td>Affine transformation of point x</td>
+</tr>
+<tr>
+<td><la-tex>\vec{v} = P_0 - P_1=
+\begin{bmatrix}\vec{x}_0 \\ 1\end{bmatrix}-\begin{bmatrix}\vec{x}_1 \\ 1\end{bmatrix} =
+\begin{bmatrix}\vec{x}_0-\vec{x}_1 \\ 0\end{bmatrix},
+\begin{bmatrix}
+\mathbf{A} & \vec{y} \\
+\vec{0}^T & 1
+\end{bmatrix}
+\begin{bmatrix}
+\vec{v} \\
+0
+\end{bmatrix} =
+\begin{bmatrix}
+\mathbf{A}\vec{v} \\
+0
+\end{bmatrix}
+</la-tex></td>
+<td>Affine transformation of vector v, where v is difference between 2 points</td>
+</tr>
+<tr>
+<td>
+<la-tex>
+\begin{bmatrix}
+\mathbf{A} & \vec{y} \\
+\vec{0}^T & 1
+\end{bmatrix}^{-1} =
+\begin{bmatrix}
+\mathbf{A}^{-1} & -\mathbf{A}^{-1}\vec{y} \\
+\vec{0}^T & 1
+\end{bmatrix}
+</la-tex>
+</td>
+<td>Affine transformation inverse</td>
+</tr>
+<tr>
+<td>
+<la-tex>
+\begin{bmatrix}
+1 & 0 & 0 & tx \\
+0 & 1 & 0 & ty \\
+0 & 0 & 1 & tz \\
+0 & 0 & 0 & 1
+\end{bmatrix} =
+\begin{bmatrix}
+\mathbf{I} & \vec{t} \\
+\vec{0}^T & 1
+\end{bmatrix}
+</la-tex>
+</td>
+<td>Translation affine matrix (only affects points).</td>
+</tr>
+<tr>
+<td>
+<la-tex>
+\begin{bmatrix}
+1 & 0 & 0 & -tx \\
+0 & 1 & 0 & -ty \\
+0 & 0 & 1 & -tz \\
+0 & 0 & 0 & 1
+\end{bmatrix} =
+\begin{bmatrix}
+\mathbf{I} & -\vec{t} \\
+\vec{0}^T & 1
+\end{bmatrix}
+</la-tex>
+</td>
+<td>Translation inverse</td>
+</tr>
+<tr>
+<td>
+<la-tex>
+\begin{bmatrix}
+1 & 0 & 0 \\
+0 & \cos\theta & -\sin\theta \\
+0 & \sin\theta & \cos\theta
+\end{bmatrix}
+</la-tex>
+</td>
+<td>x-axis rotation</td>
+</tr>
+<tr>
+<td>
+<la-tex>
+\begin{bmatrix}
+1 & 0 & 0 \\
+0 & \cos{-\theta} & -\sin{-\theta} \\
+0 & \sin{-\theta} & \cos{-\theta}
+\end{bmatrix} =
+\begin{bmatrix}
+1 & 0 & 0 \\
+0 & \cos\theta & \sin\theta \\
+0 & -\sin\theta & \cos\theta
+\end{bmatrix}
+</la-tex>
+</td>
+<td>x-axis rotation inverse (= transpose)</td>
+</tr>
+<tr>
+<td>
+<la-tex>
+\begin{bmatrix}
+\cos\theta & 0 & \sin\theta \\
+0 & 1 & 0 \\
+-\sin\theta & 0 & \cos\theta
+\end{bmatrix}
+</la-tex>
+</td>
+<td>y-axis rotation</td>
+</tr>
+<tr>
+<td>
+<la-tex>
+\begin{bmatrix}
+\cos{-\theta} & 0 & \sin{-\theta} \\
+0 & 1 & 0 \\
+-\sin{-\theta} & 0 & \cos{-\theta}
+\end{bmatrix} =
+\begin{bmatrix}
+\cos\theta & 0 & -\sin\theta \\
+0 & 1 & 0 \\
+\sin\theta & 0 & \cos\theta
+\end{bmatrix} 
+</la-tex>
+</td>
+<td>y-axis rotation inverse (= transpose)</td>
+</tr>
+<tr>
+<td>
+<la-tex>
+\begin{bmatrix}
+\cos\theta & -\sin\theta & 0 \\
+\sin\theta & \cos\theta & 0 \\
+0 & 0 & 1
+\end{bmatrix}
+</la-tex>
+</td>
+<td>z-axis rotation</td>
+</tr>
+<tr>
+<td>
+<la-tex>
+\begin{bmatrix}
+\cos{-\theta} & -\sin{-\theta} & 0 \\
+\sin{-\theta} & \cos{-\theta} & 0 \\
+0 & 0 & 1
+\end{bmatrix} =
+\begin{bmatrix}
+\cos\theta & \sin\theta & 0 \\
+-\sin\theta & \cos\theta & 0 \\
+0 & 0 & 1
+\end{bmatrix}
+</la-tex>
+</td>
+<td>z-axis rotation inverse (= transpose)</td>
+</tr>
+<tr>
+<td>
+<la-tex>
+R\vec{v} = R\vec{v}_\| + R\vec{v}_\perp =
+\cos\theta\vec{v} + [1-\cos\theta](\vec{v}\bullet\hat{r})\hat{r} + \sin\theta(\hat{r}\times\vec{v}) =
+[\cos\theta\mathbf{I} + (1-\cos\theta)(\hat{r}\otimes\hat{r}) + \sin\theta\tilde{r}] \vec{v} =
+\begin{bmatrix}
+tx^2+c & txy-sz & txz+sy \\
+txy+sz & ty^2+c & tyz-sx \\
+txz-sy & tyz+sx & tz^2+c
+\end{bmatrix}\vec{v},
+c=\cos\theta, s=\sin\theta,t=1-\cos\theta
+</la-tex>
+</td>
+<td>general axis rotation for <la-tex>\vec{v}</la-tex>about normalized axis <la-tex>\hat{r}=(x,y,z)</la-tex></td>
+</tr>
+<tr>
+<td>
+<la-tex>
+\begin{bmatrix}
+a & 0 & 0 & 0 \\
+0 & b & 0 & 0 \\
+0 & 0 & c & 0 \\
+0 & 0 & 0 & 1
+\end{bmatrix}
+</la-tex>
+</td>
+<td>Scaling matrix to scale x axis by a, y axis by b, z axis by c</td>
+</tr>
+<tr>
+<td>
+<la-tex>
+\begin{bmatrix}
+\mathbf{I}-2(\hat{n}\otimes\hat{n}) & \vec{0} \\
+\vec{0}^T & 1
+\end{bmatrix}
+</la-tex>
+</td>
+<td>Reflection matrix about normal <la-tex>\hat{n}</la-tex></td>
+</tr>
+<tr>
+<td>
+<la-tex>
+\begin{bmatrix}
+\mathbf{I}+\vec{s}\otimes\hat{n} & \vec{0} \\
+\vec{0}^T & 1
+\end{bmatrix}
+</la-tex>
+</td>
+<td>Shear matrix about plane with normal <la-tex>\hat{n}</la-tex> and shear vector <la-tex>\vec{s}</la-tex></td>
+</tr>
+<tr>
+<td>
+<la-tex>\vec{n}' = (\mathbf{M}^{-1})^T\vec{n}</la-tex>
+</td>
+<td>transformation matrix for normal <la-tex>\vec{n}</la-tex> given point transform <la-tex>\mathbf{M}</la-tex></td>
+</tr>
+<tr>
+<td>
+<la-tex>\mathbf{M} = \mathbf{TRS}</la-tex>
+</td>
+<td>Usual 3d object transform order (scale, rotation, translation), ordered right-to-left</td>
+</tr>
+<tr>
+<td>
+<la-tex>T(P) =
+\begin{bmatrix}
+s\mathbf{R}\vec{x} + \vec{t} \\
+1
+\end{bmatrix}
+</la-tex>
+</td>
+<td>Alternative transformation on a point P instead of 4x4 matrix, using uniform scale s, 3x3 rot matrix R, and translation t</td>
+</tr>
+<tr>
+<td>
+    <la-tex>s' = s_1s_0, \mathbf{R}' = \mathbf{R}_1\mathbf{R}_0, \vec{t}' = \vec{t}_1 + s_1\mathbf{R}_1\vec{t}_0</la-tex>
+</td>
+<td>Transform concatenation using previous representation (again instead of 4x4 matrix)</td>
+</tr>
+</table>
+</div>
+
+<p>Orientation is to rotation as position is to translation</p>
+
+<h3>Chapter 5 - Orientation Representation</h3>
+
+<p>4 ways to represent rotations:
+<ul>
+  <li>Rotation Matrix
+    <ul>
+      <li>Pros:
+        <ul>
+          <li>2nd lowest num operations for concatenation</li>
+          <li>Efficiently transform vectors</li>
+          <li>Can correct for floating point errors via gram-schmidt orthonormalization (although expensive)</li>
+        </ul>
+      </li>
+      <li>Cons:
+        <ul>
+          <li>Storage size (9 floats)</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>Euler Angles
+    <ul>
+      <li>Pros:
+        <ul>
+          <li>Only 3 floats</li>
+          <li>Efficient vector tranformation (if sin/cos vals cached)</li>
+        </ul>
+      </li>
+      <li>Cons:
+        <ul>
+          <li>Gimble Lock</li>
+          <li>Expensive to concatenate</li>
+          <li>Cannot normalize/account for floating point error drift</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>Angle-axis
+    <ul>
+      <li>Pros:
+        <ul>
+          <li>Storage size: 4 floats</li>
+        </ul>
+      </li>
+      <li>Cons:
+        <ul>
+          <li>Expensive to concatenate</li>
+          <li>Expensive vector transformation</li>
+          <li>Cannot normalize/account for floating point error drift</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>Quaternion
+    <ul>
+      <li>Pros:
+        <ul>
+          <li>Storage size: 4 floats</li>
+          <li>Easy to normalize/account for floating point error drift</li>
+          <li>Inexpensive concatenation</li>
+        </ul>
+      </li>
+      <li>Cons:
+        <ul>
+          <li>Slightly more expensive vector transformation</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+</p>
+
+<div>
+<span>Quaternion formulas:</span>
+<table>
+<tr><td><la-tex>\vec{q} = (w,\vec{v})</la-tex></td><td>Quaternion representation, w = scalar part, v = vector part</td></tr>
+<tr><td><la-tex>\|\vec{q}\| = \sqrt{w^2+x^2+y^2+z^2}</la-tex></td><td>Quaternion length/magnitude</td></tr>
+<tr><td><la-tex>\hat{q} = \frac{\vec{q}}{\|\vec{q}\|}</la-tex></td><td>Normalized quaternion</td></tr>
+<tr><td><la-tex>w=\cos(\theta/2), \vec{v}=\sin(\theta/2)\hat{r}</la-tex></td><td>Quaternion from angle, axis r</td></tr>
+<tr><td><la-tex>\mathbf{M}_q =
+\begin{bmatrix}
+1-2y^2-2z^2 & 2xy - 2wz & 2xz + 2wy \\
+2xy + 2wz & 1 - 2x^2 - 2z^2 & 2yz - 2wx \\
+2xz - 2wy & 2yz + 2wx & 1 - 2x^2 - 2y^2
+\end{bmatrix}
+</la-tex></td><td>Quaternion to 3x3 matrix</td></tr>
+<tr><td><la-tex>\vec{q}_2\vec{q}_1 = (w_1w_2 - \vec{v}_1\bullet\vec{v}_2, w_1\vec{v}_2 + w_2\vec{v}_1 + \vec{v}_2\times\vec{v}_1)</la-tex></td><td>Quaternion product/concatenation</td></tr>
+<tr><td><la-tex>\vec{q}^{-1} = (w,-\vec{v})</la-tex></td><td>Inverse quaternion, assuming q is normalized</td></tr>
+<tr><td><la-tex>R_q(\vec{p}) = \vec{q}\vec{p}\vec{q}^{-1}</la-tex></td><td>Vector rotation (p) using quaternion Rq</td></tr>
+<tr><td><la-tex>R_q(\vec{p}) = (2w^2 - 1)\vec{p} + 2(\vec{v}\bullet\vec{p})\vec{v} + 2w(\vec{v}\times\vec{p})</la-tex></td><td>Vector rotation (p) using quaternion Rq</td></tr>
+<tr><td><la-tex>\vec{p}' = \vec{r}(s\vec{p})\vec{r}^{-1} + \vec{t}</la-tex></td><td>Alternate transformation representation (instead of matrix), but using quaternion r instead of 3x3 rot mat</td></tr>
+<tr><td><la-tex>s' = s_1s_0, \vec{r}' = \vec{r}_1\vec{r}_0, \vec{t}' = \vec{t}_1 + \vec{r}_1(s_t\vec{t}_0)\vec{r}_1^{-1}</la-tex></td><td>Alternate transformation concatenation with quaternion r</td></tr>
+</table>
+</div>
+
+</body>
+</html>
+
