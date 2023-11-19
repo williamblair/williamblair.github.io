@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>GAM-425 Notes</title>
+
+    <script src="./TeXZilla-min.js"></script>
+    <script src="./customElement.js"></script>
+
+    <style>
+      html, body {
+        background-color: #000000;
+        color: #FFFFFF;
+      }
+      table,tr,td {
+        padding: 10px;
+        border: 1px solid;
+        border-collapse: collapse;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Vectors</h1>
+    <table>
+      <tr><td><la-tex>||\vec{v}|| = \sqrt{x^2 + y^2 + z^2}</la-tex></td><td>Euclidean Length/Magnitude</td></tr>
+      <tr><td><la-tex>\vec{v}_1\cdot\vec{v}_2 = x_1x_2 + y_1y_2 + z_1z_2</la-tex><br/>
+          <la-tex>= ||\vec{v}_1|| ||\vec{v}_2||\cos\theta</la-tex><br/>
+          = 0 if <la-tex>\vec{v}_1,\vec{v}_2</la-tex> perpindicular/90 degrees</td><td>Dot Product</td></tr>
+      <tr><td><la-tex>\vec{v}_1\times\vec{v}_2 = (y_1z_2 - z_1y_2, -(x_1z_2 - z_1x_2), x_1y_2 - y_1x_2)</la-tex><br/>
+          <la-tex>||\vec{v}\times\vec{w}|| = ||\vec{v}|| ||\vec{w}||\sin\theta</la-tex><br/>
+          <la-tex>\vec{v}\times\vec{w} = (0,0,0) if \vec{v},\vec{w}</la-tex> are parallel/colinear</td><td>Cross Product</td></tr>
+      <tr><td><la-tex>proj_\vec{w}\vec{v} = \frac{\vec{v}\cdot\vec{w}}{\vec{w}\cdot\vec{w}}\vec{w}</la-tex></td><td>Projection of v onto w</td></tr>
+      <tr><td><la-tex>perp_\vec{w}\vec{v} = \vec{v} - proj_\vec{w}\vec{v}</la-tex></td><td>Perpindicular of v onto w</td></tr>
+      <tr><td><la-tex>(x,y,z,1)</la-tex></td><td>Point</td></tr>
+      <tr><td><la-tex>(x,y,z,0)</la-tex></td><td>Vector</td></tr>
+    </table>
+    
+    <h1>Lines &amp; Planes</h1>
+    <table>
+      <tr><td>L(t) = P + t<b>v</b> or S + t<b>v</b><br/>
+        = L(t) = P + t(Q-P) for 2 points</td><td>Line equation</td></tr>
+      <tr><td><la-tex>d = ||perp_\vec{v}(S-P)|| = ||(S-P)-\frac{(S-P) \cdot v}{v \cdot v}v||</la-tex></td><td>Distance of point S to line L(t)</td></tr>
+      <tr><td><la-tex>(P-P_0)\cdot\vec{n} = 0</la-tex><br/>
+        <la-tex>\vec{n} = (P_1-P_0)\times(P_2-P_0)</la-tex> if given 3 points</td><td>Plane Equation</td></tr>
+      <tr><td><la-tex>d = abs(\frac{(P_1 - P_0) \cdot \vec{n}}{||\vec{n}||})</la-tex><br/>
+        without abs, if d&gt;0, p1 on same side, if d&lt;0, opposite side</td><td>Distance of point P1 to plane</td></tr>
+      <tr><td><la-tex>\vec{v}\cdot\vec{n} = 0</la-tex></td><td>Line is parallel to plane (v from line, n from plane)</td></tr>
+      <tr><td><la-tex>(S-P_0)\cdot\vec{n} = 0</la-tex></td><td>Line in plane if parallel and satisfies plane equation</td></tr>
+      <tr><td><la-tex>t' = \frac{(P_0-S)\cdot\vec{n}}{\vec{v}\cdot\vec{n}}</la-tex></td><td>Intersection point t of line L(t) which intersects with plane (if not parallel)</td></tr>
+      <tr><td><la-tex>\vec{w}=P_1-P_0,\vec{n}'=\vec{v}\times\vec{w}=k\vec{n}</la-tex><br/>
+        k &lt; 0: P1 right of L(t), k &gt; 0: P1 left of L(t), else P1 in L(t)</td><td>Left-right of point P1, parallel vec v, and plane (P0,n)</td></tr>
+    </table>
+    
+    <h1>Transforms</h1>
+    <table>
+      <tr><td>T(<b>u</b>+<b>v</b>) = T(<b>u</b>)+T(<b>v</b>)<br/>
+        T(a<b>u</b>) = aT(<b>u</b>)</td><td>Linear transformation definition</td></tr>
+      <tr><td><la-tex>\begin{pmatrix}
+        1 & 0 & 0 & x \\
+        0 & 1 & 0 & y \\
+        0 & 0 & 1 & z \\
+        0 & 0 & 0 & 1
+        \end{pmatrix}</la-tex></td><td>Translation matrix</td></tr>
+      <tr><td><la-tex>\begin{pmatrix}
+        1 & 0 & 0 & 0 \\
+        0 & \cos\theta & -\sin\theta & 0 \\
+        0 & \sin\theta & \cos\theta & 0 \\
+        0 & 0 & 0 & 1
+        \end{pmatrix}</la-tex></td><td>Rotation matrix about x axis</td></tr>
+      <tr><td><la-tex>\begin{pmatrix}
+        \cos\theta & 0 & \sin\theta & 0 \\
+        0 & 1 & 0 & 0 \\
+        -\sin\theta & 0 & \cos\theta & 0 \\
+        0 & 0 & 0 & 1
+        \end{pmatrix}</la-tex></td><td>Rotation matrix about y axis</td></tr>
+      <tr><td><la-tex>\begin{pmatrix}
+        \cos\theta & -\sin\theta & 0 & 0 \\
+        \sin\theta & \cos\theta & 0 & 0 \\
+        0 & 0 & 1 & 0 \\
+        0 & 0 & 0 & 1
+        \end{pmatrix}</la-tex></td><td>Rotation matrix about z axis</td></tr>
+      <tr><td><la-tex>\begin{pmatrix}
+        tx^2+c & txy-sz & txz+sy & 0 \\
+        txy+sz & ty^2+c & tyz-sx & 0 \\
+        txz-sy & tyz+sx & tz^2+c & 0 \\
+        0 & 0 & 0 & 1
+        \end{pmatrix}</la-tex></td><td>Rotation matrix about<br/>normalized r=(x,y,z), c=cos(&theta;), s=sin(&theta;), t=1-cos(&theta;)</td></tr>
+      <tr><td><la-tex>R_{\vec{r},\theta}(\vec{v}) = \vec{v}\cos\theta + (1-\cos\theta)(\vec{v}\cdot\vec{r})\vec{r} + (\vec{r}\times\vec{v})\sin\theta</la-tex></td><td>Rodriguez rotation formaula about normalized axis r=(x,y,z)</td></tr>
+      <tr><td><la-tex>\begin{pmatrix}
+        a & 0 & 0 & 0 \\
+        0 & b & 0 & 0 \\
+        0 & 0 & c & 0 \\
+        0 & 0 & 0 & 1
+        \end{pmatrix}</la-tex></td><td>Scale Matrix</td></tr>
+      <tr><td><la-tex>\begin{pmatrix}
+        1-2x^2 & -2xy & -2xz & 0 \\
+        -2xy & 1-2y^2 & -2yz & 0 \\
+        -2xz & -2yz & 1-2z^2 & 0 \\
+        0 & 0 & 0 & 1
+        \end{pmatrix}</la-tex></td><td>Reflection matrix about plane normalized normal n=(x,y,z)</td></tr>
+      <tr><td><la-tex>Rf_{\vec{n}}(\vec{v}) = \vec{v} - 2(\vec{v}\cdot\vec{n})\vec{n}</la-tex></td><td>Reflection function about normalized n=(x,y,z)</td></tr>
+      <tr><td><la-tex>M = \begin{pmatrix}I & C \\ 0^T & 1\end{pmatrix}
+        \begin{pmatrix}R_{r,\theta} & 0 \\ 0^T & 1\end{pmatrix}
+        \begin{pmatrix}I & -C \\ 0^T & 1\end{pmatrix}</la-tex></td><td>Transform when not at origin, relative to point C</td></tr>
+      <tr><td><la-tex>W = TRS</la-tex><br/><la-tex>W^{-1} = (TRS)^{-1} = S^{-1}R^{-1}T^{-1}</la-tex></td><td>Transformation order</td></tr>
+    </table>
+    
+    <h1>Matrices</h1>
+    <table>
+      <tr><td><la-tex>det(A) = |A| = a_{11}\begin{bmatrix}
+        a_{22} & a_{23} \\
+        a_{32} & a_{33}
+      \end{bmatrix} - a_{12}\begin{bmatrix}
+        a_{21} & a_{23} \\
+        a_{31} & a_{33}
+      \end{bmatrix} + a_{13}\begin{bmatrix}
+        a_{21} & a_{22} \\
+        a_{31} & a_{32}
+      \end{bmatrix}</la-tex></td><td>Determinant of 3x3 matrix A</td></tr>
+      <tr><td><la-tex>|A| = a_{11}\begin{bmatrix}
+        a_{22} & a_{23} & a_{24} \\
+        a_{32} & a_{33} & a_{34} \\
+        a_{42} & a_{43} & a_{44}
+      \end{bmatrix} - a_{12}\begin{bmatrix}
+        a_{21} & a_{23} & a_{24} \\
+        a_{31} & a_{33} & a_{34} \\
+        a_{41} & a_{43} & a_{44}
+      \end{bmatrix} + a_{13}\begin{bmatrix}
+        a_{21} & a_{22} & a_{24} \\
+        a_{31} & a_{32} & a_{34} \\
+        a_{41} & a_{42} & a_{44}
+      \end{bmatrix} - a_{14}\begin{bmatrix}
+        a_{21} & a_{22} & a_{23} \\
+        a_{31} & a_{32} & a_{33} \\
+        a_{41} & a_{42} & a_{43}
+      \end{bmatrix}</la-tex></td><td>Determinant of 4x4 matrix A</td></tr>
+      <tr><td><la-tex>\begin{pmatrix}
+        a\begin{pmatrix}r_{00}\\r_{10}\\r_{20}\end{pmatrix} &
+        b\begin{pmatrix}r_{01}\\r_{11}\\r_{21}\end{pmatrix} &
+        c\begin{pmatrix}r_{02}\\r_{12}\\r_{22}\end{pmatrix} &
+        \begin{pmatrix}t_x\\t_y\\t_z\end{pmatrix} \\
+        0 & 0 & 0 & 1
+        \end{pmatrix}</la-tex></td><td>Combined TRS matrix form</td></tr>
+      <tr><td><la-tex>W'_B = (W_A)^{-1}W_B</la-tex></td><td>World matrix Wb relative to A's local space</td></tr>
+    </table>
+    
+    <h1>Euler Angles &amp; Quaternions</h1>
+    <table>
+      <tr><td><la-tex>R = R_xR_yR_z = \begin{pmatrix}
+        \cos\theta_y\cos\theta_z & -\cos\theta_y\sin\theta_z & \sin\theta_y \\
+        ... & ... & -\sin\theta_x\cos\theta_y \\
+        ... & ... & \cos\theta_x\cos\theta_y
+      \end{pmatrix}</la-tex></td><td>Euler Angle Rotation Matrix</td></tr>
+      <tr><td><la-tex>\vec{q}=(w,\vec{v})=(w,x,y,z)</la-tex><br/>
+        <la-tex>\vec{q}=(\cos\frac{\theta}{2},\vec{r}\sin\frac{\theta}{2})</la-tex>, r = rotation axis</td><td>Quaternion Representation</td></tr>
+      <tr><td><la-tex>\vec{q}_1\cdot\vec{q}_2 = w_1w_2 + \vec{v}_1\cdot\vec{v}_2</la-tex></td><td>Quaternion dot product</td></tr>
+      <tr><td><la-tex>||\vec{q}||=\sqrt{\vec{q}\cdot\vec{q}}</la-tex></td><td>Quaternion Length/Magnitude</td></tr>
+      <tr><td><la-tex>\vec{q}' = \frac{\vec{q}}{||\vec{q}||}</la-tex></td><td>Normalize Quaternion</td></tr>
+      <tr><td><la-tex>\vec{q}_1\vec{q}_2 = (w_1w_2 - \vec{v}_1\cdot\vec{v}_2, w_1\vec{v}_2 + w_2\vec{v}_1 + \vec{v}_1\times\vec{v}_2)</la-tex></td><td>Quaternion Multiplication</td></tr>
+      <tr><td><la-tex>\vec{q}^{-1} = \frac{1}{||\vec{q}||^2}(w,-\vec{v})</la-tex></td><td>Quaternion Inverse</td></tr>
+      <tr><td><la-tex>\vec{q}=(0,\vec{v})</la-tex></td><td>Quaternion form of vector v</td></tr>
+      <tr><td><la-tex>R_q(p) = \vec{q}\vec{p}\vec{q}^{-1}</la-tex></td><td>Rotating vector p=(0,v) using quaternion</td></tr>
+      <tr><td><la-tex>\theta=2\cos^{-1}(w), ||\vec{v}||=\sqrt{1-w^2},\vec{r}=\frac{\vec{v}}{||\vec{v}||}</la-tex></td><td>Quaternion to axis-angle</td></tr>
+      <tr><td><la-tex>M_q = \begin{pmatrix}
+        1-2y^2-2z^2 & 2xy-2wz & 2xz-2wy \\
+        2xy+2wz & 1-2x^2-2z^2 & 2yz-2wx \\
+        2xz-2wy & 2yz+2wx & 1-2x^2-2y^2
+      \end{pmatrix}</la-tex></td><td>Quaternion to rotation matrix</td></tr>
+    </table>
+
+    <h1>Cameras/Rendering pipeline matrices</h1>
+    <table>
+      <tr><td>Cpos = position<br/>Tpos = target position/lookat position<br/>
+              vdir = normalize(Tpos - Cpos)<br/>
+              up dir given<br/>
+              left-hand camera: local z vec = vfwd = vdir<br/>
+              right-hand camera: local z vec = vfwd = -vdir</td>
+          <td>Camera vectors/view direction</td>
+      </tr>
+      <tr><td><la-tex>C_{view-to-world} = \begin{pmatrix}
+              v_{side} & v_{up} & v_{fwd} & Cpos \\
+              0 & 0 & 0 & 1
+              \end{pmatrix}</la-tex><br/>
+          <la-tex>v_{side} = normalize(up \times v_{fwd})</la-tex><br/>
+          <la-tex>v_{up} = normalize(v_{fwd} \times v_{side})</la-tex></td>
+          <td>Camera view-to-world matrix</td>
+      </tr>
+      <tr><td><la-tex>C_{world-to-view} = C_{view-to-world}^{-1} = \begin{pmatrix}
+              R^T & -(R^T C_{pos}) \\
+              0^T & 1
+              \end{pmatrix}</la-tex></td>
+          <td>Camera world-to-view matrix</td>
+      </tr>
+      <tr><td><la-tex>M_{ortho} = \begin{pmatrix}
+                  2/(r-l) & 0 & 0 & -(r+l)/(r-l) \\
+                  0 & 2/(t-b) & 0 & -(t+b)/(t-b) \\
+                  0 & 0 & -2/(f-n) & -(f+n)/(f-n) \\
+                  0 & 0 & 0 & 1
+      \end{pmatrix}</la-tex></td>
+          <td>Orthographic projection matrix (right-hand camera using ndc -1,1)</td>
+      </tr>
+      <tr><td><la-tex>M_{persp} = \begin{pmatrix}
+                  d/a & 0 & 0 & 0 \\
+                  0 & d & 0 & 0 \\
+                  0 & 0 & -(f+n)/(f-n) & (-2fn)/(f-n) \\
+                  0 & 0 & -1 & 0
+      \end{pmatrix}</la-tex></td>
+          <td>Perspective projection matrix (right-hand camera, left-hand ndc -1,1). d = cot(theta/2), a = aspect ratio = width/height<br/>
+          After multiplying camera-space point by this, remember to divide by w to get final 3d point in NDC coordinates</td>
+      </tr>
+      <tr><td><la-tex>M_{ndc-to-screen} = \begin{pmatrix}
+                  w/2 & 0 & 0 & w/2 \\
+                  0 & -h/2 & 0 & h/2 \\
+                  0 & 0 & d_z/2 & d_z/2 \\
+                  0 & 0 & 0 & 1
+      \end{pmatrix}</la-tex>
+              <td>ndc to screen matrix, dz = depth used</td></td>
+      </tr>
+    </table>
+
+    <h1>Backface Culling</h1>
+    <table>
+      <tr>
+          <td><la-tex>v_{los} \cdot n < 0 \rightarrow visible</la-tex>, else culled</td>
+          <td>Culling given face normal n and line of sight direction vlos</td>
+      </tr>
+      <tr>
+          <td><la-tex>n = (b-a)\times(c-a)</la-tex></td>
+          <td>Normal n calculation given triangle with points a,b,c</td>
+      </tr>
+      <tr>
+          <td><la-tex>v_{los} = p1 - C_{pos}</la-tex></td>
+          <td>vlos calc using perspective projection camera, triangle world space points (p1,p2,p3)</td>
+      </tr>
+      <tr>
+          <td><la-tex>v_{los} = v_{dir}</la-tex></td>
+          <td>vlos calc using orthographic camera</td>
+      </tr>
+    </table>
+
+    <h1>Object Picking</h1>
+    <table>
+      <tr>
+          <td>Near plane p0 = <la-tex>C_{view-to-world}M_{persp}^{-1}M_{screen-to-ndc}\begin{pmatrix}x\\y\\0\\1\end{pmatrix}</la-tex><br/>
+          Far plane p1 = <la-tex>C_{view-to-world}M_{persp}^{-1}M_{screen-to-ndc}\begin{pmatrix}x\\y\\d_z\\1\end{pmatrix}</la-tex></td>
+          <td>Screen space to world space for object picking. <br/>
+              Divide by w as the last step (after multiplying by Mview-to-world)</td>
+      </tr>
+    </table>
+
+    <h1>Collision Detection (Bsphere,AABB,OBB)</h1>
+    <table>
+      <tr>
+          <td>length(P-C) &lt; r then P inside, else outside</td>
+          <td>Point P and Bsphere=(C,r) collision, Bsphere C and r both in world space</td>
+      </tr>
+      <tr>
+          <td>length(C-C') &lt; r + r' then intersects, else no intersection</td>
+          <td>Bsphere(C,r) and BSphere(C',r') collision, both Bspheres C/r in world space</td>
+      </tr>
+      <tr>
+          <td>min.x &lt; P.x &lt; max.x AND<br/>
+              min.y &lt; P.y &lt; max.y AND<br/>
+          min.z &lt; P.z &lt; max.z then P inside A, else not</td>
+          <td>AABB-point P intersection</td>
+      </tr>
+      <tr>
+          <td>Test if intervals (a,b) and (c,d) overlap:<br/>
+              if (b&lt;c) or (d&lt;a) then return false (no overlap)<br/>
+          else return true (overlap)</td>
+          <td>Interval overlap test</td>
+      </tr>
+      <tr>
+          <td>Clamping c to interval (a,b):<br/>
+              if c &lt; a return a<br/>
+              else if b &lt; c return b<br/>
+          else return c</td>
+          <td>Clamping function on scalar to interval.<br/>
+              To clamp point between (min,max) apply clamp to x,y,z</td>
+      </tr>
+      <tr>
+          <td>p' = clamp(C',(min,max))<br/>
+           test p' point intersection with Bsphere</td>
+          <td>Bsphere-AABB collision test, using world-space bpshere C'/r'</td>
+      </tr>
+      <tr>
+          <td>Compute <la-tex>W^{-1}</la-tex> and <la-tex>L'_N = W^{-1} C'_N</la-tex><br/>
+              Compute <la-tex>Q = L'_N</la-tex> clamped to OBB local space (min,max)<br/>
+              Compute <la-tex>Q' = WQ</la-tex> clamped point in world space<br/>
+          Test if point Q' is in Bsphere</td>
+          <td>OBB using matrix W and Bsphere(C'_N,r_N) intersection
+          (C'_N world space)</td>
+      </tr>
+      <tr>
+          <td>calc <la-tex>\vec{v}' = W^{-1} \vec{v}</la-tex><br/>
+              calc proj_max = <la-tex>(|v'_x a| + |v'_y b| + |v'_z c|)/||\vec{v}||</la-tex><br/>
+              return s<sup>2</sup> proj_max</td>
+          <td>Max obb projection on axis v. OBB has tform W, (a,b,c) = max-min,<br/>
+          s = length of first column of W (assuming uniform scale).</td>
+      </tr>
+      <tr>
+          <td>Proj1 = Max OBB1 projection on Axis v<br/>
+              Proj2 = Max OBB2 projection on Axis v<br/>
+              <la-tex>D = |(C2-C1) \cdot \vec{v}| / ||\vec{v}||</la-tex><br/>
+          if D &le; Proj1 + Proj2 then return true (overlap),
+          else false (no overlap)</td>
+          <td>OBB,OBB axis overlap along axis v. If any axis returns no overlap,<br/>
+          then no intersection; else intersection. C1,C2 in world space</td>
+      </tr>
+      <tr>
+          <td>Treat AABB as OBB then do OBB/OBB intersection</td>
+          <td>AABB vs OBB intersection</td>
+      </tr>
+    </table>
+
+    <h1>Collision Detection (Plane,triangle,point,line,ray,segment)</h1>
+    <table>
+      <tr>
+          <td><la-tex>Q' = P + \frac{v \cdot (Q-P)}{v \cdot v}v</la-tex></td>
+          <td>Point Q' on line (L(t) = P + tv) that is closest to given P given Q</td>
+      </tr>
+      <tr>
+          <td><la-tex>d = ||Q-P||^2 - \frac{(\vec{v} \cdot (Q-P))^2}{\vec{v} \cdot \vec{v}}</la-tex></td>
+          <td>Distance from point Q to line L(t) = P + tv</td>
+      </tr>
+      <tr>
+          <td><la-tex>S(t) = P_0 + t(P_1 - P_0)</la-tex></td>
+          <td>Line segment definition, 0 &le; t &le; 1</td>
+      </tr>
+      <tr>
+          <td><la-tex>t = \frac{\vec{v} \cdot (Q - P_0)}{\vec{v} \cdot \vec{v}}</la-tex><br/>
+              if t &lt; 0 then return <la-tex>Q' = S(0) = P_0</la-tex><br/>
+              if t &gt; 1 then return <la-tex>Q' = S(1) = P_1</la-tex><br/>
+              else return <la-tex>Q' = S(t)</la-tex></td>
+          <td>Closest point Q' on segment S(t) to point Q.<br/>
+          distance from point Q to S(t) is ||Q' - Q||.</td>
+      </tr>
+      <tr>
+          <td><la-tex>R(t) = P_0 + t\vec{v}</la-tex></td>
+          <td>ray definition, t &ge; 0</td>
+      </tr>
+      <tr>
+          <td><la-tex>t = \frac{\vec{v} \cdot (Q - P_0)}{\vec{v} \cdot \vec{v}}</la-tex><br/>
+              if t &lt; 0 return <la-tex>R(0) = P_0</la-tex><br/>
+              else return <la-tex>R(t)</la-tex></td>
+          <td>Closest point on ray R(t) to point Q.</td>
+      </tr>
+      <tr>
+          <td><la-tex>t = (\vec{v} \cdot (C-P)) / (\vec{v} \cdot \vec{v})</la-tex><br/>
+              if t &lt; 0 then t = 0 <br/>
+              <la-tex>Q = P + t\vec{v}</la-tex><br/>
+              return <la-tex>||C - Q||^2 \less r^2</la-tex></td>
+          <td>Ray(P,v) Bsphere(C,r) intersection</td>
+      </tr>
+      <tr>
+          <td><la-tex>C_1 = P_1</la-tex><br/>
+              <la-tex>C_2 = P_2 + \frac{\vec{v}_2\cdot(P_1-P_2)}{\vec{v}_2 \cdot \vec{v}_2}\vec{v}_2</la-tex></td>
+          <td>Line-line closest points if <la-tex>L_1(t), L_2(t)</la-tex> are parallel (b^2 - ac == 0 from below)<br/>
+              if <la-tex>C_1 = C_2</la-tex> then lines are the same (coincident)</td>
+      </tr>
+      <tr>
+          <td><la-tex>a = \vec{v}_1 \cdot \vec{v}_1, b = \vec{v}_1 \cdot \vec{v}_2, c = \vec{v}_2 \cdot \vec{v}_2</la-tex><br/>
+              <la-tex>d = (P_1 - P_2) \cdot \vec{v}_1, e = (P_1 - P_2) \cdot \vec{v}_2</la-tex><br/>
+              <la-tex>t1 = (cd-be)/(b^2 - ac), t2 = (db - ae)/(b^2 - ac)</la-tex></td>
+          <td>Variables for line-line intersection</td>
+      </tr>
+      <tr>
+          <td><la-tex>C_1 = L_1(t_1) = P_1 + t1\vec{v}_1, C_2 = L_2(t_2) = P_2 + t_2\vec{v}_2</la-tex></td>
+          <td>Line-line closest points if <la-tex>L_1(t), L_2(t)</la-tex> NOT parallel</td>
+      </tr>
+      <tr>
+          <td>Distance <la-tex>d = ||C_1 - C_2||</la-tex></td>
+          <td>Line-line intersection/distance between closest points <la-tex>C_1, C_2</la-tex> from above</td>
+      </tr>
+      <tr>
+          <td>if <la-tex>v_x = 0</la-tex>:<br/>
+              if (<la-tex>P_0x \less min_x</la-tex> || <la-tex>P_0x &gt; max_x</la-tex>) then return false<br/>
+              else [<la-tex>s_x,t_x</la-tex>] = [-inf,inf].<br/>
+              else if <la-tex>v_x</la-tex> != 0:<br/>
+              <la-tex>a = (min_x - P_0x)/v_x, b = (max_x - P_0x)/v_x</la-tex><br/>
+              <la-tex>s_x</la-tex> = smallest of <la-tex>(a,b)</la-tex>
+              <la-tex>t_x</la-tex> = largest of <la-tex>(a,b)</la-tex><br/>
+          (repeat above for y,z axis)<br/>
+          if [s_x,t_x] overlaps [s_y,t_y] AND<br/>
+          [s_y,t_y] overlaps [s_z,t_z] AND<br/>
+          [s_z,t_z] overlaps [s_x,t_x] return true</td>
+          <td>Line-AABB intersection fro L(P_0,v) and AABB(Max,Min)</td>
+      </tr>
+      <tr>
+          <td>Convert line to OBB's local space where the OBB is AABB and use
+          above method</td>
+          <td>Line-OBB intersection</td>
+      </tr>
+      <tr>
+          <td><la-tex>d = |\frac{(C-P_0) \cdot \vec{n}}{||\vec{n}||}|</la-tex><br/>
+          if d &lt; r then intersection, else no intersection</td>
+          <td>Plane-Bsphere intersection. Without abs, if = 0 then C in plane,<br/>
+              if d &gt; 0 then C above plane (same side as n),<br/>
+          if d &lt; 0 then C below plane (opposite side as n).</td>
+      </tr>
+      <tr>
+          <td><la-tex>t' = ((P_0 - S_1) \cdot n) / ((S_2 - S_1) \cdot n)</la-tex><br/>
+          if 0 &le; t' &le; 1 then intersection, else no intersection</td>
+          <td>Plane P0,n segment S(t) = S1 + t(S2 - S1) collision method 1</td>
+      </tr>
+      <tr>
+          <td><la-tex>d_1 = (S_1 - P_0) \cdot \vec{n}, d_2 = (S_2 - P_0) \cdot \vec{n}</la-tex><br/>
+              if (<la-tex>d_1 &lt; 0</la-tex> and <la-tex>d_2 &gt; 0</la-tex>) OR (<la-tex>d_2 &lt; 0</la-tex> and <la-tex>d_1 &gt; 0</la-tex>) then intersection,
+              else no intersection</td>
+          <td>Plane segmend collision method 2 (only gives yes/no)</td>
+      </tr>
+      <tr>
+          <td>h = OBB half projection on <la-tex>\vec{n}</la-tex><br/>
+              <la-tex>S1 = C - h(\vec{n}/||\vec{n}||)</la-tex> (C in world space)<br/>
+              <la-tex>S2 = C + h(\vec{n}/||\vec{n}||)</la-tex><br/>
+              <la-tex>d1 = (S1 - P0) \cdot \vec{n}</la-tex><br/>
+              <la-tex>d2 = (S2 - P0) \cdot \vec{n}</la-tex><br/>
+          return d1 &lt; 0 AND d2 &gt; 0</td>
+          <td>OBB(max,min) and Plane(P0,n) collision.<br/>
+              OBB half = (max-min)*0.5. Projection axis v = n</td>
+      </tr>
+    </table>
+
+    <h1>Interpolation</h1>
+    <table>
+      <tr>
+          <td><la-tex>u = (t - t_i)/(t_{i+1} - t_i)</la-tex><br/>
+              <la-tex>U = (u,1)</la-tex><br/>
+              <la-tex>M_{lin} = \begin{pmatrix}
+                  -1 & 1 \\
+                  1 & 0
+                  \end{pmatrix}</la-tex><br/>
+              <la-tex>G = \begin{pmatrix}P_i \\ P_{i+1}\end{pmatrix}</la-tex><br/>
+              <la-tex>Q(u) = U M_{lin} G</la-tex>
+          </td>
+          <td>Linear interpolation at time t given points P and times</td>
+      </tr>
+      <tr>
+          <td><la-tex>u = (t - t_i)/(t_{i+1} - t_i)</la-tex><br/>
+              <la-tex>U = (u^3,u^2,u,1)</la-tex><br/>
+              <la-tex>M_{cr} = 0.5 \begin{pmatrix}
+                  -1 & 3 & -3 & 1 \\
+                  2 & -5 & 4 & -1 \\
+                  -1 & 0 & 1 & 0 \\
+                  0 & 2 & 0 & 0
+                  \end{pmatrix}</la-tex><br/>
+              <la-tex>G = \begin{pmatrix}P_{i-1} \\ P_i \\ P_{i+1} \\ P_{i+2}\end{pmatrix}</la-tex><br/>
+              <la-tex>Q(u) = U M_{cr} G</la-tex>
+          </td>
+          <td>Catmull-Rom interpolation at time t given points P and times</td>
+      </tr>
+      <tr>
+          <td><la-tex>u = (t - t_i)/(t_{i+1} - t_i)</la-tex><br/>
+              <la-tex>U = (u^3,u^2,u,1)</la-tex><br/>
+              <la-tex>M_{bezier} = \begin{pmatrix}
+                  -1 & 3 & -3 & 1 \\
+                  3 & -6 & 3 & 0 \\
+                  -3 & 3 & 0 & 0 \\
+                  1 & 0 & 0 & 0
+                  \end{pmatrix}</la-tex><br/>
+              <la-tex>G = \begin{pmatrix}P_i \\ C_{i1} \\ C_{i2} \\ P_{i+1}\end{pmatrix}</la-tex><br/>
+              <la-tex>Q(u) = U M_{bezier} G</la-tex>
+          </td>
+          <td>Cubic Bezier Interpolation at time t given points P, control points C, and times</td>
+      </tr>
+      <tr>
+          <td><la-tex>u = (t - t_i)/(t_{i+1} - t_i)</la-tex><br/>
+              <la-tex>U = (u^2,u,1)</la-tex><br/>
+              <la-tex>M_{bezier} = \begin{pmatrix}
+                  1 & -2 & 1 \\
+                  -2 & 2 & 0 \\
+                  1 & 0 & 0
+                  \end{pmatrix}</la-tex><br/>
+              <la-tex>G = \begin{pmatrix}P_i \\ C_i \\ P_{i+1}\end{pmatrix}</la-tex><br/>
+              <la-tex>Q(u) = U M_{bezier} G</la-tex>
+          </td>
+          <td>Quadratic Bezier Interpolation at time t given points P, control points C, and times</td>
+      </tr>
+      <tr>
+          <td><la-tex>\theta = cos^{-1}(\vec{p}\cdot\vec{q})</la-tex><br/>
+              <la-tex>slerp = \vec{r} = \frac{sin((1-u)\theta)\vec{p} + sin(u\theta)\vec{q}}{sin\theta}</la-tex></td>
+          <td>Spherical-linear interpolation (slerp) on quaternions p and q at time u in 0..1</td>
+      </tr>
+    </table>
+
+  </body>
+</html>
+
