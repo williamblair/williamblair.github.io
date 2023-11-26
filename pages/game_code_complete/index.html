@@ -408,6 +408,39 @@ instead of Bullet3Collsion/Bullet3Dynamics lib files, otherwise I got unresolved
 linker errors to different functions. TODO is create a test program to verify that
 physics is working.</p>
 
+<h3>11/26/2023</h3>
+<p>Funny to see it's been close to exactly one year since the last update lol</p>
+
+<p>Implemented chapter 19 networking w/ started test program
+Test program doesn't use the socket manager currently, or send a proper
+network event message - just sends the string "Hello World!". Differentiated
+between Windows and Linux builds similarly to what I did for
+<a href="../zfxengine/index.html">ZFX engine</a> with ifdefs. The linux
+version test program currently hangs on shutdown, presumably due to not
+currently setting SO_DONTLINGER, which is Windows only. For Linux I think
+I need to do something with SO_LINGER instead:
+</p>
+
+<pre><code>#ifdef GCC4_USE_WIN_SOCKET
+    int value = 1;
+    setsockopt(newSock, SOL_SOCKET, SO_DONTLINGER, (char*)&value, sizeof(value));
+#endif
+#ifdef GCC4_USE_POSIX_SOCKET
+    //TODO?
+#endif
+</code></pre>
+
+<p>Updated all examples Windows and Linux builds. On Windows, I ran into an
+issue when attempting to include &lt;thread&gt;, where GCC4's Process.h was
+conflicting with the windows process.h file - see
+<a href="https://stackoverflow.com/questions/27230258/error-c3861-beginthreadex-identifier-not-found">
+this stack overflow post</a>. I moved the source files for the GCC4 library
+to a subdirectory GCC4, so now all includes are of the form #include &lt;GCC4/somefile.h&gt;.</p>
+
+<p>Updated lua/luaplus to work on both Windows and Linux now also. I attempted to build
+luaplus-53 on Windows but had issues, so I directly added the necessary source files to
+lib/LuaPlus and build them directly with the other GCC4 files.</p>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
