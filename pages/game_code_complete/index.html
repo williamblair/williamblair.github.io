@@ -441,6 +441,17 @@ to a subdirectory GCC4, so now all includes are of the form #include &lt;GCC4/so
 luaplus-53 on Windows but had issues, so I directly added the necessary source files to
 lib/LuaPlus and build them directly with the other GCC4 files.</p>
 
+<h3>11/27/2023</h3>
+
+<p>Finished chapter 20 multiprogramming. Used std::thread, std::mutex, and
+std::condition_variable instead of the Windows specific CRITICAL_SECTION
+and other variables. The example program implements the protected process example
+(to increment a single variable from multiple threads),
+tests the ConcurrentQueue class using
+integers, and tests the DecompressionProces class to load a text file from within
+a zip file in the background.
+</p>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
