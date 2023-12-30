@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>BJ's Website</title>
+    <link href="https://unpkg.com/@fortawesome/fontawesome-free@5.13.0/css/all.css" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="../../bulmaswatch.bjsite.min.css"/>
+</head>
+<body>
+    <section style="margin:10px;">
+        <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
+            <div id="navbarBasicExample" class="navbar-menu is-active">
+                <div class="navbar-start">
+                    <a href="../../index.html" class="navbar-item"><strong>BJ's Website</strong></a>
+                    <a href="../../general.html" class="navbar-item">General</a>
+                    <a href="../../programming.html" class="navbar-item">Programming</a>
+                    <a href="../../school.html" class="navbar-item">School</a>
+                    <a href="../../books.html" class="navbar-item">Books</a>
+                    <a href="../../tech.html" class="navbar-item">Tech</a>
+                </div>
+                <div class="navbar-end">
+                    <a href="https://github.com/williamblair" class="navbar-item"><span class="icon"><i class="fab fa-github"></i></span><span>Github</span></a>
+                    <a href="https://bitbucket.org/williamblair" class="navbar-item"><span class="icon"><i class="fab fa-bitbucket"></i></span>Bitbucket</a>
+                </div>
+            </div>
+        </nav>
+    </section>
+    <section class="section">
+        <div class="container">
+
+        <h1 class="title">
+        <a href="https://research.ncl.ac.uk/game/mastersdegree/graphicsforgames/">Newcastle University Graphics for Games</a>
+        </h1>
+
+        <p>Implementation following "Newcastle's Graphics for Games" course but with Linux support,
+        using SDL2 instead of the Windows API.</p>
+        <p>Source Code: <a href="https://bitbucket.org/williamblair/newcastlegraphicsforgames/src/master/">
+        https://bitbucket.org/williamblair/newcastlegraphicsforgames/src/master/</a></p>
+
+        <h3>12/29/2023</h3>
+        <p>Finish "Your First Triangle". Replaced all WinAPI windowing code with SDL2 window/GL context code.
+        Replaced min/max macros with std::min/std::max. Also had to add 'const' to the last argument of
+        OGLRenderer::DebugCallback. Implemented the Mesh and Shader classes from the tutorial. TODO implement
+        keyboard/mouse support.</p>
+        <video controls>
+            <source src="./images/02VertexTransformation.webm" type="video/webm"/>
+        </video>
+
+        <p>Finish "The View Matrix". Added Keyboard, Mouse, and Camera classes.
+        Keyboard and Mouse classes take a SDL_Event as Update input instead of Windows raw data.
+        Also, instead of an array to hold key states, use an unordered_map to map the tutorial
+        key/button enums to sdl keycodes:</p>
+<pre><code>enum KeyboardKeys
+{
+    KEYBOARD_TAB = SDLK_TAB,
+    KEYBOARD_RETURN = SDLK_RETURN,
+    KEYBOARD_ESCAPE = SDLK_ESCAPE,
+...
+std::unordered_map&lt;KeyboardKeys,bool&gt; keyStates;
+...
+void Keyboard::Update(const SDL_Event& e)
+{
+    if (!isAwake) {
+        return;
+    }
+
+    if (e.type == SDL_KEYDOWN) {
+        keyStates[KeyboardKeys(e.key.keysym.sym)] = true;
+    } else if (e.type == SDL_KEYUP) {
+        keyStates[KeyboardKeys(e.key.keysym.sym)] = false;
+    }
+}
+</code></pre>
+        <video controls>
+            <source src="./images/03ViewMatrix.webm" type="video/webm"/>
+        </video>
+
+        <h3>12/30/2023</h3>
+        <p>Finish "Texture Mapping". Replaced the SOIL library with <a href="https://github.com/nothings/stb">stb_image</a>
+        as SOIL was segfaulting during texture load:</p>
+        <pre>Thread 1 "main" received signal SIGSEGV, Segmentation fault.
+__strchr_avx2 () at ../sysdeps/x86_64/multiarch/strchr-avx2.S:67
+67	../sysdeps/x86_64/multiarch/strchr-avx2.S: No such file or directory.
+(gdb) bt
+#0  __strchr_avx2 () at ../sysdeps/x86_64/multiarch/strchr-avx2.S:67
+#1  0x00007ffff74beb0e in __strstr_generic (haystack=<optimized out>, needle=0x7ffff7a11c18 "GL_ARB_texture_non_power_of_two") at ../string/strstr.c:84
+#2  0x00007ffff7a0577d in query_NPOT_capability () from /lib/libSOIL.so.1
+#3  0x00007ffff7a05b4d in SOIL_internal_create_OGL_texture () from /lib/libSOIL.so.1
+#4  0x00007ffff7a07b30 in SOIL_load_OGL_texture () from /lib/libSOIL.so.1
+#5  0x0000555555559fa4 in Renderer::Renderer (this=0x7fffffffdec0, parent=...) at src/Renderer.cpp:9
+#6  0x000055555555990f in main () at src/main.cpp:10
+(gdb) 
+        </pre>
+        <p>Instead created function OGLRenderer::LoadGLTextureFromFile:</p>
+        <pre><code>GLuint OGLRenderer::LoadGLTextureFromFile(const char* fileName)
+{
+    GLuint texId = 0;
+    int width, height, numChannels;
+    unsigned char* data = stbi_load(fileName, &width, &height, &numChannels, 0); 
+    if (!data) {
+        throw std::runtime_error("Failed to load texture: " + std::string(fileName));
+    }   
+    glGenTextures(1, &texId);
+    glBindTexture(GL_TEXTURE_2D, texId);
+    glTexImage2D(
+        GL_TEXTURE_2D,
+        0,  
+        numChannels == 3 ? GL_RGB : GL_RGBA,
+        width, height,
+        0,  
+        numChannels == 3 ? GL_RGB : GL_RGBA,
+        GL_UNSIGNED_BYTE,
+        data
+    );  
+    glGenerateMipmap(GL_TEXTURE_2D);
+    stbi_image_free(data);
+    glBindTexture(GL_TEXTURE_2D, 0); 
+    return texId;
+}
+        </code></pre>
+        <video controls>
+            <source src="./images/04TextureMapping.webm" type="video/webm"/>
+        </video>
+
+        <div>
+        <a href="../../index.html">&lt;-- Back to Home</a>
+        </div>
+
+        </div> <!-- container -->
+    </section>
+
+</body>
+</html>
+
