@@ -123,6 +123,178 @@ __strchr_avx2 () at ../sysdeps/x86_64/multiarch/strchr-avx2.S:67
             <source src="./images/04TextureMapping.webm" type="video/webm"/>
         </video>
 
+        <h3>01/02/2024</h3>
+        <p>Finish 'Skeletal Animation'. TODO implement the game timer, right now
+        1000/60 milliseconds per time delta update is hard coded. Only implemented
+        the CPU skinning from the PDF, TODO GPU skinning from the source code. Had
+        to add the std:: prefix to some string variables/arguments.</p>
+        <video controls>
+            <source src="./images/10SkeletalAnimation.webm" type="video/webm"/>
+        </video>
+
+        <h3>01/03/2024</h3>
+        <p>Finish 'post processing'. Some typos in the tutorial PDFs:
+        in Renderer.cpp, line 55:</p>
+<pre><code>// original
+//if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE || !sceneDepthTex || !sceneColourTex[0]) {
+// fixed
+if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE || !bufferDepthTex || !bufferColourTex[0]) {</code></pre>
+        <p>And in processfrag.glsl, line 9:</p>
+<pre><code>in Vertex {
+    vec2 texCoord;
+    //vec4 colour; // commented out/removed
+} IN;</code></pre>
+
+        <img src="./images/11PostProcessing.png"/>
+
+        <h3>01/04/2024</h3>
+        <p>Finish 'Real Time Lighting'. Small typo in tutorial pdf in PerPixelFragment.glsl:</p>
+<pre><code>in Vertex
+{
+    //vec3 colour; // original
+    vec4 colour; // fixed
+    vec2 texCoord;
+    vec3 normal;
+    vec3 worldPos;
+} IN;
+</code></pre>
+
+        <img src="./images/12RealtimeLighting.png"/>
+
+        <h3>01/05/2024</h3>
+        <p>Finish 'Real Time Lighting B' bump mapping. Same small typo in fragment shader (BumpFragment.glsl)
+        with the input colour data type vec4 instead of vec3.</p>
+
+        <img src="./images/13RealtimeLighting2BumpMap.png"/>
+
+        <h3>01/06/2024</h3>
+        <p>Finish 'Cube Mapping'. In order to get the skybox to show up, had
+        to add the following to DrawSkybox() in Renderer.cpp:</p>
+<pre><code>glUniform1i(glGetUniformLocation(currentShader-&gt;GetProgram(),"cubeTex"),2);
+glActiveTexture(GL_TEXTURE2);
+glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMap);</code></pre>
+        <p>The cube texture was bound and texture uniform set in the DrawWater function
+        but not this one, resulting in a black background. Also added the function
+        LoadGLCubemapFromFile to OGLRenderer to use stb_image:</p>
+<pre><code>GLuint OGLRenderer::LoadGLCubemapFromFile(
+    const char* west,
+    const char* east,
+    const char* up,
+    const char* down,
+    const char* south,
+    const char* north,
+    bool flipVertically
+)
+{
+    stbi_set_flip_vertically_on_load(flipVertically);
+    GLuint axis[6] = {
+        GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+        GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+        GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
+        GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+        GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
+        GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
+    };
+    const char* fileNames[6] = {
+        west,
+        east,
+        up,
+        down,
+        south,
+        north
+    };
+    GLuint skyBoxCubeMap;
+    glGenTextures(1, &skyBoxCubeMap);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, skyBoxCubeMap);
+
+    for (int i=0; i&lt;6; ++i) {
+        int width, height, numChannels;
+        unsigned char* data = stbi_load(fileNames[i], &width, &height, &numChannels, 0);
+        if (!data) {
+            throw std::runtime_error("Failed to load texture: " + std::string(fileNames[i]));
+        }
+        glTexImage2D(
+            axis[i],
+            0,
+            numChannels == 3 ? GL_RGB : GL_RGBA,
+            width, height,
+            0,
+            numChannels == 3 ? GL_RGB : GL_RGBA,
+            GL_UNSIGNED_BYTE,
+            data
+        );
+        stbi_image_free(data);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    }
+
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+    return skyBoxCubeMap;
+}</code></pre>
+        <video controls>
+            <source src="./images/14CubeMapping.webm" type="video/webm"/>
+        </video>
+
+        <h3>01/07/2024</h3>
+        <p>Finish 'Shadow Mapping'. Added biasMatrix to DrawShadowScene() as it
+        was missing in the pdf code:</p>
+<pre><code>Matrix4 biasMatrix;
+biasMatrix.ToIdentity();
+biasMatrix.values[0] = 0.5f; // scale
+biasMatrix.values[5] = 0.5f;
+biasMatrix.values[10] = 0.5f;
+biasMatrix.values[12] = 0.5f; // translation
+biasMatrix.values[13] = 0.5f;
+biasMatrix.values[14] = 0.5f;</code></pre>
+
+        <video controls>
+            <source src="./images/15ShadowMapping.webm" type="video/webm"/>
+        </video>
+
+        <h3>01/08/2024</h3>
+        <p>Started porting to the PS Vita using
+        <a href="https://github.com/Rinnegatamante/vitaGL">https://github.com/Rinnegatamante/vitaGL</a>.
+        I got the first triangle and skeletal animation examples working (without input control or
+        the game timer).</p>
+        <p>Some changes that were required to get it running:</p>
+        <ul style="list-style-type:circle;">
+        <li>Do not call glDrawArrays if the number of vertices is 0 in Mesh::Draw</li>
+        <li>Remove uses of GL_GEOMETRY_SHADER, glDetachShader, glGetInfoLog (they Don't
+        exist?)</li>
+        <li>Don't call glBindAttribLocation on attributes that are not used/included
+        in the shader (had to change the order of the MeshBuffer enum also so
+        the attributes were all used in order).</li>
+        <li>Have all file paths start with 'app0:' in common.h</li>
+        </ul>
+
+        <p>Sense you can't view stdout while running on the Vita, I also made
+        a logging-to-file function for use during debugging:</p>
+
+<pre><code>void VitaLog(const char* fileName, const unsigned int line, const char* msg, ...)
+{
+    FILE* fp = fopen("ux0:VPK/VitaLog.txt", "a");
+    if (fp) {
+        va_list args;
+        va_start(args, msg);
+        fprintf(fp, "%s:%u ", fileName, line);
+        vfprintf(fp, msg, args);
+        va_end(args);
+        fflush(fp);
+        fclose(fp);
+    }   
+}</code></pre>
+
+        <p>I also tried to use a macro to simplify calls to it but couldn't seem to
+        get macro varargs to compile:</p>
+<pre><code>//#define VITALOG(msg, ...) VitaLog(__FILE__, __LINE__, msg, __VA_ARGS__)
+#define VITALOG(msg) VitaLog(__FILE__, __LINE__, msg)</code></pre>
+
+        <video controls width="800px">
+            <source src="./images/VitaSkeletalAnim.webm" type="video/webm"/>
+        </video>
+        
         <div>
         <a href="../../index.html">&lt;-- Back to Home</a>
         </div>
