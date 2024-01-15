@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <title>BJ's Website</title>
     <link href="https://unpkg.com/@fortawesome/fontawesome-free@5.13.0/css/all.css" rel="stylesheet"/>
-    <link rel="stylesheet" type="text/css" href="../../bulmaswatch.bjsite.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../../bjsite.css"/>
 </head>
 <body>
     <section style="margin:10px;">
@@ -293,6 +293,91 @@ biasMatrix.values[14] = 0.5f;</code></pre>
 
         <video controls width="800px">
             <source src="./images/VitaSkeletalAnim.webm" type="video/webm"/>
+        </video>
+
+        <h3>01/14/2024</h3>
+        <p>Finished tutorial 2 the view matrix to Vita port. Started Keyboard class impl to Vita
+        buttons, by removing/renaming 'keyboard' keys to via controls:</p>
+<pre><code>enum KeyboardKeys
+{
+    KEYBOARD_SELECT = 0,
+    KEYBOARD_START,
+    KEYBOARD_LEFT,
+    KEYBOARD_UP,
+    KEYBOARD_RIGHT,
+    KEYBOARD_DOWN,
+    KEYBOARD_L, // left shoulder pad
+    KEYBOARD_R, // right shoulder pad
+    KEYBOARD_TRIANGLE,
+    KEYBOARD_CIRCLE,
+    KEYBOARD_CROSS,
+    KEYBOARD_SQUARE,
+    KEYBOARD_MAX
+};</code></pre>
+        <p>Then to update the 'keys':</p>
+<pre><code>void Keyboard::Update()
+{
+    if (!isAwake) {
+        return;
+    }
+
+    static uint32_t old_buttons = 0;
+    SceCtrlData pad;
+    sceCtrlPeekBufferPositive(0, &pad, 1);
+
+#define UPDATEBTN(vitaBtn, nclglBtn) \
+    if (CHECK_BTN(vitaBtn)) { keyStates[nclglBtn] = true; } \
+    else { keyStates[nclglBtn] = false; }
+
+    UPDATEBTN(SCE_CTRL_LEFT, KEYBOARD_LEFT)
+    UPDATEBTN(SCE_CTRL_UP, KEYBOARD_UP)
+    UPDATEBTN(SCE_CTRL_RIGHT, KEYBOARD_RIGHT)
+    UPDATEBTN(SCE_CTRL_DOWN, KEYBOARD_DOWN)
+    UPDATEBTN(SCE_CTRL_SELECT, KEYBOARD_SELECT)
+    UPDATEBTN(SCE_CTRL_START, KEYBOARD_START)
+    UPDATEBTN(SCE_CTRL_L2, KEYBOARD_L)
+    UPDATEBTN(SCE_CTRL_R2, KEYBOARD_R)
+    UPDATEBTN(SCE_CTRL_TRIANGLE, KEYBOARD_TRIANGLE)
+    UPDATEBTN(SCE_CTRL_CIRCLE, KEYBOARD_CIRCLE)
+    UPDATEBTN(SCE_CTRL_CROSS, KEYBOARD_CROSS)
+    UPDATEBTN(SCE_CTRL_SQUARE, KEYBOARD_SQUARE)
+
+    old_buttons = pad.buttons;
+
+}
+</code></pre>
+        <p>And also rewrote the shaders to the .vert/.frag syntax:</p>
+<pre><code>// MatrixVertex.vert
+uniform float4x4 modelMatrix;
+uniform float4x4 viewMatrix;
+uniform float4x4 projMatrix;
+
+void main(
+    float3 position,
+    float4 colour,
+    float4 out wColour : TEXCOORD0,
+    float4 out gl_Position : POSITION
+)
+{
+    wColour = colour;
+    gl_Position = mul(
+        mul(
+            mul(float4(position,1.0f), modelMatrix),
+            viewMatrix
+        ),
+        projMatrix
+    );
+}
+// colourFragment.frag
+float4 main(
+    float4 wColour : TEXCOORD0
+)
+{
+    return wColour;
+}</code></pre>
+
+        <video controls height="800px" style="transform:rotate(90deg);">
+            <source src="./images/02VitaVertexTransformation.webm" type="video/webm"/>
         </video>
         
         <div>

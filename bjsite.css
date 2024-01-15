@@ -1,0 +1,34 @@
+body, html {
+    font-family: monospace;
+    font-size: 14px;
+    background-image: url('images/ps2boot.png');
+    background-size: cover;
+}
+
+table, th, tr, td {
+    border: 2px ridge;
+    border-collapse: collapse;
+}
+
+a:link {
+    color: #00FFFF;
+}
+a:visited {
+    color: #00AAAA;
+}
+
+.container {
+    background-color: #000000E0;
+    border: 1px solid #00FFFF;
+    padding: 15px;
+    color: #D0D0D0;
+    max-width: 1500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+pre {
+    background-color: #101010;
+    padding: 10px;
+}
+
