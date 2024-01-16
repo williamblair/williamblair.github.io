@@ -452,6 +452,22 @@ integers, and tests the DecompressionProces class to load a text file from withi
 a zip file in the background.
 </p>
 
+<h3>01/15/2024</h3>
+<p>Started 21 teapot wars. Currently starts to the main menu but isn't showing
+anything as 2d graphics aren't implemented. Started filling in Sprite.cpp and
+a test program in 10_user_interface. Also, on Windows the .bat file build process
+was starting to get tediously long as all files were recompiled after any change,
+so figured out how to build the same as you would in visual studio using msbuild,
+following
+<a href="https://github.com/MicrosoftDocs/cpp-docs/blob/main/docs/build/walkthrough-using-msbuild-to-create-a-visual-cpp-project.md">Microsoft's documentation</a>,
+except I used Visual Studio to generate the vcxproject and test the build. Now
+the MakeWindows and CleanWindows batch files contain:</p>
+<pre><code>// MakeWindows.bat
+msbuild 10_user_interface.vcxproj /p:configuration=release
+// CleanWindows.bat
+msbuild 10_user_interface.vcxproj /p:configuration=release /t:clean
+</code></pre>
+
 <p>
 <a href="../../index.html">&lt;-- Back to Home</a>
 </p>
