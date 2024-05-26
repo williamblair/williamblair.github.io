@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>BJ's Website</title>
+    <style>
+        html, body {
+            background-color: #000000;
+            color: #FFFFFF;
+        }
+    </style>
+</head>
+<body style="min-height:1000px;">
+<h1>GameLib Log: 2024</h1>
+
+<h3>05/25/2024</h3>
+<p>I've been working on a major re-write of the library. For this newer
+version I've currently dropped support for PSP and Wii, as I wanted to
+work with systems that support shaders. Now, the current supported platforms
+are PC, PS3, PS Vita, and Switch. I'd also like to add support for the
+original XBox as that supports shaders also.</p>
+
+<p>The previous version I've added a git tag for as
+<a href="https://bitbucket.org/williamblair/hopslib/src/v0.1/">v0.1</a>.</p>
+
+<p>The following improvements have been added compared to the previous version
+so far:</p>
+<ul>
+    <li>Simplified directories/source code - more common/shared code between platforms</li>
+    <li>Scene Graph - transform hierarchy and view frustum culling</li>
+    <li>Game parent class for easier/more organized application setup</li>
+    <li>Shadows (in progress, but kind-of working)</li>
+</ul>
+
+<p>Missing features from v0.1:</p>
+<ul>
+    <p>Static &amp; animated models/file formats</p>
+    <p>Bounding volume debug drawing</p>
+    <p>Physics</p>
+    <p>Music/Audio</p>
+    <p>Threads</p>
+</ul>
+
+<p>Below shows the current shadow and scene graph/hierarchy in action:
+the ground is the root node, then sphere then cube as children, each transform
+affecting its children:</p>
+
+<video controls>
+    <source src="./images/scene_graph_05_25_2024.webm" type="video/webm"/>
+</video>
+
+<ul>
+<li><a href="./index.html">&lt;-- Back to HopsLib</li>
+<li><a href="../../index.html">&lt;-- Back to Home</a></li>
+</ul>
+
+</body>
+</html>
+
