@@ -50,6 +50,56 @@ affecting its children:</p>
     <source src="./images/scene_graph_05_25_2024.webm" type="video/webm"/>
 </video>
 
+<h3>05/27/2024</h3>
+
+<p>Working on simplifying/unifying shaders between platforms. PC and Switch
+use GLSL while Vita and PS3 use Cg. Although the VitaGL github says there is
+experimental GLSL support, TODO look into that.</p>
+
+<p>I'm not really too familiar with Cg so I spent some time looking at the
+following links:
+
+<a href="https://developer.download.nvidia.com/cg/Cg_3.1/Cg-3.1_April2012_ReferenceManual.pdf">
+https://developer.download.nvidia.com/cg/Cg_3.1/Cg-3.1_April2012_ReferenceManual.pdf
+</a>,
+
+<a href="https://developer.download.nvidia.com/CgTutorial/cg_tutorial_chapter01.html">
+https://developer.download.nvidia.com/CgTutorial/cg_tutorial_chapter01.html</a>
+
+</p>
+
+<p>While attempting to implement the shadow mapping shader for Vita, I found
+that glGetShaderInfoLog wasn't returning anything.
+Re-installed VitaGL from source, enabling error logging via
+"make HAVE_SHARK_LOG=1 LOG_ERRORS=2." and then I could see why the shader
+compilations were failing.</p>
+
+<p>Vita doesn't have inverse function in shader, so defined one for float3x3 
+using the same logic from the HopsLib math source code.</p>
+
+<p>VitaGL also doesn't support using a depth attachment to a framebuffer,
+so I attempted to calculate it and store it in the color attachment, using
+the following reference for calculation:
+<a href="https://stackoverflow.com/questions/10264949/glsl-gl-fragcoord-z-calculation-and-setting-gl-fragdepth">
+https://stackoverflow.com/questions/10264949/glsl-gl-fragcoord-z-calculation-and-setting-gl-fragdepth</a>,
+
+<a href="https://stackoverflow.com/questions/6408851/draw-the-depth-value-in-opengl-using-shaders#6409229">
+https://stackoverflow.com/questions/6408851/draw-the-depth-value-in-opengl-using-shaders#6409229</a>
+</p>
+
+<p>It kind-of works, but the objects themselves have some incorrect shading/
+artifacts. Good enough for now though:</p>
+
+<video controls>
+    <source src="./images/vita_shadow_05_27_2024.webm" type="video/webm"/>
+</video>
+
+<p>Am currently attempting to update and run the PS3 version. The same Cg
+shaders are compiling for ps3 as for Vita, but I think there are some code
+fixes needed for creation/usage of a framebuffer for rsx. The skybox is
+drawing and the game isn't crashing (at least in rpcs3), but the scene itself
+is not rendering.</p>
+
 <ul>
 <li><a href="./index.html">&lt;-- Back to HopsLib</li>
 <li><a href="../../index.html">&lt;-- Back to Home</a></li>
