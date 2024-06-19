@@ -100,6 +100,50 @@ fixes needed for creation/usage of a framebuffer for rsx. The skybox is
 drawing and the game isn't crashing (at least in rpcs3), but the scene itself
 is not rendering.</p>
 
+<h3>05/28/2024</h3>
+
+<p>Updating the ps3 version - the cg shaders from the vita are compiling.
+While making a basic unlit shader for debugging, had to send the vertex normals
+to the fragment shader even though they were unused so that the cg compiler
+didn't optimize them away; this was causing the normals to be used as the color
+in the fragment shader.</p>
+<p>Now that that's working, next is to get the framebuffer ps3 impl working.</p>
+
+<h3>06/01/2024</h3>
+
+<p>PS3 current shadow map impl working. I debugged the the shadow depth map
+generation by displaying the texture onscreen as a sprite. I noticed the PS3
+version was flipped vertically compared to the PC and Vita versions. My
+workaround for this so far is to add a define during PS3 shader calculation
+to flip the uv y coordinate in the cg fragment shader. In Makefile.ps3, I
+added:</p>
+
+<pre><code># Cg compiler flags
+CGCFLAGS	:= -Wcg,-DHOPS_PS3_BUILD=1
+</code></pre>
+
+<p>Then in ShadowedFragment.fcg:</p>
+
+<pre><code>float2 uv = clamp(projCoords.xy,0,1);
+
+    // set in Makefile.ps3
+#ifdef HOPS_PS3_BUILD
+    uv.y = 1.0 - uv.y;
+#endif
+</code></pre>
+
+<p>I also needed to normalize the color attribute and the light space fragment
+position, and clamp the shadow map uv between 0 and 1; and to change
+the clear color for the color buffers to 1/white instead of 0/black in order to
+match the original PC depth buffer texture. These changes also had the benefit
+of getting rid of the artifacts the Vita version previously had.</p>
+
+<p>Original PC shadow map using depth buffer:</p>
+<img src="./images/pc_shadow_map_depth_buffer_06_01_2024.png"/>
+
+<p>Flipped ps3 shadow map texture, using color buffer:</p>
+<img src="./images/shadow_map_comparison_06_01_2024.png"/>
+
 <ul>
 <li><a href="./index.html">&lt;-- Back to HopsLib</li>
 <li><a href="../../index.html">&lt;-- Back to Home</a></li>
