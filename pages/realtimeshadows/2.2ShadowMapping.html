@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="utf-8"/>
+    <title>WebGL</title>
+
+    <script src="./gl-matrix-min.js"></script>
+
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+        #canvasDiv {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+        }
+        canvas {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+        }
+    </style>
+</head>
+<body onload="main()">
+
+<div id="canvasDiv">
+<canvas id="myCanvas"></canvas>
+</div>
+
+<img id="whiteMarble" src="./images/white-marble.png" style="display:none;"/>
+
+<script src="./Debug.js"></script>
+<script src="./Renderer.js"></script>
+<script src="./LoopTimer.js"></script>
+<script src="./Shader.js"></script>
+<script src="./Texture.js"></script>
+
+<script>
+var render = null;
+var timer = null;
+var camera = null;
+
+var shaderProgram = null;
+var simpleShaderProgram = null;
+
+var floorModelMatrix = mat4.create();
+var torusModelMatrix = mat4.create();
+var tmpMatrix = mat4.create();
+
+//var viewMatrix = mat4.create();
+// distance to look at point
+var cameraDistance = 30.0;
+// angle around y-axis
+var cameraYAngle = Math.PI / 4.0;
+// angle to y-plane (plane with the y-axis as normal and containing origo)
+var cameraThetaAngle = Math.PI / 6.0;
+
+//var modelViewMatrix = mat4.create();
+//var modelViewProjectionMatrix = mat4.create();
+//var projectionMatrix = mat4.create();
+//var normalMatrix = mat4.create();
+
+var lightMatrix = mat4.create();
+//var lightPosition = vec4.create();
+
+var texture = null;
+
+var shadowmapTexture = null;
+var shadowmapFBO = null;
+const shadowmap_resolution = 1024;
+
+var lightpos_mv = vec4.create();
+var lightPosition = vec4.create();
+var lightYAngle = Math.PI / 4.0;
+
+function createAddAttribBuffer(vertexArrayObject, data, attributeIndex, attributeSize)
+{
+    var buffer = render.gl.createBuffer();
+    render.gl.bindBuffer(render.gl.ARRAY_BUFFER, buffer);
+    render.gl.bufferData(render.gl.ARRAY_BUFFER, new Float32Array(data), render.gl.STATIC_DRAW);
+
+    // attach buffer to vertex array object
+    render.gl.bindVertexArray(vertexArrayObject);
+    render.gl.vertexAttribPointer(attributeIndex, attributeSize, render.gl.FLOAT, false, 0, 0);
+    render.gl.enableVertexAttribArray(attributeIndex);
+
+    return buffer;
+}
+
+var quadVertexArrayObject = 0;
+function drawQuad()
+{
+    const nofVertices = 4;
+    if (quadVertexArrayObject == 0) {
+        quadVertexArrayObject = render.gl.createVertexArray();
+        const verts = [
+            -1.0, 0.0, 1.0,     // v0 -     v0 v2
+            -1.0, 0.0, -1.0,    // v1 -     |  /|
+            1.0, 0.0, 1.0,      // v2 -     | / |
+            1.0, 0.0, -1.0      // v3 -     v1 v3
+        ];
+        const vertBuffer = createAddAttribBuffer(quadVertexArrayObject, verts, 0, 3);
+        const colors = [
+            1.0, 0.0, 0.0,
+            0.0, 1.0, 0.0,
+            0.0, 0.0, 1.0,
+            1.0, 0.0, 1.0
+        ];
+        const colorBuffer = createAddAttribBuffer(quadVertexArrayObject, colors, 1, 3);
+        const texCoords = [
+            0.0, 4.0,
+            0.0, 0.0,
+            4.0, 4.0,
+            4.0, 0.0
+        ];
+        const texCoordBuffer = createAddAttribBuffer(quadVertexArrayObject, texCoords, 2, 2);
+        const normals = [
+            0.0, 1.0, 0.0,
+            0.0, 1.0, 0.0,
+            0.0, 1.0, 0.0,
+            0.0, 1.0, 0.0
+        ];
+        const normalsBuffer = createAddAttribBuffer(quadVertexArrayObject, normals, 3, 3);
+    }
+    render.gl.bindVertexArray(quadVertexArrayObject);
+    render.gl.drawArrays(render.gl.TRIANGLE_STRIP, 0, nofVertices);
+}
+
+var torusVertexArrayObject = 0;
+var torusNofVertices = 0;
+function drawTorus(rout, rin, numc, numt)
+{
+    if (torusVertexArrayObject == 0) {
+        vertexdata = [];
+        texturecoords = [];
+        normaldata = [];
+        var i = 0, j = 0, k = 0;
+        var s = 0.0, t = 0.0, twopi = 0.0;
+        twopi = 2 * Math.PI;
+        for (i=0; i<numc; i++)
+        {
+            for (j=0; j<=numt; j++)
+            {
+                for (k=1; k>=0; k--)
+                {
+                    s = i+k;
+                    t = j;
+                    var vx = 0.0, vy = 0.0, vz = 0.0,
+                        tx = 0.0, ty = 0.0, tz = 0.0,
+                        sx = 0.0, sy = 0.0, sz = 0.0,
+                        nx = 0.0, ny = 0.0, nz = 0.0,
+                        length = 0.0;
+                    const jangle = t * twopi / numt;
+                    const iangle = s * twopi / numc;
+
+                    // vertex position
+                    vx = Math.cos(jangle)*(rout+Math.cos(iangle)*rin);
+                    vy = Math.sin(jangle)*(rout+Math.cos(iangle)*rin);
+                    vz = Math.sin(iangle)*rin;
+
+                    // tangent vector with respect to big circle
+                    tx = -Math.sin(jangle);
+                    ty = Math.cos(jangle);
+                    tz = 0;
+
+                    // tangent vector with respect to little circle
+                    sx = Math.cos(jangle)*(-Math.sin(iangle));
+                    sy = Math.sin(jangle)*(-Math.sin(iangle));
+                    sz = Math.cos(iangle);
+
+                    // normal is cross product of tangents
+                    nx = ty*sz - tz*sy;
+                    ny = tz*sx - tx*sz;
+                    nz = tx*sy - ty*sx;
+
+                    // normalize the normal
+                    length = Math.sqrt(nx*nx + ny*ny + nz*nz);
+                    nx /= length;
+                    ny /= length;
+                    nz /= length;
+
+                    // save data to array
+                    vertexdata.push(vx);
+                    vertexdata.push(vy);
+                    vertexdata.push(vz);
+                    texturecoords.push(s);
+                    texturecoords.push(t);
+                    normaldata.push(nx);
+                    normaldata.push(ny);
+                    normaldata.push(nz);
+                }
+            }
+        }
+        torusVertexArrayObject = render.gl.createVertexArray();
+        createAddAttribBuffer(torusVertexArrayObject, vertexdata, 0, 3);
+        createAddAttribBuffer(torusVertexArrayObject, texturecoords, 2, 2);
+        createAddAttribBuffer(torusVertexArrayObject, normaldata, 3, 3);
+        torusNofVertices = vertexdata.length / 3;
+    }
+    render.gl.bindVertexArray(torusVertexArrayObject);
+    render.gl.drawArrays(render.gl.TRIANGLE_STRIP, 0, torusNofVertices);
+}
+
+function drawScene(
+    viewMatrix,
+    projectionMatrix,
+    lightViewMatrix,
+    lightProjectionMatrix)
+{
+    var modelViewMatrix = mat4.create();
+    var modelViewProjectionMatrix = mat4.create();
+    var normalMatrix = mat4.create();
+
+    shaderProgram.Use();
+    texture.Use();
+
+    render.gl.enable(render.gl.BLEND);
+    render.gl.blendFunc(render.gl.SRC_ALPHA, render.gl.ONE_MINUS_SRC_ALPHA);
+
+    vec4.transformMat4(lightpos_mv, lightPosition, viewMatrix);
+    shaderProgram.SetVec3Uniform("lightPosition", [lightpos_mv[0],lightpos_mv[1],lightpos_mv[2]]);
+    
+    shaderProgram.SetIntUniform("tex1", 1);
+    render.gl.activeTexture(render.gl.TEXTURE1);
+    render.gl.bindTexture(render.gl.TEXTURE_2D, shadowmapTexture);
+
+    // *********************************
+    // Draw the floor
+    // *********************************
+    mat4.mul(modelViewMatrix, viewMatrix, floorModelMatrix);
+    mat4.copy(lightMatrix, viewMatrix);
+    mat4.invert(lightMatrix, lightMatrix);
+    mat4.mul(tmpMatrix, lightViewMatrix, lightMatrix);
+    mat4.mul(lightMatrix, lightProjectionMatrix, tmpMatrix);
+    shaderProgram.SetMatrixUniform("lightMatrix", lightMatrix);
+
+    mat4.mul(modelViewProjectionMatrix, projectionMatrix, modelViewMatrix);
+    mat4.copy(normalMatrix, modelViewMatrix);
+    mat4.invert(normalMatrix, normalMatrix);
+    mat4.transpose(normalMatrix, normalMatrix);
+    shaderProgram.SetMatrixUniform("modelViewMatrix", modelViewMatrix);
+    shaderProgram.SetMatrixUniform("modelViewProjectionMatrix", modelViewProjectionMatrix);
+    shaderProgram.SetMatrixUniform("normalMatrix", normalMatrix);
+    drawQuad();
+
+    // *********************************
+    // Draw the torus
+    // *********************************
+    mat4.mul(modelViewMatrix, viewMatrix, torusModelMatrix);
+    mat4.copy(lightMatrix, viewMatrix);
+    mat4.invert(lightMatrix, lightMatrix);
+    mat4.mul(tmpMatrix, lightViewMatrix, lightMatrix);
+    mat4.mul(lightMatrix, lightProjectionMatrix, tmpMatrix);
+    shaderProgram.SetMatrixUniform("lightMatrix", lightMatrix);
+
+    mat4.mul(modelViewProjectionMatrix, projectionMatrix, modelViewMatrix);
+    mat4.copy(normalMatrix, modelViewMatrix);
+    mat4.invert(normalMatrix, normalMatrix);
+    mat4.transpose(normalMatrix, normalMatrix);
+    shaderProgram.SetMatrixUniform("modelViewMatrix", modelViewMatrix);
+    shaderProgram.SetMatrixUniform("modelViewProjectionMatrix", modelViewProjectionMatrix);
+    shaderProgram.SetMatrixUniform("normalMatrix", normalMatrix);
+    drawTorus(1.0, 0.4, 10, 40);
+
+    render.gl.useProgram(null); // unbind the shader
+}
+
+function drawShadowMap(viewMatrix, projectionMatrix)
+{
+    render.gl.polygonOffset(2.5, 10);
+    render.gl.enable(render.gl.POLYGON_OFFSET_FILL);
+    
+    render.gl.bindFramebuffer(render.gl.FRAMEBUFFER, shadowmapFBO);
+    // pushAttrib does not exist in webgl
+    //render.gl.pushAttrib(render.gl.VIEWPORT_BIT);
+    const saveViewport = render.gl.getParameter(render.gl.VIEWPORT);
+    render.gl.viewport(0,0,shadowmap_resolution,shadowmap_resolution);
+    
+    render.gl.clearColor(1.0, 1.0, 1.0, 1.0);
+    render.gl.clearDepth(1.0);
+    render.gl.clear(render.gl.DEPTH_BUFFER_BIT | render.gl.COLOR_BUFFER_BIT);
+    
+    // shader program
+    var current_program = render.gl.getParameter(render.gl.CURRENT_PROGRAM);
+    simpleShaderProgram.Use();
+    
+    // *****************************
+    // Draw the floor
+    // *****************************
+    var modelViewMatrix = mat4.create();
+    var modelViewProjectionMatrix = mat4.create();
+    mat4.mul(modelViewMatrix, viewMatrix, floorModelMatrix);
+    mat4.mul(modelViewProjectionMatrix, projectionMatrix, modelViewMatrix);
+    simpleShaderProgram.SetMatrixUniform("modelViewProjectionMatrix", modelViewProjectionMatrix);
+    drawQuad();
+    
+    // *****************************
+    // Draw the torus
+    // *****************************
+    mat4.mul(modelViewMatrix, viewMatrix, torusModelMatrix);
+    mat4.mul(modelViewProjectionMatrix, projectionMatrix, modelViewMatrix);
+    simpleShaderProgram.SetMatrixUniform("modelViewProjectionMatrix", modelViewProjectionMatrix);
+    drawTorus(1.0, 0.4, 10, 40);
+    
+    // restore the previously used shader
+    render.gl.useProgram(current_program);
+    
+    // popAttrib does not exist in webgl
+    //render.gl.popAttrib();
+    render.gl.viewport(saveViewport[0],saveViewport[1],saveViewport[2],saveViewport[3]);
+    render.gl.bindFramebuffer(render.gl.FRAMEBUFFER, null);
+    
+    render.gl.disable(render.gl.POLYGON_OFFSET_FILL);
+}
+
+function drawLight(modelMatrix, viewMatrix, projectionMatrix)
+{
+    simpleShaderProgram.Use();
+    
+    var ROT = mat4.create();
+    var modelViewProjectionMatrix = mat4.create();
+    mat4.rotateX(ROT, ROT, Math.PI/2.0);
+    
+    mat4.mul(tmpMatrix, modelMatrix, ROT);
+    mat4.mul(tmpMatrix, viewMatrix, tmpMatrix);
+    mat4.mul(modelViewProjectionMatrix, projectionMatrix, tmpMatrix);
+    
+    simpleShaderProgram.SetMatrixUniform("modelViewProjectionMatrix", modelViewProjectionMatrix);
+    drawQuad();
+    
+    render.gl.useProgram(null);
+}
+
+function setCamera(viewMatrix, projectionMatrix)
+{
+    const viewat = vec3.fromValues(0,0,0);
+    const viewup = vec3.fromValues(0,1,0);
+    const yaxis = vec3.fromValues(0,1,0);
+    var viewpos = vec4.fromValues(0,0,1,1);
+    var rotmat = mat4.create();
+    
+    // rotate around y-axis
+    vec4.set(viewpos,0,0,cameraDistance,1);
+    mat4.identity(rotmat);
+    mat4.rotate(rotmat,rotmat,cameraYAngle,yaxis);
+    vec4.transformMat4(viewpos,viewpos,rotmat);
+    
+    // rotate around y-plane
+    var tmpvec = vec3.create();
+    vec3.cross(tmpvec,vec3.fromValues(viewpos[0],viewpos[1],viewpos[2]),yaxis);
+    vec3.normalize(tmpvec,tmpvec);
+    mat4.identity(rotmat);
+    mat4.rotate(rotmat,rotmat,cameraThetaAngle,tmpvec);
+    vec4.transformMat4(viewpos,viewpos,rotmat);
+    
+    const w = render.canvas.width;
+    const h = render.canvas.height;
+    
+    // projection matrix
+    mat4.perspective(projectionMatrix, 45.0*Math.PI/180.0, w/h, 0.01, 300.0);
+    // view matrix
+    const viewPos3 = vec3.fromValues(viewpos[0],viewpos[1],viewpos[2]);
+    mat4.lookAt(viewMatrix, viewPos3, viewat, viewup);
+}
+
+function setLight(viewMatrix, projectionMatrix)
+{
+    var viewpos = vec4.fromValues(10,10,0,1);
+    const viewat = vec3.fromValues(0,0,0);
+    const viewup = vec3.fromValues(0,1,0);
+    var yaxis = vec3.fromValues(0,1,0);
+    var rotmat = mat4.create();
+    
+    // rotate around y-axis
+    mat4.identity(rotmat);
+    mat4.rotate(rotmat,rotmat,lightYAngle,yaxis);
+    vec4.transformMat4(lightPosition,viewpos,rotmat);
+    
+    // compute projection matrix
+    // out, fov, aspect, near, far
+    mat4.perspective(projectionMatrix, 45.0*Math.PI/180.0, 1.0, 5.0, 100.0);
+    // view matrix
+    const viewPos3 = vec3.fromValues(lightPosition[0],lightPosition[1],lightPosition[2]);
+    mat4.lookAt(viewMatrix, viewPos3, viewat, viewup);
+}
+
+function display()
+{
+    render.gl.clearColor(0.2,0.2,0.8,1.0);
+    render.gl.clear(render.gl.COLOR_BUFFER_BIT | render.gl.DEPTH_BUFFER_BIT);
+    render.gl.enable(render.gl.DEPTH_TEST);
+    render.gl.disable(render.gl.CULL_FACE);
+    
+    const w = render.canvas.width;
+    const h = render.canvas.height;
+    render.gl.viewport(0,0,w,h);
+    
+    var viewMatrix = mat4.create();
+    var projectionMatrix = mat4.create();
+    setCamera(viewMatrix, projectionMatrix);
+    //console.log("viewMatrix",viewMatrix);
+    //console.log("projectionMatrix",projectionMatrix);
+    
+    // set up view and projection matrices for light
+    var lightViewMatrix = mat4.create();
+    var lightProjectionMatrix = mat4.create();
+    setLight(lightViewMatrix, lightProjectionMatrix);
+    //console.log("lightViewMatrix:",lightViewMatrix);
+    //console.log("lightProjectionMatrix:",lightProjectionMatrix);
+    
+    drawShadowMap(lightViewMatrix, lightProjectionMatrix);
+    
+    // draw light for reference
+    var lightModelMatrix = mat4.clone(lightViewMatrix);
+    mat4.invert(lightModelMatrix, lightModelMatrix);
+    drawLight(lightModelMatrix, viewMatrix, projectionMatrix);
+
+    // draw scene using the shadow map
+    drawScene(viewMatrix, projectionMatrix, lightViewMatrix, lightProjectionMatrix);
+    //drawSceneSimpleShader(viewMatrix, projectionMatrix, lightViewMatrix, lightProjectionMatrix);
+}
+
+function mainLoop()
+{
+    //camera.Update(timer.dt/1000.0);
+    timer.Update();
+    lightYAngle = (timer.totalTimeMs/1000.0) * 0.5;
+    //console.log("timer dt:",timer.dt);
+    //console.log("totalTimeMs:",timer.totalTimeMs);
+    //console.log("lightYAngle:",lightYAngle);
+
+    display();
+
+    window.requestAnimationFrame(mainLoop);
+}
+function main()
+{
+    render = new Renderer("myCanvas");
+    render.SetClearColor([0.0, 0.5, 0.5]);
+    timer = new LoopTimer();
+
+    // ***************************************************
+    // Create shaders
+    // ***************************************************
+    shaderProgram = new Shader(
+        render.gl,
+        document.getElementById("shadingVert").text,
+        document.getElementById("shadingFrag").text
+    );
+    simpleShaderProgram = new Shader(
+        render.gl,
+        document.getElementById("simpleVert").text,
+        document.getElementById("simpleFrag").text
+    );
+
+    texture = new Texture(render.gl, "whiteMarble", false);
+    render.gl.activeTexture(render.gl.TEXTURE0);
+    render.gl.bindTexture(render.gl.TEXTURE_2D, texture.texture);
+    render.gl.generateMipmap(render.gl.TEXTURE_2D);
+    // not a value in webgl it seems...
+    //render.gl.texParameterf(render.gl.TEXTURE_2D, render.gl.TEXTURE_MAX_ANISOTROPY_EXT, 16);
+    render.gl.texParameteri(render.gl.TEXTURE_2D, render.gl.TEXTURE_WRAP_S, render.gl.MIRRORED_REPEAT);
+    render.gl.texParameteri(render.gl.TEXTURE_2D, render.gl.TEXTURE_WRAP_T, render.gl.MIRRORED_REPEAT);
+    render.gl.texParameteri(render.gl.TEXTURE_2D, render.gl.TEXTURE_MAG_FILTER, render.gl.LINEAR);
+    render.gl.texParameteri(render.gl.TEXTURE_2D, render.gl.TEXTURE_MIN_FILTER, render.gl.LINEAR_MIPMAP_LINEAR);
+
+    // ***************************************************
+    // Object matrices 
+    // ***************************************************
+    mat4.identity(floorModelMatrix);
+    mat4.scale(floorModelMatrix, floorModelMatrix, vec3.fromValues(10.0, 1.0, 10.0));
+    //console.log("floorModelMatrix:",floorModelMatrix);
+
+    mat4.identity(torusModelMatrix);
+    mat4.identity(tmpMatrix);
+    mat4.rotateX(tmpMatrix, tmpMatrix, Math.PI/2.0);
+    mat4.translate(torusModelMatrix, torusModelMatrix, vec3.fromValues(0.0, 0.0, -2.0));
+    mat4.mul(torusModelMatrix, tmpMatrix, torusModelMatrix);
+    console.log("torusModelMatrix:",torusModelMatrix);
+
+    // ***************************************************
+    // Create shadowmap texture and framebuffer
+    // ***************************************************
+    shadowmapTexture = render.gl.createTexture();
+    render.gl.bindTexture(render.gl.TEXTURE_2D, shadowmapTexture);
+    render.gl.texImage2D(render.gl.TEXTURE_2D, 0, render.gl.DEPTH_COMPONENT32F, shadowmap_resolution, shadowmap_resolution, 0, render.gl.DEPTH_COMPONENT, render.gl.FLOAT, null);
+    render.gl.texParameteri(render.gl.TEXTURE_2D, render.gl.TEXTURE_MIN_FILTER, render.gl.LINEAR);
+    render.gl.texParameteri(render.gl.TEXTURE_2D, render.gl.TEXTURE_MAG_FILTER, render.gl.LINEAR);
+    render.gl.texParameteri(render.gl.TEXTURE_2D, render.gl.TEXTURE_WRAP_S, render.gl.CLAMP_TO_EDGE);
+    render.gl.texParameteri(render.gl.TEXTURE_2D, render.gl.TEXTURE_WRAP_T, render.gl.CLAMP_TO_EDGE);
+    render.gl.texParameteri(render.gl.TEXTURE_2D, render.gl.TEXTURE_COMPARE_MODE, render.gl.COMPARE_REF_TO_TEXTURE);
+    render.gl.texParameteri(render.gl.TEXTURE_2D, render.gl.TEXTURE_COMPARE_FUNC, render.gl.LEQUAL);
+    // NOT AVAILABLE in WebGL
+    //const ones = [1.0, 1.0, 1.0, 1.0];
+    //render.gl.texParameterfv(render.gl.TEXTURE_2D, render.gl.TEXTURE_BORDER_COLOR, ones);
+
+    shadowmapFBO = render.gl.createFramebuffer();
+    render.gl.bindFramebuffer(render.gl.FRAMEBUFFER, shadowmapFBO);
+    render.gl.framebufferTexture2D(render.gl.FRAMEBUFFER, render.gl.DEPTH_ATTACHMENT, render.gl.TEXTURE_2D, shadowmapTexture, 0);
+    render.gl.drawBuffers([render.gl.NONE]);
+    render.gl.readBuffer(render.gl.NONE);
+    render.gl.bindFramebuffer(render.gl.FRAMEBUFFER, null);
+
+    // gl matrix 2.2.0 doesn't have these functions
+    mat4.multiplyScalar = function(res, mat, s) {
+        res[0] = mat[0] * s;
+        res[1] = mat[1] * s;
+        res[2] = mat[2] * s;
+        res[3] = mat[3] * s;
+        res[4] = mat[4] * s;
+        res[5] = mat[5] * s;
+        res[6] = mat[6] * s;
+        res[7] = mat[7] * s;
+        res[8] = mat[8] * s;
+        res[9] = mat[9] * s;
+        res[10] = mat[10] * s;
+        res[11] = mat[11] * s;
+        res[12] = mat[12] * s;
+        res[13] = mat[13] * s;
+        res[14] = mat[14] * s;
+        res[15] = mat[15] * s;
+    }
+    mat4.add = function(res, mat1, mat2) {
+        res[0] = mat1[0] + mat2[0];
+        res[1] = mat1[1] + mat2[1];
+        res[2] = mat1[2] + mat2[2];
+        res[3] = mat1[3] + mat2[3];
+        res[4] = mat1[4] + mat2[4];
+        res[5] = mat1[5] + mat2[5];
+        res[6] = mat1[6] + mat2[6];
+        res[7] = mat1[7] + mat2[7];
+        res[8] = mat1[8] + mat2[8];
+        res[9] = mat1[9] + mat2[9];
+        res[10] = mat1[10] + mat2[10];
+        res[11] = mat1[11] + mat2[11];
+        res[12] = mat1[12] + mat2[12];
+        res[13] = mat1[13] + mat2[13];
+        res[14] = mat1[14] + mat2[14];
+        res[15] = mat1[15] + mat2[15];
+    }
+
+    mainLoop();
+}
+</script>
+
+<script id="shadingVert" type="x-shader/x-vertex">#version 300 es
+layout(location = 0) in vec3 vertex;
+layout(location = 1) in vec3 color;
+layout(location = 2) in vec2 texCoordIn;
+layout(location = 3) in vec3 normalIn;
+
+uniform mat4 normalMatrix;
+uniform mat4 modelViewMatrix;
+uniform mat4 modelViewProjectionMatrix;
+uniform mat4 lightMatrix;
+
+out vec4 outColor;
+out vec2 texCoord; // outgoing interpolated texcoord to fragshader
+out vec3 normal; // sent to fragment shader
+out vec3 modelViewPosition; // sent to fragment shader
+out vec4 shadowMapCoord;
+
+void main()
+{
+    gl_Position = modelViewProjectionMatrix * vec4(vertex,1.0);
+    outColor = vec4(color,1.0);
+    texCoord = texCoordIn;
+    normal = (normalMatrix * vec4(normalIn,0.0)).xyz;
+    modelViewPosition = (modelViewMatrix * vec4(vertex,1.0)).xyz;
+    shadowMapCoord = lightMatrix * vec4(modelViewPosition,1.0);
+    shadowMapCoord.xyz *= vec3(0.5,0.5,0.5);
+    shadowMapCoord.xyz += shadowMapCoord.w * vec3(0.5,0.5,0.5);
+}
+</script>
+
+<script id="shadingFrag" type="x-shader/x-fragment">#version 300 es
+precision mediump float;
+precision highp sampler2DShadow;
+
+in vec4 outColor;
+in vec2 texCoord;
+in vec3 normal;
+in vec3 eyeVector;
+in vec3 modelViewPosition;
+in vec4 shadowMapCoord;
+
+uniform sampler2D tex0;
+uniform sampler2DShadow tex1;
+uniform vec3 lightPosition;
+
+out vec4 fragmentColor;
+
+void main()
+{
+    vec3 posToLight = normalize(lightPosition - modelViewPosition);
+    fragmentColor = max(0.0, dot(posToLight, normalize(normal))) * texture(tex0, texCoord.xy);
+    fragmentColor *= textureProj(tex1, shadowMapCoord);
+    fragmentColor.a = 1.0;
+}
+</script>
+
+<script id="simpleVert" type="x-shader/x-vertex">#version 300 es
+layout(location = 0) in vec3 vertex;
+
+uniform mat4 modelViewProjectionMatrix;
+
+void main()
+{
+    gl_Position = modelViewProjectionMatrix * vec4(vertex,1.0);
+}
+</script>
+
+<script id="simpleFrag" type="x-shader/x-fragment">#version 300 es
+precision mediump float;
+
+out vec4 fragmentColor;
+
+void main()
+{
+    fragmentColor = vec4(1.0);
+}
+</script>
+
+</body>
+</html>
+
