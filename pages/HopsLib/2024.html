@@ -144,6 +144,38 @@ of getting rid of the artifacts the Vita version previously had.</p>
 <p>Flipped ps3 shadow map texture, using color buffer:</p>
 <img src="./images/shadow_map_comparison_06_01_2024.png"/>
 
+<h3>06/30/2024</h3>
+<p>Fixed shutdown crash on Vita, kind-of fixed on ps3. Ps3 hangs then beeps three times but
+exits to the home screen as opposed to totally freezing like before. On vita I was re-freeing
+the texture for the framebuffer as it was already freed by the framebuffer class. On Ps3
+the shader class was freeing the embedded skybox and 2d sprite shaders, and also wasn't
+handling when the home button/exit is pressed. Also, I was calling free() instead of rsxFree() on
+the ps3 vertex buffer memory. Not sure why the ps3 is hanging/beeping on exit currently. Might
+have to do something with in the sample code, gcmSetWaitFlip()/rsxFinish() are the very last
+function calls done in the system exit callback, as opposed to the Renderer destructor.</p>
+
+<h3>07/08/2024</h3>
+<p>Integrated Imgui, at least visually so far. Interaction (being able to close/move/select dropdowns) is next.
+PC/Vita/Switch were fairly straightforward, I was able to follow the OpenGL3 implementation from
+<a href="https://github.com/ocornut/imgui/blob/master/backends/imgui_impl_opengl3.cpp">
+https://github.com/ocornut/imgui/blob/master/backends/imgui_impl_opengl3.cpp</a>.
+</p>
+<p>On PS3 I ran into more issues. First, as ps3 is big endian, the ImGUI RGBA generated texture was
+actually ABGR because each pixel is packed into a 32bit integer, hence the bytes were backwards.
+Additionally, the texture format uploaded to gpu memory is in ARGB format (as opposed to RGBA) which
+caused the bytes to be even more scrambled. The vertices color attribute given by ImGUI is also
+a 32 bit integer, which again was flipped bytewise. For the OpenGL implementations you can normalize
+the attribute to a vec4 float, but that wasn't available in the ps3 rsx library. I tried doing
+the conversion in the vertex shader but they don't support bit shifting and masking. I instead
+tried just doing divisions and subtractions to extract each color component, but I couldn't get
+that working either. I finally ended up doing the conversion in the Vertex buffer init/update
+functions, converting to a custom vertex structure instead which has a vec4 for the color instead of the
+32bit int. This also does the byte swapping so the RGBA values are in the correct order. Whew!
+The results (initial errors + working version) are shown below:</p>
+<img src="./images/imgui_ps3_error1_07_08_2024.png" width="800px"/><br/>
+<img src="./images/imgui_ps3_error2_07_08_2024.png" width="800px"/><br/>
+<img src="./images/imgui_ps3_working_07_08_2024.png" width="800px"/><br/>
+
 <ul>
 <li><a href="./index.html">&lt;-- Back to HopsLib</li>
 <li><a href="../../index.html">&lt;-- Back to Home</a></li>
