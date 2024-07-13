@@ -176,6 +176,47 @@ The results (initial errors + working version) are shown below:</p>
 <img src="./images/imgui_ps3_error2_07_08_2024.png" width="800px"/><br/>
 <img src="./images/imgui_ps3_working_07_08_2024.png" width="800px"/><br/>
 
+<h3>07/09/2024</h3>
+<p>Basic imgui input on PC working; TODO gamepad/joystick support. Also missing mouse scrollwheel
+input atm. Implementation is fairly straightforward. There is a ImGui_ImplHops_ProcessEvent() function
+that maps Hops input keys/mouse to ImGui keys which you forward to the ImGui io object.</p>
+<video controls width="800px">
+    <source src="./images/imgui_input_pc_07_09_2024.webm" type="video/webm"/>
+</video>
+
+<h3>07/10/2024</h3>
+<p>Controller/joystick input for imgui working. Tested on PS3, initially found rendering issue
+when using multiple windows:</p>
+<video controls width="800px">
+    <source src="./images/imgui_ps3_render_issue_07_10_2024.webm" type="video/webm">
+</video>
+<p>I'm guessing the issue was that we were overwriting the vertices in the rsx memory while
+the old ones were still being rendered. Switching to using one vertex buffer per imgui draw
+list fixed the issue.</p>
+<p>Currently now am having a rendering issue on switch where the imgui components are
+rendering fine but the background 3d scene right now is not rendering at all, just the
+screen background clear color.</p>
+
+<h3>07/13/2024</h3>
+<p>Fixed switch issue. Turned out not to be a rendering problem, it was actually
+that the joystick analog values were not being initialized, sometimes resulting in
+garbage values that were being read as camera movement input and causing the
+scene to go haywire. That's what I get for not initializing all my variables
+properly, like in the constructor. I also never added the update on switch
+to accept analog input, so I added that too:</p>
+<pre><code>// new; were missing before
+mLeftJoyX = mLeftJoyY = 0.0f;
+mRightJoyX = mRightJoyY = 0.0f;
+...
+const HidAnalogStickState& stickL = gPad.sticks[0];
+const HidAnalogStickState& stickR = gPad.sticks[1];
+// scale from -32768,32768 to -1,1
+mLeftJoyX = float(stickL.x)/32768.0f;
+mLeftJoyY = -float(stickL.y)/32768.0f;
+mRightJoyX = float(stickR.x)/32768.0f;
+mRightJoyY = -float(stickR.y)/32768.0f;
+</code></pre>
+
 <ul>
 <li><a href="./index.html">&lt;-- Back to HopsLib</li>
 <li><a href="../../index.html">&lt;-- Back to Home</a></li>
