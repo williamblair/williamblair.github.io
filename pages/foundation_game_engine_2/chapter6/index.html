@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="utf-8"/>
+    <title>BJ's Website</title>
+    <style>
+        body, html {
+            background-color: #000000;
+            color: #FFFFFF;
+        }
+        table, tr, th, td {
+            border: 1px solid #FFFFFF;
+            border-collapse: collapse;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+<h1>Chapter 6: Projections</h1>
+<p>Definitions/Variables used</p>
+<table>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td><i>n</i></td><td>Distance from camera position to near plane</td></tr>
+<tr><td>Camera View direction</td><td>Positive <i>z</i> axis</td></tr>
+<tr><td><i>f</i></td><td>Distance from camera position to far plane</td></tr>
+<tr><td><i>s</i></td><td>Aspect ratio=width/height</td></tr>
+<tr><td><i>g</i></td><td>Distance from camera position to projection plane</td></tr>
+<tr><td>Field of View</td><td>Angle between left/right or top/bottom frustum planes.</td></tr>
+</table>
+<img src="./images/viewFrustum.png"/>
+<p>fovY = 2tan<sup>-1</sup>(1/g)</p>
+<p>g = tan<sup>-1</sup>(fovY/2)</p>
+<p>To calculate camera-space frustum planes:</p>
+<table>
+<tr><th>Frustum Plane</th><th>Camera-space (x,y,z,w)</th></tr>
+<tr><td>Near</td><td>(0,0,1,<i>-n</i>)</td></tr>
+<tr><td>Far</td><td>(0,0,-1,<i>f</i>)</td></tr>
+<tr><td>Left</td><td>(1/sqrt(g<sup>2</sup>+s<sup>2</sup>))(<i>g</i>,0,<i>s</i>,0)</td></tr>
+<tr><td>Right</td><td>(1/sqrt(g<sup>2</sup>+s<sup>2</sup>))(<i>-g</i>,0,<i>s</i>,0)</td></tr>
+<tr><td>Top</td><td>(1/sqrt(g<sup>2</sup>+1))(0,<i>g</i>,1,0)</td></tr>
+<tr><td>Bottom</td><td>(1/sqrt(g<sup>2</sup>+1))(0,<i>-g</i>,1,0)</td></tr>
+</table>
+<p>To calculate the corner points on the near/far frustum planes <b>q</b>0,<b>q</b>1,<b>q</b>2,<b>q</b>3:</p>
+<table>
+<tr><td><b>q</b>0</td><td><b>c</b> + ((us)/g)<b>x</b> + (u/g)<b>y</b> + u<b>z</b></td></tr>
+<tr><td><b>q</b>1</td><td><b>c</b> + ((us)/g)<b>x</b> - (u/g)<b>y</b> + u<b>z</b></td></tr>
+<tr><td><b>q</b>2</td><td><b>c</b> - ((us)/g)<b>x</b> - (u/g)<b>y</b> + u<b>z</b></td></tr>
+<tr><td><b>q</b>3</td><td><b>c</b> - ((us)/g)<b>x</b> + (u/g)<b>y</b> + u<b>z</b></td></tr>
+</table>
+<p><b>x</b> = <b>M</b><sub>camera[0]</sub> (column 0),
+<b>y</b> = <b>M</b><sub>camera[0]</sub> (column 1),
+<b>z</b> = <b>M</b><sub>camera[0]</sub> (column 2),
+<b>c</b> = <b>M</b><sub>camera[3]</sub> (column 3),
+<i>u</i> = <i>n</i> for near plane points, <i>f</i> for far plane points.</p>
+<img src="./images/projectionTransforms.png"/>
+<p>Reversing the depth buffer value/z allows for less floating point errors/more
+accuracy at farther z-positions away from the camera as opposed to very close to
+the near clip plane:</p>
+<img src="./images/depthPrecision.png"/>
+<p>Normal Perspective Projection Matrix:</p>
+<img src="./images/perspectiveProjectionMatrix.png"/><br/>
+<p>Infinite Distance Perspective Projection Matrix:</p>
+<img src="./images/infinitePerspectiveProjectionMatrix.png"/><br/>
+<p>Reversed depth infinite distance perspective projection matrix:</p>
+<img src="./images/infiniteReversePerspectiveProjectionMatrix.png"/>
+<p>This is a good choice for the default projection matrix to use, just need
+to make sure to flip the depth test pass condition from "greater than" to "less than"</p>
+<p>Orthographic Projection Matrix:</p>
+<img src="./images/orthographicProjectionMatrix.png"/>
+<p>Extracting camera-space planes from "canonical view volume" (normalized device
+coordinates cube):</p>
+<table>
+<tr><th>Frustum Plane</th><th>Clip-Space</th><th>Camera-Space</th></tr>
+<tr><td>Left</td><td>(1,0,0,1)</td><td>P3 + P0</td></tr>
+<tr><td>Right</td><td>(-1,0,0,1)</td><td>P3 - P0</td></tr>
+<tr><td>Top</td><td>(0,1,0,1)</td><td>P3 + P1</td></tr>
+<tr><td>Bottom</td><td>(0,-1,0,1)</td><td>P3 - P1</td></tr>
+<tr><td>Regular projection matrix</td></tr>
+<tr><td>Near</td><td>(0,0,1,0)</td><td>P2</td></tr>
+<tr><td>Far</td><td>(0,0,-1,1)</td><td>P3-P2</td></tr>
+<tr><td>Reversed Depth projection matrix</td></tr>
+<tr><td>Near</td><td>(0,0,-1,1)</td><td>R3-R2</td></tr>
+<tr><td>Far</td><td>(0,0,1,0)</td><td>R2</td></tr>
+</table>
+<p>Pi means projection matrix zero-based index row <i>i</i>, Ri for reversed-depth projection
+matrix row <i>i</i></p>
+<p>To reflect scene about a world-space boundary plane <b>k</b>,
+<b>M</b><sub>reflection</sub> = <b>H</b><sub>reflect</sub>(<b>k</b>)<b>M</b><sub>camera</sub>.
+</p>
+<p>Then to modify a projection matrix to clip points by the boundary plane,
+replace the third row of P with m<b>k</b>, or R3 - m<b>k</b> for reversed depth
+proj mat.</p>
+<p>m = 1/dot(k,<b>v</b><sub>camera</sub>)</p>
+<p><b>v</b><sub>camera</sub> = (sign(k<sub>x</sub>)-P<sub>02</sub>)/P<sub>00</sub>,
+(sign(k<sub>y</sub>)-P<sub>12</sub>)/P<sub>11</sub>, 1,
+(1-P<sub>22</sub>)/P<sub>23</sub>)</p>
+</body>
+</html>
