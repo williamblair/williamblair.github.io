@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>BJ's Website</title>
+    <link rel="stylesheet" type="text/css" href="../../bjsite.css"/>
+</head>
+<body>
+<section style="margin:10px;">
+    <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
+        <div id="navbarBasicExample" class="navbar-menu is-active">
+            <div class="navbar-start">
+                <a href="../../index.html" class="navbar-item"><strong>BJ's Website</strong></a>
+                <a href="../../general.html" class="navbar-item">General</a>
+                <a href="../../programming.html" class="navbar-item">Programming</a>
+                <a href="../../school.html" class="navbar-item">School</a>
+                <a href="../../books.html" class="navbar-item">Books</a>
+                <a href="../../tech.html" class="navbar-item">Tech</a>
+            </div>
+            <div class="navbar-end">
+                <a href="https://github.com/williamblair" class="navbar-item"><span class="icon"><i class="fab fa-github"></i></span><span>Github</span></a>
+                <a href="https://bitbucket.org/williamblair" class="navbar-item"><span class="icon"><i class="fab fa-bitbucket"></i></span>Bitbucket</a>
+            </div>
+        </div>
+    </nav>
+</section>
+<section class="section">
+<div class="container">
+<h3>Rules/Notes from "Effective C++", 3rd edition by Scott Meyers</h3>
+<p>This book is a little outdated, like the use of std::tr1,
+but still I learned a thing or two - for example, about private inheritance
+and implicit/explicit conversions.</p>
+<a href="https://www.amazon.com/Effective-Specific-Improve-Programs-Designs/dp/0321334876">
+<img src="bookcover.jpg"/>
+</a>
+<ol>
+<li>View c++ as a federation of languages
+    <ul><li>C, Object-Oriented C++, STL, and templates</li></ul>
+</li>
+<li>Prefer consts, enums, and inlines to #defines</li>
+<li>Use const whenever possible</li>
+<li>Make sure that objects are initialized before they are used
+    <ul>
+    <li>Use the constructor member initialization list</li>
+    <li>Use singletons over static global variables</li>
+    </ul>
+</li>
+<li>Know what functions c++ silently writes and calls</li>
+<li>Explicitly disallow the use of compiler-generated functions you do not want</li>
+<li>Declare destructors virtual in polymorphic base classes
+    <ul>
+    <li>Only add virtual if the class itself will be used as a parent/base class,
+        as using virtual increases the object's size in memory</li>
+    </ul>
+</li>
+<li>Prevent exceptions from leaving destructors</li>
+<li>Never call virtual functions during construction or destruction
+    <ul>
+    <li>Derived classes are not initialized yet while in the base class ctor</li>
+    </ul>
+</li>
+<li>Have assignment operators return a reference to *this</li>
+<li>Handle assignment to self in operator=</li>
+<li>Copy all parts of an object</li>
+<li>Use objects to manager resources
+    <ul>
+    <li>Use smart pointers</li>
+    <li>Use RAII technique (resource acquisition is initialization)</li>
+    </ul>
+</li>
+<li>Think carefully about copying behavior in resource-managing classes
+    <ul>
+    <li>Some options: prevent copying, use resource counter, use deep copy, transfer resource ownership</li>
+    </ul>
+</li>
+<li>Provide access to raw resources in resource-managing classes</li>
+<li>Use the same form in corresponding uses of new and delete
+    <ul>
+    <li>Avoid typedefs using arrays, as it hides wether you need to use delete or delete[] on the typedef'd object</li>
+    </ul>
+</li>
+<li>Store new'd objects in smart pointers in standalone statements</li>
+<li>Make interfaces easy to use correctly and hard to use incorrectly</li>
+<li>Treat class design as type design</li>
+<li>Prefer pass-by-reference-to-const to pass-by-value</li>
+<li>Don't try to return a reference when you must return an object</li>
+<li>Declare data members private</li>
+<li>Prefer non-member non-friend functions to member functions</li>
+<li>Declare non-member functions when type conversions should apply to all parameters</li>
+<li>Consider support for a non-throwing swap</li>
+<li>Postpone variable definitions as long as possible</li>
+<li>Minimize Casting
+    <ul><li>dynamic casts in particular can be slow</li></ul>
+</li>
+<li>Avoid returning "handles" to object internals
+    <ul><li>Pointers, references, iterators, ...</li></ul>
+</li>
+<li>Strive for exception-safe code</li>
+<li>Understand the ins and outs of inlining</li>
+<li>Minimize compiliation dependencies between files
+    <ul>
+        <li>Avoid using objects when references and pointers will do</li>
+        <li>Depend on class declarations instead of class definitions whenever you can</li>
+        <li>Provide separate header files for declarations and definitions</li>
+        <li>Use abstract interfaces for classes when possible (pimpl paradigm)</li>
+    </ul>
+</li>
+<li>Make sure public inheritance models "is-a"</li>
+<li>Avoid hiding inherited names
+    <ul>
+        <li>Can use 'using ...' to make original base names visible in derived</li>
+    </ul>
+</li>
+<li>Differentiate between inheritance of interface and inheritance of implementation</li>
+<li>Consider alternatives to virtual functions
+    <ul>
+        <li>i.e. template method design pattern, strategy design pattern, std::function objects</li>
+    </ul>
+</li>
+<li>Never redefine an inherited non-virtual function</li>
+<li>Never redefine a function's inherited default parameter value
+    <ul><li>Default parameters are statically bound as opposed to dynamically bound</li></ul>
+</li>
+<li>Model "has-a" or "is-implemented-in-terms-of" through composition</li>
+<li>Use private inheritance judiciously</li>
+<li>Use multiple inheritance judiciously</li>
+<li>Understand implicit interfaces and compile-time polymorphism
+    <ul><li>Implicit interfaces for templates are based on valid expressions at compile time</li></ul>
+</li>
+<li>Understand the two meanings of typename
+    <ul><li>typename keyword can also be used to specify nested dependent type names</li></ul>
+</li>
+<li>Know how to access names in templatized base classes
+    <ul><li>Can use "this" keyword, add a "using" statement, or add parent namespace (least desirable)</li></ul>
+</li>
+<li>Factor parameter-independent code out of templates</li>
+<li>Use member function templates to accept "all compatible types"</li>
+<li>Define non-member functions inside templates as friends when type conversions are desired</li>
+<li>Use traits classes for information about types</li>
+<li>Be aware of template metaprogramming</li>
+<li>Understand the behavior of the new-handler</li>
+<li>Understand when it makes sense to replace new and delete</li>
+<li>Adhere to convention when writing new and delete</li>
+<li>Write placement delete if you write placement new</li>
+<li>Pay attention to compiler warnings</li>
+<li>Familiarize yourself with the standard library, including tr1</li>
+<li>Familiarize yourself with Boost</li>
+</ol>
+<p><a href="../../index.html">&lt;-- Back to home</a></p>
+</div>
+</section>
+</body>
+</html>
+
