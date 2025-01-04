@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>BJ's Website</title>
+    <link rel="stylesheet" type="text/css" href="../../bjsite.css"/>
+</head>
+<body>
+    <section style="margin:10px;">
+        <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
+            <div id="navbarBasicExample" class="navbar-menu is-active">
+                <div class="navbar-start">
+                    <a href="../../index.html" class="navbar-item"><strong>BJ's Website</strong></a>
+                    <a href="../../general.html" class="navbar-item">General</a>
+                    <a href="../../programming.html" class="navbar-item">Programming</a>
+                    <a href="../../school.html" class="navbar-item">School</a>
+                    <a href="../../books.html" class="navbar-item">Books</a>
+                    <a href="../../tech.html" class="navbar-item">Tech</a>
+                </div>
+                <div class="navbar-end">
+                    <a href="https://github.com/williamblair" class="navbar-item"><span class="icon"><i class="fab fa-github"></i></span><span>Github</span></a>
+                    <a href="https://bitbucket.org/williamblair" class="navbar-item"><span class="icon"><i class="fab fa-bitbucket"></i></span>Bitbucket</a>
+                </div>
+            </div>
+        </nav>
+    </section>
+    <section class="section">
+        <div class="container">
+
+        <h1 class="title">Ultimate 3D Game Engine Design &amp; Architecture</h1>
+
+        <p>My implementation following "Ultimate 3D Game Engine Design &amp; Architecture"
+        by Allen Sherrod</p>
+        <p>
+        <a href="https://www.amazon.com/Ultimate-Engine-Architecture-Charles-Development/dp/1584504730">
+        <img src="bookcover.jpg" width="300"/>
+        </a>
+        </p>
+        
+        <p>For my implementation, I used SDL2 instead of platform specific Windowing,
+        and stb_image instead of the book's TGA image loading code. You can also
+        read some notes on changes/issues encountered in  the log.txt of the repo.</p>
+        
+        <p>For this project I also logged how long I spent whenever I was working
+        on it, which adding up the times in the log, came out to ~82 hours.</p>
+        
+        <p>Additionally, I was experimenting with Doxygen and trying to comment everything,
+        you can browse the result here:
+        <a href="./doc/index.html">doc/index.html</a>
+        </p>
+
+        <p>The Code is here: 
+        <a href="https://gitlab.com/beedge19/ultimate3d">
+        https://gitlab.com/beedge19/ultimate3d
+        </a>
+        </p>
+        
+        <p>Screenshots/Videos:</p>
+
+        <figure>
+        <figcaption>Chapter 5 Alpha Mapping Demo</figcaption>
+        <img src="./images/Chp5AlphaMapping.png"/>
+        </figure>
+        
+        <figure>
+        <figcaption>Chapter 4 Billboard Demo</figcaption>
+        <img src="./images/Chp4Billboard.png"/>
+        </figure>
+        
+        <figure>
+        <figcaption>Chapter 5 Bump Mapping Demo</figcaption>
+        <img src="./images/Chp5BumpMapping.png"/>
+        </figure>
+        
+        <figure>
+        <figcaption>Chapter 6 Cloth Simulation Demo</figcaption>
+        <video controls>
+            <source src="./images/Chp6ClothSim.webm" type="video/webm"/>
+        </video>
+        </figure>
+        
+        <figure>
+        <figcaption>Chapter 6 Constant Velocity Demo</figcaption>
+        <img src="./images/Chp6ConstantVelocity.png"/>
+        </figure>
+        
+        <figure>
+        <figcaption>Chapter 5 Cube Map Demo</figcaption>
+        <img src="./images/Chp5CubeMap.png"/>
+        </figure>
+        
+        <figure>
+        <figcaption>Chapter 6 Gravity Demo</figcaption>
+        <img src="./images/Chp6Gravity.png"/>
+        </figure>
+        
+        <figure>
+        <figcaption>Chapter 5 Level-of-detail Demo</figcaption>
+        <img src="./images/Chp5LOD.png"/>
+        </figure>
+        
+        <figure>
+        <figcaption>Chapter 5 Luminance Demo</figcaption>
+        <img src="./images/Chp5Luminance.png"/>
+        </figure>
+        
+        <figure>
+        <figcaption>Chapter 5 Multitexture Demo</figcaption>
+        <img src="./images/Chp5Multitexture.png"/>
+        </figure>
+        
+        <figure>
+        <figcaption>Chapter 5 Octree Demo</figcaption>
+        <img src="./images/Chp5Octree.png"/>
+        </figure>
+
+        <figure>
+        <figcaption>Chapter 4 OpenGL Demo</figcaption>
+        <img src="./images/Chp4OpenGL.png"/>
+        </figure>
+
+        <figure>
+        <figcaption>Chapter 5 Per Pixel Lighting Demo</figcaption>
+        <img src="./images/Chp5PerPixelLighting.png"/>
+        </figure>
+        
+        <figure>
+        <figcaption>Chapter 5 Per Vertex Lighting Demo</figcaption>
+        <img src="./images/Chp5PerVertexLighting.png"/>
+        </figure>
+        
+        <figure>
+        <figcaption>Chapter 5 Scene Graph Demo</figcaption>
+        <img src="./images/Chp5SceneGraph.png"/>
+        </figure>
+        
+        <figure>
+        <figcaption>Chapter 5 Sepia Demo</figcaption>
+        <img src="./images/Chp5Sepia.png"/>
+        </figure>
+        
+        <figure>
+        <figcaption>Chapter 5 Specular Demo</figcaption>
+        <img src="./images/Chp5Specular.png"/>
+        </figure>
+        
+        <figure>
+        <figcaption>Chapter 6 Sphere Collision Demo</figcaption>
+        <video controls>
+            <source src="./images/Chp6SphereCollision.webm" type="video/webm"/>
+        </video>
+        </figure>
+        
+        <figure>
+        <figcaption>Chapter 6 Sphere-Plane Collision Demo</figcaption>
+        <video controls>
+            <source src="./images/Chp6SpherePlaneCollision.webm" type="video/webm"/>
+        </video>
+        </figure>
+        
+        <figure>
+        <figcaption>Chapter 5 Texture Map Demo</figcaption>
+        <img src="./images/Chp5TextureMap.png"/>
+        </figure>
+        
+        <figure>
+        <figcaption>Chapter 9 Black Jack Demo</figcaption>
+        <img src="./images/Chp9BlackJack.png"/>
+        </figure>
+        
+        <figure>
+        <figcaption>Chapter 9 Walkthrough Portal Demo</figcaption>
+        <img src="./images/Chp9Walkthrough.png"/>
+        </figure>       
+        
+        <p>
+        <a href="../../index.html">&lt;-- Back to Home</a>
+        </p>
+
+        </div>
+    </section>
+
+</body>
+</html>
+

@@ -1,0 +1,97 @@
+var hierarchy =
+[
+    [ "Ult::Archive", "class_ult_1_1_archive.html", null ],
+    [ "Ult::ArchiveFileHeader", "class_ult_1_1_archive_file_header.html", null ],
+    [ "Ult::ArchiveHeader", "class_ult_1_1_archive_header.html", null ],
+    [ "BlackJackGame", "class_black_jack_game.html", [
+      [ "BlackJackSDL", "class_black_jack_s_d_l.html", null ]
+    ] ],
+    [ "Ult::BoundingBox", "class_ult_1_1_bounding_box.html", null ],
+    [ "Ult::BoundingSphere", "class_ult_1_1_bounding_sphere.html", null ],
+    [ "Ult::Camera", "class_ult_1_1_camera.html", null ],
+    [ "Card", "struct_card.html", null ],
+    [ "Cloth", "class_cloth.html", null ],
+    [ "Ult::CollisionResponse", "class_ult_1_1_collision_response.html", null ],
+    [ "Ult::DynamicModel", "class_ult_1_1_dynamic_model.html", null ],
+    [ "Ult::Effect", "class_ult_1_1_effect.html", [
+      [ "Ult::MultiTexEffect", "class_ult_1_1_multi_tex_effect.html", null ],
+      [ "Ult::MultiTexShader", "class_ult_1_1_multi_tex_shader.html", null ],
+      [ "Ult::TextureMapEffect", "class_ult_1_1_texture_map_effect.html", null ],
+      [ "Ult::TextureShader", "class_ult_1_1_texture_shader.html", null ]
+    ] ],
+    [ "Ult::EffectResource", "class_ult_1_1_effect_resource.html", null ],
+    [ "Ult::EffectResourceTag", "class_ult_1_1_effect_resource_tag.html", null ],
+    [ "Ult::Endian", "class_ult_1_1_endian.html", null ],
+    [ "Ult::Frustum", "class_ult_1_1_frustum.html", null ],
+    [ "Ult::GameMonkey", "class_ult_1_1_game_monkey.html", null ],
+    [ "Ult::GameMonkeyFunction", "class_ult_1_1_game_monkey_function.html", null ],
+    [ "Ult::GLSLParameter", "struct_ult_1_1_g_l_s_l_parameter.html", null ],
+    [ "Ult::GLSLShader", "struct_ult_1_1_g_l_s_l_shader.html", null ],
+    [ "Ult::GLTexture", "class_ult_1_1_g_l_texture.html", null ],
+    [ "Ult::Handle< T >", "class_ult_1_1_handle.html", null ],
+    [ "Ult::Handle< stTexture >", "class_ult_1_1_handle.html", null ],
+    [ "Ult::Handle< Ult::EffectResourceTag >", "class_ult_1_1_handle.html", null ],
+    [ "Ult::Handle< Ult::ModelResourceTag >", "class_ult_1_1_handle.html", null ],
+    [ "Ult::HashItem< T >", "class_ult_1_1_hash_item.html", null ],
+    [ "Ult::HashTable< T >", "class_ult_1_1_hash_table.html", null ],
+    [ "Ult::HashTable< Ult::ResourceName >", "class_ult_1_1_hash_table.html", null ],
+    [ "Ult::Matrix4x4", "class_ult_1_1_matrix4x4.html", null ],
+    [ "Ult::ModelData", "class_ult_1_1_model_data.html", null ],
+    [ "Ult::ModelResource", "class_ult_1_1_model_resource.html", null ],
+    [ "Ult::ModelResourceTag", "class_ult_1_1_model_resource_tag.html", null ],
+    [ "Ult::Network", "class_ult_1_1_network.html", null ],
+    [ "Ult::Node", "class_ult_1_1_node.html", [
+      [ "Ult::GeometryNode", "class_ult_1_1_geometry_node.html", null ],
+      [ "Ult::TransformationNode", "class_ult_1_1_transformation_node.html", null ]
+    ] ],
+    [ "Ult::OBB", "class_ult_1_1_o_b_b.html", null ],
+    [ "Ult::OctreeNode", "class_ult_1_1_octree_node.html", null ],
+    [ "Ult::OpenALSoundBuffer", "class_ult_1_1_open_a_l_sound_buffer.html", null ],
+    [ "Ult::OpenALSoundSource", "class_ult_1_1_open_a_l_sound_source.html", null ],
+    [ "Ult::OpenALSystem", "class_ult_1_1_open_a_l_system.html", null ],
+    [ "Ult::Packet", "class_ult_1_1_packet.html", null ],
+    [ "Ult::PhysicsObject", "class_ult_1_1_physics_object.html", [
+      [ "Ult::PointMass", "class_ult_1_1_point_mass.html", [
+        [ "Ult::SpringMass", "class_ult_1_1_spring_mass.html", null ]
+      ] ]
+    ] ],
+    [ "Ult::PhysicsSpace", "class_ult_1_1_physics_space.html", null ],
+    [ "Ult::Plane", "class_ult_1_1_plane.html", null ],
+    [ "Portal", "class_portal.html", null ],
+    [ "Ult::Property", "struct_ult_1_1_property.html", null ],
+    [ "Ult::PropertyScript", "class_ult_1_1_property_script.html", null ],
+    [ "Ult::Quaternion", "class_ult_1_1_quaternion.html", null ],
+    [ "Ult::Ray", "class_ult_1_1_ray.html", null ],
+    [ "Ult::RenderInterface", "class_ult_1_1_render_interface.html", [
+      [ "Ult::OpenGLRenderer", "class_ult_1_1_open_g_l_renderer.html", null ]
+    ] ],
+    [ "Ult::RenderParams", "struct_ult_1_1_render_params.html", null ],
+    [ "Ult::ResourceManager< A, HANDLE >", "class_ult_1_1_resource_manager.html", null ],
+    [ "Ult::ResourceManager< Ult::GLTexture, Ult::Handle< stTexture > >", "class_ult_1_1_resource_manager.html", null ],
+    [ "Ult::ResourceName", "class_ult_1_1_resource_name.html", null ],
+    [ "Ult::SceneGraph", "class_ult_1_1_scene_graph.html", null ],
+    [ "Sector", "class_sector.html", null ],
+    [ "SectorMesh", "class_sector_mesh.html", null ],
+    [ "Ult::Socket", "class_ult_1_1_socket.html", null ],
+    [ "Ult::Spring", "class_ult_1_1_spring.html", null ],
+    [ "Ult::stAxisPlaneVertex", "struct_ult_1_1st_axis_plane_vertex.html", null ],
+    [ "stbi_io_callbacks", "structstbi__io__callbacks.html", null ],
+    [ "stClothVertex", "structst_cloth_vertex.html", null ],
+    [ "stModel", "structst_model.html", null ],
+    [ "Ult::stOBJMeshVertex", "struct_ult_1_1st_o_b_j_mesh_vertex.html", null ],
+    [ "Ult::stObjModel", "struct_ult_1_1st_obj_model.html", null ],
+    [ "stSectorVertex", "structst_sector_vertex.html", null ],
+    [ "Ult::stTexture", "struct_ult_1_1st_texture.html", null ],
+    [ "Ult::stUnitBoxVertex", "struct_ult_1_1st_unit_box_vertex.html", null ],
+    [ "Ult::stUnitSphereVertex", "struct_ult_1_1st_unit_sphere_vertex.html", null ],
+    [ "Ult::stUnitSquareVertex", "struct_ult_1_1st_unit_square_vertex.html", null ],
+    [ "stVertex", "structst_vertex.html", null ],
+    [ "Ult::TokenStream", "class_ult_1_1_token_stream.html", null ],
+    [ "Ult::Vector3D", "class_ult_1_1_vector3_d.html", null ],
+    [ "Ult::VertexDescriptor", "class_ult_1_1_vertex_descriptor.html", null ],
+    [ "Ult::VertexElement", "class_ult_1_1_vertex_element.html", null ],
+    [ "Walkthrough3D", "class_walkthrough3_d.html", [
+      [ "WalkthroughSDL", "class_walkthrough_s_d_l.html", null ]
+    ] ],
+    [ "Ult::WindowHandle", "class_ult_1_1_window_handle.html", null ]
+];
