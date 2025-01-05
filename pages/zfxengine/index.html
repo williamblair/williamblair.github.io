@@ -457,6 +457,45 @@ while (SDL_PollEvent(&amp;e))
             <source src="./images/chp12demo09022023.webm" type="video/webm"/>
         </video>
 
+        <p>01/05/2025 - 9:30am - 11:00am, 12:00pm - 3:00pm</p>
+        
+        <p>Revisiting this project, doing a reorganization/rewrite. Planning
+        to do different console implementations (ps3, vita, switch) as I go,
+        which I think will be easier than trying to go back and port everything
+        afterwords.</p>
+        <p>Using gitlab for repo hosting as I've been trying it lately and
+        testing it's CICD pipeline functionality. Also using CMake for build
+        management (TODO - can I use CMake with the console ports?) and
+        planning on putting all the code in a Zfx namespace, along with
+        commenting thuroughly using Doxygen.</p>
+        <p>The new repo is
+        <a href="https://gitlab.com/beedge19/zfxengineopengl">
+        https://gitlab.com/beedge19/zfxengineopengl
+        </a>. If I finish I will probably put it on the github repo also,
+        which I believe is private at the moment (TODO make public).</p>
+
+        <p>Finished chapter 3 starting the Renderer and RenderDevice
+        classes. PC and Switch both compiling the test application which
+        clears the screen to green.</p>
+        <p>I got the switch build using CMake via
+        <a href="https://github.com/vbe0201/switch-cmake/tree/rewrite">
+        https://github.com/vbe0201/switch-cmake/tree/rewrite
+        </a> which provides CMake templates for devkitPro switch development.
+        I made a small modification to FindLibnx.cmake to add portlibs to
+        LIBNX_INCLUDE_DIRS for the EGL opengl impl. Then to compile for switch,
+        in the command line you run:</p>
+<pre><code>mkdir switchbuild && cd switchbuild
+cmake .. -DZFX_SWITCH_BUILD=1 -DCMAKE_TOOLCHAIN_FILE=../DevkitA64Libnx.cmake
+VERBOSE=1 cmake --build .
+</code></pre>
+        <p>Which places libzfx.a and zfxTestRendererInit.nro in switchbuild/src.
+        To run the program on the switch remotely with nxlink:</p>
+<pre><code>nxlink --address <switch IP> -s ./src/zfxTestRendererInit.nro
+</code></pre>
+
+        <img src="./images/switchRenderInit_1_01052025.jpg"/>
+        <img src="./images/switchRenderInit01052025.jpg"/>
+
         <p>
         <a href="../../index.html">&lt;-- Back to Home</a>
         </p>
