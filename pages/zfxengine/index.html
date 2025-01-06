@@ -457,7 +457,7 @@ while (SDL_PollEvent(&amp;e))
             <source src="./images/chp12demo09022023.webm" type="video/webm"/>
         </video>
 
-        <p>01/05/2025 - 9:30am - 11:00am, 12:00pm - 3:00pm</p>
+        <p>01/05/2025 - 9:30am - 11:00am, 12:00pm - 3:00pm, 8:00pm - 9:30pm</p>
         
         <p>Revisiting this project, doing a reorganization/rewrite. Planning
         to do different console implementations (ps3, vita, switch) as I go,
@@ -493,8 +493,16 @@ VERBOSE=1 cmake --build .
 <pre><code>nxlink --address <switch IP> -s ./src/zfxTestRendererInit.nro
 </code></pre>
 
-        <img src="./images/switchRenderInit_1_01052025.jpg"/>
+        <p>Also have initial Vita support implemented. Vitasdk includes a CMake
+        configuration via /usr/local/vitasdk/share/vita.cmake and vita.toolchain.cmake.
+        Similar to switch, the build process is:</p>
+<pre><code>mkdir vitabuild && cd vitabuild
+cmake .. -DZFX_VITA_BUILD=1 -DCMAKE_TOOLCHAIN_FILE=/usr/local/vitasdk/share/vita.toolchain.cmake
+VERBOSE=1 cmake --build .
+</code></pre>
+
         <img src="./images/switchRenderInit01052025.jpg"/>
+        <img src="./images/vitaRenderInit01052025.jpg"/>
 
         <p>
         <a href="../../index.html">&lt;-- Back to Home</a>
