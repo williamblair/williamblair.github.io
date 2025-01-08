@@ -457,7 +457,7 @@ while (SDL_PollEvent(&amp;e))
             <source src="./images/chp12demo09022023.webm" type="video/webm"/>
         </video>
 
-        <p>01/05/2025 - 9:30am - 11:00am, 12:00pm - 3:00pm, 8:00pm - 9:30pm</p>
+        <h3>01/05/2025 - 9:30am - 11:00am, 12:00pm - 3:00pm, 8:00pm - 9:30pm</h3>
         
         <p>Revisiting this project, doing a reorganization/rewrite. Planning
         to do different console implementations (ps3, vita, switch) as I go,
@@ -503,6 +503,55 @@ VERBOSE=1 cmake --build .
 
         <img src="./images/switchRenderInit01052025.jpg"/>
         <img src="./images/vitaRenderInit01052025.jpg"/>
+
+        <h3>01/06/2025 - 7:30pm - 9:30pm</h3>
+        
+        <p>Start initial PS3 impl. Found this github repo for ps3dev/psl1ght CMake toolchain configuration:
+        <a href="https://github.com/zzanp/ps3-cmake/tree/master">https://github.com/zzanp/ps3-cmake/tree/master</a>.
+        Have not tested yet. placed the scripts/binaries from this repo in $PS3DEV/bin so they can be ran from the
+        command line anywhere. TODO after testing, place instructions for this in README. Started code on the initial
+        PS3RenderDevice implementation, mostly copying code over from
+        <a href="https://bitbucket.org/williamblair/hopslib/">https://bitbucket.org/williamblair/hopslib/</a>.</p>
+
+        <h3>01/07/2025 - 7:00pm - 9:30pm</h3>
+
+        <p>Finish initial PS3 impl. The ps3dev cmake toolchain from github worked smoothly, however it didn't
+        contain a command for .self generation, so I added a macro in my top level CMakeLists.txt to do this:</p>
+<pre><code>macro(ps3_create_self elfTarget)
+    add_custom_command(OUTPUT ${elfTarget}.self
+        COMMAND ppu-strip ${CMAKE_CURRENT_BINARY_DIR}/${elfTarget} -o ${CMAKE_CURRENT_BINARY_DIR}/${elfTarget} &&
+            sprxlinker ${CMAKE_CURRENT_BINARY_DIR}/${elfTarget} &&
+            make_self ${CMAKE_CURRENT_BINARY_DIR}/${elfTarget} ${CMAKE_CURRENT_BINARY_DIR}/${elfTarget}.self &&
+            fself ${CMAKE_CURRENT_BINARY_DIR}/${elfTarget} ${CMAKE_CURRENT_BINARY_DIR}/${elfTarget}.fake.self
+        DEPENDS ${elfTarget}
+        VERBATIM)
+    add_custom_target(${elfTarget}Self ALL DEPENDS ${elfTarget}.self)
+endmacro()
+</code></pre>
+
+        <p>Also, for the clear/background color, I didn't remember the format of the bytes for the argument
+        to rsxSetClearColor. After some experimentation, the order turned out to be ARGB:</p>
+<pre><code>const u32 color =
+    0xFF000000 | // alpha
+    (u32(mClearColor[0]*255.0f)<<16) | // red
+    (u32(mClearColor[1]*255.0f)<<8) | // green
+    (u32(mClearColor[2]*255.0f)); // blue
+rsxSetClearColor(mGcmCtx, color);
+</code></pre>
+
+        <p>Finally, the cmake build process is:</p>
+<pre><code>mkdir ps3build && cd ps3build
+ppu-cmake .. -DZFX_PS3_BUILD=1
+cmake --build .
+</code></pre>
+
+        <p>I also added a define check around the contents of the header/source files for the OpenGL/PS3
+        implementations so their contents are only processed on the correct platforms,
+        without needing to conditionally include/exclude files in the CMake configuration.</p>
+
+        <p>I tested the PS3 build on both hardware and in rpcs3:</p>
+
+        <img src="./images/ps3RendererInit01072025.png" width="600px"/>
 
         <p>
         <a href="../../index.html">&lt;-- Back to Home</a>
