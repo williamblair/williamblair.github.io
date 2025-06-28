@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>BJ's Website</title>
+    <link href="https://unpkg.com/@fortawesome/fontawesome-free@5.13.0/css/all.css" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="../../bjsite.css"/>
+</head>
+<body>
+    <section style="margin:10px;">
+        <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
+            <div id="navbarBasicExample" class="navbar-menu is-active">
+                <div class="navbar-start">
+                    <a href="../../index.html" class="navbar-item"><strong>BJ's Website</strong></a>
+                    <a href="../../general.html" class="navbar-item">General</a>
+                    <a href="../../programming.html" class="navbar-item">Programming</a>
+                    <a href="../../school.html" class="navbar-item">School</a>
+                    <a href="../../books.html" class="navbar-item">Books</a>
+                    <a href="../../tech.html" class="navbar-item">Tech</a>
+                </div>
+                <div class="navbar-end">
+                    <a href="https://github.com/williamblair" class="navbar-item"><span class="icon"><i class="fab fa-github"></i></span><span>Github</span></a>
+                    <a href="https://bitbucket.org/williamblair" class="navbar-item"><span class="icon"><i class="fab fa-bitbucket"></i></span>Bitbucket</a>
+                </div>
+            </div>
+        </nav>
+    </section>
+    <section class="section">
+        <div class="container">
+          <h1 class="title">GAM-576 Azul Engine Port</h1>
+          <hr/>
+          <div>
+            <p>Working on porting my DePaul GAM-576 DirectX based engine to OpenGL (PC,Switch,Vita) and PS3.</p>
+          </div>
+          <div>
+            <h3>04/06/2025</h3>
+            <p>8:00pm-9:00pm,10:00pm-11:15pm</p>
+            <p>Finished initial window creation/clear screen for Switch.
+            Starting Nvidia CG shading language integration (for Windows):
+            Installer for latest version (3.1, April 2012) available here:
+            https://developer.download.nvidia.com/cg/cg_3_1_0013.html.
+            Check the checkbox for "Files to run and link 64-bit (x64) Cg-based applications".
+            Add Install dir include/lib dirs (C:\Program Files (x86)\NVIDIA Corporation\Cg\lib.x64,include) to cmake-gui.
+            Based on PSL1GHT shaders, PS3 cg profile seems to be VP40/FP40.
+            TODO try test shader following https://developer.download.nvidia.com/CgTutorial/cg_tutorial_appendix_b.html.</p>
+
+            <h3>04/30/2025</h3>
+            <p>6:30pm - 10:30pm</p>
+            <p>Continue nvidia CG integration.
+            Having issues using the Cg GL runtime, when setting the profile it always seems to return that the profile is unsupported.
+            Was following the code example from https://github.com/FrozenStormInteractive/Cg-Toolkit/blob/master/examples/OpenGL/basic/01_vertex_program/01_vertex_program.c.
+            Instead am going with using cgc to convert the cg into glsl during the
+            CMake build process. See https://stackoverflow.com/questions/15920244/converting-hybrid-cg-hlsl-shaders-to-glsl-es
+            (cgc filename -profile glslv/glslf).
+            My test cg vertex shader compiled to glsl and was loaded in OpenGL code successfully, but the fragment shader output
+            glsl had an issue where it thought the output color was an input uniform. Switching the cg code output to be a struct
+            with an internal float4 color fixed the issue.
+            TODO test that this cg change will compile/run on PS3 and Vita.
+            Vita CMake config for auto-making VPK with shader files working.</p>
+
+            <h3>05/02/2025</h3>
+            <p>8:30pm - 9:30pm</p>
+            <p>Continue nvidia CG integration. Working on adding PS3 shader code and testing.
+            Added cmake compile cg to vpo/fpo macro.
+            Tested in RPCS3.</p>
+
+            <h3>05/03/2025</h3>
+            <p>9:30pm - 10:30pm</p>
+            <p>Continue nvidia CG integration. CG to glsl for switch working.
+            Had to modify SwitchTools.cmake to not combine nro gen args string, which were being wrapped in quotes and interpreted as a single argument.
+            Added to src/CMakeLists.txt romfs generation.
+            Tested on switch hardware.</p>
+
+            <h3>05/04/2025</h3>
+            <p>8:00pm - 10:00pm</p>
+            <p>Merge nvidia CG integration
+            Begin logging implementation.
+            Planning on remote logging to a gui interface.
+            Created TcpServer/TcpClient for linux.
+            Created starter/basic libgtkmm-4.0 gui.
+            Created LogMsgHdr, BuildLogMsg</p>
+
+            <h3>05/06/2025</h3>
+            <p>7:30pm - 10:00pm</p>
+            <p>Continue logging implementation.
+            Create Azul::Log function w/ variadic args so it works like printf.
+            Uses internal tcp client to write messages to gui.
+            Add Vita TcpClient/TcpServer using documentation from https://docs.vitasdk.org/group__SceNetUser.html.
+            Switch gui from libgtkmm-4.0 to libgtkmm-3.0 for glade</p>
+
+            <h3>05/07/2025</h3>
+            <p>8:00pm - 10:00pm</p>
+            <p>Continue logging implementation. Switch build running.
+            Noticed gui is missing some messages.
+            However, using netcat (nc -l 1234) all messages are read...</p>
+
+            <h3>06/13/2025</h3>
+            <p>6:00pm - 6:30pm, 8:00pm - 9:00pm, 11:00pm - 11:30pm</p>
+            <p>Continue logging implementation. Scrapping custom gui and just using netcat for now.
+            PS3 implementation identical to PC/Switch, just needed to include &lt;net/net.h&gt; and link against -lnet.
+            Start converting basic shaders from HLSL to CG. Shaders besides skinning written, compiled to glsl.
+            TODO test on consoles. Implemented windows TcpClient/Server.</p>
+
+            <h3>06/16/2025</h3>
+            <p>7:00pm - 9:00pm</p>
+            <p>Tested loading of all shaders on console. Added doxygen comments to current code. Added mkdocs/mkdoxy configuration.</p>
+
+            <h3>06/17/2025</h3>
+            <p>3:00pm - 4:00pm, 5:30pm - 6:30pm</p>
+            <p>Copied in header/cpp files from math library. Fixed compile errors related to anonymous structures.</p>
+
+            <h3>06/18/2025</h3>
+            <p>6:00pm - 7:30pm</p>
+            <p>Creating first ColorByVertex shader class. Added Camera Class.
+            Added Color class. Added Shader SetMat4() for uniform, SetActive().</p>
+
+            <h3>06/19/2025</h3>
+            <p>3:30pm - 4:30pm, 8:30pm - 10:00pm</p>
+            <p>Creating other shader object classes: ConstColor.
+            Attempting to test rendering a triangle with hardcoded OpenGL code in Game, but
+            nothing showing on screen currently. Turned out to be issue with the converted cg to glsl file.
+            Giving up on trying to convert from cg to glsl, re-writing cg shaders manually.
+            Tested with re-written glsl on PC, switch successfully - single red triangle renders.
+            On PC/Switch need to transpose Mat4's prior to sending to shader (set GL_TRUE to transpose in glUniformMatrix4fv).
+            On Vita no transpose necessary. TODO test PS3.</p>
+
+            <h3>06/20/2025</h3>
+            <p>9:00pm - 10:00pm</p>
+            <p>Testing basic triangle on PS3. Triangle not showing up, debugging</p>
+
+            <h3>06/26/2025</h3>
+            <p>7:00pm - 10:00pm</p>
+            <p>Fixed Debugging PS3 triangle. Needed to set the viewport every frame, and initialize a couple variables</p>
+
+            <h3>06/27/2025</h3>
+            <p>7:00pm - 8:00pm</p>
+            <p>Testing more shader objects. Tested/wrote GLSL for ColorByVertex, confirmed on PC and consoles.</p>
+
+          </div>
+        </div>
+          
+        <p>
+        <a href="../../../index.html">&lt;-- Back to Home</a>
+        </p>
+
+    </section>
+    
+</body>
+</html>
+
