@@ -150,6 +150,45 @@
             <p>Debugging PS3 Texture/ShaderObject_FlatTexture. Something to do with the Texture class - if texture not loaded, runs without crashing.
             Commented out STB library and created a manual 512x512 buffer of red pixels, still crashing also.</p>
 
+            <h3>07/14/2025</h3>
+            <p>7:30pm - 8:30pm</p>
+            <p>Figured out PS3 Texture crash - was issue with array-out-of bounds as the buffer being accessed was a 32-bit pointer, not 8-bit:</p>
+            <pre><code>// This code was crashing:
+bpp = 4;
+#ifdef AZUL_PS3_BUILD
+mBuffer = (u32*)rsxMemalign(128, width * height * bpp);
+// convert from RGBA to ARGB
+for (size_t i = 0; i < width * height * bpp; i += 4) {
+    u8 inR = pData4[i+0];
+    u8 inG = pData4[i+1];
+    u8 inB = pData4[i+2];
+    u8 inA = pData4[i+3];
+    mBuffer[i+0] = inA;
+    mBuffer[i+1] = inR;
+    mBuffer[i+2] = inG;
+    mBuffer[i+3] = inB;
+}
+rsxAddressToOffset(mBuffer, &mOffset);
+
+// This fixed the crash:
+bpp = 4;
+#ifdef AZUL_PS3_BUILD
+mBuffer = (u32*)rsxMemalign(128, width * height * bpp);
+u8* mBufferU8 = (u8*)mBuffer;
+// convert from RGBA to ARGB
+for (size_t i = 0; i < width * height * bpp; i += 4) {
+    u8 inR = pData4[i+0];
+    u8 inG = pData4[i+1];
+    u8 inB = pData4[i+2];
+    u8 inA = pData4[i+3];
+    mBufferU8[i+0] = inA;
+    mBufferU8[i+1] = inR;
+    mBufferU8[i+2] = inG;
+    mBufferU8[i+3] = inB;
+}
+rsxAddressToOffset(mBuffer, &mOffset);</code></pre>
+          <img src="./images/ps3_shader_flattexture_07_14_2025.png" width="600px"/>
+
           </div>
         </div>
           
