@@ -243,6 +243,21 @@ pShader->TransferUVCorrection(&uvMatrix);
 pShader->TransferScaleColor((Color*)&Colors::White);
           </code></pre>
 
+          <h3>07/26/2025</h3>
+          <p>1:00pm - 5:00pm</p>
+          <p>Started Mesh class and implemented MeshCube. Had to figure out mapping
+            shader vertex attribute locations for the different platforms. On PS3, can use
+            GCM_VERTEX_ATTRIB_POS/NORMAL/... which match the Cg shader locations. On Vita, these
+            don't exist (at least I don't think, haven't really looked). I tried copying the
+            values from the PS3 names but that didn't seem to work. Instead, I made a global
+            pointer to the current active shader, and set the attribute locations based on that
+            shader name in a switch case. On PC/Switch, I use the VertexSlot enum in conjunction
+            with using 'layout (location = X)' in the GLSL shaders and use the same values as
+            in VertexSlot, then all of the mesh vertex attributes can be bound even if the current
+            shader doesn't use them all.</p>
+
+          <img src="./images/MeshCube_07_26_2025.png" width="600px"/>
+
           </div>
         </div>
           
