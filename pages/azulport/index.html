@@ -199,6 +199,50 @@ rsxAddressToOffset(mBuffer, &mOffset);</code></pre>
           <p>7:30pm - 8:30pm</p>
           <p>Started sprite shader</p>
 
+          <h3>07/25/2025</h3>
+          <p>7:00pm - 9:00pm</p>
+          <p>Finished sprite shader and tested. In order to test, had to implement the sprite vertex buffer/position calculation logic
+            used internally in the GraphicsObject_Sprite and GameObjectSprite classes:</p>
+          <pre><code>
+cam.setViewport(0, 0, WindowWidth, WindowHeight);
+cam.setOrthographic(
+    -WindowWidth/2.0f, WindowWidth/2.0f,
+    -WindowHeight/2.0f, WindowHeight/2.0f,
+    1.0f, 1000.0f
+);
+cam.setOrientAndPosition(Vec3(0,1,0), Vec3(0,0,-1), Vec3(0,0,2));
+cam.updateCamera();
+...
+float texWidth = 512.0f;
+float texHeight = 512.0f;
+float texImage[4] = {0.0f, 0.0f, texWidth, texHeight};
+
+float texScreenRect[4] = {WindowWidth/2.0f, WindowHeight/2.0f, 256.0f, 256.0f};
+
+float origWidth = texScreenRect[2];
+float origHeight = texScreenRect[3];
+float origPosX = texScreenRect[0];
+float origPosY = texScreenRect[1];
+
+float w = texImage[2] / texWidth;
+float h = texImage[3] / texHeight;
+float u = texImage[0] / texWidth;
+float v = texImage[1] / texHeight;
+Scale ScaleUV(w, h, 1.0f);
+Trans TransUV(u, v, 0.0f);
+Mat4 uvMatrix = ScaleUV * TransUV;
+Mat4 origMatrix = Scale(origWidth, origHeight, 1.0f);
+Mat4 worldMat = Scale(1.0f, 1.0f, 1.0f) * Rot(Rot1::Z, 0.0f) * Trans(origPosX, origPosY, 0.0f);
+
+Trans toOriginLowerLeft(-cam.getScreenWidth()/2.0f, -cam.getScreenHeight()/2.0f, 0.0f);
+Mat4 tmpMatrix = origMatrix * worldMat * toOriginLowerLeft;
+
+pShader->ActivateShader();
+pShader->TransferWorldViewProj(&cam, &tmpMatrix);
+pShader->TransferUVCorrection(&uvMatrix);
+pShader->TransferScaleColor((Color*)&Colors::White);
+          </code></pre>
+
           </div>
         </div>
           
