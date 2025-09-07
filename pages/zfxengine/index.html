@@ -628,6 +628,18 @@ cmake --build .
         <h3>09/04/2025 - 10:00pm - 11:00pm</h3>
         <p>Chapter 7 demo 0 room cube rendering; enabled back-face culling and set winding order to clockwise.</p>
 
+        <h3>09/05/2025 - 9:00pm - 10:00pm</h3>
+        <p>Debugging Vita sprite shader/font rendering, squares are showing instead of text.</p>
+
+        <h3>09/06/2025 - 7:00pm - 10:30pm</h3>
+        <p>Fixed Vita font rendering; the cg vertex shader needed to send the vertex normal to the fragment shader
+            even though it wasn't used, in order to prevent it being optimized out and thus messing up the vertex
+            attributes.</p>
+        <p>Also fixed crash on Switch, the RenderDevice class mStage int wasn't being initialized to zero and had
+            a garbage value used to being accessed the projection matrices array.</p>
+        <p>Chapter 7 demo 0 working with color uniform in the fragment shader:</p>
+        <img src="./images/vitaChp7_0_09062025.jpg" width="600px"/>
+
         <p>
         <a href="../../index.html">&lt;-- Back to Home</a>
         </p>
