@@ -644,6 +644,90 @@ cmake --build .
         <p>Chapter 7 demo 1 working. Note on PS3 (and Vita maybe?) the texture samplers cannot be given uniform
         values from the CPU side like on PC, they seem to be automatically mapped to bound texture 0,1,2,...</p>
 
+        <h3>09/21/2025 - 1:00pm - 6:00pm</h3>
+        <p>Chapter 7 demos 1,2,3 are done. Debugging chapter 7 demos on PS3 hardware, not just in emulator.
+        There were a couple of bugs/issues.</p>
+        <p>First, the default video mode was being selected and setting to a resolution of 960x1080, instead of 1280x720.
+        This was causing a weird aspect ratio compared to what was expected:</p>
+        <pre><code>const size_t RESOLUTION_ID_COUNT = 4;
+u32 resolutionIds[RESOLUTION_ID_COUNT] = {
+    VIDEO_RESOLUTION_720,
+    VIDEO_RESOLUTION_960x1080, // This was the first entry, which wasn't being selected by RPCS3 but was on hardware
+    VIDEO_RESOLUTION_480,
+    VIDEO_RESOLUTION_576
+};
+for (size_t i=0; i&lt;RESOLUTION_ID_COUNT; i++) {
+rval = videoGetResolutionAvailability(VIDEO_PRIMARY, resolutionIds[i], VIDEO_ASPECT_AUTO, 0);
+...</code></pre>
+        <p>Second, when rendering text all of the letters were showing as the last character in the input string.
+        This had something to do with the shader uniform values not being applied to the corresponding call to
+        render the font rectangle vertex buffer. Instead, the last set uniform value was being applied to all of
+        the render calls. I wasn't able to figure out why; instead, I calculate the screen-space vertex positions
+        and UV values on the CPU side, and update separate vertices for each character to the GPU directly,
+        with a different shader than the other platforms:</p>
+        <pre><code>// Previous PS3 code:
+    Vector uvScale(ci.uWidth, ci.vHeight, 0.0f, 0.0f);
+    Vector uvTranslation(ci.u, ci.v, 0.0f, 0.0f);
+    Vector screenPos(x + xOffset + scrWidth*0.5f, y - yOffset, 0.0f, 0.0f);
+    Color color = {r, g, b, 1.0f};
+
+    SetShaderConstant(ShaderType::Vertex, DataType::Vector, "uScreenPos", &screenPos);
+    SetShaderConstant(ShaderType::Vertex, DataType::Vector, "uScreenScale", &screenScale);
+    SetShaderConstant(ShaderType::Pixel, DataType::Vector, "uUvScale", &uvScale);
+    SetShaderConstant(ShaderType::Pixel, DataType::Vector, "uUvTranslation", &uvTranslation);
+    SetShaderConstant(ShaderType::Pixel, DataType::Vector, "uColor", &color);
+    mpVertMan->Render(fnt.nVertBufID); // single 2-triangle vertex buffer, modified by the above shader uniforms
+
+    x += xAdvance;
+}
+
+// Updated PS3 code:
+Vertex* pVerts = &amp;((Vertex*)mpVertMan->mVertBufs[fnt.nVertBufID].pVerts)[mFontVertCount]; // pointer to GPU vertex memory
+    ...
+    const float xOffs = x + xOffset;
+    const float yOffs = y - yOffset;
+    const float scrWHalf = scrWidth * 0.5f;
+    const float scrHHalf = scrHeight * 0.5f;
+                // pos                                          normal               texcoord
+    pVerts[0] = { xOffs - scrWHalf, yOffs + scrHHalf, 0.0f,     0.0f, 0.0f, 0.0f,    ci.u + 0.0f, ci.v + ci.vHeight}; // top left
+    pVerts[1] = { xOffs + scrWHalf, yOffs + scrHHalf, 0.0f,     0.0f, 0.0f, 0.0f,    ci.u + ci.uWidth, ci.v + ci.vHeight}; // top right
+    pVerts[2] = { xOffs - scrWHalf, yOffs - scrHHalf, 0.0f,     0.0f, 0.0f, 0.0f,    ci.u + 0.0f, ci.v + 0.0f}; // bottom left
+
+    pVerts[3] = { xOffs + scrWHalf, yOffs + scrHHalf, 0.0f,     0.0f, 0.0f, 0.0f,    ci.u + ci.uWidth, ci.v + ci.vHeight}; // top right
+    pVerts[4] = { xOffs + scrWHalf, yOffs - scrHHalf, 0.0f,     0.0f, 0.0f, 0.0f,    ci.u + ci.uWidth, ci.v + 0.0f}; // bottom right
+    pVerts[5] = { xOffs - scrWHalf, yOffs - scrHHalf, 0.0f,     0.0f, 0.0f, 0.0f,    ci.u + 0.0f, ci.v + 0.0f}; // bottom left
+
+    pVerts += 6;
+    renderVertCount += 6;
+
+    x += xAdvance;
+}
+Color color = {r, g, b, 1.0f};
+SetShaderConstant(ShaderType::Pixel, DataType::Vector, "uColor", &amp;color);
+mpVertMan->Render(fnt.nVertBufID, mFontVertCount, renderVertCount);
+mFontVertCount += renderVertCount;</code></pre>
+
+        <p>Finally, the dot product call in the cg shader on PS3 was not behaving as expected, and I wrote a custom one instead:</p>
+        <pre><code>// built-in dot product on PS3 doesn't work as expected
+float myDot(float3 vA, float3 vB)
+{
+    return
+        vA.x*vB.x +
+        vA.y*vB.y +
+        vA.z*vB.z;
+}
+
+FragShaderOutput main(VertexShaderOutput inData)
+{
+    FragShaderOutput output;
+
+    float3 lDir = -1.0*uLightDir.xyz;
+    float fL = myDot(lDir, inData.normal);
+    ...</code></pre>
+
+        <p>And the result running on PS3 hardware:</p>
+        <img src="./images/ps3Chp7_2_09212025.jpg" width="600px"/>
+
         <p>
         <a href="../../index.html">&lt;-- Back to Home</a>
         </p>
