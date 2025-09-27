@@ -728,6 +728,61 @@ FragShaderOutput main(VertexShaderOutput inData)
         <p>And the result running on PS3 hardware:</p>
         <img src="./images/ps3Chp7_2_09212025.jpg" width="600px"/>
 
+        <h3>09/27/2025 - 12:30pm - 2:30pm</h3>
+        <p>Chapter 7 demo 4 working on pc/ps3/vita/switch. Was able to implement the additive blending point-light
+        multipass shader, as opposed to last time which used a single shader. For the point light matrix, I had to
+        not transpose it when calculating on the CPU, unlike the book, presumably due to using OpenGL instead of
+        D3D:</p>
+        <pre><code>static Zfx::Matrix CalcTransAttenNoRot(const Zfx::Vector&amp; vcPos, float fRadius)
+...
+mA = mTL * mS;
+mX = mA * mB2;
+
+//mTP.TransposeOf(mX); // needed in book, but not for us
+mTP = mX;
+return mTP;</code></pre>
+
+        <p>Then, translating the lighting-pass shader from assembly to glsl/cg was a bit tricky.
+        Documentation on the dot product and bias instructions is available
+        <a href="https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dp3---ps">here</a> and
+        <a href="https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx9-graphics-reference-asm-ps-registers-modifiers-signed-scale">here</a>.
+        The result fragment shader in glsl is:</p>
+        <pre><code>#version 330 core
+
+in vec3 fragNormal;
+in vec3 fragPosLightSpace;
+in vec2 fragTexCoord;
+
+uniform vec4 uLightColor;
+
+uniform sampler2D uTextureDiffuse;
+
+out vec4 outFragColor;
+
+void main()
+{
+    // convert from 0..1 range to -1.0..+1.0
+    vec3 fragPosOffset = (fragPosLightSpace - 0.5) * 2.0;
+
+    // distance squared to light center, max value of 1
+    float D2 = min(dot(fragPosOffset, fragPosOffset), 1.0);
+
+    // light fall off/attenuation based on squared distance from light
+    vec3 litColor = (1.0 - D2) * uLightColor.rgb;
+
+    // combine with texture diffuse color
+    litColor = texture(uTextureDiffuse, fragTexCoord).rgb * litColor;
+
+    outFragColor = vec4(litColor, 1.0);
+}</code></pre>
+
+        <p>Then translating to cg was no problem, remembering to use myDot dot product due to ps3 weirdness.
+        And the result:</p>
+
+        <video controls width="640" height="480">
+            <source src="./images/chp7Demo3PS3_09_27_2025.webm" type="video/webm"/>
+        </video>
+
         <p>
         <a href="../../index.html">&lt;-- Back to Home</a>
         </p>
