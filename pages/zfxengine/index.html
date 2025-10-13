@@ -783,6 +783,23 @@ void main()
             <source src="./images/chp7Demo3PS3_09_27_2025.webm" type="video/webm"/>
         </video>
 
+        <h3>10/13/2025 - 5:30pm - 6:30pm</h3>
+        <p>Chapter 7 demo 5 working. Had an issue on PS3 where in the fragment shader, the textures being used
+        were switched. Specifying on the CPU-side by setting the sampler uniforms to 0/1 doesn't work on PS3.
+        Additionally tried specifying a constant buffer index (BUFFER[0]/BUFFER[1]) as shown in this pdf didn't
+        work either:
+        <a href="https://developer.download.nvidia.com/cg/Cg_2.0/2.0.0010/Cg-2.0.pdf">link</a>. I resolved it by
+        changing the fragment shader to sample the desired first texture into a variable before the second texture
+        is used. Here is the result with the textures switched:</p>
+
+        <img src="./images/chp7Demo4PS3_SwitchedTextures_10_13_2025.png" width="600px"/>
+
+        <p>And working properly:</p>
+
+        <video controls>
+            <source src="./images/chp7Demo4PS3Working-2025-10-13_19.46.43.webm" type="video/webm"/>
+        </video>
+
         <p>
         <a href="../../index.html">&lt;-- Back to Home</a>
         </p>
