@@ -827,7 +827,7 @@ void main()
         <p>Started chapter 9 input devices. Made initial impls for PC and Switch.</p>
         
         <h3>11/06/2025 - 6:00pm - 7:00pm</h3>
-        <p>Finished chapter 9 demo. Fixed a bug when drawing text on PS3 - I needed to double-buffer the rendered/
+        <p>Finished chapter 9 demo - input devices. Fixed a bug when drawing text on PS3 - I needed to double-buffer the rendered/
         generated vertices, otherwise without any other 3d objects being rendered, the values were being overwritten
         before the GPU was finished with them.</p>
         <p>For the switch/vita/ps3 joysticks, I normalized their values in the range -1..1. Then for PC the equivalent
@@ -836,6 +836,13 @@ void main()
         <video controls width="640" height="480">
             <source src="./images/chp9InputDemo-2025-11-06_19.03.21.clipped.webm" type="video/webm"/>
         </video>
+        
+        <h3>11/07/2025 - 8:00pm - 9:00pm</h3>
+        <p>Finished chapter 10 - audio. I used SDL_mixer on all platforms since it was available
+        (SDL1 on PS3 and SDL2 on PC/Vita/Switch). It was a bit of a struggle to get the link libraries
+        in the right order in each CMakeLists.txt entry. Other than that, the implementation went
+        smoothly. Two points to note is that right now only Mix_Chunks are being used, which are meant
+        for sound effects not long playing background music. Additionally, 3D sound is not implemented.</p>
 
         <p>
         <a href="../../index.html">&lt;-- Back to Home</a>
