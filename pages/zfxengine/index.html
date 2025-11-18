@@ -843,6 +843,34 @@ void main()
         in the right order in each CMakeLists.txt entry. Other than that, the implementation went
         smoothly. Two points to note is that right now only Mix_Chunks are being used, which are meant
         for sound effects not long playing background music. Additionally, 3D sound is not implemented.</p>
+        
+        <h3>11/12/2025 - 10:00pm - 11:00pm</h3>
+        <p>Start Thread class. This will be used for running blocking socket functions in the background.
+        For PC/Switch/Vita this will use std::thread while on PS3 the PSL1GHT custom ppu thread functions
+        are used. Untested on PS3 yet.</p>
+        
+        <h3>11/14/2025 - 9:00pm - 11:00pm</h3>
+        <p>Initial Thread class working. I found out on Windows you need to be sure to include
+        &lt;thread&gt; prior to any Windows platform headers, which is used for the Windows socket
+        (winsock) implementation. I also moved the specific Windows includes into Socket.cpp, as
+        including them in the Socket.h header was causing issues with DrawText (which was being
+        redefined to DrawTextA or something similar).</p>
+        
+        <h3>11/15/2025 - 5:30pm - 6:30pm</h3>
+        <p>Vita Thread class impl working. Had to switch from std::thread to the Vita SDK sce* custom
+        functions, as calling thread.join was crashing. From searching it seems it isn't officially
+        supported.</p>
+        
+        <h3>11/16/2025 - 9:30pm - 10:30pm</h3>
+        <p>Finish chp 11 client test on PC. For the socket send call I needed to add MSG_NOSIGNAL to the
+        flags parameter, otherwise the code would crash when the client disconnected. There
+        was also a bug where the send command was using the server socket instead of the client's.</p>
+        
+        <h3>11/17/2025 - 5:30pm - 7:30pm</h3>
+        <p>Vita chp 11 server test working. Had to change the Packet struct to be packed and make the
+        void pointer member a uint64_t instead due to the size of a pointer being different on PC vs Vita.
+        The conversion is done just by casting to/from the void pointer. Additionally, there was a bug
+        in the vita impl of the socket Send function using the server socket instead of the provided client socket.</p>
 
         <p>
         <a href="../../index.html">&lt;-- Back to Home</a>
