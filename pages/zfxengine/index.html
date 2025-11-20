@@ -872,6 +872,12 @@ void main()
         The conversion is done just by casting to/from the void pointer. Additionally, there was a bug
         in the vita impl of the socket Send function using the server socket instead of the provided client socket.</p>
 
+        <h3>11/19/2025 - 6:30pm - 8:00pm</h3>
+        <p>Fixed PS3 socket/chp 11 server test. I had to endian swap the Packet header fields on PS3
+        before and after sending/receiving them to be interoperable with the other systems. I also
+        was missing a call to netInitalize(). Finally, giving a sockaddr argument to accept() seemed
+        to cause it to fail.</p>
+
         <p>
         <a href="../../index.html">&lt;-- Back to Home</a>
         </p>
