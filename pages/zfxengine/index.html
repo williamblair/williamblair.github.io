@@ -878,6 +878,38 @@ void main()
         was missing a call to netInitalize(). Finally, giving a sockaddr argument to accept() seemed
         to cause it to fail.</p>
 
+        <h3>12/18/2025 - 9:00pm - 11:00pm</h3>
+        <p>Finished chp 11 server/client demo using the NetworkDevice struct instead of the Socket object.
+        Fixed two bugs: first, the struct size argument to connect() was wrong, which only caused an
+        error on PS3 for some reason:</p>
+<pre><code>if (connect(
+        m_skSocket,
+        (struct sockaddr*)&saServerAddress,
+        sizeof(saServerAddress)) < 0) { // was sizeof(sockaddr)
+</code></pre>
+
+        <p>Additionally, I didn't realize the thread user argument on vita was actually a double void
+        pointer instead of a regular pointer, and needed to change the network device threads to:</p>
+<pre><code>#ifdef ZFX_VITA_BUILD
+int ThreadedNetworkDevice::ServerThreadFcn(SceSize, void* _pArg)
+#else
+void ThreadedNetworkDevice::ServerThreadFcn(void* pArg)
+#endif
+{
+#ifdef ZFX_VITA_BUILD
+    void* pArg = *(void**)_pArg;
+#endif
+    ThreadedNetworkDevice* pThis = (ThreadedNetworkDevice*)pArg;
+</code></pre>
+
+        <p>Which I figured out by looking at the SDL Vita implementation:
+        <a href="https://github.com/Rinnegatamante/SDL-Vita/blob/sdl12_gl/src/thread/psp2/SDL_systhread.c">
+        SDL_systhread.c</a></p>
+
+        <video width="1024" controls>
+            <source src="./images/chp11ClientServerDemo.webm" type="video/webm"/>
+        </video>
+
         <p>
         <a href="../../index.html">&lt;-- Back to Home</a>
         </p>
