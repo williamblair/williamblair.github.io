@@ -941,7 +941,7 @@ void ThreadedNetworkDevice::ServerThreadFcn(void* pArg)
         buffer. Updated vertex cache manager to allow updating indices also instead of
         just vertices, and ability to render subset of indices (untested yet).</p>
 
-        <h3>4:30pm - 6:00pm</h3>
+        <h3>01/09/2026 - 4:30pm - 6:00pm</h3>
         <p>Chp 13 demo attemping to run, but reading an incorrect value for number of vertices partway
         through the testlevel.pbp load. I found online it seems that in the book CD some files
         are corrupted, including the test level:</p>
@@ -951,6 +951,16 @@ void ThreadedNetworkDevice::ServerThreadFcn(void* pArg)
         <a href="https://web.archive.org/web/20060721001423/http://stefan.zfx.info/3dgep.html">
         https://web.archive.org/web/20060721001423/http://stefan.zfx.info/3dgep.html</a>
         thanks to the wayback archive. Haven't tested the updated files yet.</p>
+
+        <h3>01/11/2026 - 3:00pm - 4:00pm</h3>
+        <p>Loading the updated testlevel.pbp all the way now with the updated file. Uncovered
+        some bugs: a minus sign instead of equals in Polygon, and a duplicated delete[] in Octree.
+        However, I still think there is an issue at least in Octree or Polygon, as the level isn't
+        rendering correctly:</p>
+
+        <video controls width="640">
+            <source src="./images/chp13OctreeRenderIssue01112026.webm" type="video/webm"/>
+        </video>
 
         <p>
         <a href="../../index.html">&lt;-- Back to Home</a>
