@@ -970,6 +970,63 @@ void ThreadedNetworkDevice::ServerThreadFcn(void* pArg)
         <img src="./images/RenderDocTestLevelCorrectVsInput_01_14_2026.png"/><br/>
         <img src="./images/chp13DemoCombinedNoTree_01_14_2026.png"/>
 
+        <h3>01/17/2026 - 6:30pm - 8:00pm</h3>
+        <p>Fixed the Octree-split and rendered level, as well as fixed the MovementControllers.
+        For the movement, I changed from how the book was calculating the view
+        matrix:</p>
+        <pre><code>// book
+#if 0
+    qFrame.MakeFromEuler(m_fRotX, m_fRotY, m_fRotZ);
+    m_Quat *= qFrame;
+    m_Quat.GetMatrix(&mat);
+
+    m_vcRight.x = mat._11;
+    m_vcRight.y = mat._21;
+    m_vcRight.z = mat._31;
+
+    m_vcUp.x = mat._12;
+    m_vcUp.y = mat._22;
+    m_vcUp.z = mat._32;
+
+    m_vcDir.x = mat._13;
+    m_vcDir.y = mat._23;
+    m_vcDir.z = mat._33;
+#endif
+
+// Bj
+#if 1
+    Matrix matT, matRx, matRy, matRz;
+    matT.Identity();
+    matRx.Identity();
+    matRy.Identity();
+    matRz.Identity();
+    
+    matT.Translate(m_vcPos.x, m_vcPos.y, m_vcPos.z);
+    matRx.RotaX(m_fRotX);
+    matRy.RotaY(m_fRotY);
+    matRz.RotaZ(m_fRotZ);
+    mat = matT * matRz * matRy * matRx;
+
+    m_vcRight.x = mat._11;
+    m_vcRight.y = mat._21;
+    m_vcRight.z = mat._31;
+
+    m_vcUp.x = mat._12;
+    m_vcUp.y = mat._22;
+    m_vcUp.z = mat._32;
+
+    m_vcDir.x = mat._13;
+    m_vcDir.y = mat._23;
+    m_vcDir.z = mat._33;
+#endif</code></pre>
+
+        <p>Although technically the translate portion is unused I believe.
+        Then for rendering from the Octree calculated level polygons, there
+        was an error with how I was combining the vertices into a single buffer;
+        I was offsetting the indices for the current polygon by the current number
+        of total indices, instead of the current number of total vertices. Next,
+        I need to handle rendering in wireframe instead of solid triangles.</p>
+
         <p>
         <a href="../../index.html">&lt;-- Back to Home</a>
         </p>
