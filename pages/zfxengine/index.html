@@ -1033,6 +1033,24 @@ void ThreadedNetworkDevice::ServerThreadFcn(void* pArg)
 
         <img src="./images/chp13DemoWireframeFontIssue_1_28_2026.png"/>
 
+        <h3>02/09/2026 - 6:30pm - 8:30pm</h3>
+        <p>Font rendering fixed for wireframe. Fixed issue on Vita where functions called
+        within assert() were not actually being called - mainly this was causing the renderer
+        to not be initialized and thus crashing when being used. The "fix" was to just to not
+        use assert. Not sure why this wasn't an issue before; I might have changed some CMake
+        settings, or am using a different vitasdk version now? I know at least the VitaGL version
+        has changed as the vglEnd() function was removed which caused a renderer compile error.
+        For vita/switch I made the use of BSP/Octree disabled by default, which on Vita I think
+        was causing a crash due to attempting to pre-allocate too many vertices that only the PC
+        can handle. Technically I should instead make arbitrary vertex lists renderable instead
+        of needing buffers but just for this demo, the book says the BSP/Octrees aren't really
+        meant to be used for rendering and this demo is just for demonstration.
+        TODO still is PS3 implementation/updates.</p>
+
+        <video controls width="640">
+            <source src="./images/chp13Demo_02_11_2026.webm" type="video/webm"/>
+        </video>
+
         <p>
         <a href="../../index.html">&lt;-- Back to Home</a>
         </p>
