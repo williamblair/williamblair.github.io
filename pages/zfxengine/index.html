@@ -1055,6 +1055,25 @@ void ThreadedNetworkDevice::ServerThreadFcn(void* pArg)
         <p>PS3 chapter 13 test working. Had the same issue with the render init code within assert
         not being called. Also added endian swapping to the level file loading.</p>
 
+        <h3>04/25/2026 - 3:00pm - 8:30pm</h3>
+        <p>I've been working on chapter 14 support class code, as well as adding support for
+        dynamic/on-the-fly vertex rendering (as opposed to from a pre-created vertex buffer),
+        with the goal of adding ImGUI support for the editor component, instead of the book's
+        use of the Windows API gui.</p>
+        <p>Found that there was another update to VitaGL, which now experimentally supports
+        auto converting from GLSL to CG for its shaders, which means I had to change the
+        parameter to glCreateShader to indicate the input shader code is already CG:</p>
+        <pre><code>glCreateShader(GL_CG_VERTEX_SHADER_EXT);
+glCreateShader(GL_CG_FRAGMENT_SHADER_EXT);</code></pre>
+
+        <p>
+        I have a test program started that will eventually get updated to test ImGUI:
+        </p>
+
+        <video controls width="640">
+            <source src="./images/testDynamicVerts04252026.webm" type="video/webm"/>
+        </video>
+
         <p>
         <a href="../../index.html">&lt;-- Back to Home</a>
         </p>
