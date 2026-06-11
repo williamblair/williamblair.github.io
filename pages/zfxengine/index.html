@@ -1085,6 +1085,42 @@ glCreateShader(GL_CG_FRAGMENT_SHADER_EXT);</code></pre>
             <source src="./images/testDynamicVertsPs304292026.webm" type="video/webm"/>
         </video>
 
+        <h3>06/10/2026 - 7:00pm - 11:00pm</h3>
+        <p>Updating the backend of this project to use my HopsLib library. Got the chapter 6 demo
+        working, plus made the demo rotate/cycle through each model to inspect them a bit more:</p>
+
+        <video controls width="640">
+            <source src="./images/zfxHopsChapter6Demo06102026.webm" type="video/webm"/>
+        </video>
+
+        <p>I updated HopsLib to use CMake for this.
+        Fixed two issues on PS3 - first, the models weren't rendering if you didn't explicitly
+        set the viewport each frame. Resolved by setting the viewport within HopsLib during the
+        Update call. Second, found specifying POSITION/TEXCOORD0,... if using an input data
+        structure in the cg shader caused rendering to not work:</p>
+        <pre><code> // change from this
+struct AppData
+{
+    float3 position : POSITION;
+    float2 texCoord : TEXCOORD0;
+};
+...
+VertexShaderOutput main(AppData inData)
+
+// To this
+struct AppData
+{
+    float3 position;
+    float2 texCoord;
+};
+...
+VertexShaderOutput main(AppData inData)</code></pre>
+
+        <p>The updated project source code is here:
+        <a href="https://bitbucket.org/williamblair/zfxhops">
+        https://bitbucket.org/williamblair/zfxhops
+        </a></p>
+
         <p>
         <a href="../../index.html">&lt;-- Back to Home</a>
         </p>
