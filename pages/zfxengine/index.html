@@ -1148,9 +1148,25 @@ VertexShaderOutput main(AppData inData)</code></pre>
         <img src="./images/iqmIndicesError_2_08192026.png" width="640px"/>
         <img src="./images/iqmIndices_08192026.png" width="640px"/>
 
+        <h3>09/19/2026</h3>
+        <p>IQM model working again in HopsLib. Had two issues when attempting
+        to test on PS3: first I wasn't fully endian swapping one of the IQM
+        data arrays during load. Second, in the test shader I was using I wasn't
+        passing through the iqm vertex normals from the vertex shader to the fragment
+        shader so they were getting optimized out
+        during load which resulted in a vertex data format mismatch from the PPU
+        side. I improved this implementation compared to the last time by adding
+        a Iqm::Instance class so that multiple instances of 1 IQM model can share
+        data instead of duplicating it for each instance.</p>
+
+        <video controls width="640">
+            <source src="./images/SwitchVita09182026.webm" type="video/webm"/>
+        </video>
+
         <p>
         <a href="../../index.html">&lt;-- Back to Home</a>
         </p>
+
 
         </div>
     </section>
